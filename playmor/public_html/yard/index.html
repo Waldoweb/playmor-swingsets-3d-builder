@@ -463,10 +463,9 @@
       }
 
       .custom-controls-line {
-        height: 55px;
+        height: 100px;
         width: 3px;
         margin: 0 10px;
-        margin-top: -2.5px;
         background: rgba(255, 255, 255, 0.8);
       }
 
@@ -477,8 +476,9 @@
       .custom-controls-color {
         width: 50px;
         height: 50px;
-        margin-right: 10px;
+        margin-right: 5px;
         border-radius: 26px;
+        cursor: pointer;
         border: 2px solid white;
       }
 
@@ -509,6 +509,62 @@
         height: 50px;
         width: 70px;
         text-align: left;
+      }
+
+      .custom-controls-unified {
+        display: none;
+        padding: 15px;
+        border-radius: 20px;
+        background: rgba(0, 0, 0, 0.5);
+        position: absolute;
+        top: calc(100vh - 280px);
+        left: calc(50vw - 200px);
+        align-items: center;
+        flex-direction: row;
+      }
+
+      .custom-controls-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        gap: 10px;
+      }
+
+      .custom-controls-row .custom-controls-text {
+        min-width: 60px;
+      }
+
+      .custom-controls-separator {
+        color: white;
+        font-weight: bold;
+        margin: 0 5px;
+      }
+
+      .custom-controls-color-canopy,
+      .custom-controls-color-poly,
+      .custom-controls-color-frame,
+      .custom-controls-color-trim {
+        display: flex;
+        gap: 5px;
+      }
+
+      .roof-type-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-right: 15px;
+      }
+
+      .roof-type-label {
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        margin-right: 10px;
+      }
+
+      .cedar-tan-split {
+        background: linear-gradient(90deg, #8B4513 50%, #d3c6a6 50%);
+        border: 2px solid white;
       }
 
       #info-modal-container {
@@ -666,9 +722,9 @@
         width: 100%;
       }
 
-      .custom-controls-color-canopy {
+      /* .custom-controls-color-canopy {
         display: contents;
-      }
+      } */
 
       .custom-controls-color-poly {
         display: contents;
@@ -1270,108 +1326,54 @@
           </h6>
         </div>
       </div>
-      <div
-        class="custom-controls"
-        style="display: none; left: calc(-164.5px + 50vw)"
-      >
+      <div class="custom-controls-unified" style="display: none">
         <div id="custom-controls-delete">
-          <img
-            src="images/image_6eedc2a9.png"
-          />
+          <img src="images/image_6eedc2a9.png" />
         </div>
         <div class="custom-controls-line"></div>
-        <div class="custom-controls-color-container">
-          <div
-            onclick="Colorize ( 0x004983)"
-            class="custom-controls-color custom-controls-poly-color"
-            style="background-color: #004983"
-          ></div>
-          <div
-            onclick="Colorize ( 0x01664b)"
-            class="custom-controls-color custom-controls-poly-color"
-            style="background-color: #01664b"
-          ></div>
-          <div
-            onclick="Colorize ( 0xffcb05)"
-            class="custom-controls-color custom-controls-poly-color"
-            style="background-color: #ffcb05"
-          ></div>
-          <div
-            onclick="Colorize ( 0x93293b)"
-            class="custom-controls-color custom-controls-poly-color"
-            style="background-color: #93293b"
-          ></div>
-          <div
-            onclick="Colorize ( 0x5b5e67)"
-            class="custom-controls-color custom-controls-poly-color"
-            style="background-color: #5b5e67"
-          ></div>
-        </div>
-      </div>
 
-      <div class="custom-controls-roof" style="display: none">
-        <div class="custom-controls-roof-content">
-          <div class="custom-controls-text">CANOPY</div>
-          <div class="custom-controls-line"></div>
-          <div class="custom-controls-color-canopy">
-            <div
-              onclick="Change_roof_canopy_color ( 0x004983)"
-              class="custom-controls-color custom-controls-poly-color"
-              index="1"
-              style="background-color: #004983"
-            ></div>
-            <div
-              onclick="Change_roof_canopy_color ( 0x01664b)"
-              class="custom-controls-color custom-controls-poly-color"
-              index="2"
-              style="background-color: #01664b"
-            ></div>
-            <div
-              onclick="Change_roof_canopy_color ( 0x5b5e67)"
-              class="custom-controls-color custom-controls-poly-color"
-              index="3"
-              style="background-color: #5b5e67"
-            ></div>
-            <div
-              onclick="Change_roof_canopy_color ( 0xffcb05)"
-              class="custom-controls-color custom-controls-poly-color"
-              index="4"
-              style="background-color: #ffcb05"
-            ></div>
-            <div
-              onclick="Change_roof_canopy_color ( 0x93293b)"
-              class="custom-controls-color custom-controls-poly-color"
-              index="5"
-              style="background-color: #93293b"
-            ></div>
-            <div
-              onclick="Change_roof_canopy_color ( `tricolors` )"
-              class="custom-controls-color custom-controls-poly-color"
-              index="6"
-              style="background-color: tricolors"
-            >
-              <img
-                src="images/image_ae45a138.png"
-              />
+        <div style="display: block; margin-bottom: -10px;">
+          <!-- Roof Section -->
+          <div class="custom-controls-row" id="roof-section" style="display: none;">
+            <div class="custom-controls-text">ROOF:</div>
+            <div class="roof-type-group">
+              <div class="custom-controls-color-canopy">
+                <div onclick="Change_roof_canopy_color(0x004983)" class="custom-controls-color" style="background-color: #004983" title="Blue"></div>
+                <div onclick="Change_roof_canopy_color(0x01664b)" class="custom-controls-color" style="background-color: #01664b" title="Green"></div>
+                <div onclick="Change_roof_canopy_color(0xffcb05)" class="custom-controls-color" style="background-color: #ffcb05" title="Yellow"></div>
+                <div onclick="Change_roof_canopy_color(0x93293b)" class="custom-controls-color" style="background-color: #93293b" title="Red"></div>
+                <div onclick="Change_roof_canopy_color(0x5b5e67)" class="custom-controls-color" style="background-color: #5b5e67" title="Gray"></div>
+                <div onclick="Change_roof_canopy_color('tricolors')" class="custom-controls-color" style="background-color: tricolors" title="Tricolor">
+                  <img src="images/image_ae45a138.png" />
+                </div>
+              </div>
+            </div>
+            <div class="roof-type-group" id="poly-group">
+              <span class="roof-type-label">POLY</span>
+              <div class="custom-controls-color-poly">
+                <div onclick="Change_roof_poly_color(0x01664b)" class="custom-controls-color" style="background-color: #01664b" title="Green"></div>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="custom-controls-roof-content">
-          <div class="custom-controls-text">POLY</div>
-          <div class="custom-controls-line"></div>
-          <div class="custom-controls-color-poly">
-            <div
-              onclick="Change_roof_poly_color ( 0x01664b)"
-              class="custom-controls-color custom-controls-poly-color"
-              index="1"
-              style="background-color: #01664b"
-            ></div>
-            <div
-              onclick="Change_roof_poly_color ( 0x5b5e67)"
-              class="custom-controls-color custom-controls-poly-color"
-              index="2"
-              style="background-color: #5b5e67"
-            ></div>
+
+          <!-- Frame Section -->
+          <div class="custom-controls-row" id="frame-section" style="display: none;">
+            <div class="custom-controls-text">FRAME:</div>
+            <div class="custom-controls-color-frame">
+              <div onclick="Change_frame_color('cedar_tan')" class="custom-controls-color cedar-tan-split" title="Cedar/Tan"></div>
+              <div onclick="Change_frame_color(0xffffff)" class="custom-controls-color" style="background-color: #ffffff; border: 2px solid #ccc;" title="White"></div>
+            </div>
+          </div>
+
+          <!-- Trim Section -->
+          <div class="custom-controls-row" id="trim-section" style="display: none;">
+            <div class="custom-controls-text">TRIM:</div>
+            <div class="custom-controls-color-trim">
+              <div onclick="Colorize(0x01664b)" class="custom-controls-color" style="background-color: #01664b" title="Green"></div>
+              <div onclick="Colorize(0x004983)" class="custom-controls-color" style="background-color: #004983" title="Blue"></div>
+              <div onclick="Colorize(0x93293b)" class="custom-controls-color" style="background-color: #93293b" title="Red"></div>
+              <div onclick="Colorize(0x5b5e67)" class="custom-controls-color" style="background-color: #5b5e67" title="Gray"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -3367,234 +3369,24 @@
                 let splits = picked_mesh.name.toLowerCase().split(",");
 
                 if (splits[0].toLowerCase().startsWith("flag")) {
+                  // Handle flags with the unified popup but only show trim colors
                   $("#custom-controls-delete").hide();
-                  $(".custom-controls-line").hide();
-
+                  $("#frame-section").hide();
+                  $("#roof-section").hide();
+                  $("#trim-section").show();
+                  
                   let htmlStr = "";
-                  for (
-                    let color_index = 1;
-                    color_index < splits.length;
-                    color_index++
-                  ){
+                  for (let color_index = 1; color_index < splits.length; color_index++) {
                     if(splits[color_index] !== 'tricolors')
-                      htmlStr +=
-                        '<div onclick = "Change_flag_color ( 0x' +
-                        splits[color_index].substring(1) +
-                        ')" class="custom-controls-color custom-controls-poly-color" style="background-color: ' +
-                        splits[color_index] +
-                        '"></div>';
+                      htmlStr += `<div onclick="Change_flag_color(0x${splits[color_index].substring(1)})" class="custom-controls-color" style="background-color: ${splits[color_index]}"></div>`;
                   }
-
-                  $(".custom-controls-color-container").html(htmlStr);
-
-                  $(".custom-controls").css("display", "inline-flex");
-                  $(".custom-controls").css(
-                    "left",
-                    `calc(50vw - ${$(".custom-controls").width() / 2}px)`
-                  );
-                  $(".custom-controls-roof").hide();
-                } else if (splits[0].toLowerCase().startsWith("roof")) {
-                  if (
-                    picked_mesh.model.roof_poly_mesh &&
-                    picked_mesh.model.roof_canopy_mesh
-                  ) {
-                    $("#custom-controls-delete").hide();
-                    $(".custom-controls-line").hide();
-                    $(".custom-controls-color-container").html("");
-                    $(".custom-controls").hide();
-
-                    $(".custom-controls-roof").css("display", "flex");
-                    $(".custom-controls-roof").css("flex-direction", "column");
-                    $(".custom-controls-roof").show();
-                    $(".custom-controls-line").show();
-
-                    let htmlStr = "";
-                    let splits_canopy = picked_mesh.model.roof_canopy_mesh.name
-                      .toLowerCase()
-                      .split(",");
-                    // Reorder colors to match static HTML: white, blue, red, gray, yellow, then any remaining colors
-                    const colorOrder = [1, 2, 3, 4, 6, 5]; // Skip index 0, reorder: white(1), blue(2), red(3), gray(5), yellow(4)
-                    const processedIndexes = new Set([0, ...colorOrder]); // Track processed indexes
-                    
-                    // First process the reordered colors
-                    for (let i = 0; i < colorOrder.length; i++) {
-                      const color_index = colorOrder[i];
-                      if (color_index >= splits_canopy.length) continue;
-                      if (splits_canopy[color_index] == "tricolors") {
-                        htmlStr +=
-                          '<div onclick = "Change_roof_canopy_color ( `tricolors` )" class="custom-controls-color custom-controls-poly-color" index="' +
-                          color_index +
-                          '"';
-                        htmlStr +=
-                          'style="background-color: ' +
-                          splits_canopy[color_index] +
-                          '">';
-                        htmlStr +=
-                          '<img src="images/image_ae45a138.png">';
-                        htmlStr += "</div>";
-                      } else {
-                        htmlStr +=
-                          '<div onclick = "Change_roof_canopy_color ( 0x' +
-                          splits_canopy[color_index].substring(1) +
-                          ')" class="custom-controls-color custom-controls-poly-color" index="' +
-                          color_index +
-                          '"';
-                        htmlStr +=
-                          'style="background-color: ' +
-                          splits_canopy[color_index] +
-                          '">';
-                        htmlStr += "</div>";
-                      }
-                    }
-                    
-                    // Then process any remaining colors (like tricolors at index 6, etc.)
-                    for (let color_index = 1; color_index < splits_canopy.length; color_index++) {
-                      if (processedIndexes.has(color_index)) continue; // Skip already processed colors
-                      
-                      if (splits_canopy[color_index] == "tricolors") {
-                        htmlStr +=
-                          '<div onclick = "Change_roof_canopy_color ( `tricolors` )" class="custom-controls-color custom-controls-poly-color" index="' +
-                          color_index +
-                          '"';
-                        htmlStr +=
-                          'style="background-color: ' +
-                          splits_canopy[color_index] +
-                          '">';
-                        htmlStr +=
-                          '<img src="images/image_6a0cd279.png">';
-                        htmlStr += "</div>";
-                      } else {
-                        htmlStr +=
-                          '<div onclick = "Change_roof_canopy_color ( 0x' +
-                          splits_canopy[color_index].substring(1) +
-                          ')" class="custom-controls-color custom-controls-poly-color" index="' +
-                          color_index +
-                          '"';
-                        htmlStr +=
-                          'style="background-color: ' +
-                          splits_canopy[color_index] +
-                          '">';
-                        htmlStr += "</div>";
-                      }
-                    }
-                    
-                    $(".custom-controls-color-canopy").html(htmlStr);
-
-                    htmlStr = "";
-                    let splits_poly = picked_mesh.model.roof_poly_mesh.name
-                      .toLowerCase()
-                      .split(",");
-                    // Reorder colors to match static HTML: white, blue, red, gray, yellow
-                    const polyColorOrder = [1, 2, 3, 4, 6, 5]; // Skip index 0, reorder: white(1), blue(2), red(3), gray(5), yellow(4)
-                    
-                    for (let i = 0; i < polyColorOrder.length; i++) {
-                      const color_index = polyColorOrder[i];
-                      if (color_index >= splits_poly.length) continue;
-                      if (splits_poly[color_index] != "tricolor") {
-                        htmlStr +=
-                          '<div onclick = "Change_roof_poly_color ( 0x' +
-                          splits_poly[color_index].substring(1) +
-                          ')" class="custom-controls-color custom-controls-poly-color" index="' +
-                          color_index +
-                          '"';
-                        if (splits_poly[color_index] == "tricolor")
-                          htmlStr +=
-                            '><img src="images/image_ae45a138.png">';
-                        else
-                          htmlStr +=
-                            'style="background-color: ' +
-                            splits_poly[color_index] +
-                            '">';
-                        htmlStr += "</div>";
-                      }
-                    }
-                    $(".custom-controls-color-poly").html(htmlStr);
-
-                  } else {
-                    $("#custom-controls-delete").hide();
-                    $(".custom-controls-line").hide();
-                    $(".custom-controls-roof").hide();
-
-                    let htmlStr = "";
-                    let splits_canopy = picked_mesh.model.roof_canopy_mesh.name
-                      .toLowerCase()
-                      .split(",");
-                    // Reorder colors to match static HTML: white, blue, red, gray, yellow, then any remaining colors
-                    const colorOrder = [1, 2, 3, 4, 6, 5]; // Skip index 0, reorder: white(1), blue(2), red(3), gray(5), yellow(4)
-                    const processedIndexes = new Set([0, ...colorOrder]); // Track processed indexes
-                    
-                    // First process the reordered colors
-                    for (let i = 0; i < colorOrder.length; i++) {
-                      const color_index = colorOrder[i];
-                      if (color_index >= splits_canopy.length) continue;
-                      if (splits_canopy[color_index] == "tricolors") {
-                        htmlStr +=
-                          '<div onclick = "Change_roof_canopy_color ( `tricolors` )" class="custom-controls-color custom-controls-poly-color" index="' +
-                          color_index +
-                          '"';
-                        htmlStr +=
-                          'style="background-color: ' +
-                          splits_canopy[color_index] +
-                          '">';
-                        htmlStr +=
-                          '<img src="images/image_ae45a138.png">';
-                        htmlStr += "</div>";
-                      } else {
-                        htmlStr +=
-                          '<div onclick = "Change_roof_canopy_color ( 0x' +
-                          splits_canopy[color_index].substring(1) +
-                          ')" class="custom-controls-color custom-controls-poly-color" index="' +
-                          color_index +
-                          '"';
-                        htmlStr +=
-                          'style="background-color: ' +
-                          splits_canopy[color_index] +
-                          '">';
-                        htmlStr += "</div>";
-                      }
-                    }
-                    $(".custom-controls-color-container").html(htmlStr);
-
-                    $(".custom-controls").css("display", "inline-flex");
-                    $(".custom-controls").css(
-                      "left",
-                      `calc(50vw - ${$(".custom-controls").width() / 2}px)`
-                    );
-                  }
+                  $(".custom-controls-color-trim").html(htmlStr);
+                  
+                  $(".custom-controls-unified").css("display", "flex");
+                  $(".custom-controls-unified").css("left", `calc(50vw - ${$(".custom-controls-unified").width() / 2}px)`);
                 } else {
-                  $("#custom-controls-delete").show();
-
-                  let splits_2 = picked_mesh.model.mesh.children[0].name
-                    .toLowerCase()
-                    .split(",");
-
-                  if(splits_2 == "summitglb"){
-                    splits_2 = ['summitglb', '#004983', '#01664b', '#93293b', '#5b5e67'];
-                  }
-
-                  if (splits_2.length > 1) $(".custom-controls-line").show();
-                  else $(".custom-controls-line").hide();
-
-                  let htmlStr = "";
-                  for (
-                    let color_index = 1;
-                    color_index < splits_2.length;
-                    color_index++
-                  )
-                    htmlStr +=
-                      '<div onclick = "Colorize ( 0x' +
-                      splits_2[color_index].substring(1) +
-                      ')" class="custom-controls-color custom-controls-poly-color" style="background-color: ' +
-                      splits_2[color_index] +
-                      '"></div>';
-                  $(".custom-controls-color-container").html(htmlStr);
-
-                  $(".custom-controls").css("display", "inline-flex");
-                  $(".custom-controls").css(
-                    "left",
-                    `calc(50vw - ${$(".custom-controls").width() / 2}px)`
-                  );
-                  $(".custom-controls-roof").hide();
+                  // For all other elements (roof, towers, swings, etc.), show unified popup
+                  Show_unified_popup();
                 }
               } else {
                 for (let model of Model.instances) model.selected = false;
@@ -4434,16 +4226,52 @@
       };
       const Change_roof_poly_color = (color) => {
         let model = picked_mesh.model;
-        model.roof_canopy_mesh.visible = false;
-        model.roof_poly_mesh.visible = true;
-        model.roof_poly_mesh.traverse((mesh) => {
-          if ("material" in mesh)
-            mesh.material.color = new THREE.Color(color);
-        });
+        // Only change poly color, don't hide canopy
+        if (model.roof_poly_mesh) {
+          model.roof_poly_mesh.visible = true;
+          model.roof_poly_mesh.traverse((mesh) => {
+            if ("material" in mesh)
+              mesh.material.color = new THREE.Color(color);
+          });
+        }
 
-        model.ruf = "poly";
-        model.ruf_color = color;
+        model.ruf_poly_color = color;
 
+        Hide_options();
+      };
+      const Change_frame_color = (color) => {
+        let model = picked_mesh.model;
+        model.frame_color = color;
+        
+        if (color === 'cedar_tan') {
+          // Handle cedar/tan combination - need to apply different colors to different frame parts
+          let cedarColor = new THREE.Color(0x8B4513); // Cedar brown
+          let tanColor = new THREE.Color(0xd3c6a6);   // Tan
+          
+          model.mesh.traverse((mesh) => {
+            if (mesh.name.indexOf("_frame_") != -1 || 
+                mesh.name.indexOf("post") != -1 || 
+                mesh.name.indexOf("beam") != -1 ||
+                mesh.name.indexOf("frame") != -1) {
+              // For now, alternate between cedar and tan, or use tan as default
+              // This could be refined to apply specific colors to specific frame parts
+              mesh.material.color = tanColor; // Default to tan for cedar/tan option
+            }
+          });
+        } else {
+          // Handle solid colors (like white)
+          let colorHex = new THREE.Color(color);
+          
+          model.mesh.traverse((mesh) => {
+            if (mesh.name.indexOf("_frame_") != -1 || 
+                mesh.name.indexOf("post") != -1 || 
+                mesh.name.indexOf("beam") != -1 ||
+                mesh.name.indexOf("frame") != -1) {
+              mesh.material.color = colorHex;
+            }
+          });
+        }
+        
         Hide_options();
       };
       const Colorize = (color) => {
@@ -5459,10 +5287,96 @@
         }
       });
 
+      const Show_unified_popup = () => {
+        let model = picked_mesh.model;
+        
+        // Show delete button
+        $("#custom-controls-delete").show();
+        
+        // Reset all sections to hidden
+        $("#frame-section").hide();
+        $("#roof-section").hide();
+        $("#trim-section").hide();
+        
+        // Always show Frame section with tan/cedar and white options
+        $("#frame-section").show();
+        
+        // Show Roof section if model has roof components or is a tower
+        let isTower = model.category === 0; // Assuming category 0 is towers
+        if (model.roof_canopy_mesh || model.roof_poly_mesh || isTower) {
+          $("#roof-section").show();
+          
+          // Update canopy colors dynamically
+          if (model.roof_canopy_mesh) {
+            let splits_canopy = model.roof_canopy_mesh.name.toLowerCase().split(",");
+            let canopyHtml = "";
+            const colorOrder = [1, 2, 3, 4, 6, 5];
+            
+            for (let i = 0; i < colorOrder.length; i++) {
+              const color_index = colorOrder[i];
+              if (color_index >= splits_canopy.length) continue;
+              if (splits_canopy[color_index] == "tricolors") {
+                canopyHtml += `<div onclick="Change_roof_canopy_color('tricolors')" class="custom-controls-color" style="background-color: tricolors"><img src="images/image_ae45a138.png" /></div>`;
+              } else {
+                canopyHtml += `<div onclick="Change_roof_canopy_color(0x${splits_canopy[color_index].substring(1)})" class="custom-controls-color" style="background-color: ${splits_canopy[color_index]}"></div>`;
+              }
+            }
+            $(".custom-controls-color-canopy").html(canopyHtml);
+          } else if (isTower) {
+            // Default canopy colors for towers without canopy mesh
+            const defaultCanopyHtml = `
+              <div onclick="Change_roof_canopy_color(0x004983)" class="custom-controls-color" style="background-color: #004983" title="Blue"></div>
+              <div onclick="Change_roof_canopy_color(0x01664b)" class="custom-controls-color" style="background-color: #01664b" title="Green"></div>
+              <div onclick="Change_roof_canopy_color(0xffcb05)" class="custom-controls-color" style="background-color: #ffcb05" title="Yellow"></div>
+              <div onclick="Change_roof_canopy_color(0x93293b)" class="custom-controls-color" style="background-color: #93293b" title="Red"></div>
+              <div onclick="Change_roof_canopy_color(0x5b5e67)" class="custom-controls-color" style="background-color: #5b5e67" title="Gray"></div>
+              <div onclick="Change_roof_canopy_color('tricolors')" class="custom-controls-color" style="background-color: tricolors" title="Tricolor">
+                <img src="images/image_ae45a138.png" />
+              </div>
+            `;
+            $(".custom-controls-color-canopy").html(defaultCanopyHtml);
+          }
+          
+          // Handle poly colors - show only if available
+          let polyHtml = "";
+          
+          if (model.roof_poly_mesh) {
+            let splits_poly = model.roof_poly_mesh.name.toLowerCase().split(",");
+            // Check if the poly mesh has color data
+            if (splits_poly.length > 1) {
+              for (let color_index = 1; color_index < splits_poly.length; color_index++) {
+                if (splits_poly[color_index] != "tricolor") {
+                  polyHtml += `<div onclick="Change_roof_poly_color(0x${splits_poly[color_index].substring(1)})" class="custom-controls-color" style="background-color: ${splits_poly[color_index]}"></div>`;
+                }
+              }
+            }
+          }
+          
+          // Show or hide poly section based on whether there are poly colors
+          if (polyHtml !== "") {
+            $(".custom-controls-color-poly").html(polyHtml);
+            $("#poly-group").show();
+          } else {
+            $("#poly-group").hide();
+          }
+        }
+        
+        // Show Trim section for elements that can be colorized
+        let splits = picked_mesh.name.toLowerCase().split(",");
+        if (model.mesh.children.length > 0) {
+          $("#trim-section").show();
+        }
+        
+        // Show the unified popup
+        $(".custom-controls-unified").css("display", "flex");
+        $(".custom-controls-unified").css("left", `calc(50vw - ${$(".custom-controls-unified").width() / 2}px)`);
+      };
+      
       const Hide_options = (args) => {
         $("#measurement-display").css("display", "none");
         $(".custom-controls").css("display", "none");
         $(".custom-controls-roof").css("display", "none");
+        $(".custom-controls-unified").css("display", "none");
 
         for (let model of Model.instances) model.selected = false;
       };
