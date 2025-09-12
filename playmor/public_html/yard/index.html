@@ -1333,20 +1333,6 @@
         <div id="custom-controls-line" class="custom-controls-line"></div>
 
         <div id="custom-controls-padding" style="display: block; margin-bottom: -10px; margin-left: 10px;">
-          <!-- Roof Section -->
-          <div class="custom-controls-row" id="roof-section" style="display: none;">
-            <div class="custom-controls-text">ROOF:</div>
-            <div class="roof-type-group">
-              <div class="custom-controls-color-canopy">
-              </div>
-            </div>
-            <div class="roof-type-group" id="poly-group">
-              <span class="roof-type-label">POLY</span>
-              <div class="custom-controls-color-poly">
-                <div onclick="Change_roof_poly_color(0x01664b)" class="custom-controls-color" style="background-color: #01664b" title="Green"></div>
-              </div>
-            </div>
-          </div>
 
           <!-- Frame Section -->
           <div class="custom-controls-row" id="frame-section" style="display: none;">
@@ -1359,6 +1345,21 @@
           <div class="custom-controls-row" id="trim-section" style="display: none;">
             <div class="custom-controls-text">TRIM:</div>
             <div class="custom-controls-color-trim">
+            </div>
+          </div>
+
+          <!-- Roof Section -->
+          <div class="custom-controls-row" id="roof-section" style="display: none;">
+            <div class="custom-controls-text">ROOF:</div>
+            <div class="roof-type-group">
+              <div class="custom-controls-color-canopy">
+              </div>
+            </div>
+            <div class="roof-type-group" id="poly-group">
+              <span class="roof-type-label">POLY</span>
+              <div class="custom-controls-color-poly">
+                <div onclick="Change_roof_poly_color(0x01664b)" class="custom-controls-color" style="background-color: #01664b" title="Green"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -4133,7 +4134,6 @@
       };
       const Change_flag_color = (color) => {
         picked_mesh.material.color = new THREE.Color(color);
-        Hide_options();
       };
       const Change_roof_canopy_color = (color) => {
         let model = picked_mesh.model;
@@ -4156,8 +4156,6 @@
 
         model.ruf = "canopy";
         model.ruf_color = color;
-
-        Hide_options();
       };
       const Change_roof_poly_color = (color) => {
         let model = picked_mesh.model;
@@ -4171,8 +4169,6 @@
         }
 
         model.ruf_poly_color = color;
-
-        Hide_options();
       };
       const Change_frame_color = (color) => {
         let model = picked_mesh.model;
@@ -4302,8 +4298,6 @@
             }
           });
         }
-        
-        Hide_options();
       };
       const Colorize = (color) => {
         picked_mesh.model.colorized = color;
@@ -4316,7 +4310,6 @@
         picked_mesh.model.mesh.traverse((mesh) => {
           if (mesh.name.indexOf("_colorize_") != -1) mesh.material.color = c;
         });
-        Hide_options();
       };
       const Key_up = (args) => {
         switch (Keys.code) {
