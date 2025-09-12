@@ -1,0 +1,101 @@
+{
+  "category_0": {
+    "name": "towers",
+    "objects": {
+      "0": "Deluxe Play Tower",
+      "1": "Deluxe Sky Tower",
+      "2": "King Tower",
+      "3": "Poly Play Tower",
+      "4": "Summit Tower",
+      "5": "Watch Tower Tower",
+      "6": "Tower Tunnel",
+      "7": "Tunnel Bridge"
+    }
+  },
+  "category_1": {
+    "name": "swing_beams", 
+    "objects": {
+      "0": "Attachment Beam 3 Positions 8 ft",
+      "1": "Attachment Beam 3 Positions 10 ft",
+      "2": "Attachment Beam 4 Positions 8 ft",
+      "3": "Attachment Beam 4 Positions 10 ft",
+      "4": "Disc Swing Attachment Beam 8 ft",
+      "5": "Disc Swing Attachment Beam 10 ft"
+    }
+  },
+  "category_2": {
+    "name": "swings",
+    "objects": {
+      "0": "Baby Swing",
+      "1": "Ball Swing",
+      "2": "Bird Nest Swing",
+      "3": "Disc Swing",
+      "4": "Horse Glider",
+      "5": "Sling Swing",
+      "6": "Tire Swing",
+      "7": "Trapeeze Swing",
+      "8": "Vinyl Tire Swing"
+    }
+  },
+  "category_3": {
+    "name": "kits",
+    "objects": {
+      "0": "End Rail",
+      "1": "DT Full Floor Kit",
+      "2": "DT Half Floor Kit",
+      "3": "KT Floor Kit",
+      "4": "WT Floor Kit",
+      "5": "Picnic Table",
+      "6": "Kitchen"
+    }
+  },
+  "category_4": {
+    "name": "entry_points",
+    "objects": {
+      "0": "Cargo Net",
+      "1": "Combo Climbing", 
+      "2": "Climbing Pole", 
+      "3": "Fireman Pole",
+      "4": "Gang Plank 4ft",
+      "5": "Gang Plank 5ft",
+      "6": "Monkey Bar Attachment",
+      "7": "Monkey Bar Climber 4ft",
+      "8": "Monkey Bar Climber 5ft",
+      "9": "Poly Rock Climb 5ft",
+      "10": "Poly Rock Climb 7ft",
+      "11": "Steps 4ft",
+      "12": "Steps 5ft",
+      "13": "Steps 7ft"
+    }
+  },
+  "category_5": {
+    "name": "slides",
+    "objects": {
+      "0": "10ft Scope Wave Slide",
+      "1": "10ft Wave Slide", 
+      "2": "14ft Scope Wave Slide",
+      "3": "Side Winder Slide 5ft",
+      "4": "Side Winder Slide 7ft",
+      "5": "Spiral Slide 5ft",
+      "6": "Spiral Slide 7ft",
+      "7": "Turbo Twister Slide 5ft",
+      "8": "Turbo Twister Slide 7ft",
+      "9": "Turbo Twister Slide 5ft Clear",
+      "10": "Turbo Twister Slide 7ft Clear"
+    }
+  },
+  "category_6": {
+    "name": "toys",
+    "objects": {
+      "0": "Bubble",
+      "1": "Hand Grip",
+      "2": "Hand Rail",
+      "3": "Mailbox",
+      "4": "Phone",
+      "5": "Ship Wheel",
+      "6": "Steering Wheel",
+      "7": "Super Scope",
+      "8": "Tic Tac Toe"
+    }
+  }
+}

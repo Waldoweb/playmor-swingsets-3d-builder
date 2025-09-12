@@ -1,0 +1,457 @@
+{
+  "constants": {
+    "colors": {
+      "cedar": "#D2691E",
+      "tan": "#DEB887", 
+      "white": "#FFFFFF",
+      "roof_blue": "#004983",
+      "roof_green": "#01664b",
+      "roof_yellow": "#ffcb05",
+      "roof_red": "#93293b",
+      "roof_gray": "#5b5e67",
+      "trim_green": "#01664b",
+      "trim_blue": "#004983", 
+      "trim_red": "#93293b",
+      "trim_gray": "#5b5e67",
+      "flag_blue": "#004983",
+      "flag_green": "#01664b",
+      "flag_yellow": "#ffcb05",
+      "flag_red": "#93293b",
+      "flag_gray": "#5b5e67"
+    },
+    "frame_colors": {
+      "cedar_tan": {
+        "type": "split",
+        "colors": ["@cedar", "@tan"],
+        "label": "Cedar/Tan"
+      },
+      "white": {
+        "type": "solid", 
+        "color": "@white",
+        "label": "White"
+      }
+    },
+    "roof_canopy_colors": {
+      "blue": {"color": "@roof_blue", "hex": "0x004983"},
+      "green": {"color": "@roof_green", "hex": "0x01664b"},
+      "yellow": {"color": "@roof_yellow", "hex": "0xffcb05"},
+      "red": {"color": "@roof_red", "hex": "0x93293b"},
+      "gray": {"color": "@roof_gray", "hex": "0x5b5e67"},
+      "tricolor": {"type": "special", "image": "images/image_ae45a138.png"}
+    },
+    "roof_poly": {
+      "dynamic": true,
+      "source": "mesh_name"
+    },
+    "trim_colors": {
+      "green": {"color": "@trim_green", "hex": "0x01664b"},
+      "blue": {"color": "@trim_blue", "hex": "0x004983"},
+      "red": {"color": "@trim_red", "hex": "0x93293b"},
+      "gray": {"color": "@trim_gray", "hex": "0x5b5e67"}
+    },
+    "trim_dynamic": {
+      "dynamic": true,
+      "colors": "@trim_colors"
+    },
+    "flag_colors": {
+      "green": {"color": "@flag_green", "hex": "0x01664b"},
+      "blue": {"color": "@flag_blue", "hex": "0x004983"},
+      "yellow": {"color": "@flag_yellow", "hex": "0xffcb05"},
+      "red": {"color": "@flag_red", "hex": "0x93293b"},
+      "gray": {"color": "@flag_gray", "hex": "0x5b5e67"}
+    }
+  },
+  "objects": {
+    "Deluxe Play Tower": {
+      "sections": ["roof", "frame", "trim"],
+      "colors": {
+        "frame": "@frame_colors",
+        "roof": {
+          "canopy": "@roof_canopy_colors"
+        },
+        "trim": "@trim_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube001001"],
+        "tan_meshes": ["Cube001_1"],
+        "all_meshes": ["Cube001_1", "Cube001001"]
+      }
+    },
+    "Deluxe Sky Tower": {
+      "sections": ["roof", "frame", "trim"],
+      "colors": {
+        "frame": "@frame_colors",
+        "roof": {
+          "canopy": "@roof_canopy_colors",
+          "poly": "@roof_poly"
+        },
+        "trim": "@trim_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube603_1001"],
+        "tan_meshes": ["Cube603"],
+        "all_meshes": ["Cube603", "Cube603_1001"]
+      }
+    },
+    "King Tower": {
+      "sections": ["roof", "frame", "trim"],
+      "colors": {
+        "frame": "@frame_colors",
+        "roof": {
+          "canopy": "@roof_canopy_colors"
+        },
+        "trim": "@trim_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["King_base_middle", "Cube201_1"],
+        "tan_meshes": ["King_base_bottom", "Cube201", "King_base_top", "Box"],
+        "all_meshes": ["King_base_bottom", "Cube201_1", "Cube201", "King_base_top", "Box", "King_base_middle"]
+      }
+    },
+    "Poly Play Tower": {
+      "sections": ["roof", "frame", "trim"],
+      "colors": {
+        "frame": "@frame_colors",
+        "roof": {
+          "canopy": "@roof_canopy_colors"
+        },
+        "trim": "@trim_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube138_1001"],
+        "tan_meshes": ["Cube138"],
+        "all_meshes": ["Cube138", "Cube138_1001"]
+      }
+    },
+    "Summit Tower": {
+      "sections": ["roof", "frame", "trim"],
+      "colors": {
+        "frame": "@frame_colors",
+        "roof": {
+          "canopy": "@roof_canopy_colors",
+          "poly": "@roof_poly"
+        },
+        "trim": "@trim_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Plane091_1001"],
+        "tan_meshes": ["Plane091"],
+        "all_meshes": ["Plane091", "Plane091_1001"]
+      }
+    },
+    "Watch Tower Tower": {
+      "sections": ["roof", "frame", "trim"],
+      "colors": {
+        "frame": "@frame_colors",
+        "roof": {
+          "canopy": "@roof_canopy_colors",
+          "poly": "@roof_poly"
+        },
+        "trim": "@trim_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Watch_tower_base_middle002", "Cube833_1001"],
+        "tan_meshes": ["Watch_tower_base_bottom002", "Cube833"],
+        "all_meshes": ["Watch_tower_base_bottom002", "Cube833", "Watch_tower_base_middle002", "Cube833_1001"]
+      }
+    },
+    "Tower Tunnel": {
+      "sections": ["trim"],
+      "colors": {
+        "trim": "@trim_colors"
+      }
+    },
+    "Tunnel Bridge": {
+      "sections": ["frame", "trim"],
+      "colors": {
+        "frame": "@frame_colors",
+        "trim": "@trim_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": [],
+        "tan_meshes": ["Cube188"],
+        "all_meshes": ["Cube188"]
+      }
+    },
+    "Attachment Beam 3 Positions 8 ft": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Plane001"],
+        "tan_meshes": ["Plane001_1,_colorize_"],
+        "all_meshes": ["Plane001_1,_colorize_", "Plane001"]
+      }
+    },
+    "Attachment Beam 3 Positions 10 ft": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Plane049"],
+        "tan_meshes": ["Plane049_1,_colorize_"],
+        "all_meshes": ["Plane049_1,_colorize_", "Plane049"]
+      }
+    },
+    "Attachment Beam 4 Positions 8 ft": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Plane003"],
+        "tan_meshes": ["Plane003_1,_colorize_"],
+        "all_meshes": ["Plane003_1,_colorize_", "Plane003"]
+      }
+    },
+    "Attachment Beam 4 Positions 10 ft": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Plane002"],
+        "tan_meshes": ["Plane002_1,_colorize_"],
+        "all_meshes": ["Plane002_1,_colorize_", "Plane002"]
+      }
+    },
+    "Disc Swing Attachment Beam 8 ft": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Plane077"],
+        "tan_meshes": ["Plane077_1,_colorize_"],
+        "all_meshes": ["Plane077_1,_colorize_", "Plane077"]
+      }
+    },
+    "Disc Swing Attachment Beam 10 ft": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Plane073"],
+        "tan_meshes": ["Plane073_1,_colorize_"],
+        "all_meshes": ["Plane073_1,_colorize_", "Plane073"]
+      }
+    },
+    "Tire Swing": {
+      "sections": [],
+      "colors": {}
+    },
+    "Bird Nest Swing": {
+      "sections": [],
+      "colors": {}
+    },
+    "End Rail": {
+      "sections": ["frame", "trim"],
+      "colors": {
+        "frame": "@frame_colors",
+        "trim": "@trim_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": [],
+        "tan_meshes": ["Box"],
+        "all_meshes": ["Box"]
+      }
+    },
+    "DT Full Floor Kit": {
+      "sections": [],
+      "colors": {}
+    },
+    "DT Half Floor Kit": {
+      "sections": [],
+      "colors": {}
+    },
+    "KT Floor Kit": {
+      "sections": [],
+      "colors": {}
+    },
+    "WT Floor Kit": {
+      "sections": [],
+      "colors": {}
+    },
+    "Picnic Table": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Icosphere006_2"],
+        "tan_meshes": ["Icosphere006_1,_colorize_"],
+        "all_meshes": ["Icosphere006_1,_colorize_", "Icosphere006_2"]
+      }
+    },
+    "Kitchen": {
+      "sections": [],
+      "colors": {}
+    },
+    "Cargo Net": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube151"],
+        "tan_meshes": ["Cube151_1"],
+        "all_meshes": ["Cube151_1", "Cube151"]
+      }
+    },
+    "Combo Climbing": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube168"],
+        "tan_meshes": ["Cube168_1"],
+        "all_meshes": ["Cube168_1", "Cube168"]
+      }
+    },
+    "Climbing Pole": {
+      "sections": [],
+      "colors": {}
+    },
+    "Fireman Pole": {
+      "sections": [],
+      "colors": {}
+    },
+    "Gang Plank 4ft": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Plane070"],
+        "tan_meshes": ["Plane001"],
+        "all_meshes": ["Plane001", "Plane070"]
+      }
+    },
+    "Gang Plank 5ft": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Plane052"],
+        "tan_meshes": ["Plane001"],
+        "all_meshes": ["Plane001", "Plane052"]
+      }
+    },
+    "Monkey Bar Attachment": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cylinder005_2"],
+        "tan_meshes": ["Cylinder005_1"],
+        "all_meshes": ["Cylinder005_1", "Cylinder005_2"]
+      }
+    },
+    "Monkey Bar Climber 4ft": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube219_1"],
+        "tan_meshes": ["Cube219"],
+        "all_meshes": ["Cube219", "Cube219_1"]
+      }
+    },
+    "Monkey Bar Climber 5ft": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube219_1"],
+        "tan_meshes": ["Cube219"],
+        "all_meshes": ["Cube219", "Cube219_1"]
+      }
+    },
+    "Poly Rock Climb 5ft": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube361"],
+        "tan_meshes": ["Cube361_1"],
+        "all_meshes": ["Cube361_1", "Cube361"]
+      }
+    },
+    "Poly Rock Climb 7ft": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube199_2"],
+        "tan_meshes": ["Cube199_1"],
+        "all_meshes": ["Cube199_1", "Cube199_2"]
+      }
+    },
+    "Steps 4ft": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube339_1"],
+        "tan_meshes": ["Cube339,_colorize_"],
+        "all_meshes": ["Cube339,_colorize_", "Cube339_1"]
+      }
+    },
+    "Steps 5ft": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube195_1"],
+        "tan_meshes": ["Cube195"],
+        "all_meshes": ["Cube195_1", "Cube195"]
+      }
+    },
+    "Steps 7ft": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube360", "Cube359_1"],
+        "tan_meshes": ["Cube359"],
+        "all_meshes": ["Cube359", "Cube360", "Cube359_1"]
+      }
+    },
+    "Tic Tac Toe": {
+      "sections": [],
+      "colors": {}
+    }
+  },
+  "default_sections": {
+    "towers": ["roof", "frame", "trim"],
+    "swing_beams": ["frame"],
+    "swings": ["trim"],
+    "kits": ["frame"],
+    "entry_points": ["frame"],
+    "slides": ["trim"],
+    "toys": ["trim"],
+    "flag": ["flag"]
+  },
+  "default_colors": {
+    "frame": "@frame_colors",
+    "roof": {
+      "canopy": "@roof_canopy_colors"
+    },
+    "trim": "@trim_colors",
+    "flag": "@flag_colors"
+  },
+  "colorizable_tag": "_colorize_"
+}

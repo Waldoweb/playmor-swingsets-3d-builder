@@ -1330,22 +1330,14 @@
         <div id="custom-controls-delete">
           <img src="images/image_6eedc2a9.png" />
         </div>
-        <div class="custom-controls-line"></div>
+        <div id="custom-controls-line" class="custom-controls-line"></div>
 
-        <div style="display: block; margin-bottom: -10px;">
+        <div id="custom-controls-padding" style="display: block; margin-bottom: -10px; margin-left: 10px;">
           <!-- Roof Section -->
           <div class="custom-controls-row" id="roof-section" style="display: none;">
             <div class="custom-controls-text">ROOF:</div>
             <div class="roof-type-group">
               <div class="custom-controls-color-canopy">
-                <div onclick="Change_roof_canopy_color(0x004983)" class="custom-controls-color" style="background-color: #004983" title="Blue"></div>
-                <div onclick="Change_roof_canopy_color(0x01664b)" class="custom-controls-color" style="background-color: #01664b" title="Green"></div>
-                <div onclick="Change_roof_canopy_color(0xffcb05)" class="custom-controls-color" style="background-color: #ffcb05" title="Yellow"></div>
-                <div onclick="Change_roof_canopy_color(0x93293b)" class="custom-controls-color" style="background-color: #93293b" title="Red"></div>
-                <div onclick="Change_roof_canopy_color(0x5b5e67)" class="custom-controls-color" style="background-color: #5b5e67" title="Gray"></div>
-                <div onclick="Change_roof_canopy_color('tricolors')" class="custom-controls-color" style="background-color: tricolors" title="Tricolor">
-                  <img src="images/image_ae45a138.png" />
-                </div>
               </div>
             </div>
             <div class="roof-type-group" id="poly-group">
@@ -1360,8 +1352,6 @@
           <div class="custom-controls-row" id="frame-section" style="display: none;">
             <div class="custom-controls-text">FRAME:</div>
             <div class="custom-controls-color-frame">
-              <div onclick="Change_frame_color('cedar_tan')" class="custom-controls-color cedar-tan-split" title="Cedar/Tan"></div>
-              <div onclick="Change_frame_color(0xffffff)" class="custom-controls-color" style="background-color: #ffffff; border: 2px solid #ccc;" title="White"></div>
             </div>
           </div>
 
@@ -1369,10 +1359,6 @@
           <div class="custom-controls-row" id="trim-section" style="display: none;">
             <div class="custom-controls-text">TRIM:</div>
             <div class="custom-controls-color-trim">
-              <div onclick="Colorize(0x01664b)" class="custom-controls-color" style="background-color: #01664b" title="Green"></div>
-              <div onclick="Colorize(0x004983)" class="custom-controls-color" style="background-color: #004983" title="Blue"></div>
-              <div onclick="Colorize(0x93293b)" class="custom-controls-color" style="background-color: #93293b" title="Red"></div>
-              <div onclick="Colorize(0x5b5e67)" class="custom-controls-color" style="background-color: #5b5e67" title="Gray"></div>
             </div>
           </div>
         </div>
@@ -2330,36 +2316,6 @@
                 this.joints.push(mesh);
               }
             });
-            
-            // Add gray color option to mesh names (morph method)
-            // Categories 0, 1, 2 are Tower, Swing beam, Swings
-            // Categories 3, 4, 5 typically contain trim/accessories in yard design software
-            // Category 6 is Toys
-            if (this.category === 0 || this.category === 1 || this.category === 2 || this.category === 3 || this.category === 4 || this.category === 5 || this.category === 6) {
-              if (this.mesh && this.mesh.children && this.mesh.children[0]) {
-                let childMesh = this.mesh.children[0];
-                if (childMesh.name && childMesh.name.includes('#')) {
-                  // Check if gray color is not already in the name
-                  if (!childMesh.name.includes('#5b5e67')) {
-                    // Add gray color to the mesh name
-                    childMesh.name += ',#5b5e67';
-                  }
-                }
-              }
-              
-              // Also add gray color to roof mesh names for Tower and Toys (morph method)
-              if (this.category === 0 || this.category === 6) {
-                this.mesh.traverse((mesh) => {
-                  if (mesh.name.toLowerCase().startsWith("roof_canopy") || 
-                      mesh.name.toLowerCase().startsWith("roof_poly")) {
-                    if (mesh.name.includes('#') && !mesh.name.includes('#5b5e67')) {
-                      mesh.name += ',#5b5e67';
-                    }
-                  }
-                });
-              }
-              
-            }
           }
         }
         sort_joints(args) {
@@ -2407,48 +2363,7 @@
               }
               if (mesh.name.toLowerCase().indexOf("mirrorx") != -1)
                 mesh.model.mirrorx = 0;
-              // Add gray color to flag meshes
-              if (mesh.name.toLowerCase().startsWith("flag")) {
-                if (mesh.name.includes('#') && !mesh.name.includes('#5b5e67')) {
-                  mesh.name += ',#5b5e67';
-                } else if (!mesh.name.includes('#')) {
-                  // If no colors defined, add some default colors including gray
-                  mesh.name += ',#004983,#01664b,#ffcb05,#93293b,#5b5e67';
-                }
-              }
             });
-
-            // Add gray color option to mesh names
-            // Categories 0, 1, 2 are Tower, Swing beam, Swings
-            // Categories 3, 4, 5 typically contain trim/accessories in yard design software
-            // Category 6 is Toys
-            if (this.category === 0 || this.category === 1 || this.category === 2 || this.category === 3 || this.category === 4 || this.category === 5 || this.category === 6) {
-              if (this.mesh && this.mesh.children && this.mesh.children[0]) {
-                let childMesh = this.mesh.children[0];
-                if (childMesh.name && childMesh.name.includes('#')) {
-                  // Check if gray color is not already in the name
-                  if (!childMesh.name.includes('#5b5e67')) {
-                    // Add gray color to the mesh name
-                    childMesh.name += ',#5b5e67';
-                  }
-                }
-              }
-              
-              // Add gray color to roof canopy mesh names, but not to poly roofs for Tower and Toys
-              if (this.category === 0 || this.category === 6) {
-                this.mesh.traverse((mesh) => {
-                  if (mesh.name.toLowerCase().startsWith("roof_canopy")) {
-                    if (mesh.name.includes('#') && !mesh.name.includes('#5b5e67')) {
-                      mesh.name += ',#5b5e67';
-                    }
-                  }
-                  // Process poly roofs but don't add gray color - just ensure they're processed
-                  if (mesh.name.toLowerCase().startsWith("roof_poly")) {
-                    // Poly roofs are processed but no gray color added
-                  }
-                });
-              }
-            }
 
             this.sort_joints();
 
@@ -2480,15 +2395,6 @@
                   this.joints.push(mesh);
 
                   //console . log (  ',' + mesh . name + ',' + mesh . position . y + ',' + mesh . rotation . y )
-                }
-                // Add gray color to flag meshes
-                if (mesh.name.toLowerCase().startsWith("flag")) {
-                  if (mesh.name.includes('#') && !mesh.name.includes('#5b5e67')) {
-                    mesh.name += ',#5b5e67';
-                  } else if (!mesh.name.includes('#')) {
-                    // If no colors defined, add some default colors including gray
-                    mesh.name += ',#004983,#01664b,#ffcb05,#93293b,#5b5e67';
-                  }
                 }
               });
 
@@ -3366,21 +3272,50 @@
                   picked_mesh.model.selected = true;
                 }
 
+                console.log("=== SELECTED OBJECT DETAILS ===");
+                console.log("Mesh Name:", picked_mesh.name);
+                console.log("Mesh UUID:", picked_mesh.uuid);
+                console.log("Mesh Type:", picked_mesh.type);
+                console.log("Mesh Position:", picked_mesh.position);
+                console.log("Mesh Parent:", picked_mesh.parent ? picked_mesh.parent.name : "No parent");
+                console.log("Model Category:", picked_mesh.model ? picked_mesh.model.category : "No model");
+                console.log("Model Name:", picked_mesh.model ? picked_mesh.model.name : "No model");
+                console.log("Full picked_mesh object:", picked_mesh);
+
                 let splits = picked_mesh.name.toLowerCase().split(",");
 
                 if (splits[0].toLowerCase().startsWith("flag")) {
-                  // Handle flags with the unified popup but only show trim colors
+                  // Handle flags with JSON config colors - no labels or dividers
                   $("#custom-controls-delete").hide();
+                  $("#custom-controls-line").hide();
                   $("#frame-section").hide();
                   $("#roof-section").hide();
                   $("#trim-section").show();
                   
-                  let htmlStr = "";
-                  for (let color_index = 1; color_index < splits.length; color_index++) {
-                    if(splits[color_index] !== 'tricolors')
-                      htmlStr += `<div onclick="Change_flag_color(0x${splits[color_index].substring(1)})" class="custom-controls-color" style="background-color: ${splits[color_index]}"></div>`;
+                  // Hide trim label and remove styling for clean flag display
+                  $("#trim-section .custom-controls-text").hide();
+                  
+                  // Use flag colors from JSON config
+                  if (colorConfig && colorConfig.constants && colorConfig.constants.flag_colors) {
+                    let flagHtml = "";
+                    const flagColors = colorConfig.constants.flag_colors;
+                    
+                    Object.entries(flagColors).forEach(([key, colorData]) => {
+                      const actualColor = colorConfig.constants.colors[colorData.color.substring(1)] || colorData.color;
+                      flagHtml += `<div onclick="Change_flag_color(${colorData.hex})" class="custom-controls-color" style="background-color: ${actualColor}" title="${key}"></div>`;
+                    });
+                    
+                    $(".custom-controls-color-trim").html(flagHtml);
+                  } else {
+                    console.warn('Flag colors not found in JSON config, using fallback');
+                    // Fallback to old method if JSON not loaded
+                    let htmlStr = "";
+                    for (let color_index = 1; color_index < splits.length; color_index++) {
+                      if(splits[color_index] !== 'tricolors')
+                        htmlStr += `<div onclick="Change_flag_color((0x${splits[color_index].substring(1)})" class="custom-controls-color" style="background-color: ${splits[color_index]}"></div>`;
+                    }
+                    $(".custom-controls-color-trim").html(htmlStr);
                   }
-                  $(".custom-controls-color-trim").html(htmlStr);
                   
                   $(".custom-controls-unified").css("display", "flex");
                   $(".custom-controls-unified").css("left", `calc(50vw - ${$(".custom-controls-unified").width() / 2}px)`);
@@ -4243,31 +4178,127 @@
         let model = picked_mesh.model;
         model.frame_color = color;
         
-        if (color === 'cedar_tan') {
-          // Handle cedar/tan combination - need to apply different colors to different frame parts
-          let cedarColor = new THREE.Color(0x8B4513); // Cedar brown
-          let tanColor = new THREE.Color(0xd3c6a6);   // Tan
+        console.log("Change_frame_color called with:", color);
+        console.log("Model object:", model);
+        console.log("Model category:", model?.category);
+        console.log("Model children_index:", model?.children_index);
+        
+        // Use category and children_index to find object name
+        const categoryKey = `category_${model.category}`;
+        const categoryInfo = objectMapping[categoryKey];
+        
+        let objectName = null;
+        let objectConfig = null;
+        
+        if (categoryInfo && categoryInfo.objects) {
+          const childrenIndex = (model.children_index || 0).toString();
+          objectName = categoryInfo.objects[childrenIndex];
+          
+          // Look for specific object configuration
+          if (objectName) {
+            objectConfig = colorConfig.objects[objectName];
+          }
+        }
+        
+        console.log("Resolved object name:", objectName);
+        console.log("Object config found:", !!objectConfig);
+        
+        // Get frame color configuration from JSON
+        const frameColorConfig = colorConfig.constants.frame_colors[color];
+        if (!frameColorConfig) {
+          console.error("Frame color not found in config:", color);
+          return;
+        }
+        
+        if (frameColorConfig.type === 'split' && color === 'cedar_tan') {
+          // Handle cedar/tan split - different colors for different mesh types
+          let cedarColor = new THREE.Color(colorConfig.constants.colors.cedar);
+          let tanColor = new THREE.Color(colorConfig.constants.colors.tan);
+          
+          // Get object-specific mesh names if available
+          const objectFrameMeshes = objectConfig?.frame_meshes;
+          
+          // Use object-specific mesh names (required for cedar_tan split)
+          if (!objectFrameMeshes?.cedar_meshes || !objectFrameMeshes?.tan_meshes) {
+            console.error("Object-specific cedar_meshes and tan_meshes required for cedar_tan split:", objectName);
+            return;
+          }
+          const cedarMeshes = objectFrameMeshes.cedar_meshes;
+          const tanMeshes = objectFrameMeshes.tan_meshes;
           
           model.mesh.traverse((mesh) => {
-            if (mesh.name.indexOf("_frame_") != -1 || 
-                mesh.name.indexOf("post") != -1 || 
-                mesh.name.indexOf("beam") != -1 ||
-                mesh.name.indexOf("frame") != -1) {
-              // For now, alternate between cedar and tan, or use tan as default
-              // This could be refined to apply specific colors to specific frame parts
-              mesh.material.color = tanColor; // Default to tan for cedar/tan option
+            if (mesh.material && mesh.material.color) {
+              // Check if mesh matches cedar mesh patterns
+              let isCedarMesh = cedarMeshes.some(pattern => 
+                mesh.name === pattern
+              );
+              
+              // Check if mesh matches tan mesh patterns  
+              let isTanMesh = tanMeshes.some(pattern => 
+                mesh.name === pattern
+              );
+              
+              if (isCedarMesh) {
+                // Override map color while keeping texture style for cedar
+                // if (mesh.material.map) {
+                //   mesh.material.color = cedarColor;
+                //   mesh.material.emissive = cedarColor;
+                //   mesh.material.emissiveIntensity = 0.2;
+                // } else {
+                  mesh.material.map = null;
+                  mesh.material.color = cedarColor;
+                // }
+                mesh.material.needsUpdate = true;
+              } else if (isTanMesh) {
+                // Override map color while keeping texture style for tan
+                if (mesh.material.map) {
+                  mesh.material.color = tanColor;
+                  mesh.material.emissive = tanColor;
+                  mesh.material.emissiveIntensity = 0.2;
+                } else {
+                  mesh.material.color = tanColor;
+                }
+                mesh.material.needsUpdate = true;
+              }
             }
           });
         } else {
-          // Handle solid colors (like white)
-          let colorHex = new THREE.Color(color);
+          // Handle solid colors (cedar, tan, white)
+          let colorValue = frameColorConfig.color.replace('@', '');
+          let colorHex = new THREE.Color(colorConfig.constants.colors[colorValue]);
+          
+          // Use the already resolved objectConfig from above
+          const objectFrameMeshes = objectConfig?.frame_meshes;
+          
+          // Use object-specific mesh names (required since global config doesn't have mesh_names)
+          if (!objectFrameMeshes?.all_meshes) {
+            console.error("Object-specific all_meshes required for solid colors:", objectName);
+            return;
+          }
+          const meshNames = objectFrameMeshes.all_meshes;
           
           model.mesh.traverse((mesh) => {
-            if (mesh.name.indexOf("_frame_") != -1 || 
-                mesh.name.indexOf("post") != -1 || 
-                mesh.name.indexOf("beam") != -1 ||
-                mesh.name.indexOf("frame") != -1) {
-              mesh.material.color = colorHex;
+            if (mesh.material && mesh.material.color) {
+              // Check if mesh matches any of the frame mesh patterns
+              let isFrameMesh = meshNames.some(pattern => 
+                mesh.name ===pattern
+              );
+              
+              if (isFrameMesh) {
+                // // Override map color while keeping texture style
+                // if (mesh.material.map) {
+                //   // Set material color to white first to neutralize map color
+                //   mesh.material.color = colorHex;
+                //   // Create a color overlay effect
+                //   mesh.material.emissive = colorHex;
+                //   mesh.material.emissiveIntensity = 0.7;
+                // } else {
+                  // No map, just set color normally
+                  mesh.material.map = null;
+                  mesh.material.color = colorHex;
+                // }
+                mesh.material.needsUpdate = true;
+              }
             }
           });
         }
@@ -4393,22 +4424,6 @@
           // Other towers use standard orientation
           plug_model.mesh.rotation.y = 0; // 0 degrees
           plug_model.yaw = 0; // Set yaw for consistency with attachment system
-        }
-        
-        // Apply default gray color to trim/accessories when cloned
-        if (category_index === 1 || category_index === 3 || category_index === 4 || category_index === 5) {
-          if (plug_model.colorized) {
-            let color_string = plug_model.colorized.toString(16);
-            if (color_string.length < 5) color_string = "0" + color_string;
-            if (color_string.length < 6) color_string = "0" + color_string;
-            let gray_color = new THREE.Color("#" + color_string);
-            
-            plug_model.mesh.traverse((mesh) => {
-              if (mesh.name.indexOf("_colorize_") != -1) {
-                mesh.material.color = gray_color;
-              }
-            });
-          }
         }
         
         scene.add(plug_model.mesh);
@@ -5098,28 +5113,6 @@
               category: category_index,
               children_index: child_index++,
             });
-            
-            // Set default gray color for categories
-            // Categories 0, 1, 2 are Tower, Swing beam, Swings
-            // Categories 3, 4, 5 typically contain trim/accessories in yard design software
-            // Category 6 is Toys
-            if (category_index === 0 || category_index === 1 || category_index === 2 || category_index === 3 || category_index === 4 || category_index === 5 || category_index === 6) {
-              child.model.colorized = 0x5b5e67; // Default gray color
-              
-              // Apply gray color to mesh if it's already loaded
-              if (child.model.mesh) {
-                let color_string = child.model.colorized.toString(16);
-                if (color_string.length < 5) color_string = "0" + color_string;
-                if (color_string.length < 6) color_string = "0" + color_string;
-                let gray_color = new THREE.Color("#" + color_string);
-                
-                child.model.mesh.traverse((mesh) => {
-                  if (mesh.name.indexOf("_colorize_") != -1) {
-                    mesh.material.color = gray_color;
-                  }
-                });
-              }
-            }
           }
           category_index++;
         }
@@ -5287,84 +5280,291 @@
         }
       });
 
+      // Load color configuration and object mapping
+      let colorConfig = null;
+      let objectMapping = null;
+      
+      const loadColorConfig = async () => {
+        try {
+          const response = await fetch('color-config.json');
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const text = await response.text();
+          colorConfig = JSON.parse(text);
+        } catch (error) {
+          console.error('Failed to load color configuration:', error);
+          colorConfig = null;
+        }
+      };
+      
+      const loadObjectMapping = async () => {
+        try {
+          const response = await fetch('object-mapping.json');
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          objectMapping = await response.json();
+        } catch (error) {
+          console.error('Failed to load object mapping:', error);
+          objectMapping = null;
+        }
+      };
+      
+      // Load configuration on page load
+      const initializeConfigs = async () => {
+        await Promise.all([loadColorConfig(), loadObjectMapping()]);
+        console.log('All configurations loaded. Ready for color popup.');
+      };
+      
+      initializeConfigs();
+      
+      // Function to resolve constants in configuration
+      const resolveConstants = (obj, constants) => {
+        if (typeof obj === 'string' && obj.startsWith('@')) {
+          const constantPath = obj.substring(1).split('.');
+          let result = constants;
+          for (let part of constantPath) {
+            result = result[part];
+            if (!result) break;
+          }
+          return result || obj;
+        } else if (Array.isArray(obj)) {
+          return obj.map(item => resolveConstants(item, constants));
+        } else if (typeof obj === 'object' && obj !== null) {
+          const resolved = {};
+          for (let key in obj) {
+            resolved[key] = resolveConstants(obj[key], constants);
+          }
+          return resolved;
+        }
+        return obj;
+      };
+      
+      // Function to resolve color references like @cedar
+      const resolveColorReferences = (value, colors) => {
+        if (typeof value === 'string' && value.startsWith('@')) {
+          const colorName = value.substring(1);
+          return colors[colorName] || value;
+        } else if (Array.isArray(value)) {
+          return value.map(item => resolveColorReferences(item, colors));
+        }
+        return value;
+      };
+
       const Show_unified_popup = () => {
         let model = picked_mesh.model;
         
         // Show delete button
         $("#custom-controls-delete").show();
         
+        // Fallback to old logic if configs not loaded
+        if (!colorConfig || !objectMapping) {
+          console.warn('Color config or object mapping not loaded, using fallback logic');
+          console.warn('colorConfig loaded:', !!colorConfig);
+          console.warn('objectMapping loaded:', !!objectMapping);
+          // Reset all sections to hidden
+          $("#frame-section").hide();
+          $("#roof-section").hide();
+          $("#trim-section").hide();
+          $("#frame-section").show();
+          $(".custom-controls-unified").css("display", "flex");
+          return;
+        }
+        
+        // Use category and children_index to find object name
+        const categoryKey = `category_${model.category}`;
+        const categoryInfo = objectMapping[categoryKey];
+        
+        let objectName = null;
+        let objectConfig = null;
+        
+        if (categoryInfo && categoryInfo.objects) {
+          const childrenIndex = (model.children_index || 0).toString();
+          objectName = categoryInfo.objects[childrenIndex];
+          
+          // Look for specific object configuration
+          if (objectName) {
+            objectConfig = colorConfig.objects[objectName];
+          }
+        }
+        
+        // If no specific object config, use category defaults
+        if (!objectConfig && categoryInfo) {
+          const categoryType = categoryInfo.name;
+          if (colorConfig.default_sections && colorConfig.default_sections[categoryType]) {
+            objectConfig = {
+              sections: colorConfig.default_sections[categoryType],
+              colors: colorConfig.default_colors || {}
+            };
+          }
+        }
+        
+        // Resolve constants in the configuration
+        if (objectConfig && colorConfig.constants) {
+          try {
+            objectConfig = resolveConstants(objectConfig, colorConfig.constants);
+            // Also resolve color references within the resolved constants
+            if (colorConfig.constants.colors) {
+              objectConfig = JSON.parse(JSON.stringify(objectConfig).replace(/@(\w+)/g, (match, colorName) => {
+                return colorConfig.constants.colors[colorName] || match;
+              }));
+            }
+          } catch (error) {
+            console.error('Error resolving constants:', error);
+          }
+        }
+        
+        if (!objectConfig) {
+          console.warn(`No configuration found for category: ${model.category} (${categoryType}), children_index: ${model.children_index}`);
+          return;
+        }
+        
         // Reset all sections to hidden
         $("#frame-section").hide();
         $("#roof-section").hide();
         $("#trim-section").hide();
         
-        // Always show Frame section with tan/cedar and white options
-        $("#frame-section").show();
+        const visibleSections = [];
+
+        console.log(objectConfig)
         
-        // Show Roof section if model has roof components or is a tower
-        let isTower = model.category === 0; // Assuming category 0 is towers
-        if (model.roof_canopy_mesh || model.roof_poly_mesh || isTower) {
-          $("#roof-section").show();
-          
-          // Update canopy colors dynamically
-          if (model.roof_canopy_mesh) {
-            let splits_canopy = model.roof_canopy_mesh.name.toLowerCase().split(",");
-            let canopyHtml = "";
-            const colorOrder = [1, 2, 3, 4, 6, 5];
+        // Process each section based on object configuration
+        objectConfig.sections.forEach(section => {
+          if (section === "frame") {
+            $("#frame-section").show();
+            visibleSections.push("frame");
             
-            for (let i = 0; i < colorOrder.length; i++) {
-              const color_index = colorOrder[i];
-              if (color_index >= splits_canopy.length) continue;
-              if (splits_canopy[color_index] == "tricolors") {
-                canopyHtml += `<div onclick="Change_roof_canopy_color('tricolors')" class="custom-controls-color" style="background-color: tricolors"><img src="images/image_ae45a138.png" /></div>`;
-              } else {
-                canopyHtml += `<div onclick="Change_roof_canopy_color(0x${splits_canopy[color_index].substring(1)})" class="custom-controls-color" style="background-color: ${splits_canopy[color_index]}"></div>`;
-              }
+            // Use JSON configured frame colors
+            if (objectConfig.colors.frame) {
+              const frameColors = objectConfig.colors.frame;
+              let frameHtml = "";
+              
+              Object.entries(frameColors).forEach(([key, colorData]) => {
+                if (colorData.type === "split") {
+                  // Cedar/Tan split color
+                  frameHtml += `<div onclick="Change_frame_color('cedar_tan')" class="custom-controls-color cedar-tan-split" title="${colorData.label}"></div>`;
+                } else if (colorData.type === "solid") {
+                  // Solid color like white
+                  frameHtml += `<div onclick="Change_frame_color('${key}')" class="custom-controls-color" style="background-color: ${colorData.color}" title="${colorData.label}"></div>`;
+                }
+              });
+              
+              $(".custom-controls-color-frame").html(frameHtml);
             }
-            $(".custom-controls-color-canopy").html(canopyHtml);
-          } else if (isTower) {
-            // Default canopy colors for towers without canopy mesh
-            const defaultCanopyHtml = `
-              <div onclick="Change_roof_canopy_color(0x004983)" class="custom-controls-color" style="background-color: #004983" title="Blue"></div>
-              <div onclick="Change_roof_canopy_color(0x01664b)" class="custom-controls-color" style="background-color: #01664b" title="Green"></div>
-              <div onclick="Change_roof_canopy_color(0xffcb05)" class="custom-controls-color" style="background-color: #ffcb05" title="Yellow"></div>
-              <div onclick="Change_roof_canopy_color(0x93293b)" class="custom-controls-color" style="background-color: #93293b" title="Red"></div>
-              <div onclick="Change_roof_canopy_color(0x5b5e67)" class="custom-controls-color" style="background-color: #5b5e67" title="Gray"></div>
-              <div onclick="Change_roof_canopy_color('tricolors')" class="custom-controls-color" style="background-color: tricolors" title="Tricolor">
-                <img src="images/image_ae45a138.png" />
-              </div>
-            `;
-            $(".custom-controls-color-canopy").html(defaultCanopyHtml);
-          }
-          
-          // Handle poly colors - show only if available
-          let polyHtml = "";
-          
-          if (model.roof_poly_mesh) {
-            let splits_poly = model.roof_poly_mesh.name.toLowerCase().split(",");
-            // Check if the poly mesh has color data
-            if (splits_poly.length > 1) {
-              for (let color_index = 1; color_index < splits_poly.length; color_index++) {
-                if (splits_poly[color_index] != "tricolor") {
-                  polyHtml += `<div onclick="Change_roof_poly_color(0x${splits_poly[color_index].substring(1)})" class="custom-controls-color" style="background-color: ${splits_poly[color_index]}"></div>`;
+          } else if (section === "roof") {
+            // Only show roof if model has roof components
+            if (model.roof_canopy_mesh || model.roof_poly_mesh) {
+              $("#roof-section").show();
+              visibleSections.push("roof");
+              
+              // Use JSON configured roof colors only
+              if (objectConfig.colors.roof) {
+                // Handle canopy colors from JSON config
+                if (objectConfig.colors.roof.canopy) {
+                  const canopyColors = objectConfig.colors.roof.canopy;
+                  let canopyHtml = "";
+                  
+                  Object.entries(canopyColors).forEach(([key, colorData]) => {
+                    if (colorData.type === "special") {
+                      canopyHtml += `<div onclick="Change_roof_canopy_color('tricolors')" class="custom-controls-color" style="background-color: tricolors" title="Tricolor">
+                        <img src="${colorData.image}" />
+                      </div>`;
+                    } else {
+                      canopyHtml += `<div onclick="Change_roof_canopy_color(${colorData.hex})" class="custom-controls-color" style="background-color: ${colorData.color}" title="${key}"></div>`;
+                    }
+                  });
+                  
+                  $(".custom-controls-color-canopy").html(canopyHtml);
+                }
+                
+                // Handle poly colors from JSON config
+                if (objectConfig.colors.roof.poly && model.roof_poly_mesh) {
+                  const polyConfig = objectConfig.colors.roof.poly;
+                  let polyHtml = "";
+                  
+                  // Check if it's dynamic (parse from mesh) or static (use defined colors)
+                  if (polyConfig.dynamic && polyConfig.source === "mesh_name") {
+                    // Dynamic: parse colors from mesh name
+                    let splits_poly = model.roof_poly_mesh.name.toLowerCase().split(",");
+                    if (splits_poly.length > 1) {
+                      for (let color_index = 1; color_index < splits_poly.length; color_index++) {
+                        if (splits_poly[color_index] && splits_poly[color_index] !== "tricolor") {
+                          const colorValue = splits_poly[color_index].startsWith("#") ? splits_poly[color_index] : `#${splits_poly[color_index]}`;
+                          polyHtml += `<div onclick="Change_roof_poly_color(0x${splits_poly[color_index].replace('#', '')})" class="custom-controls-color" style="background-color: ${colorValue}"></div>`;
+                        }
+                      }
+                    }
+                  } else {
+                    // Static: use defined colors from JSON
+                    Object.entries(polyConfig).forEach(([key, colorData]) => {
+                      if (key !== "dynamic" && key !== "source") {
+                        if (colorData.type === "special") {
+                          polyHtml += `<div onclick="Change_roof_poly_color('tricolors')" class="custom-controls-color" style="background-color: tricolors" title="Tricolor">
+                            <img src="${colorData.image}" />
+                          </div>`;
+                        } else {
+                          polyHtml += `<div onclick="Change_roof_poly_color(${colorData.hex})" class="custom-controls-color" style="background-color: ${colorData.color}" title="${key}"></div>`;
+                        }
+                      }
+                    });
+                  }
+                  
+                  if (polyHtml !== "") {
+                    $(".custom-controls-color-poly").html(polyHtml);
+                    $("#poly-group").show();
+                  } else {
+                    $("#poly-group").hide();
+                  }
+                } else {
+                  $("#poly-group").hide();
                 }
               }
             }
+          } else if (section === "trim") {
+            // Check if object has colorizable children
+            const colorizableTag = colorConfig.colorizable_tag || "_colorize_";
+            const hasColorizableChildren = model.mesh.children.some(child => 
+              child.name.toLowerCase().includes(colorizableTag.toLowerCase())
+            );
+            
+            // For debugging, show trim section if it's configured regardless of colorizable children
+            if (objectConfig.colors.trim) {
+              $("#trim-section").show();
+              visibleSections.push("trim");
+              
+              const trimColors = objectConfig.colors.trim;
+              let trimHtml = "";
+              
+              console.log(`Trim colors:`, trimColors);
+              
+              Object.entries(trimColors).forEach(([key, colorData]) => {
+                console.log(`Adding trim color: ${key}`, colorData);
+                trimHtml += `<div onclick="Colorize(${colorData.hex})" class="custom-controls-color" style="background-color: ${colorData.color}" title="${key}"></div>`;
+              });
+              
+              console.log(`Trim HTML:`, trimHtml);
+              $(".custom-controls-color-trim").html(trimHtml);
+            }
           }
-          
-          // Show or hide poly section based on whether there are poly colors
-          if (polyHtml !== "") {
-            $(".custom-controls-color-poly").html(polyHtml);
-            $("#poly-group").show();
-          } else {
-            $("#poly-group").hide();
-          }
+        });
+        
+        // Hide section labels if only one section is visible
+        if (visibleSections.length === 1) {
+          $(".custom-controls-text").hide();
+          $("#custom-controls-line").css("height", "50px");
+        } else {
+          $(".custom-controls-text").show();
+          $("#custom-controls-line").css("height", "100px");
         }
         
-        // Show Trim section for elements that can be colorized
-        let splits = picked_mesh.name.toLowerCase().split(",");
-        if (model.mesh.children.length > 0) {
-          $("#trim-section").show();
+        // Hide divider line if no color sections are visible
+        if (visibleSections.length === 0) {
+          $("#custom-controls-line").hide();
+          $("#custom-controls-padding").hide();
+        } else {
+          $("#custom-controls-line").show();
+          $("#custom-controls-padding").show();
         }
         
         // Show the unified popup
