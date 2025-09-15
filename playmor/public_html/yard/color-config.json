@@ -2,20 +2,21 @@
   "constants": {
     "colors": {
       "cedar": "#D2691E",
-      "tan": "#DEB887", 
+      "tan": "#d3c6a6", 
       "white": "#FFFFFF",
       "roof_blue": "#004983",
       "roof_green": "#01664b",
-      "roof_yellow": "#ffcb05",
+      "roof_yellow": "#fac606",
       "roof_red": "#93293b",
       "roof_gray": "#5b5e67",
       "trim_green": "#01664b",
+      "trim_yellow": "#fac606",
       "trim_blue": "#004983", 
       "trim_red": "#93293b",
       "trim_gray": "#5b5e67",
       "flag_blue": "#004983",
       "flag_green": "#01664b",
-      "flag_yellow": "#ffcb05",
+      "flag_yellow": "#fac606",
       "flag_red": "#93293b",
       "flag_gray": "#5b5e67"
     },
@@ -34,7 +35,7 @@
     "roof_canopy_colors": {
       "blue": {"color": "@roof_blue", "hex": "0x004983"},
       "green": {"color": "@roof_green", "hex": "0x01664b"},
-      "yellow": {"color": "@roof_yellow", "hex": "0xffcb05"},
+      "yellow": {"color": "@roof_yellow", "hex": "0xfac606"},
       "red": {"color": "@roof_red", "hex": "0x93293b"},
       "gray": {"color": "@roof_gray", "hex": "0x5b5e67"},
       "tricolor": {"type": "special", "image": "images/image_ae45a138.png"}
@@ -49,6 +50,13 @@
       "red": {"color": "@trim_red", "hex": "0x93293b"},
       "gray": {"color": "@trim_gray", "hex": "0x5b5e67"}
     },
+    "toy_colors": {
+      "green": {"color": "@trim_green", "hex": "0x01664b"},
+      "blue": {"color": "@trim_blue", "hex": "0x004983"},
+      "red": {"color": "@trim_red", "hex": "0x93293b"},
+      "gray": {"color": "@trim_gray", "hex": "0x5b5e67"},
+      "yellow": {"color": "@trim_yellow", "hex": "0xfac606"}
+    },
     "trim_dynamic": {
       "dynamic": true,
       "colors": "@trim_colors"
@@ -56,7 +64,7 @@
     "flag_colors": {
       "green": {"color": "@flag_green", "hex": "0x01664b"},
       "blue": {"color": "@flag_blue", "hex": "0x004983"},
-      "yellow": {"color": "@flag_yellow", "hex": "0xffcb05"},
+      "yellow": {"color": "@flag_yellow", "hex": "0xfac606"},
       "red": {"color": "@flag_red", "hex": "0x93293b"},
       "gray": {"color": "@flag_gray", "hex": "0x5b5e67"}
     }
@@ -430,6 +438,12 @@
         "all_meshes": ["Cube359", "Cube360", "Cube359_1"]
       }
     },
+    "Bubble": {
+      "sections": ["trim"],
+      "colors": {
+        "trim": "@trim_colors"
+      }
+    },
     "Tic Tac Toe": {
       "sections": [],
       "colors": {}
@@ -438,11 +452,11 @@
   "default_sections": {
     "towers": ["roof", "frame", "trim"],
     "swing_beams": ["frame"],
-    "swings": ["trim"],
+    "swings": ["toy"],
     "kits": ["frame"],
     "entry_points": ["frame"],
-    "slides": ["trim"],
-    "toys": ["trim"],
+    "slides": ["toy"],
+    "toys": ["toy"],
     "flag": ["flag"]
   },
   "default_colors": {
@@ -451,6 +465,7 @@
       "canopy": "@roof_canopy_colors"
     },
     "trim": "@trim_colors",
+    "toy": "@toy_colors",
     "flag": "@flag_colors"
   },
   "colorizable_tag": "_colorize_"

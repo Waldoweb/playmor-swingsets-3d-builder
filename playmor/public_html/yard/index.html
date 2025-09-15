@@ -543,7 +543,8 @@
       .custom-controls-color-canopy,
       .custom-controls-color-poly,
       .custom-controls-color-frame,
-      .custom-controls-color-trim {
+      .custom-controls-color-trim,
+      .custom-controls-color-toy {
         display: flex;
         gap: 5px;
       }
@@ -1327,7 +1328,7 @@
         </div>
       </div>
       <div class="custom-controls-unified" style="display: none">
-        <div id="custom-controls-delete">
+        <div id="custom-controls-delete" style="cursor: pointer;" title="Delete">
           <img src="images/image_6eedc2a9.png" />
         </div>
         <div id="custom-controls-line" class="custom-controls-line"></div>
@@ -1345,6 +1346,13 @@
           <div class="custom-controls-row" id="trim-section" style="display: none;">
             <div class="custom-controls-text">TRIM:</div>
             <div class="custom-controls-color-trim">
+            </div>
+          </div>
+
+          <!-- Toy Section -->
+          <div class="custom-controls-row" id="toy-section" style="display: none;">
+            <div class="custom-controls-text">COLOR:</div>
+            <div class="custom-controls-color-toy">
             </div>
           </div>
 
@@ -1801,6 +1809,7 @@
                 position: model.mesh.position,
                 y_rotation: model.mesh.rotation.y,
                 colorized: model.colorized,
+                frame_color: model.frame_color,
                 ruf: model.ruf,
                 ruf_color: model.ruf_color,
                 flags: model.get_flag_color_list(),
@@ -1959,6 +1968,25 @@
                   mesh.material.color = color;
               });
             }
+            
+            // Restore frame color or set default cedar_tan if not saved
+            if (model_data.frame_color) {
+              model.frame_color = model_data.frame_color;
+              // Apply the saved frame color
+              const tempPickedMesh = picked_mesh;
+              picked_mesh = { model: model };
+              Change_frame_color(model.frame_color);
+              picked_mesh = tempPickedMesh;
+            } else {
+              // Set default frame color if not saved
+              model.frame_color = 'cedar_tan';
+              // Apply the default frame color
+              const tempPickedMesh = picked_mesh;
+              picked_mesh = { model: model };
+              Change_frame_color('cedar_tan');
+              picked_mesh = tempPickedMesh;
+            }
+            
             model.mirrorx = model_data.mirrorx;
             if (model.mirrorx == 1) {
               model.mesh.scale.z = -1;
@@ -2264,6 +2292,7 @@
           this.colorized = null;
           this.ruf = "";
           this.ruf_color = null;
+          this.frame_color = 'cedar_tan';
           this.original = null;
           this.mirrorx = -1;
           this.slope = 0;
@@ -4224,6 +4253,11 @@
           
           model.mesh.traverse((mesh) => {
             if (mesh.material && mesh.material.color) {
+              // Save original map if not already saved
+              if (!mesh.material._originalMap && mesh.material.map) {
+                mesh.material._originalMap = mesh.material.map;
+              }
+              
               // Check if mesh matches cedar mesh patterns
               let isCedarMesh = cedarMeshes.some(pattern => 
                 mesh.name === pattern
@@ -4235,15 +4269,14 @@
               );
               
               if (isCedarMesh) {
-                // Override map color while keeping texture style for cedar
-                // if (mesh.material.map) {
-                //   mesh.material.color = cedarColor;
-                //   mesh.material.emissive = cedarColor;
-                //   mesh.material.emissiveIntensity = 0.2;
-                // } else {
-                  mesh.material.map = null;
-                  mesh.material.color = cedarColor;
-                // }
+                // Cedar meshes should be white color to represent natural cedar
+                mesh.material.color.setHex(0xffffff); // Set to white for cedar
+                mesh.material.emissive.setHex(0x000000); // Reset emissive
+                mesh.material.emissiveIntensity = 0; // Reset emissive intensity
+                // Restore original texture map for natural wood appearance
+                if (mesh.material._originalMap) {
+                  mesh.material.map = mesh.material._originalMap;
+                }
                 mesh.material.needsUpdate = true;
               } else if (isTanMesh) {
                 // Override map color while keeping texture style for tan
@@ -4275,24 +4308,18 @@
           
           model.mesh.traverse((mesh) => {
             if (mesh.material && mesh.material.color) {
+              // Save original map if not already saved
+              mesh.material._originalMap = mesh.material.map;
+              
               // Check if mesh matches any of the frame mesh patterns
               let isFrameMesh = meshNames.some(pattern => 
                 mesh.name ===pattern
               );
               
               if (isFrameMesh) {
-                // // Override map color while keeping texture style
-                // if (mesh.material.map) {
-                //   // Set material color to white first to neutralize map color
-                //   mesh.material.color = colorHex;
-                //   // Create a color overlay effect
-                //   mesh.material.emissive = colorHex;
-                //   mesh.material.emissiveIntensity = 0.7;
-                // } else {
-                  // No map, just set color normally
-                  mesh.material.map = null;
-                  mesh.material.color = colorHex;
-                // }
+                // For solid colors, remove map and apply color
+                mesh.material.map = null;
+                mesh.material.color = colorHex;
                 mesh.material.needsUpdate = true;
               }
             }
@@ -4420,6 +4447,14 @@
         }
         
         scene.add(plug_model.mesh);
+
+        // Apply default cedar_tan frame color to the new model
+        if (plug_model.frame_color === 'cedar_tan') {
+          const tempPickedMesh = picked_mesh;
+          picked_mesh = { model: plug_model };
+          Change_frame_color('cedar_tan');
+          picked_mesh = tempPickedMesh;
+        }
 
         for (let model of Model.instances) model.selected = false;
         //plug_model . selected = true
@@ -5417,6 +5452,7 @@
         $("#frame-section").hide();
         $("#roof-section").hide();
         $("#trim-section").hide();
+        $("#toy-section").hide();
         
         const visibleSections = [];
 
@@ -5538,6 +5574,31 @@
               
               console.log(`Trim HTML:`, trimHtml);
               $(".custom-controls-color-trim").html(trimHtml);
+            }
+          } else if (section === "toy") {
+            // Check if object has colorizable children
+            const colorizableTag = colorConfig.colorizable_tag || "_colorize_";
+            const hasColorizableChildren = model.mesh.children.some(child =>
+              child.name.toLowerCase().includes(colorizableTag.toLowerCase())
+            );
+
+            // Show toy section if it's configured
+            if (objectConfig.colors.toy) {
+              $("#toy-section").show();
+              visibleSections.push("toy");
+
+              const toyColors = objectConfig.colors.toy;
+              let toyHtml = "";
+
+              console.log(`Toy colors:`, toyColors);
+
+              Object.entries(toyColors).forEach(([key, colorData]) => {
+                console.log(`Adding toy color: ${key}`, colorData);
+                toyHtml += `<div onclick="Colorize(${colorData.hex})" class="custom-controls-color" style="background-color: ${colorData.color}" title="${key}"></div>`;
+              });
+
+              console.log(`Toy HTML:`, toyHtml);
+              $(".custom-controls-color-toy").html(toyHtml);
             }
           }
         });
