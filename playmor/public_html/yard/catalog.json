@@ -1,0 +1,84 @@
+{
+  "catalog": [
+    {
+      "id": 1,
+      "catalogId": 171,
+      "title": "Lovely Retreat Swing Set",
+      "description": "Enjoy healthy exercise and fun with the Lovely Retreat Swing Set! Whoosh down the 10′ wave slide, and climb the 5′ steps while having a blast! Imaginations will run, while looking through the super scope and swinging upside down on the trapeze bar! This economical set will give your child loads of fun!",
+      "image": "assets/preview/_171 Lovely Retreat.png",
+      "catalog": "assets/catalog/_171 Lovely Retreat.json"
+    },
+    {
+      "id": 2,
+      "catalogId": 173,
+      "title": "Family Joy Swing Set",
+      "description": "Jump on the vinyl tire swing and have a blast! The Family Joy Swing Set will add many memories to your family. It features a 5′ Cargo Net, that adds a fun twist to your climb to the Play Tower! The baby swing, trapeze with rings, and the super scope complete this versatile set!",
+      "image": "assets/preview/_173 Family Joy.jpg",
+      "catalog": "assets/catalog/_173 Family Joy.json"
+    },
+    {
+      "id": 3,
+      "catalogId": 175,
+      "title": "Jolly Retreat Swing Set",
+      "description": "Your backyard will become a summer retreat, with this jolly retreat swing set! Featuring a 5′ Rock Climb, your child can enjoy the climb to the Poly Play Tower, before swooshing down the 10′ Wave Slide! This set will create fun for all ages!",
+      "image": "assets/preview/_175 Poly Jolly Retreat.jpg",
+      "catalog": "assets/catalog/_175 Poly Jolly Retreat.json"
+    },
+    {
+      "id": 4,
+      "catalogId": 211,
+      "title": "Scenic Pointe Swing Set",
+      "description": "Your child’s playtime fun will skyrocket with the Scenic Pointe swing set. Steps and a gangplank lead to the tower with its steering wheel, and super scope. More challenging ways to climb are the 5′ step or 5′ combo climb. A ride on the 10′ scoop wave slide will take your adventures to the ground where several swing styles are also included – a horse glider, two sling swings and a tire swing. Add this playset to your backyard, and many joy-filled memories are sure to be in your future!",
+      "image": "assets/preview/_211 Scenic Pointe.jpg",
+      "catalog": "assets/catalog/_211 Scenic Pointe.json"
+    },
+    {
+      "id": 5,
+      "catalogId": 223,
+      "title": "Friendly Retreat Swing Set",
+      "description": "If your looking for an economical set, that offers your children maximum play, you have found it with the Friendly Retreat Swing Set! Climb to the summit tower, by using the 5′ step, or for some extra fun, use the 5′ combo climb! Swoosh down the slide, and continue your exploration, by trying out the two sling swings! Add some twirling fun, with the molded tire swing, and make family memories that will last a lifetime!",
+      "image": "assets/preview/_223 Friendly Retreat.png",
+      "catalog": "assets/catalog/_223 Friendly Retreat.json"
+    },
+    {
+      "id": 6,
+      "catalogId": 475,
+      "title": "Golden Retreat Swing Set",
+      "description": "Looking for a backyard retreat? The Golden Retreat Swing Set offers you an economical option, while still featuring all the fun components! The 10′ Gangplank offers a gradual ascent to the lower level tower, before swooshing down the 10′ Wave Slide! The binoculars will give your child a chance to view new horizons!",
+      "image": "assets/preview/_475 Poly Golden Retreat.png",
+      "catalog": "assets/catalog/_475 Poly Golden Retreat.json"
+    },
+    {
+      "id": 7,
+      "catalogId": 518,
+      "title": "Dizzy Delight Swing Set",
+      "description": "Your children will treasure their little days with this Dizzy Delight swing set. They can whittle away many happy hours on the swing options and twirl down the turbo twister slide! From building castles in the sandbox to playing make-believe with the steering wheel and super scope, children will make moments to remember forever!",
+      "image": "assets/preview/_518 Poly Dizzy Delight.png",
+      "catalog": "assets/catalog/_518 Poly Dizzy Delight.json"
+    },
+    {
+      "id": 8,
+      "catalogId": 549,
+      "title": "Backyard Retreat Swing Set",
+      "description": "Whoops of delight and shrieks of laughter can be heard all around this Happy Space Saver swing set. Two Sling Swings provide plenty of good swinging fun and the 10’ Wave Slide adds an extra swoosh of excitement to this space saving swing set. The Super Scope helps your youngster see things just a little better while steering this play set towards an afternoon loaded with fun.",
+      "image": "assets/preview/_549 Backyard Retreat.jpg",
+      "catalog": "assets/catalog/_549 Backyard Retreat.json"
+    },
+    {
+      "id": 9,
+      "catalogId": 102,
+      "title": "Happy Space Saver Swing Set",
+      "description": "If your looking for an economical set, that offers your children maximum play, you have found it with the Friendly Retreat Swing Set! Climb to the summit tower, by using the 5′ step, or for some extra fun, use the 5′ combo climb! Swoosh down the slide, and continue your exploration, by trying out the two sling swings! Add some twirling fun, with the molded tire swing, and make family memories that will last a lifetime!",
+      "image": "assets/preview/_102 Happy Space Saver.jpg",
+      "catalog": "assets/catalog/_102 Happy Space Saver.json"
+    },
+    {
+      "id": 10,
+      "catalogId": 104,
+      "title": "Family Space Saver Swing Set",
+      "description": "Create precious memories in your own backyard with the Family Space Saver swing set. Hours of fun and play await your children with plenty of room for everyone to swing, slide, and climb. This set features a Watch Tower with steps, a Scoop Wave slide, Rock climb, Sling Swings, Picnic Table, Super Scope, Binoculars, and Steering Wheel. Gather the whole family and start making memories today!",
+      "image": "assets/preview/_104 Family Space Saver.png",
+      "catalog": "assets/catalog/_104 Family Space Saver.json"
+    }
+  ]
+}

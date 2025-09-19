@@ -604,6 +604,317 @@
         color: white;
       }
 
+      #welcome-modal-container {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      #welcome-modal {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 4vh;
+        padding: 40px;
+        width: 60vh;
+        max-width: 90vw;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        color: white;
+      }
+
+      #welcome-modal h2 {
+        margin: 0 0 20px 0;
+        color: white;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      #welcome-modal p {
+        margin: 0 0 30px 0;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      .welcome-options {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+      }
+
+      .welcome-option {
+        flex: 1;
+        padding: 20px;
+        padding-top: 100px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 2vh;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: rgba(0, 0, 0, 0.3);
+        background-size: cover;
+        background-position: center;
+        /* background-blend-mode: overlay; */
+        text-decoration: none;
+        color: white;
+        position: relative;
+      }
+
+      .welcome-option.new-project {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('images/image_new.png');
+      }
+
+      .welcome-option.catalog {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('images/image_catalog.png');
+      }
+
+      .welcome-option:hover {
+        border-color: rgba(255, 255, 255, 0.5);
+        background: rgba(0, 0, 0, 0.6);
+      }
+
+      .welcome-option h3 {
+        margin: 0 0 10px 0;
+        font-size: 18px;
+        font-weight: bold;
+        color: white;
+      }
+
+      .welcome-option p {
+        margin: 0;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.4;
+      }
+
+      /* Catalog Modal Styles */
+      #catalog-modal-container {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #catalog-modal {
+        background: #2a2a2a;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 1000px;
+        max-height: 90%;
+        overflow-y: auto;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        position: relative;
+        padding: 0;
+      }
+
+      #catalog-modal::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      #catalog-modal::-webkit-scrollbar-track {
+        background-color: transparent;
+        border-radius: 4px;
+      }
+
+      #catalog-modal::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+      }
+
+      #catalog-modal::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+
+      #catalog-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 30px 40px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+      }
+
+      #catalog-modal h2 {
+        color: white;
+        font-size: 28px;
+        margin: 0;
+        font-weight: 600;
+      }
+
+      #catalog-modal-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 30px;
+        cursor: pointer;
+        line-height: 1;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #catalog-modal-close:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+      }
+
+      #catalog-modal p {
+        color: rgba(255, 255, 255, 0.8);
+        text-align: left;
+        margin: 0;
+        font-size: 15px;
+      }
+
+      #catalog-modal .catalog-modal-subtitle{
+        font-size: 16px;
+        font-weight: 400;
+        text-align: center;
+        margin: 0 40px 30px;
+      }
+
+      #catalog-projects-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        padding: 20px 40px;
+        margin-bottom: 20px;
+        max-height: 60vh;
+        overflow-y: auto;
+      }
+
+      #catalog-projects-container::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      #catalog-projects-container::-webkit-scrollbar-track {
+        background-color: transparent;
+      }
+
+      #catalog-projects-container::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 3px;
+      }
+
+      #catalog-projects-container::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+
+      .catalog-project-card {
+        background: linear-gradient(135deg, #3a3a3a 0%, #2d2d2d 100%);
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        position: relative;
+      }
+
+      .catalog-project-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        border-color: rgba(74, 144, 226, 0.8);
+        background-size: scale(1.1);
+      }
+
+      .catalog-project-card:active {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        border-color: rgba(74, 144, 226, 1);
+      }
+
+      .catalog-project-image {
+        width: 100%;
+        height: 180px;
+        background: linear-gradient(45deg, #4a90e2, #357abd);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 18px;
+        font-weight: 500;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .catalog-project-image::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><g fill-opacity="0.1"><polygon fill="%23ffffff" points="50 0 60 40 100 50 60 60 50 100 40 60 0 50 40 40"/></g></svg>') repeat;
+        opacity: 0.3;
+      }
+
+      .catalog-project-content {
+        padding: 18px 20px;
+      }
+
+      .catalog-project-title {
+        color: white;
+        font-size: 20px;
+        font-weight: 600;
+        margin: 0 0 10px 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .catalog-project-description {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 0;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        text-overflow: ellipsis;
+      }
+
+      .catalog-modal-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 15px 40px;
+        text-align: center;
+      }
+
+      .catalog-back-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 12px 30px;
+        height: fit-content;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s ease;
+      }
+
+      .catalog-back-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+      }
+
+
       #measurement-display {
         display: none;
         position: absolute;
@@ -1380,6 +1691,39 @@
         </div>
       </div>
 
+      <div id="welcome-modal-container">
+        <div id="welcome-modal">
+          <h2>Welcome to 3D Swing Set Builder</h2>
+          <p>Choose how you'd like to start your project</p>
+          <div class="welcome-options">
+            <div class="welcome-option new-project" onclick="startNewProject()">
+              <h3>Start New Project</h3>
+              <p>Begin with a blank canvas and create your playground from scratch</p>
+            </div>
+            <div class="welcome-option catalog" onclick="browseCatalog()">
+              <h3>Browse Playmor Catalog</h3>
+              <p>Explore pre-designed playground projects from our catalog</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="catalog-modal-container">
+        <div id="catalog-modal">
+          <div id="catalog-modal-header">
+            <h2>Browse Playmor Catalog</h2>
+            <div id="catalog-modal-close" onclick="hideCatalogModal()">×</div>
+          </div>
+          <p class="catalog-modal-subtitle">Select a pre-designed playground to start with</p>
+          <div id="catalog-projects-container">
+            <!-- Catalog cards will be populated here -->
+          </div>
+          <div class="catalog-modal-footer">
+            <button onclick="hideCatalogModal()" class="catalog-back-btn">Back to Options</button>
+          </div>
+        </div>
+      </div>
+
       <div id="email_dialog" style="padding: 31px; height: 790px">
         <div id="email_dialog_title" style="height: 79px">
           <label><b>Get a quote</b></label>
@@ -1766,6 +2110,129 @@
       let plug_joint = null;
       let plug_joint_index = -1;
       let plug_model = null;
+
+      let catalogProjects = [];
+
+      // Load catalog data from JSON file
+      async function loadCatalogData() {
+        try {
+          const response = await fetch('catalog.json');
+          const data = await response.json();
+          catalogProjects = data.catalog;
+        } catch (error) {
+          console.error('Error loading catalog data:', error);
+          // Fallback to empty array
+          catalogProjects = [];
+        }
+      }
+
+      function showWelcomeModal() {
+        const welcomeModal = document.getElementById('welcome-modal-container');
+        if (welcomeModal) {
+          welcomeModal.style.display = 'flex';
+        }
+      }
+
+      function hideWelcomeModal() {
+        const welcomeModal = document.getElementById('welcome-modal-container');
+        if (welcomeModal) {
+          welcomeModal.style.display = 'none';
+        }
+      }
+
+      function startNewProject() {
+        hideWelcomeModal();
+        localStorage.setItem('yard-builder-visited', 'true');
+      }
+
+      async function browseCatalog() {
+        hideWelcomeModal();
+        await showCatalogModal();
+        localStorage.setItem('yard-builder-visited', 'true');
+      }
+
+      async function showCatalogModal() {
+        const catalogModal = document.getElementById('catalog-modal-container');
+        if (catalogModal) {
+          catalogModal.style.display = 'flex';
+          await loadCatalogData();
+          populateCatalogProjects();
+        }
+      }
+
+      function hideCatalogModal() {
+        const catalogModal = document.getElementById('catalog-modal-container');
+        if (catalogModal) {
+          catalogModal.style.display = 'none';
+        }
+      }
+
+      function populateCatalogProjects() {
+        const container = document.getElementById('catalog-projects-container');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        if (catalogProjects.length === 0) {
+          container.innerHTML = '<p style="color: white; text-align: center; grid-column: 1 / -1;">Loading catalog...</p>';
+          return;
+        }
+
+        catalogProjects.forEach(project => {
+          const card = document.createElement('div');
+          card.className = 'catalog-project-card';
+          card.onclick = () => loadCatalogProject(project);
+
+          card.innerHTML = `
+            <div class="catalog-project-image" style="background-image: url('${project.image}'); background-size: cover; background-position: center;">
+              <span style="display: none;">Preview Image</span>
+            </div>
+            <div class="catalog-project-content">
+              <h3 class="catalog-project-title">${project.title}</h3>
+              <p class="catalog-project-description">${project.description}</p>
+            </div>
+          `;
+
+          container.appendChild(card);
+        });
+      }
+
+      async function loadCatalogProject(project) {
+        try {
+          let projectData;
+
+          if (project.state) {
+            // Legacy support: project has state property directly
+            projectData = project.state;
+          } else if (project.catalog) {
+            // New approach: fetch JSON from catalog file
+            const response = await fetch(project.catalog);
+            if (!response.ok) {
+              throw new Error(`Failed to fetch catalog file: ${project.catalog}`);
+            }
+            projectData = await response.text();
+          } else {
+            throw new Error('Project has no state or catalog property');
+          }
+
+          // Load the project state using existing Blueprint functionality
+          if (typeof blueprint !== 'undefined' && blueprint.restore) {
+            blueprint.restore({ state: projectData });
+          }
+
+          // Hide the catalog modal
+          hideCatalogModal();
+
+          console.log(`Loaded catalog project: ${project.title}`);
+        } catch (error) {
+          console.error('Error loading catalog project:', error);
+          alert('Failed to load the selected project. Please try another one.');
+        }
+      }
+
+      function checkFirstVisit() {
+        showWelcomeModal();
+      }
 
       class Blueprint {
         static states = [];
@@ -5038,6 +5505,7 @@
           Key_up();
         });
 
+        checkFirstVisit();
         interval_id = setInterval(Tik, 1000 / 33);
       };
     </script>
