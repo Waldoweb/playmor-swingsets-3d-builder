@@ -1451,62 +1451,6 @@
 
       <div class="left-bar">
         <div class="sub_step_container" id="sub_step_container">
-          <h6 class="steps" id="steps-0">
-            <img
-              class="step-image"
-              src="images/image_95eb4509.png"
-              style="opacity: 1; background: transparent"
-            />
-            <div class="step-text">1.Tower</div>
-          </h6>
-          <h6 class="steps" id="steps-1">
-            <img
-              class="step-image"
-              src="images/image_611b458c.png"
-              style="opacity: 1; background: transparent"
-            />
-            <div class="step-text">2.Swing beam</div>
-          </h6>
-          <h6 class="steps" id="steps-2">
-            <img
-              class="step-image"
-              src="images/image_0503539b.png"
-              style="opacity: 1; background: transparent"
-            />
-            <div class="step-text">3.Swings</div>
-          </h6>
-          <h6 class="steps" id="steps-3">
-            <img
-              class="step-image"
-              src="images/image_5524963f.png"
-              style="opacity: 1; background: transparent"
-            />
-            <div class="step-text">4.Kits</div>
-          </h6>
-          <h6 class="steps" id="steps-4">
-            <img
-              class="step-image"
-              src="images/image_8d2acb6c.png"
-              style="opacity: 1; background: rgb(192, 192, 192)"
-            />
-            <div class="step-text">5.Entry point</div>
-          </h6>
-          <h6 class="steps" id="steps-5">
-            <img
-              class="step-image"
-              src="images/image_249c7ebb.png"
-              style="opacity: 1; background: transparent"
-            />
-            <div class="step-text">6.Slides</div>
-          </h6>
-          <h6 class="steps" id="steps-6">
-            <img
-              class="step-image"
-              src="images/image_fd42e184.png"
-              style="opacity: 1; background: transparent"
-            />
-            <div class="step-text">7.Toys</div>
-          </h6>
         </div>
       </div>
       <div id="show-right-btn" style="right: calc(40px + 26vh)">
@@ -2439,20 +2383,12 @@
             // Restore frame color or set default cedar_tan if not saved
             if (model_data.frame_color) {
               model.frame_color = model_data.frame_color;
-              // Apply the saved frame color
-              const tempPickedMesh = picked_mesh;
-              picked_mesh = { model: model };
-              Change_frame_color(model.frame_color);
-              picked_mesh = tempPickedMesh;
             } else {
-              // Set default frame color if not saved
               model.frame_color = 'cedar_tan';
-              // Apply the default frame color
-              const tempPickedMesh = picked_mesh;
-              picked_mesh = { model: model };
-              Change_frame_color('cedar_tan');
-              picked_mesh = tempPickedMesh;
             }
+
+            // Apply all default colors (frame colors and toy colors for swings)
+            applyDefaultColors(model);
             
             model.mirrorx = model_data.mirrorx;
             if (model.mirrorx == 1) {
@@ -3699,6 +3635,9 @@
                 plug_model.morph({ layer: host_joint.model.joints[0].layer });
                 plug_joint = plug_model.joints[plug_joint_index];
                 scene.add(plug_model.mesh);
+
+                // Apply default colors after morphing
+                applyDefaultColors(plug_model);
               }
 
               plug_model.mesh.rotation.y =
@@ -4805,6 +4744,85 @@
           if (mesh.name.indexOf("_colorize_") != -1) mesh.material.color = c;
         });
       };
+
+      const applyDefaultColors = (model, options = {}) => {
+        const { applyFrameColor = true, applyToyColor = true } = options;
+        const tempPickedMesh = picked_mesh;
+        picked_mesh = { model: model };
+
+        // Apply frame color if requested and object has frame configuration
+        if (applyFrameColor && model.frame_color) {
+          const categoryKey = `category_${model.category}`;
+          const categoryInfo = objectMapping[categoryKey];
+          let objectConfig = null;
+
+          if (categoryInfo && categoryInfo.objects[model.children_index]) {
+            const objectName = categoryInfo.objects[model.children_index];
+            objectConfig = colorConfig.objects[objectName];
+          }
+
+          if (objectConfig && objectConfig.sections && objectConfig.sections.includes('frame') && objectConfig.frame_meshes) {
+            Change_frame_color(model.frame_color);
+          }
+        }
+
+        // Check if this specific object has toy color configuration
+        const categoryKey = `category_${model.category}`;
+        const categoryInfo = objectMapping[categoryKey];
+        let objectConfig = null;
+        let objectName = null;
+
+        if (categoryInfo && categoryInfo.objects[model.children_index]) {
+          objectName = categoryInfo.objects[model.children_index];
+          objectConfig = colorConfig.objects[objectName];
+        }
+
+        // Check if object has toy section and toy colors configured
+        const hasToyColorConfig = (objectConfig &&
+                                  objectConfig.sections &&
+                                  objectConfig.sections.includes('toy') &&
+                                  objectConfig.colors &&
+                                  objectConfig.colors.toy) || (!objectConfig && model.category === 2);
+
+        if (applyToyColor && hasToyColorConfig) {
+          let colorizableMeshes = [];
+          let toyBlueColor = new THREE.Color(0x004983);
+
+          model.mesh.traverse((mesh) => {
+            if (mesh.name.toLowerCase().includes("_colorize_")) {
+              colorizableMeshes.push(mesh.name);
+
+              if (mesh.material) {
+                // Handle different material types
+                if (mesh.material.color) {
+                  mesh.material.color.setHex(0x004983);
+                } else if (mesh.material.map) {
+                  // If it's a textured material, try to set color
+                  mesh.material.color = toyBlueColor;
+                } else {
+                  console.log("Mesh has material but no color property:", mesh.name);
+                }
+
+                // Force material to update
+                mesh.material.needsUpdate = true;
+              } else {
+                console.log("Mesh has no material:", mesh.name);
+              }
+            }
+          });
+
+          if (colorizableMeshes.length > 0) {
+            model.colorized = 0x004983; // Set the model as colorized
+          } else {
+            console.log("DEBUG: No colorizable meshes found in swing");
+          }
+        } else {
+          console.log("DEBUG: Toy color not applied - conditions not met");
+        }
+
+        picked_mesh = tempPickedMesh;
+      };
+      
       const Key_up = (args) => {
         switch (Keys.code) {
           case Keys.esc:
@@ -4915,13 +4933,8 @@
         
         scene.add(plug_model.mesh);
 
-        // Apply default cedar_tan frame color to the new model
-        if (plug_model.frame_color === 'cedar_tan') {
-          const tempPickedMesh = picked_mesh;
-          picked_mesh = { model: plug_model };
-          Change_frame_color('cedar_tan');
-          picked_mesh = tempPickedMesh;
-        }
+        // Apply default colors to the new model
+        applyDefaultColors(plug_model);
 
         for (let model of Model.instances) model.selected = false;
         //plug_model . selected = true
@@ -5571,7 +5584,7 @@
             '"/>' +
             '<div class="step-text">' +
             (index + 1) +
-            "." +
+            ". " +
             category.name +
             "</div>" +
             "</h6>";
@@ -6058,14 +6071,10 @@
               const toyColors = objectConfig.colors.toy;
               let toyHtml = "";
 
-              console.log(`Toy colors:`, toyColors);
-
               Object.entries(toyColors).forEach(([key, colorData]) => {
-                console.log(`Adding toy color: ${key}`, colorData);
                 toyHtml += `<div onclick="Colorize(${colorData.hex})" class="custom-controls-color" style="background-color: ${colorData.color}" title="${key}"></div>`;
               });
 
-              console.log(`Toy HTML:`, toyHtml);
               $(".custom-controls-color-toy").html(toyHtml);
             }
           }

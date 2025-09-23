@@ -9,10 +9,10 @@
       "roof_yellow": "#fac606",
       "roof_red": "#93293b",
       "roof_gray": "#5b5e67",
-      "trim_green": "#01664b",
+      "trim_green": "#264425",
       "trim_yellow": "#fac606",
-      "trim_blue": "#004983", 
-      "trim_red": "#93293b",
+      "trim_blue": "#1c4bad", 
+      "trim_red": "#800020",
       "trim_gray": "#5b5e67",
       "flag_blue": "#004983",
       "flag_green": "#01664b",
@@ -45,9 +45,9 @@
       "source": "mesh_name"
     },
     "trim_colors": {
-      "green": {"color": "@trim_green", "hex": "0x01664b"},
-      "blue": {"color": "@trim_blue", "hex": "0x004983"},
-      "red": {"color": "@trim_red", "hex": "0x93293b"},
+      "green": {"color": "@trim_green", "hex": "0x264425"},
+      "blue": {"color": "@trim_blue", "hex": "0x1c4bad"},
+      "red": {"color": "@trim_red", "hex": "0x800020"},
       "gray": {"color": "@trim_gray", "hex": "0x5b5e67"}
     },
     "toy_colors": {
@@ -70,7 +70,7 @@
     }
   },
   "objects": {
-    "Deluxe Play Tower": {
+    "DX Play Tower": {
       "sections": ["roof", "frame", "trim"],
       "colors": {
         "frame": "@frame_colors",
@@ -85,7 +85,7 @@
         "all_meshes": ["Cube001_1", "Cube001001"]
       }
     },
-    "Deluxe Sky Tower": {
+    "DX Sky Tower": {
       "sections": ["roof", "frame", "trim"],
       "colors": {
         "frame": "@frame_colors",
@@ -101,7 +101,7 @@
         "all_meshes": ["Cube603", "Cube603_1001"]
       }
     },
-    "King Tower": {
+    "King's Tower": {
       "sections": ["roof", "frame", "trim"],
       "colors": {
         "frame": "@frame_colors",
@@ -116,7 +116,7 @@
         "all_meshes": ["King_base_bottom", "Cube201_1", "Cube201", "King_base_top", "Box", "King_base_middle"]
       }
     },
-    "Poly Play Tower": {
+    "Play Tower": {
       "sections": ["roof", "frame", "trim"],
       "colors": {
         "frame": "@frame_colors",
@@ -147,7 +147,7 @@
         "all_meshes": ["Plane091", "Plane091_1001"]
       }
     },
-    "Watch Tower Tower": {
+    "Watch Tower": {
       "sections": ["roof", "frame", "trim"],
       "colors": {
         "frame": "@frame_colors",
@@ -163,13 +163,13 @@
         "all_meshes": ["Watch_tower_base_bottom002", "Cube833", "Watch_tower_base_middle002", "Cube833_1001"]
       }
     },
-    "Tower Tunnel": {
+    "Tunnel": {
       "sections": ["trim"],
       "colors": {
         "trim": "@trim_colors"
       }
     },
-    "Tunnel Bridge": {
+    "Bridge": {
       "sections": ["frame", "trim"],
       "colors": {
         "frame": "@frame_colors",
@@ -181,81 +181,81 @@
         "all_meshes": ["Cube188"]
       }
     },
-    "Attachment Beam 3 Positions 8 ft": {
+    "3 Swing Beam - 8 ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
       },
       "frame_meshes": {
         "cedar_meshes": ["Plane001"],
-        "tan_meshes": ["Plane001_1,_colorize_"],
-        "all_meshes": ["Plane001_1,_colorize_", "Plane001"]
+        "tan_meshes": ["Plane001_1,_colorize_", "Plane001_2"],
+        "all_meshes": ["Plane001_1,_colorize_", "Plane001", "Plane001_2"]
       }
     },
-    "Attachment Beam 3 Positions 10 ft": {
+    "3 Swing Beam - 10 ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
       },
       "frame_meshes": {
         "cedar_meshes": ["Plane049"],
-        "tan_meshes": ["Plane049_1,_colorize_"],
-        "all_meshes": ["Plane049_1,_colorize_", "Plane049"]
+        "tan_meshes": ["Plane049_1,_colorize_", "Plane049_2"],
+        "all_meshes": ["Plane049_1,_colorize_", "Plane049", "Plane049_2"]
       }
     },
-    "Attachment Beam 4 Positions 8 ft": {
+    "4 Swing Beam - 8 ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
       },
       "frame_meshes": {
         "cedar_meshes": ["Plane003"],
-        "tan_meshes": ["Plane003_1,_colorize_"],
-        "all_meshes": ["Plane003_1,_colorize_", "Plane003"]
+        "tan_meshes": ["Plane003_1,_colorize_", "Plane003_2"],
+        "all_meshes": ["Plane003_1,_colorize_", "Plane003", "Plane003_2"]
       }
     },
-    "Attachment Beam 4 Positions 10 ft": {
+    "4 Swing Beam - 10 ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
       },
       "frame_meshes": {
         "cedar_meshes": ["Plane002"],
-        "tan_meshes": ["Plane002_1,_colorize_"],
-        "all_meshes": ["Plane002_1,_colorize_", "Plane002"]
+        "tan_meshes": ["Plane002_1,_colorize_", "Plane002_2"],
+        "all_meshes": ["Plane002_1,_colorize_", "Plane002", "Plane002_2"]
       }
     },
-    "Disc Swing Attachment Beam 8 ft": {
+    "Disc Swing Beam - 8 ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
       },
       "frame_meshes": {
         "cedar_meshes": ["Plane077"],
-        "tan_meshes": ["Plane077_1,_colorize_"],
-        "all_meshes": ["Plane077_1,_colorize_", "Plane077"]
+        "tan_meshes": ["Plane077_1,_colorize_", "Plane077_2"],
+        "all_meshes": ["Plane077_1,_colorize_", "Plane077", "Plane077_2"]
       }
     },
-    "Disc Swing Attachment Beam 10 ft": {
+    "Disc Swing Beam - 10 ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
       },
       "frame_meshes": {
         "cedar_meshes": ["Plane073"],
-        "tan_meshes": ["Plane073_1,_colorize_"],
-        "all_meshes": ["Plane073_1,_colorize_", "Plane073"]
+        "tan_meshes": ["Plane073_1,_colorize_", "Plane073_2"],
+        "all_meshes": ["Plane073_1,_colorize_", "Plane073", "Plane073_2"]
       }
     },
     "Tire Swing": {
       "sections": [],
       "colors": {}
     },
-    "Bird Nest Swing": {
+    "Bird's Nest Swing": {
       "sections": [],
       "colors": {}
     },
-    "End Rail": {
+    "Safety Rail Kit": {
       "sections": ["frame", "trim"],
       "colors": {
         "frame": "@frame_colors",
@@ -267,23 +267,23 @@
         "all_meshes": ["Box"]
       }
     },
-    "DT Full Floor Kit": {
+    "DX Sky Tower Floor - Full": {
       "sections": [],
       "colors": {}
     },
-    "DT Half Floor Kit": {
+    "DX Sky Tower Floor - Half": {
       "sections": [],
       "colors": {}
     },
-    "KT Floor Kit": {
+    "King's Tower Floor,": {
       "sections": [],
       "colors": {}
     },
-    "WT Floor Kit": {
+    "Watch Tower Floor": {
       "sections": [],
       "colors": {}
     },
-    "Picnic Table": {
+    "Picnic Table Kit": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -294,11 +294,11 @@
         "all_meshes": ["Icosphere006_1,_colorize_", "Icosphere006_2"]
       }
     },
-    "Kitchen": {
+    "Kitchen Kit": {
       "sections": [],
       "colors": {}
     },
-    "Cargo Net": {
+    "Cargo Net - 5ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -309,7 +309,7 @@
         "all_meshes": ["Cube151_1", "Cube151"]
       }
     },
-    "Combo Climbing": {
+    "Combo Climb - 5ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -324,11 +324,11 @@
       "sections": [],
       "colors": {}
     },
-    "Fireman Pole": {
+    "Fireman's Pole": {
       "sections": [],
       "colors": {}
     },
-    "Gang Plank 4ft": {
+    "Gang Plank - 4ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -339,7 +339,7 @@
         "all_meshes": ["Plane001", "Plane070"]
       }
     },
-    "Gang Plank 5ft": {
+    "Gang Plank - 5ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -350,7 +350,7 @@
         "all_meshes": ["Plane001", "Plane052"]
       }
     },
-    "Monkey Bar Attachment": {
+    "Monkey Bars Attachment - 5ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -361,7 +361,7 @@
         "all_meshes": ["Cylinder005_1", "Cylinder005_2"]
       }
     },
-    "Monkey Bar Climber 4ft": {
+    "Monkey Bars - Stand-Alone 5ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -372,18 +372,7 @@
         "all_meshes": ["Cube219", "Cube219_1"]
       }
     },
-    "Monkey Bar Climber 5ft": {
-      "sections": ["frame"],
-      "colors": {
-        "frame": "@frame_colors"
-      },
-      "frame_meshes": {
-        "cedar_meshes": ["Cube219_1"],
-        "tan_meshes": ["Cube219"],
-        "all_meshes": ["Cube219", "Cube219_1"]
-      }
-    },
-    "Poly Rock Climb 5ft": {
+    "Rock Climb - 5ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -394,7 +383,7 @@
         "all_meshes": ["Cube361_1", "Cube361"]
       }
     },
-    "Poly Rock Climb 7ft": {
+    "Rock Climb - 7ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -405,7 +394,7 @@
         "all_meshes": ["Cube199_1", "Cube199_2"]
       }
     },
-    "Steps 4ft": {
+    "Steps - 4ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -416,7 +405,7 @@
         "all_meshes": ["Cube339,_colorize_", "Cube339_1"]
       }
     },
-    "Steps 5ft": {
+    "Steps - 5ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -427,7 +416,7 @@
         "all_meshes": ["Cube195_1", "Cube195"]
       }
     },
-    "Steps 7ft": {
+    "Steps - 7ft": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -438,25 +427,25 @@
         "all_meshes": ["Cube359", "Cube360", "Cube359_1"]
       }
     },
-    "Bubble": {
+    "Bubble Panel Kit": {
       "sections": ["trim"],
       "colors": {
         "trim": "@trim_colors"
       }
     },
-    "Tic Tac Toe": {
+    "Tic-Tac-Toe": {
       "sections": [],
       "colors": {}
     }
   },
   "default_sections": {
-    "towers": ["roof", "frame", "trim"],
-    "swing_beams": ["frame"],
-    "swings": ["toy"],
-    "kits": ["frame"],
-    "entry_points": ["frame"],
-    "slides": ["toy"],
-    "toys": ["toy"],
+    "Towers": ["roof", "frame", "trim"],
+    "Swing Beams": ["frame"],
+    "Swings": ["toy"],
+    "Floors + Kits": ["frame"],
+    "Entries + Climbers": ["frame"],
+    "Slides": ["toy"],
+    "Toys": ["toy"],
     "flag": ["flag"]
   },
   "default_colors": {
