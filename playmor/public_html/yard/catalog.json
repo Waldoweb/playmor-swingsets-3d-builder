@@ -21,8 +21,8 @@
       "catalogId": 175,
       "title": "Jolly Retreat Swing Set",
       "description": "Your backyard will become a summer retreat, with this jolly retreat swing set! Featuring a 5′ Rock Climb, your child can enjoy the climb to the Poly Play Tower, before swooshing down the 10′ Wave Slide! This set will create fun for all ages!",
-      "image": "assets/preview/_175 Poly Jolly Retreat.jpg",
-      "catalog": "assets/catalog/_175 Poly Jolly Retreat.json"
+      "image": "assets/preview/_175 Jolly Retreat.jpg",
+      "catalog": "assets/catalog/_175 Jolly Retreat.json"
     },
     {
       "id": 4,
@@ -45,16 +45,16 @@
       "catalogId": 475,
       "title": "Golden Retreat Swing Set",
       "description": "Looking for a backyard retreat? The Golden Retreat Swing Set offers you an economical option, while still featuring all the fun components! The 10′ Gangplank offers a gradual ascent to the lower level tower, before swooshing down the 10′ Wave Slide! The binoculars will give your child a chance to view new horizons!",
-      "image": "assets/preview/_475 Poly Golden Retreat.png",
-      "catalog": "assets/catalog/_475 Poly Golden Retreat.json"
+      "image": "assets/preview/_475 Golden Retreat.png",
+      "catalog": "assets/catalog/_475 Golden Retreat.json"
     },
     {
       "id": 7,
       "catalogId": 518,
       "title": "Dizzy Delight Swing Set",
       "description": "Your children will treasure their little days with this Dizzy Delight swing set. They can whittle away many happy hours on the swing options and twirl down the turbo twister slide! From building castles in the sandbox to playing make-believe with the steering wheel and super scope, children will make moments to remember forever!",
-      "image": "assets/preview/_518 Poly Dizzy Delight.png",
-      "catalog": "assets/catalog/_518 Poly Dizzy Delight.json"
+      "image": "assets/preview/_518 Dizzy Delight.png",
+      "catalog": "assets/catalog/_518 Dizzy Delight.json"
     },
     {
       "id": 8,

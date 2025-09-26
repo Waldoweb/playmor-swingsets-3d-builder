@@ -2038,8 +2038,22 @@
       let intersection_object;
       let intersection_point;
       let intersection_mesh;
-      let switchboard = [];
       let adopted = 0;
+
+      // New object ID-based variables to replace category_index and item_index
+      let selected_category = null;
+      let selected_object_id = null;
+
+      // Initialize with first category if objectMapping is available
+      function initializeObjectIdSystem() {
+        if (objectMapping && !selected_category) {
+          const sortedCategories = Object.entries(objectMapping.categories)
+            .sort((a, b) => a[1].display_order - b[1].display_order);
+          if (sortedCategories.length > 0) {
+            selected_category = sortedCategories[0][0];
+          }
+        }
+      }
       let show_mesurements = false;
       let measurements = "0.00' x 0.00' x 0.00'";
       let measurements_font_height = 32;
@@ -2215,6 +2229,7 @@
                 slope: model.slope,
                 mirrorx: model.mirrorx,
                 index: model.index,
+                object_id: model.object_id,
                 save_index: model.save_index,
                 yaw: model.yaw,
                 position: model.mesh.position,
@@ -2230,6 +2245,7 @@
                     return {
                       index: joint.index,
                       link: {
+                        model_object_id: joint.connected.model.object_id,
                         model_save_index: joint.connected.model.save_index,
                         joint_index: joint.connected.index,
                       },
@@ -2277,7 +2293,22 @@
 
           models_with_available_joints = [];
           for (let model_data of state.models_data) {
-            let model = Model.instances[model_data.index].clone();
+            let model;
+
+            // Try to get model using object_id first (new system)
+            if (model_data.object_id && objectMapping) {
+              const modelIndex = getModelIndexFromObjectId(model_data.object_id);
+              if (modelIndex !== null) {
+                model = Model.instances[modelIndex].clone();
+                model.object_id = model_data.object_id; // Set the object_id on the cloned model
+              } else {
+                console.warn('Could not find model for object_id:', model_data.object_id, 'falling back to index');
+                model = Model.instances[model_data.index].clone();
+              }
+            } else {
+              // Fallback to old index system
+              model = Model.instances[model_data.index].clone();
+            }
             model.yaw = model_data.yaw;
             model.mesh.rotation.y = model_data.y_rotation;
             model.mesh.position.set(
@@ -2330,15 +2361,30 @@
             }
             for (let joint_data of model_data.joints) {
               let joint = model.joints[joint_data.index];
-              if (
-                !joint.connected &&
-                joint_data.link.model_save_index <
-                  models_with_available_joints.length
-              ) {
-                let model2 =
-                  models_with_available_joints[
-                    joint_data.link.model_save_index
-                  ];
+
+              // Safety check: ensure joint exists
+              if (!joint) {
+                console.warn('Joint not found at index:', joint_data.index, 'for model with object_id:', model.object_id);
+                continue;
+              }
+
+              if (!joint.connected) {
+                let model2;
+
+                // Try to find connected model using object_id first (new system)
+                if (joint_data.link.model_object_id) {
+                  model2 = models_with_available_joints.find(m => m.object_id === joint_data.link.model_object_id);
+                  if (!model2) {
+                    console.warn('Could not find connected model for object_id:', joint_data.link.model_object_id, 'falling back to save_index');
+                  }
+                }
+
+                // Fallback to old save_index system
+                if (!model2 && joint_data.link.model_save_index < models_with_available_joints.length) {
+                  model2 = models_with_available_joints[joint_data.link.model_save_index];
+                }
+
+                if (model2) {
                 let joint2 = model2.joints[joint_data.link.joint_index];
 
                 if (
@@ -2357,12 +2403,13 @@
 
                 if (joint.layer == "handle") {
                   joint.model.mesh.traverse((mesh) => {
-                    if (mesh.name.indexOf("_colorize_") != -1)
+                    if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
                       mesh.rotation.x = model2.slope * Deg2Rad;
                   });
                 }
 
                 Connect_joints({ joint_1: joint, joint_2: joint2 });
+                }
               }
             }
             if (model_data.colorized) {
@@ -2375,7 +2422,7 @@
               let color = new THREE.Color("#" + color_string);
 
               model.mesh.traverse((mesh) => {
-                if (mesh.name.indexOf("_colorize_") != -1)
+                if (mesh.name && mesh.name.indexOf("_colorize_") != -1 && mesh.material)
                   mesh.material.color = color;
               });
             }
@@ -2692,6 +2739,7 @@
           this.index = Model.instances.length;
           this.category = -1;
           this.children_index = -1;
+          this.object_id = null;
           this.colorized = null;
           this.ruf = "";
           this.ruf_color = null;
@@ -2702,6 +2750,11 @@
           this.tubular = false;
 
           if (args) {
+            // Direct object_id assignment takes priority
+            if ("object_id" in args) {
+              this.object_id = args.object_id;
+            }
+
             if ("category" in args) this.category = args.category;
             if ("children_index" in args)
               this.children_index = args.children_index;
@@ -2716,6 +2769,11 @@
               if ("slope" in args.category_child)
                 this.slope = args.category_child.slope;
             }
+          }
+
+          // Set object_id based on category and children_index if not already set
+          if (!this.object_id && this.category !== -1 && this.children_index !== -1) {
+            this.object_id = getObjectIdFromCategoryIndex(this.category, this.children_index);
           }
 
           Model.instances.push(this);
@@ -2734,11 +2792,11 @@
               mesh.model = this;
               mesh.castShadow = shadows;
               mesh.receiveShadow = shadows;
-              if (mesh.name.toLowerCase().startsWith("roof_canopy"))
+              if (mesh.name && mesh.name.toLowerCase().startsWith("roof_canopy"))
                 this.roof_canopy_mesh = mesh;
-              if (mesh.name.toLowerCase().startsWith("roof_poly"))
+              if (mesh.name && mesh.name.toLowerCase().startsWith("roof_poly"))
                 this.roof_poly_mesh = mesh;
-              if (mesh.name.toLowerCase().startsWith("joint")) {
+              if (mesh.name && mesh.name.toLowerCase().startsWith("joint")) {
                 let splits = mesh.name.split(",");
                 mesh.direction = parseInt(splits[1]);
                 mesh.layer = splits[2].toLowerCase();
@@ -2758,7 +2816,7 @@
           let joint = null;
           while (index < 0 && i < this.joints.length) {
             joint = this.joints[i++];
-            index = joint.name.indexOf("!");
+            index = joint.name ? joint.name.indexOf("!") : -1;
           }
           if (index >= 0) {
             this.joints.splice(--i, 1);
@@ -2778,13 +2836,13 @@
               mesh.model = this;
               mesh.castShadow = shadows;
               mesh.receiveShadow = shadows;
-              if (mesh.name.toLowerCase().startsWith("roof_canopy")) {
+              if (mesh.name && mesh.name.toLowerCase().startsWith("roof_canopy")) {
                 this.roof_canopy_mesh = mesh;
                 this.roof_canopy_material = mesh.material;
               }
-              if (mesh.name.toLowerCase().startsWith("roof_poly"))
+              if (mesh.name && mesh.name.toLowerCase().startsWith("roof_poly"))
                 this.roof_poly_mesh = mesh;
-              if (mesh.name.toLowerCase().startsWith("joint")) {
+              if (mesh.name && mesh.name.toLowerCase().startsWith("joint")) {
                 let splits = mesh.name.split(",");
                 mesh.direction = parseInt(splits[1]);
                 mesh.layer = splits[2].toLowerCase();
@@ -2878,6 +2936,7 @@
 
           clone.category = this.category;
           clone.children_index = this.children_index;
+          clone.object_id = this.object_id; // Copy the object_id
           clone.layers = this.layers;
           clone.index = this.index;
           clone.original = this;
@@ -3536,7 +3595,7 @@
               let we_gud = false;
               if (joint.available) {
                 if (
-                  joint.name.indexOf("_no_tube_slides") > -1 &&
+                  joint.name && joint.name.indexOf("_no_tube_slides") > -1 &&
                   plug_joint.model.tubular
                 ) {
                 } else {
@@ -3649,7 +3708,7 @@
 
               if (host_joint.layer == "handle") {
                 plug_model.mesh.traverse((mesh) => {
-                  if (mesh.name.indexOf("_colorize_") != -1)
+                  if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
                     mesh.rotation.x = host_joint.model.slope * Deg2Rad;
                 });
               }
@@ -3748,7 +3807,7 @@
                     let htmlStr = "";
                     for (let color_index = 1; color_index < splits.length; color_index++) {
                       if(splits[color_index] !== 'tricolors')
-                        htmlStr += `<div onclick="Change_flag_color((0x${splits[color_index].substring(1)})" class="custom-controls-color" style="background-color: ${splits[color_index]}"></div>`;
+                        htmlStr += `<div onclick="Change_flag_color(0x${splits[color_index].substring(1)})" class="custom-controls-color" style="background-color: ${splits[color_index]}"></div>`;
                     }
                     $(".custom-controls-color-trim").html(htmlStr);
                   }
@@ -3899,8 +3958,8 @@
           html += "<tr>";
 
           let thumbnail = thumbnailer.nail_it({ model: model });
-          let name =
-            Categories[model.category].children[model.children_index].name;
+          const { objectName } = getObjectInfoById(model.object_id);
+          let name = objectName || 'Unknown Object';
           let ruf = "";
           if (model.roof_canopy_mesh)
             if (model.roof_canopy_mesh.visible)
@@ -3910,7 +3969,7 @@
           let colorized_color_name = "";
 
           model.mesh.traverse((mesh) => {
-            if (mesh.name.indexOf("_colorize_") != -1)
+            if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
               colorized_color_name =
                 Color2Name(new THREE.Color(mesh.material.color)) +
                 " base color";
@@ -4409,13 +4468,21 @@
             .promise({ base_64: event.target.result })
             .then((resolution) => {
               let model = resolution.resolution;
-              Categories[category_index].children.push({
-                name: fileReader.filename_name,
-                thumbnail: thumbnailer.nail_it({ model: model }),
-                model: model,
-                glb:
-                  "data:application/octet-stream;base64," + event.target.result,
-              });
+              // Generate a unique object_id for user-uploaded models
+              const userObjectId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+              model.object_id = userObjectId;
+
+              // Add to Categories if it exists (for backward compatibility)
+              if (typeof Categories !== 'undefined' && Categories.length > 0) {
+                Categories[category_index].children.push({
+                  name: fileReader.filename_name,
+                  thumbnail: thumbnailer.nail_it({ model: model }),
+                  model: model,
+                  object_id: userObjectId,
+                  glb:
+                    "data:application/octet-stream;base64;" + event.target.result,
+                });
+              }
               Show_items();
 
               if (!display_items) {
@@ -4456,12 +4523,13 @@
           });
 
           if (
+            picked_mesh.name &&
             picked_mesh.name.indexOf("roof") == -1 &&
             picked_mesh.name.indexOf("flag") == -1
           ) {
             let colorized = 0;
             picked_mesh.model.mesh.traverse(function (mesh) {
-              if (mesh.name.indexOf("_colorize_") != -1) {
+              if (mesh.name && mesh.name.indexOf("_colorize_") != -1) {
                 mesh.visible = true;
                 while (mesh != null) {
                   mesh.visible = true;
@@ -4568,7 +4636,9 @@
         Render();
       };
       const Change_flag_color = (color) => {
-        picked_mesh.material.color = new THREE.Color(color);
+        if (picked_mesh && picked_mesh.material) {
+          picked_mesh.material.color = new THREE.Color(color);
+        }
       };
       const Change_roof_canopy_color = (color) => {
         let model = picked_mesh.model;
@@ -4609,27 +4679,8 @@
         let model = picked_mesh.model;
         model.frame_color = color;
         
-        console.log("Change_frame_color called with:", color);
-        console.log("Model object:", model);
-        console.log("Model category:", model?.category);
-        console.log("Model children_index:", model?.children_index);
-        
-        // Use category and children_index to find object name
-        const categoryKey = `category_${model.category}`;
-        const categoryInfo = objectMapping[categoryKey];
-        
-        let objectName = null;
-        let objectConfig = null;
-        
-        if (categoryInfo && categoryInfo.objects) {
-          const childrenIndex = (model.children_index || 0).toString();
-          objectName = categoryInfo.objects[childrenIndex];
-          
-          // Look for specific object configuration
-          if (objectName) {
-            objectConfig = colorConfig.objects[objectName];
-          }
-        }
+        // Use object_id to find object name and config
+        const { objectName, objectConfig } = getObjectInfoById(model.object_id);
         
         console.log("Resolved object name:", objectName);
         console.log("Object config found:", !!objectConfig);
@@ -4736,12 +4787,13 @@
         picked_mesh.model.colorized = color;
 
         let s = color.toString(16);
-        if (s.length < 6) s = "0" + s;
-        if (s.length < 6) s = "0" + s;
+        while (s.length < 6) s = "0" + s;
         let c = new THREE.Color("#" + s);
 
         picked_mesh.model.mesh.traverse((mesh) => {
-          if (mesh.name.indexOf("_colorize_") != -1) mesh.material.color = c;
+          if (mesh.name && mesh.name.indexOf("_colorize_") != -1 && mesh.material) {
+            mesh.material.color = c;
+          }
         });
       };
 
@@ -4752,30 +4804,14 @@
 
         // Apply frame color if requested and object has frame configuration
         if (applyFrameColor && model.frame_color) {
-          const categoryKey = `category_${model.category}`;
-          const categoryInfo = objectMapping[categoryKey];
-          let objectConfig = null;
-
-          if (categoryInfo && categoryInfo.objects[model.children_index]) {
-            const objectName = categoryInfo.objects[model.children_index];
-            objectConfig = colorConfig.objects[objectName];
-          }
-
+          const { objectName, objectConfig } = getObjectInfoById(model.object_id);
           if (objectConfig && objectConfig.sections && objectConfig.sections.includes('frame') && objectConfig.frame_meshes) {
             Change_frame_color(model.frame_color);
           }
         }
 
         // Check if this specific object has toy color configuration
-        const categoryKey = `category_${model.category}`;
-        const categoryInfo = objectMapping[categoryKey];
-        let objectConfig = null;
-        let objectName = null;
-
-        if (categoryInfo && categoryInfo.objects[model.children_index]) {
-          objectName = categoryInfo.objects[model.children_index];
-          objectConfig = colorConfig.objects[objectName];
-        }
+        const { objectName, objectConfig } = getObjectInfoById(model.object_id);
 
         // Check if object has toy section and toy colors configured
         const hasToyColorConfig = (objectConfig &&
@@ -4917,8 +4953,32 @@
         plug_joint_index = -1;
         plug_model = null;
 
-        plug_model =
-          Categories[category_index].children[item_index].model.clone();
+        // Determine object_id from either the new system or fallback to Categories
+        let objectId = null;
+
+        if (selected_object_id) {
+          objectId = selected_object_id;
+        } else if (typeof Categories !== 'undefined' && Categories.length > 0 && typeof category_index !== 'undefined' && typeof item_index !== 'undefined') {
+          // Fallback: get object_id from Categories using category_index and item_index
+          const model = Categories[category_index].children[item_index].model;
+          if (model && model.object_id) {
+            objectId = model.object_id;
+          }
+        }
+
+        if (!objectId) {
+          console.warn('No object ID available for item click');
+          return;
+        }
+
+        // Find the model by object_id
+        const model = Model.instances.find(m => m.object_id === objectId);
+        if (!model) {
+          console.warn(`No model found for object_id: ${objectId}`);
+          return;
+        }
+
+        plug_model = model.clone();
 
         // Check tower type and apply correct rotation for front-facing direction
         if(plug_model.mesh.children[0].name.includes("King") || plug_model.mesh.children[0].name.includes("summitglb")){
@@ -5248,8 +5308,8 @@
           html += "<tr>";
 
           let thumbnail = thumbnailer.nail_it({ model: model });
-          let name =
-            Categories[model.category].children[model.children_index].name;
+          const { objectName } = getObjectInfoById(model.object_id);
+          let name = objectName || 'Unknown Object';
           let ruf = "";
           if (model.roof_canopy_mesh)
             if (model.roof_canopy_mesh.visible)
@@ -5259,7 +5319,7 @@
           let colorized_color_name = "";
 
           model.mesh.traverse((mesh) => {
-            if (mesh.name.indexOf("_colorize_") != -1)
+            if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
               colorized_color_name =
                 Color2Name(new THREE.Color(mesh.material.color)) +
                 " base color";
@@ -5478,6 +5538,7 @@
           console.log('Camera rotation set to:', degrees, 'degrees');
         };
 
+
         //document . oncontextmenu    = event => event . preventDefault ( )
         window.addEventListener("resize", Resize, false);
         canvas.addEventListener("pointerdown", function (event) {
@@ -5567,73 +5628,172 @@
       let display_mulch = false;
       let display_email = false;
       let mulch_enabled = true;
+      // Legacy variables kept for backward compatibility with Categories system
       let category_index = 0;
       let item_index = 0;
 
       const Show_categories = function () {
-        let index = 0;
         let html = "";
-        switchboard = [];
-        for (let category of Categories) {
-          html +=
-            '<h6 class="steps" id="steps-' +
-            index +
-            '">' +
-            '<img class="step-image" src="' +
-            category.thumbnail +
-            '"/>' +
-            '<div class="step-text">' +
-            (index + 1) +
-            ". " +
-            category.name +
-            "</div>" +
-            "</h6>";
-          switchboard.push([]);
-          index++;
-        }
-        sub_step_container.innerHTML = html;
 
-        $(".steps").on("click", (event) => {
-          if (event && event.currentTarget && event.currentTarget.id) {
-            var index = event.currentTarget.id.replace(/^\D+/g, "");
-
-            category_index = parseInt(index);
-            Highlight_category();
-            Show_items();
-            Highlight_item();
-
-            if (!display_items) {
-              // open
-              $(".right-bar").css("right", "10px");
-              $("#show-right-btn").css("right", `calc(26vh + 40px)`);
-              $(".bottom-controls-right").css("right", `calc(26vh + 40px)`);
-              display_items = true;
-            }
+        // Use existing Categories system if available, otherwise fall back to objectMapping
+        if (typeof Categories !== 'undefined' && Categories.length > 0) {
+          let index = 0;
+          for (let category of Categories) {
+            html +=
+              '<h6 class="steps" id="steps-' +
+              index +
+              '">' +
+              '<img class="step-image" src="' +
+              category.thumbnail +
+              '"/>' +
+              '<div class="step-text">' +
+              (index + 1) +
+              ". " +
+              category.name +
+              "</div>" +
+              "</h6>";
+            index++;
           }
-        });
+
+          sub_step_container.innerHTML = html;
+
+          $(".steps").on("click", (event) => {
+            if (event && event.currentTarget && event.currentTarget.id) {
+              var index = event.currentTarget.id.replace(/^\D+/g, "");
+              category_index = parseInt(index);
+              Highlight_category();
+              Show_items();
+              Highlight_item();
+
+              if (!display_items) {
+                // open
+                $(".right-bar").css("right", "10px");
+                $("#show-right-btn").css("right", `calc(26vh + 40px)`);
+                $(".bottom-controls-right").css("right", `calc(26vh + 40px)`);
+                display_items = true;
+              }
+            }
+          });
+        } else if (objectMapping) {
+          // Use objectMapping.categories as fallback
+          const sortedCategories = Object.entries(objectMapping.categories)
+            .sort((a, b) => a[1].display_order - b[1].display_order);
+
+          sortedCategories.forEach(([categoryKey, categoryInfo], index) => {
+            html +=
+              '<h6 class="steps" data-category="' + categoryKey + '" id="steps-' +
+              index +
+              '">' +
+              '<img class="step-image" src="' +
+              'images/' + categoryKey + '_thumbnail.png' +
+              '"/>' +
+              '<div class="step-text">' +
+              (index + 1) +
+              ". " +
+              categoryInfo.name +
+              "</div>" +
+              "</h6>";
+          });
+
+          sub_step_container.innerHTML = html;
+
+          $(".steps").on("click", (event) => {
+            if (event && event.currentTarget) {
+              let categoryKey = event.currentTarget.getAttribute('data-category');
+              if (selected_category !== categoryKey) {
+                selected_category = categoryKey;
+                Highlight_category();
+                Show_items();
+                Highlight_item();
+
+                if (!display_items) {
+                  // open
+                  $(".right-bar").css("right", "10px");
+                  $("#show-right-btn").css("right", `calc(26vh + 40px)`);
+                  $(".bottom-controls-right").css("right", `calc(26vh + 40px)`);
+                  display_items = true;
+                }
+              }
+            }
+          });
+        } else {
+          console.warn('Neither Categories nor objectMapping available for showing categories');
+        }
       };
       const Load_models = (args) => {
-        let category_index = 0;
-        for (let category of Categories) {
-          let child_index = 0;
-          for (let child of category.children) {
-            child.model = new Model({
-              category_child: child,
-              category: category_index,
-              children_index: child_index++,
-            });
+        // Keep the original Categories-based system but ensure object_id is set
+        if (typeof Categories !== 'undefined' && Categories.length > 0) {
+          // Use existing Categories system
+          let category_index = 0;
+          for (let category of Categories) {
+            let child_index = 0;
+            for (let child of category.children) {
+              child.model = new Model({
+                category_child: child,
+                category: category_index,
+                children_index: child_index++,
+              });
+            }
+            category_index++;
           }
-          category_index++;
+        } else if (objectMapping) {
+          // Fallback to objectMapping if Categories is not available
+          console.log('Categories not available, using objectMapping');
+          Object.entries(objectMapping.objects).forEach(([objectId, objectInfo]) => {
+            // Create a placeholder model structure similar to what Categories provided
+            const modelConfig = {
+              object_id: objectId,
+              name: objectInfo.name,
+              category: objectInfo.category,
+              index: objectInfo.index,
+              thumbnail: `images/${objectId}_thumbnail.png`,
+              glb: `models/${objectId}.glb`
+            };
+
+            // Create the actual Model instance
+            const model = new Model({
+              category_child: modelConfig,
+              object_id: objectId
+            });
+
+            // Store reference for easy access
+            modelConfig.model = model;
+          });
+        } else {
+          console.warn('Neither Categories nor objectMapping available for loading models');
         }
       };
       const Show_items = function () {
-        let index = 0;
         let html = "";
         let cabuse = [];
-        switchboard[category_index] = [];
-        for (let child of Categories[category_index].children) {
-          child.index = index;
-          if (child.model.capable()) {
+
+        // Use existing Categories system if available
+        if (typeof Categories !== 'undefined' && Categories.length > 0 && typeof category_index !== 'undefined') {
+          let index = 0;
+          if (typeof switchboard === 'undefined') {
+            switchboard = [];
+          }
+          switchboard[category_index] = [];
+          for (let child of Categories[category_index].children) {
+            child.index = index;
+            if (child.model.capable()) {
+              html +=
+                '<h6 class="sub-items" id="sub-items-' +
+                index +
+                '">' +
+                '<div class="sub-item-text">' +
+                child.name +
+                "</div>" +
+                '<img class="sub-item-image" src="' +
+                child.thumbnail +
+                '"/>' +
+                "</h6>";
+              switchboard[category_index].push(child.index);
+            } else cabuse.push(child);
+
+            index++;
+          }
+          for (let child of cabuse) {
             html +=
               '<h6 class="sub-items" id="sub-items-' +
               index +
@@ -5641,58 +5801,117 @@
               '<div class="sub-item-text">' +
               child.name +
               "</div>" +
-              '<img class="sub-item-image" src="' +
+              '<img class="sub-item-image" style="filter: grayscale(100%);" src="' +
               child.thumbnail +
               '"/>' +
               "</h6>";
             switchboard[category_index].push(child.index);
-          } else cabuse.push(child);
-
-          index++;
-        }
-        for (let child of cabuse) {
-          html +=
-            '<h6 class="sub-items" id="sub-items-' +
-            index +
-            '">' +
-            '<div class="sub-item-text">' +
-            child.name +
-            "</div>" +
-            //'<img class="sub-item-image" src="' + child . thumbnail + '"/>'    +
-            //'<img class="sub-item-image" style = "filter : blur(5px);" src="' + child . thumbnail + '"/>'    +
-            //'<img class="sub-item-image" style = "filter : grayscale(100%);" src="' + child . thumbnail + '"/>'    +
-            //'<img class="sub-item-image" src="' + child . thumbnail + '"/>'    +
-            '<img class="sub-item-image" style = "filter : grayscale(100%);" src="' +
-            child.thumbnail +
-            '"/>' +
-            "</h6>";
-          switchboard[category_index].push(child.index);
-        }
-
-        sub_item_container.innerHTML = html;
-
-        $(".sub-items").on("click", (event) => {
-          if (event && event.currentTarget && event.currentTarget.id) {
-            var index = event.currentTarget.id.replace(/^\D+/g, "");
-
-            item_index = parseInt(index);
-            Highlight_item(switchboard[category_index].indexOf(item_index));
-
-            Item_clicked();
           }
-        });
+
+          sub_item_container.innerHTML = html;
+
+          $(".sub-items").on("click", (event) => {
+            if (event && event.currentTarget && event.currentTarget.id) {
+              var index = event.currentTarget.id.replace(/^\D+/g, "");
+              item_index = parseInt(index);
+              Highlight_item(switchboard[category_index].indexOf(item_index));
+              Item_clicked();
+            }
+          });
+        } else if (objectMapping && selected_category) {
+          // Fallback to objectMapping system
+          let availableObjects = [];
+          let unavailableObjects = [];
+
+          // Get objects for the selected category
+          const categoryObjects = Object.entries(objectMapping.objects)
+            .filter(([objectId, objectInfo]) => objectInfo.category === selected_category)
+            .sort((a, b) => a[1].index - b[1].index);
+
+          categoryObjects.forEach(([objectId, objectInfo]) => {
+            // Find the model instance for this object
+            const model = Model.instances.find(m => m.object_id === objectId);
+
+            if (model && model.capable()) {
+              availableObjects.push({ objectId, objectInfo, model });
+            } else if (model) {
+              unavailableObjects.push({ objectId, objectInfo, model });
+            }
+          });
+
+          // Show available objects first
+          availableObjects.forEach(({ objectId, objectInfo, model }) => {
+            html +=
+              '<h6 class="sub-items" data-object-id="' + objectId + '">' +
+              '<div class="sub-item-text">' +
+              objectInfo.name +
+              "</div>" +
+              '<img class="sub-item-image" src="' +
+              `images/${objectId}_thumbnail.png` +
+              '"/>' +
+              "</h6>";
+          });
+
+          // Show unavailable objects (grayed out)
+          unavailableObjects.forEach(({ objectId, objectInfo, model }) => {
+            html +=
+              '<h6 class="sub-items" data-object-id="' + objectId + '">' +
+              '<div class="sub-item-text">' +
+              objectInfo.name +
+              "</div>" +
+              '<img class="sub-item-image" style="filter: grayscale(100%);" src="' +
+              `images/${objectId}_thumbnail.png` +
+              '"/>' +
+              "</h6>";
+          });
+
+          sub_item_container.innerHTML = html;
+
+          $(".sub-items").on("click", (event) => {
+            if (event && event.currentTarget) {
+              let objectId = event.currentTarget.getAttribute('data-object-id');
+              if (selected_object_id !== objectId) {
+                selected_object_id = objectId;
+                Highlight_item();
+                Item_clicked();
+              }
+            }
+          });
+        } else {
+          console.warn('Cannot show items: no Categories or objectMapping/selected_category available');
+        }
       };
       const Highlight_category = function () {
         $(".steps img").css("opacity", 1);
         $(".steps img").css("background", "transparent");
-        $(`#steps-${category_index} img`).css("opacity", 1);
-        $(`#steps-${category_index} img`).css("background", "#c0c0c0");
+
+        // Use object ID-based highlighting if available
+        if (selected_category) {
+          $(`.steps[data-category="${selected_category}"] img`).css("opacity", 1);
+          $(`.steps[data-category="${selected_category}"] img`).css("background", "#c0c0c0");
+        } else if (typeof category_index !== 'undefined') {
+          // Fallback to index-based highlighting
+          $(`#steps-${category_index} img`).css("opacity", 1);
+          $(`#steps-${category_index} img`).css("background", "#c0c0c0");
+        }
       };
-      const Highlight_item = function () {
+      const Highlight_item = function (override_index) {
         $(".sub-item-image").css("opacity", 1);
         $(".sub-item-image").css("background", "transparent");
-        $(`#sub-items-${item_index} img`).css("opacity", 1);
-        $(`#sub-items-${item_index} img`).css("background", "#c0c0c0");
+
+        // Use object ID-based highlighting if available
+        if (selected_object_id) {
+          $(`.sub-items[data-object-id="${selected_object_id}"] img`).css("opacity", 1);
+          $(`.sub-items[data-object-id="${selected_object_id}"] img`).css("background", "#c0c0c0");
+        } else if (typeof override_index !== 'undefined') {
+          // Use provided index
+          $(`#sub-items-${override_index} img`).css("opacity", 1);
+          $(`#sub-items-${override_index} img`).css("background", "#c0c0c0");
+        } else if (typeof item_index !== 'undefined') {
+          // Fallback to item_index
+          $(`#sub-items-${item_index} img`).css("opacity", 1);
+          $(`#sub-items-${item_index} img`).css("background", "#c0c0c0");
+        }
       };
 
       $("#controls-buttons-info").on("click", (event) => {
@@ -5826,8 +6045,105 @@
         console.log('All configurations loaded. Ready for color popup.');
       };
       
-      initializeConfigs();
-      
+      initializeConfigs().then(() => {
+        // After configs are loaded, update existing models with object_ids
+        updateExistingModelObjectIds();
+      });
+
+      // Function to update existing models with object_ids
+      const updateExistingModelObjectIds = () => {
+        if (!objectMapping) return;
+
+        for (let model of Model.instances) {
+          if (!model.object_id && model.category !== -1 && model.children_index !== -1) {
+            model.object_id = getObjectIdFromCategoryIndex(model.category, model.children_index);
+          }
+        }
+      };
+
+      // Helper function to get object_id from category and children_index
+      const getObjectIdFromCategoryIndex = (category, childrenIndex) => {
+        if (!objectMapping || category === undefined || childrenIndex === undefined) {
+          return null;
+        }
+
+        // Find the object that matches this category and index
+        for (const [objectId, objectInfo] of Object.entries(objectMapping.objects)) {
+          const categoryInfo = objectMapping.categories[objectInfo.category];
+          if (categoryInfo && categoryInfo.display_order === category && objectInfo.index === childrenIndex) {
+            return objectId;
+          }
+        }
+        return null;
+      };
+
+      // Helper function to get object info from object_id
+      const getObjectInfoById = (objectId) => {
+        if (!objectMapping || !objectId) {
+          return { objectName: null, objectConfig: null };
+        }
+
+        const objectInfo = objectMapping.objects[objectId];
+        if (!objectInfo) {
+          console.warn('Object not found in mapping:', objectId);
+          return { objectName: null, objectConfig: null };
+        }
+
+        const objectName = objectInfo.name;
+        // Use object_id directly to get color configuration
+        const objectConfig = colorConfig ? colorConfig.objects[objectId] : null;
+        return { objectName, objectConfig };
+      };
+
+      // Helper function to get model index from object_id using object-mapping.json
+      const getModelIndexFromObjectId = (objectId) => {
+        if (!objectMapping || !objectId) {
+          return null;
+        }
+
+        const objectInfo = objectMapping.objects[objectId];
+        if (!objectInfo) {
+          console.warn('Object not found in mapping:', objectId);
+          return null;
+        }
+
+        const categoryName = objectInfo.category;
+        const categoryInfo = objectMapping.categories[categoryName];
+        if (!categoryInfo) {
+          console.warn('Category not found in mapping:', categoryName);
+          return null;
+        }
+
+        // Use the pre-calculated index from the object mapping
+        const objectIndex = objectInfo.index;
+        if (objectIndex === undefined) {
+          console.warn('Object index not found for:', objectId);
+          return null;
+        }
+
+        // Calculate global model index based on category display order and object position
+        let globalIndex = 0;
+
+        // Add indices for all categories that come before this one
+        const sortedCategories = Object.entries(objectMapping.categories)
+          .sort((a, b) => a[1].display_order - b[1].display_order);
+
+        for (const [catName, catInfo] of sortedCategories) {
+          if (catName === categoryName) {
+            // Add the object's index within its category
+            globalIndex += objectIndex;
+            break;
+          } else {
+            // Add all objects from this category
+            const catObjectCount = Object.values(objectMapping.objects)
+              .filter(obj => obj.category === catName).length;
+            globalIndex += catObjectCount;
+          }
+        }
+
+        return globalIndex;
+      };
+
       // Function to resolve constants in configuration
       const resolveConstants = (obj, constants) => {
         if (typeof obj === 'string' && obj.startsWith('@')) {
@@ -5863,10 +6179,10 @@
 
       const Show_unified_popup = () => {
         let model = picked_mesh.model;
-        
+
         // Show delete button
         $("#custom-controls-delete").show();
-        
+
         // Fallback to old logic if configs not loaded
         if (!colorConfig || !objectMapping) {
           console.warn('Color config or object mapping not loaded, using fallback logic');
@@ -5880,32 +6196,30 @@
           $(".custom-controls-unified").css("display", "flex");
           return;
         }
-        
-        // Use category and children_index to find object name
-        const categoryKey = `category_${model.category}`;
-        const categoryInfo = objectMapping[categoryKey];
-        
-        let objectName = null;
-        let objectConfig = null;
-        
-        if (categoryInfo && categoryInfo.objects) {
-          const childrenIndex = (model.children_index || 0).toString();
-          objectName = categoryInfo.objects[childrenIndex];
-          
-          // Look for specific object configuration
-          if (objectName) {
-            objectConfig = colorConfig.objects[objectName];
-          }
-        }
-        
-        // If no specific object config, use category defaults
-        if (!objectConfig && categoryInfo) {
-          const categoryType = categoryInfo.name;
-          if (colorConfig.default_sections && colorConfig.default_sections[categoryType]) {
-            objectConfig = {
-              sections: colorConfig.default_sections[categoryType],
-              colors: colorConfig.default_colors || {}
-            };
+
+        // Use object_id to find object name and config
+        const { objectName, objectConfig: initialObjectConfig } = getObjectInfoById(model.object_id);
+        let objectConfig = initialObjectConfig;
+
+        // If no specific object config, try to find category from object_id and use defaults
+        if (!objectConfig && model.object_id && objectMapping) {
+          const objectInfo = objectMapping.objects[model.object_id];
+          if (objectInfo && objectInfo.category) {
+            const categoryInfo = objectMapping.categories[objectInfo.category];
+            if (categoryInfo && colorConfig.default_sections && colorConfig.default_sections[categoryInfo.name]) {
+              // Create fallback config with default sections and colors
+              let fallbackConfig = {
+                sections: colorConfig.default_sections[categoryInfo.name],
+                colors: colorConfig.default_colors || {}
+              };
+
+              // Resolve constants in the fallback configuration
+              if (colorConfig.constants) {
+                fallbackConfig = resolveConstants(fallbackConfig, colorConfig.constants);
+              }
+
+              objectConfig = fallbackConfig;
+            }
           }
         }
         
@@ -5925,7 +6239,7 @@
         }
         
         if (!objectConfig) {
-          console.warn(`No configuration found for category: ${model.category} (${categoryType}), children_index: ${model.children_index}`);
+          console.warn(`No configuration found for object_id: ${model.object_id}, object name: ${objectName}`);
           return;
         }
         
@@ -6113,6 +6427,7 @@
       };
 
       Load_models();
+      initializeObjectIdSystem();
       Show_categories();
       Show_items();
       Highlight_category();

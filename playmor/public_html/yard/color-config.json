@@ -70,53 +70,7 @@
     }
   },
   "objects": {
-    "DX Play Tower": {
-      "sections": ["roof", "frame", "trim"],
-      "colors": {
-        "frame": "@frame_colors",
-        "roof": {
-          "canopy": "@roof_canopy_colors"
-        },
-        "trim": "@trim_colors"
-      },
-      "frame_meshes": {
-        "cedar_meshes": ["Cube001001"],
-        "tan_meshes": ["Cube001_1"],
-        "all_meshes": ["Cube001_1", "Cube001001"]
-      }
-    },
-    "DX Sky Tower": {
-      "sections": ["roof", "frame", "trim"],
-      "colors": {
-        "frame": "@frame_colors",
-        "roof": {
-          "canopy": "@roof_canopy_colors",
-          "poly": "@roof_poly"
-        },
-        "trim": "@trim_colors"
-      },
-      "frame_meshes": {
-        "cedar_meshes": ["Cube603_1001"],
-        "tan_meshes": ["Cube603"],
-        "all_meshes": ["Cube603", "Cube603_1001"]
-      }
-    },
-    "King's Tower": {
-      "sections": ["roof", "frame", "trim"],
-      "colors": {
-        "frame": "@frame_colors",
-        "roof": {
-          "canopy": "@roof_canopy_colors"
-        },
-        "trim": "@trim_colors"
-      },
-      "frame_meshes": {
-        "cedar_meshes": ["King_base_middle", "Cube201_1"],
-        "tan_meshes": ["King_base_bottom", "Cube201", "King_base_top", "Box"],
-        "all_meshes": ["King_base_bottom", "Cube201_1", "Cube201", "King_base_top", "Box", "King_base_middle"]
-      }
-    },
-    "Play Tower": {
+    "P-PT": {
       "sections": ["roof", "frame", "trim"],
       "colors": {
         "frame": "@frame_colors",
@@ -131,23 +85,22 @@
         "all_meshes": ["Cube138", "Cube138_1001"]
       }
     },
-    "Summit Tower": {
+    "P-DPT": {
       "sections": ["roof", "frame", "trim"],
       "colors": {
         "frame": "@frame_colors",
         "roof": {
-          "canopy": "@roof_canopy_colors",
-          "poly": "@roof_poly"
+          "canopy": "@roof_canopy_colors"
         },
         "trim": "@trim_colors"
       },
       "frame_meshes": {
-        "cedar_meshes": ["Plane091_1001"],
-        "tan_meshes": ["Plane091"],
-        "all_meshes": ["Plane091", "Plane091_1001"]
+        "cedar_meshes": ["Cube001001"],
+        "tan_meshes": ["Cube001_1"],
+        "all_meshes": ["Cube001_1", "Cube001001"]
       }
     },
-    "Watch Tower": {
+    "P-WT": {
       "sections": ["roof", "frame", "trim"],
       "colors": {
         "frame": "@frame_colors",
@@ -163,10 +116,51 @@
         "all_meshes": ["Watch_tower_base_bottom002", "Cube833", "Watch_tower_base_middle002", "Cube833_1001"]
       }
     },
-    "Tunnel": {
-      "sections": ["trim"],
+    "P-ST": {
+      "sections": ["roof", "frame", "trim"],
       "colors": {
+        "frame": "@frame_colors",
+        "roof": {
+          "canopy": "@roof_canopy_colors",
+          "poly": "@roof_poly"
+        },
         "trim": "@trim_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Plane091_1001"],
+        "tan_meshes": ["Plane091"],
+        "all_meshes": ["Plane091", "Plane091_1001"]
+      }
+    },
+    "P-DST": {
+      "sections": ["roof", "frame", "trim"],
+      "colors": {
+        "frame": "@frame_colors",
+        "roof": {
+          "canopy": "@roof_canopy_colors",
+          "poly": "@roof_poly"
+        },
+        "trim": "@trim_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube603_1001"],
+        "tan_meshes": ["Cube603"],
+        "all_meshes": ["Cube603", "Cube603_1001"]
+      }
+    },
+    "P-KT": {
+      "sections": ["roof", "frame", "trim"],
+      "colors": {
+        "frame": "@frame_colors",
+        "roof": {
+          "canopy": "@roof_canopy_colors"
+        },
+        "trim": "@trim_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["King_base_middle", "Cube201_1"],
+        "tan_meshes": ["King_base_bottom", "Cube201", "King_base_top", "Box"],
+        "all_meshes": ["King_base_bottom", "Cube201_1", "Cube201", "King_base_top", "Box", "King_base_middle"]
       }
     },
     "Bridge": {
@@ -181,7 +175,13 @@
         "all_meshes": ["Cube188"]
       }
     },
-    "3 Swing Beam - 8 ft": {
+    "Tunnel": {
+      "sections": ["trim"],
+      "colors": {
+        "trim": "@trim_colors"
+      }
+    },
+    "P-AB-3-8": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -192,7 +192,7 @@
         "all_meshes": ["Plane001_1,_colorize_", "Plane001", "Plane001_2"]
       }
     },
-    "3 Swing Beam - 10 ft": {
+    "P-AB-3-10": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -203,7 +203,7 @@
         "all_meshes": ["Plane049_1,_colorize_", "Plane049", "Plane049_2"]
       }
     },
-    "4 Swing Beam - 8 ft": {
+    "P-AB-4-8": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -214,7 +214,7 @@
         "all_meshes": ["Plane003_1,_colorize_", "Plane003", "Plane003_2"]
       }
     },
-    "4 Swing Beam - 10 ft": {
+    "P-AB-4-10": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -225,7 +225,7 @@
         "all_meshes": ["Plane002_1,_colorize_", "Plane002", "Plane002_2"]
       }
     },
-    "Disc Swing Beam - 8 ft": {
+    "P-AB-DS-8": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -236,7 +236,7 @@
         "all_meshes": ["Plane077_1,_colorize_", "Plane077", "Plane077_2"]
       }
     },
-    "Disc Swing Beam - 10 ft": {
+    "P-AB-DS-10": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -247,15 +247,46 @@
         "all_meshes": ["Plane073_1,_colorize_", "Plane073", "Plane073_2"]
       }
     },
-    "Tire Swing": {
+    "BNS": {
       "sections": [],
       "colors": {}
     },
-    "Bird's Nest Swing": {
+    "MTS": {
       "sections": [],
       "colors": {}
     },
-    "Safety Rail Kit": {
+    "FK-WT": {
+      "sections": [],
+      "colors": {}
+    },
+    "FK-DXH": {
+      "sections": [],
+      "colors": {}
+    },
+    "FK-DXF": {
+      "sections": [],
+      "colors": {}
+    },
+    "FK-KT": {
+      "sections": [],
+      "colors": {}
+    },
+    "PT-K": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Icosphere006_2"],
+        "tan_meshes": ["Icosphere006_1,_colorize_"],
+        "all_meshes": ["Icosphere006_1,_colorize_", "Icosphere006_2"]
+      }
+    },
+    "KK": {
+      "sections": [],
+      "colors": {}
+    },
+    "SR-KT": {
       "sections": ["frame", "trim"],
       "colors": {
         "frame": "@frame_colors",
@@ -267,134 +298,7 @@
         "all_meshes": ["Box"]
       }
     },
-    "DX Sky Tower Floor - Full": {
-      "sections": [],
-      "colors": {}
-    },
-    "DX Sky Tower Floor - Half": {
-      "sections": [],
-      "colors": {}
-    },
-    "King's Tower Floor,": {
-      "sections": [],
-      "colors": {}
-    },
-    "Watch Tower Floor": {
-      "sections": [],
-      "colors": {}
-    },
-    "Picnic Table Kit": {
-      "sections": ["frame"],
-      "colors": {
-        "frame": "@frame_colors"
-      },
-      "frame_meshes": {
-        "cedar_meshes": ["Icosphere006_2"],
-        "tan_meshes": ["Icosphere006_1,_colorize_"],
-        "all_meshes": ["Icosphere006_1,_colorize_", "Icosphere006_2"]
-      }
-    },
-    "Kitchen Kit": {
-      "sections": [],
-      "colors": {}
-    },
-    "Cargo Net - 5ft": {
-      "sections": ["frame"],
-      "colors": {
-        "frame": "@frame_colors"
-      },
-      "frame_meshes": {
-        "cedar_meshes": ["Cube151"],
-        "tan_meshes": ["Cube151_1"],
-        "all_meshes": ["Cube151_1", "Cube151"]
-      }
-    },
-    "Combo Climb - 5ft": {
-      "sections": ["frame"],
-      "colors": {
-        "frame": "@frame_colors"
-      },
-      "frame_meshes": {
-        "cedar_meshes": ["Cube168"],
-        "tan_meshes": ["Cube168_1"],
-        "all_meshes": ["Cube168_1", "Cube168"]
-      }
-    },
-    "Climbing Pole": {
-      "sections": [],
-      "colors": {}
-    },
-    "Fireman's Pole": {
-      "sections": [],
-      "colors": {}
-    },
-    "Gang Plank - 4ft": {
-      "sections": ["frame"],
-      "colors": {
-        "frame": "@frame_colors"
-      },
-      "frame_meshes": {
-        "cedar_meshes": ["Plane070"],
-        "tan_meshes": ["Plane001"],
-        "all_meshes": ["Plane001", "Plane070"]
-      }
-    },
-    "Gang Plank - 5ft": {
-      "sections": ["frame"],
-      "colors": {
-        "frame": "@frame_colors"
-      },
-      "frame_meshes": {
-        "cedar_meshes": ["Plane052"],
-        "tan_meshes": ["Plane001"],
-        "all_meshes": ["Plane001", "Plane052"]
-      }
-    },
-    "Monkey Bars Attachment - 5ft": {
-      "sections": ["frame"],
-      "colors": {
-        "frame": "@frame_colors"
-      },
-      "frame_meshes": {
-        "cedar_meshes": ["Cylinder005_2"],
-        "tan_meshes": ["Cylinder005_1"],
-        "all_meshes": ["Cylinder005_1", "Cylinder005_2"]
-      }
-    },
-    "Monkey Bars - Stand-Alone 5ft": {
-      "sections": ["frame"],
-      "colors": {
-        "frame": "@frame_colors"
-      },
-      "frame_meshes": {
-        "cedar_meshes": ["Cube219_1"],
-        "tan_meshes": ["Cube219"],
-        "all_meshes": ["Cube219", "Cube219_1"]
-      }
-    },
-    "Rock Climb - 5ft": {
-      "sections": ["frame"],
-      "colors": {
-        "frame": "@frame_colors"
-      },
-      "frame_meshes": {
-        "cedar_meshes": ["Cube361"],
-        "tan_meshes": ["Cube361_1"],
-        "all_meshes": ["Cube361_1", "Cube361"]
-      }
-    },
-    "Rock Climb - 7ft": {
-      "sections": ["frame"],
-      "colors": {
-        "frame": "@frame_colors"
-      },
-      "frame_meshes": {
-        "cedar_meshes": ["Cube199_2"],
-        "tan_meshes": ["Cube199_1"],
-        "all_meshes": ["Cube199_1", "Cube199_2"]
-      }
-    },
-    "Steps - 4ft": {
+    "P-STEP-4": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -405,7 +309,7 @@
         "all_meshes": ["Cube339,_colorize_", "Cube339_1"]
       }
     },
-    "Steps - 5ft": {
+    "P-STEP-5": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -416,7 +320,7 @@
         "all_meshes": ["Cube195_1", "Cube195"]
       }
     },
-    "Steps - 7ft": {
+    "P-STEP-7": {
       "sections": ["frame"],
       "colors": {
         "frame": "@frame_colors"
@@ -427,13 +331,109 @@
         "all_meshes": ["Cube359", "Cube360", "Cube359_1"]
       }
     },
-    "Bubble Panel Kit": {
+    "P-GP-10": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Plane070"],
+        "tan_meshes": ["Plane001"],
+        "all_meshes": ["Plane001", "Plane070"]
+      }
+    },
+    "P-GP-12": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Plane052"],
+        "tan_meshes": ["Plane001"],
+        "all_meshes": ["Plane001", "Plane052"]
+      }
+    },
+    "P-RC-5": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube361"],
+        "tan_meshes": ["Cube361_1"],
+        "all_meshes": ["Cube361_1", "Cube361"]
+      }
+    },
+    "P-RC-7": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube199_2"],
+        "tan_meshes": ["Cube199_1"],
+        "all_meshes": ["Cube199_1", "Cube199_2"]
+      }
+    },
+    "P-CN-5": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube151"],
+        "tan_meshes": ["Cube151_1"],
+        "all_meshes": ["Cube151_1", "Cube151"]
+      }
+    },
+    "P-CC-5": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube168"],
+        "tan_meshes": ["Cube168_1"],
+        "all_meshes": ["Cube168_1", "Cube168"]
+      }
+    },
+    "CP": {
+      "sections": [],
+      "colors": {}
+    },
+    "FP": {
+      "sections": [],
+      "colors": {}
+    },
+    "P-MB-A": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cylinder005_2"],
+        "tan_meshes": ["Cylinder005_1"],
+        "all_meshes": ["Cylinder005_1", "Cylinder005_2"]
+      }
+    },
+    "P-MB-C": {
+      "sections": ["frame"],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube219_1"],
+        "tan_meshes": ["Cube219"],
+        "all_meshes": ["Cube219", "Cube219_1"]
+      }
+    },
+    "BUB": {
       "sections": ["trim"],
       "colors": {
         "trim": "@trim_colors"
       }
     },
-    "Tic-Tac-Toe": {
+    "TIC": {
       "sections": [],
       "colors": {}
     }
