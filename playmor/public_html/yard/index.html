@@ -2235,6 +2235,7 @@
                 position: model.mesh.position,
                 y_rotation: model.mesh.rotation.y,
                 colorized: model.colorized,
+                toy_color: model.toy_color,
                 frame_color: model.frame_color,
                 ruf: model.ruf,
                 ruf_color: model.ruf_color,
@@ -2432,6 +2433,11 @@
               model.frame_color = model_data.frame_color;
             } else {
               model.frame_color = 'cedar_tan';
+            }
+
+            // Restore toy color if saved
+            if (model_data.toy_color) {
+              model.toy_color = model_data.toy_color;
             }
 
             // Apply all default colors (frame colors and toy colors for swings)
@@ -2988,13 +2994,20 @@
             // bail if wildcard model
             let jokers = 0;
             for (let joint of this.joints) if (joint.layer == "*") jokers++;
-            return jokers == 0 && this.category == 0;
+            const result = jokers == 0 && this.category == 0;
+            return result;
           }
 
           // check for available joints
-          for (let model of models_with_available_joints)
-            for (let joint of model.joints)
-              if (!found && joint.available) found = true;
+          let availableJointCount = 0;
+          for (let model of models_with_available_joints) {
+            for (let joint of model.joints) {
+              if (joint.available) {
+                availableJointCount++;
+                if (!found) found = true;
+              }
+            }
+          }
           // no available joints to connect to
           // can't add disconnected models
           if (!found) return false;
@@ -3007,21 +3020,26 @@
           if (found) {
             // search for an available valid host joint that's not a wildcard
             let valid = 0;
-            for (let model of models_with_available_joints)
-              for (let joint of model.joints)
+            for (let model of models_with_available_joints) {
+              for (let joint of model.joints) {
                 if (
                   joint.available &&
                   joint.layer[0] > "0" &&
                   joint.layer[0] <= "9"
-                )
+                ) {
                   valid++;
-            return valid != 0;
+                }
+              }
+            }
+            const result = valid != 0;
+            return result;
           }
 
           // not a wildcard seek an available exact match
           if (!found) {
             let i = 0;
             while (!found && i < this.joints.length) {
+              const seekingLayer = this.joints[i].layer;
               let j = 0;
               while (!found && j < models_with_available_joints.length) {
                 let model = models_with_available_joints[j++];
@@ -3029,9 +3047,26 @@
                 while (!found && k < model.joints.length) {
                   let joint = model.joints[k++];
                   if (joint.available && joint.model.category != 2) {
-                    found = joint.layer == this.joints[i].layer;
+                    found = joint.layer == seekingLayer;
+
+                    // Special case: allow layer "8" to connect to layer "handle" for handrails
+                    if (!found && ((seekingLayer === "8" && joint.layer === "handle") ||
+                                   (seekingLayer === "handle" && joint.layer === "8"))) {
+                      found = true;
+                    }
+
                     if (found) {
-                      found = joint.model.category != this.category;
+                      const categoryMatch = joint.model.category != this.category;
+
+                      // Special case: handrails (HGR, HR) can connect to same category (steps)
+                      const isHandrail = this.object_id === 'HGR' || this.object_id === 'HR';
+                      const isHandleConnection = seekingLayer === 'handle' || seekingLayer === '8';
+
+                      if (isHandrail && isHandleConnection) {
+                        found = true; // Allow handrails to connect to steps in same category
+                      } else {
+                        found = categoryMatch; // Original logic for other items
+                      }
                       /*
                                         if ( joint        . name . indexOf ( 'female' ) >= 0 &&
                                              joints [ i ] . name . indexOf ( 'female' ) >= 0 )
@@ -3599,10 +3634,22 @@
                   plug_joint.model.tubular
                 ) {
                 } else {
-                  if (joint.layer == plug_joint.layer) {
-                    if (joint.layer != "*")
-                      we_gud =
-                        joint.model.category != plug_joint.model.category;
+                  // Check if layers match (including special case for "8" and "handle")
+                  const layersMatch = joint.layer === plug_joint.layer ||
+                                    ((joint.layer === "8" && plug_joint.layer === "handle") ||
+                                     (joint.layer === "handle" && plug_joint.layer === "8"));
+
+                  if (layersMatch) {
+                    if (joint.layer != "*") {
+                      // Special case: handrails (HGR, HR) can connect to same category (steps)
+                      const isHandrail = plug_joint.model.object_id === 'HGR' || plug_joint.model.object_id === 'HR';
+                      const isHandleConnection = joint.layer === 'handle' || joint.layer === '8';
+                      if (isHandrail && isHandleConnection) {
+                        we_gud = true;
+                      } else {
+                        we_gud = joint.model.category != plug_joint.model.category;
+                      }
+                    }
                   } else {
                     if (joint.layer == "*") {
                       if (model.joints.length > 1) {
@@ -3634,6 +3681,12 @@
                   show_joint =
                     joint.name.startsWith("joint,") ||
                     joint.name.startsWith("joint_pole");
+                else if (plug_joint.layer === "handle" || plug_joint.layer === "8") {
+                  // Handle joints should always be shown for handrails (including "8" layer)
+                  show_joint = joint.layer === "handle" || joint.layer === "8";
+                } else {
+                  console.log(`Non-handle joint logic: plug_joint.layer=${plug_joint.layer}, joint.layer=${joint.layer}, show_joint=${show_joint}`);
+                }
 
                 if (
                   Can_connect({ plug_joint: plug_joint, host_joint: joint }) &&
@@ -3832,7 +3885,7 @@
               plug_model = null;
               plug_joint_index = -1;
               Mode.mode = Mode.normal;
-              
+
               // Hide rotation hint when object is successfully placed
               document.getElementById('rotation-hint').style.display = 'none';
 
@@ -3843,16 +3896,17 @@
             break;
           case Mode.plugging:
             {
-              if (
-                Can_connect({
-                  plug_joint: plug_joint,
-                  host_joint: host_joint,
-                }) &&
+              const canConnect = host_joint && Can_connect({
+                plug_joint: plug_joint,
+                host_joint: host_joint,
+              });
+              const inClickArea = host_joint &&
                 Pointers.position.x > host_joint.x &&
                 Pointers.position.x < host_joint.x + joint_image.height / 2 &&
                 Pointers.position.y > host_joint.y &&
-                Pointers.position.y < host_joint.y + joint_image.height / 2
-              ) {
+                Pointers.position.y < host_joint.y + joint_image.height / 2;
+
+              if (canConnect && inClickArea) {
                 // undo
                 blueprint.add_snapshot();
 
@@ -4038,25 +4092,135 @@
 
         $("#info_dialog").show();
       };
+
+
       const Trash_picked_mesh = (args) => {
         // undo
         blueprint.add_snapshot();
 
         let model = picked_mesh.model;
-        switch (model.category) {
-          case 0:
-            break;
-          case 1:
-            {
-              // swing beam
+
+        // Handle deletion logic based on category name instead of category index
+        // First try to get category directly from object ID using object mapping
+        let categoryName = getCategoryFromObjectId(model.object_id);
+        
+        console.log(`Trash_picked_mesh: deleting ${model.object_id} from category ${categoryName}`);
+
+        switch (categoryName) {
+          case "towers":
+            // Check if this is a bridge or tunnel (they are categorized as towers but behave differently)
+            if (model.object_id === "Bridge" || model.object_id === "Tunnel") {
+              // When deleting a bridge or tunnel, just delete that specific object
+              console.log(`Deleting ${model.object_id.toLowerCase()} object`);
+              // Note: The general disconnection logic after the switch statement will handle
+              // making connected joints available, so we don't need to do it here
+            } else {
+              // When deleting a regular tower, remove connected objects but preserve bridges/tunnels with other connections
+              console.log(`Deleting tower ${model.object_id}, checking connected objects`);
               for (let joint of model.joints) {
                 if (!joint.available && joint.connected) {
                   let connected_joint = joint.connected;
                   let connected_model = connected_joint.model;
 
-                  if (joint.layer.startsWith("b")) {
-                    connected_joint.available = true;
+                  // Check if this is a bridge or tunnel
+                  if (connected_model.object_id === "Bridge" || connected_model.object_id === "Tunnel") {
+                    // Check if the bridge/tunnel has other tower connections
+                    let hasOtherTowerConnections = false;
+                    for (let bridge_joint of connected_model.joints) {
+                      if (!bridge_joint.available && bridge_joint.connected && bridge_joint !== connected_joint) {
+                        let other_connected_model = bridge_joint.connected.model;
+                        // Check if the other connected object is a tower (not the one being deleted)
+                        if (other_connected_model !== model &&
+                            getCategoryFromObjectId(other_connected_model.object_id) === "towers" &&
+                            other_connected_model.object_id !== "Bridge" &&
+                            other_connected_model.object_id !== "Tunnel") {
+                          hasOtherTowerConnections = true;
+                          break;
+                        }
+                      }
+                    }
+
+                    if (hasOtherTowerConnections) {
+                      // Don't delete the bridge/tunnel, just disconnect this joint
+                      console.log(`Preserving ${connected_model.object_id} - it has other tower connections`);
+                      connected_joint.available = true;
+                      joint.available = true;
+                    } else {
+                      // No other tower connections, safe to delete
+                      console.log(`Removing ${connected_model.object_id} - no other tower connections`);
+                      scene.remove(connected_model.mesh);
+
+                      let index = models_with_available_joints.indexOf(connected_model);
+                      if (index != -1)
+                        models_with_available_joints.splice(index, 1);
+
+                      index = picked_meshes.indexOf(connected_model.mesh);
+                      if (index != -1) picked_meshes.splice(index, 1);
+
+                      joint.available = true;
+                    }
                   } else {
+                    // For non-bridge/tunnel objects, remove as before
+                    console.log(`Removing connected object ${connected_model.object_id} from tower`);
+                    scene.remove(connected_model.mesh);
+
+                    let index = models_with_available_joints.indexOf(connected_model);
+                    if (index != -1)
+                      models_with_available_joints.splice(index, 1);
+
+                    index = picked_meshes.indexOf(connected_model.mesh);
+                    if (index != -1) picked_meshes.splice(index, 1);
+
+                    joint.available = true;
+                  }
+                }
+              }
+            }
+            break;
+          case "swing_beams":
+            // swing beam
+            for (let joint of model.joints) {
+              if (!joint.available && joint.connected) {
+                let connected_joint = joint.connected;
+                let connected_model = connected_joint.model;
+
+                if (joint.layer.startsWith("b")) {
+                  connected_joint.available = true;
+                } else {
+                  scene.remove(connected_model.mesh);
+
+                  let index =
+                    models_with_available_joints.indexOf(connected_model);
+                  if (index != -1)
+                    models_with_available_joints.splice(index, 1);
+
+                  index = picked_meshes.indexOf(connected_model.mesh);
+                  if (index != -1) picked_meshes.splice(index, 1);
+                }
+                joint.available = true;
+              }
+            }
+            break;
+          case "swings":
+            // No special deletion logic for swings currently
+            break;
+          case "floors_kits":
+            // No special deletion logic for floors_kits currently
+            break;
+          case "entries_climbers":
+            // entry/climber
+            for (let joint of model.joints) {
+              if (!joint.available && joint.connected) {
+                let connected_joint = joint.connected;
+                let connected_model = connected_joint.model;
+
+                if (joint.layer.startsWith("handle")) {
+                  // Only remove connected handrails when deleting steps, not the reverse
+                  // Steps have handle joints, handrails connect TO handle joints
+                  const isHandrail = model.object_id === 'HGR' || model.object_id === 'HR';
+                  if (!isHandrail) {
+                    // This is a step being deleted, so remove connected handrails
+                    console.log(`Deleting step ${model.object_id}, removing connected handrail ${connected_model.object_id}`);
                     scene.remove(connected_model.mesh);
 
                     let index =
@@ -4066,42 +4230,26 @@
 
                     index = picked_meshes.indexOf(connected_model.mesh);
                     if (index != -1) picked_meshes.splice(index, 1);
+                  } else {
+                    // This is a handrail being deleted, just disconnect but don't remove the step
+                    console.log(`Deleting handrail ${model.object_id}, keeping connected step ${connected_model.object_id}`);
+                    // Make both joints available again
+                    connected_joint.available = true;
                   }
+                  // Always make the current model's joint available when disconnecting
                   joint.available = true;
                 }
               }
             }
             break;
-          case 2:
+          case "slides":
+            // No special deletion logic for slides currently
             break;
-          case 3:
+          case "toys":
+            // No special deletion logic for toys currently
             break;
-          case 4:
-            {
-              // entry
-              for (let joint of model.joints) {
-                if (!joint.available && joint.connected) {
-                  let connected_joint = joint.connected;
-                  let connected_model = connected_joint.model;
-
-                  if (joint.layer.startsWith("handle")) {
-                    scene.remove(connected_model.mesh);
-
-                    let index =
-                      models_with_available_joints.indexOf(connected_model);
-                    if (index != -1)
-                      models_with_available_joints.splice(index, 1);
-
-                    index = picked_meshes.indexOf(connected_model.mesh);
-                    if (index != -1) picked_meshes.splice(index, 1);
-                  }
-                }
-              }
-            }
-            break;
-          case 5:
-            break;
-          case 6:
+          default:
+            console.log(`Unknown category: ${categoryName} for object ${model.object_id}`);
             break;
         }
 
@@ -4418,21 +4566,23 @@
       };
       const Find_closest_available_joint = (args) => {
         let result = null;
-        if (!plug_joint) return result;
+        if (!plug_joint) {
+          return result;
+        }
 
         let min_joint_distance_squared = Infinity;
         for (let model of models_with_available_joints) {
           for (let joint of model.joints) {
-            let position = Ddd2dd({ object3D: joint });
-            let distance_squared = args.position.distanceToSquared(position);
-            if (
-              distance_squared < min_joint_distance_squared &&
-              (plug_joint.layer == "*" ||
-                joint.layer == "*" ||
-                joint.layer == plug_joint.layer)
-            ) {
-              min_joint_distance_squared = distance_squared;
-              result = joint;
+            const available = joint.available;
+            const layerMatch = (plug_joint.layer == "*" || joint.layer == "*" || joint.layer == plug_joint.layer);
+
+            if (available && layerMatch) {
+              let position = Ddd2dd({ object3D: joint });
+              let distance_squared = args.position.distanceToSquared(position);
+              if (distance_squared < min_joint_distance_squared) {
+                min_joint_distance_squared = distance_squared;
+                result = joint;
+              }
             }
           }
         }
@@ -4785,6 +4935,7 @@
       };
       const Colorize = (color) => {
         picked_mesh.model.colorized = color;
+        picked_mesh.model.toy_color = color; // Also save as toy color for proper JSON persistence
 
         let s = color.toString(16);
         while (s.length < 6) s = "0" + s;
@@ -4822,7 +4973,9 @@
 
         if (applyToyColor && hasToyColorConfig) {
           let colorizableMeshes = [];
-          let toyBlueColor = new THREE.Color(0x004983);
+          // Use saved toy color if available, otherwise default to blue
+          let toyColorHex = model.toy_color || 0x004983;
+          let toyColor = new THREE.Color(toyColorHex);
 
           model.mesh.traverse((mesh) => {
             if (mesh.name.toLowerCase().includes("_colorize_")) {
@@ -4831,10 +4984,10 @@
               if (mesh.material) {
                 // Handle different material types
                 if (mesh.material.color) {
-                  mesh.material.color.setHex(0x004983);
+                  mesh.material.color.setHex(toyColorHex);
                 } else if (mesh.material.map) {
                   // If it's a textured material, try to set color
-                  mesh.material.color = toyBlueColor;
+                  mesh.material.color = toyColor;
                 } else {
                   console.log("Mesh has material but no color property:", mesh.name);
                 }
@@ -4848,7 +5001,8 @@
           });
 
           if (colorizableMeshes.length > 0) {
-            model.colorized = 0x004983; // Set the model as colorized
+            model.colorized = toyColorHex; // Set the model as colorized
+            model.toy_color = toyColorHex; // Also save it in the toy_color field
           } else {
             console.log("DEBUG: No colorizable meshes found in swing");
           }
@@ -4980,6 +5134,13 @@
 
         plug_model = model.clone();
 
+        // Check if this model can be placed (has available connections)
+        if (!plug_model.capable()) {
+          console.warn(`Cannot place object ${objectId}: no available connection points`);
+          // Show user feedback that placement is not possible
+          return;
+        }
+
         // Check tower type and apply correct rotation for front-facing direction
         if(plug_model.mesh.children[0].name.includes("King") || plug_model.mesh.children[0].name.includes("summitglb")){
           // King's Tower and Watchtower need 90-degree rotation due to different front direction
@@ -4990,7 +5151,7 @@
           plug_model.mesh.rotation.y = 0; // 0 degrees
           plug_model.yaw = 0; // Set yaw for consistency with attachment system
         }
-        
+
         scene.add(plug_model.mesh);
 
         // Apply default colors to the new model
@@ -5639,10 +5800,23 @@
         if (typeof Categories !== 'undefined' && Categories.length > 0) {
           let index = 0;
           for (let category of Categories) {
+            // Find corresponding category key in objectMapping
+            let categoryKey = null;
+            if (objectMapping && objectMapping.categories) {
+              for (const [key, info] of Object.entries(objectMapping.categories)) {
+                if (info.name === category.name) {
+                  categoryKey = key;
+                  break;
+                }
+              }
+            }
+
             html +=
               '<h6 class="steps" id="steps-' +
               index +
-              '">' +
+              '"' +
+              (categoryKey ? ' data-category="' + categoryKey + '"' : '') +
+              '>' +
               '<img class="step-image" src="' +
               category.thumbnail +
               '"/>' +
@@ -5661,6 +5835,11 @@
             if (event && event.currentTarget && event.currentTarget.id) {
               var index = event.currentTarget.id.replace(/^\D+/g, "");
               category_index = parseInt(index);
+              // Set selected_category from data attribute or fallback to helper function
+              selected_category = event.currentTarget.getAttribute('data-category');
+              if (!selected_category && Categories && Categories[category_index]) {
+                selected_category = getCategoryKeyFromIndex(category_index);
+              }
               Highlight_category();
               Show_items();
               Highlight_item();
@@ -5776,10 +5955,13 @@
           switchboard[category_index] = [];
           for (let child of Categories[category_index].children) {
             child.index = index;
-            if (child.model.capable()) {
+            const isCapable = child.model.capable();
+            if (isCapable) {
               html +=
                 '<h6 class="sub-items" id="sub-items-' +
                 index +
+                '" data-object-id="' +
+                (child.model.object_id || '') +
                 '">' +
                 '<div class="sub-item-text">' +
                 child.name +
@@ -5797,6 +5979,8 @@
             html +=
               '<h6 class="sub-items" id="sub-items-' +
               index +
+              '" data-object-id="' +
+              (child.model.object_id || '') +
               '">' +
               '<div class="sub-item-text">' +
               child.name +
@@ -5811,11 +5995,19 @@
           sub_item_container.innerHTML = html;
 
           $(".sub-items").on("click", (event) => {
-            if (event && event.currentTarget && event.currentTarget.id) {
-              var index = event.currentTarget.id.replace(/^\D+/g, "");
-              item_index = parseInt(index);
-              Highlight_item(switchboard[category_index].indexOf(item_index));
-              Item_clicked();
+            if (event && event.currentTarget) {
+              let objectId = event.currentTarget.getAttribute('data-object-id');
+              if (objectId) {
+                selected_object_id = objectId;
+                Highlight_item();
+                Item_clicked();
+              } else {
+                // Fallback to index-based system
+                var index = event.currentTarget.id.replace(/^\D+/g, "");
+                item_index = parseInt(index);
+                Highlight_item(switchboard[category_index].indexOf(item_index));
+                Item_clicked();
+              }
             }
           });
         } else if (objectMapping && selected_category) {
@@ -5830,12 +6022,30 @@
 
           categoryObjects.forEach(([objectId, objectInfo]) => {
             // Find the model instance for this object
-            const model = Model.instances.find(m => m.object_id === objectId);
+            let model = Model.instances.find(m => m.object_id === objectId);
 
-            if (model && model.capable()) {
-              availableObjects.push({ objectId, objectInfo, model });
-            } else if (model) {
-              unavailableObjects.push({ objectId, objectInfo, model });
+            // Fallback: if no model found by object_id, try to find by category and index
+            if (!model && objectMapping.categories[objectInfo.category]) {
+              const categoryDisplayOrder = objectMapping.categories[objectInfo.category].display_order;
+              model = Model.instances.find(m =>
+                m.category === categoryDisplayOrder &&
+                m.children_index === objectInfo.index
+              );
+              // Set the object_id if found via fallback
+              if (model) {
+                model.object_id = objectId;
+              }
+            }
+
+            if (model) {
+              const isCapable = model.capable();
+              if (isCapable) {
+                availableObjects.push({ objectId, objectInfo, model });
+              } else {
+                unavailableObjects.push({ objectId, objectInfo, model });
+              }
+            } else {
+              console.warn(`Object mapping - No model found for ${objectInfo.name} (${objectId})`);
             }
           });
 
@@ -5995,6 +6205,8 @@
         display_items = !display_items;
       });
       $("#custom-controls-delete").on("click", (event) => {
+        // Hide color options popup immediately when delete is pressed
+        Hide_options();
         Trash_picked_mesh();
       });
       $("#controls-buttons-mail").on("click", (event) => {
@@ -6059,6 +6271,40 @@
             model.object_id = getObjectIdFromCategoryIndex(model.category, model.children_index);
           }
         }
+      };
+
+      // Helper function to get category key from category index
+      const getCategoryKeyFromIndex = (categoryIndex) => {
+        if (!objectMapping || !Categories || categoryIndex === undefined) {
+          return null;
+        }
+
+        // Find the category that matches this index
+        const categoryName = Categories[categoryIndex]?.name;
+        if (!categoryName) return null;
+
+        // Find the matching category key in objectMapping
+        for (const [categoryKey, categoryInfo] of Object.entries(objectMapping.categories)) {
+          if (categoryInfo.name === categoryName) {
+            return categoryKey;
+          }
+        }
+        return null;
+      };
+
+      // Helper function to get category from object ID using object mapping
+      const getCategoryFromObjectId = (objectId) => {
+        if (!objectMapping || !objectId) {
+          return null;
+        }
+
+        // Look up the object in the mapping
+        const objectInfo = objectMapping.objects[objectId];
+        if (objectInfo && objectInfo.category) {
+          return objectInfo.category;
+        }
+
+        return null;
       };
 
       // Helper function to get object_id from category and children_index

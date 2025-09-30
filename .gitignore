@@ -16,6 +16,7 @@ pids
 coverage/
 *.lcov
 output/
+extracted_glb/
 
 # nyc test coverage
 .nyc_output
@@ -39,7 +40,10 @@ playmor/public_html/yard/.env
 # dotenv environment variables file
 playmor/public_html/yard/.env
 playmor/public_html/yard/config.php
+playmor/public_html/yard/js/extracted_images/
+playmor/public_html/yard/assets/
 playmor/nodevenv/public_html/yard/16/lib/.env
+.claude/
 
 # IDE files
 .vscode/
