@@ -1479,107 +1479,7 @@
       </div>
       <div class="right-bar" style="right: 10px">
         <div class="sub_item_container" id="sub_item_container">
-          <h6 class="sub-items" id="sub-items-0">
-            <div class="sub-item-text">Cargo net</div>
-            <img
-              class="sub-item-image"
-              src="images/image_507fc15b.png"
-            />
-          </h6>
-          <h6 class="sub-items" id="sub-items-1">
-            <div class="sub-item-text">Combo climbing</div>
-            <img
-              class="sub-item-image"
-              src="images/image_3a2dd7a7.png"
-            />
-          </h6>
-          <h6 class="sub-items" id="sub-items-2">
-            <div class="sub-item-text">Climbing pole</div>
-            <img
-              class="sub-item-image"
-              src="images/image_4d042197.png"
-            />
-          </h6>
-          <h6 class="sub-items" id="sub-items-3">
-            <div class="sub-item-text">Fireman pole</div>
-            <img
-              class="sub-item-image"
-              src="images/image_5639f543.png"
-            />
-          </h6>
-          <h6 class="sub-items" id="sub-items-4">
-            <div class="sub-item-text">Gang plank 4 ft</div>
-            <img
-              class="sub-item-image"
-              src="images/image_601ec133.png"
-            />
-          </h6>
-          <h6 class="sub-items" id="sub-items-5">
-            <div class="sub-item-text">Gang plank 5 ft</div>
-            <img
-              class="sub-item-image"
-              src="images/image_42baf42c.png"
-            />
-          </h6>
-          <h6 class="sub-items" id="sub-items-7">
-            <div class="sub-item-text">Monkey bar climber 4 ft</div>
-            <img
-              class="sub-item-image"
-              src="images/image_fbbe3bd6.png"
-            />
-          </h6>
-          <h6 class="sub-items" id="sub-items-8">
-            <div class="sub-item-text">Monkey bar climber 5 ft</div>
-            <img
-              class="sub-item-image"
-              src="images/image_fbbe3bd6.png"
-            />
-          </h6>
-          <h6 class="sub-items" id="sub-items-9">
-            <div class="sub-item-text">Poly rock climb 5 ft</div>
-            <img
-              class="sub-item-image"
-              src="images/image_0ba4708b.png"
-            />
-          </h6>
-          <h6 class="sub-items" id="sub-items-11">
-            <div class="sub-item-text">Steps 4 ft</div>
-            <img
-              class="sub-item-image"
-              src="images/image_d79b3747.png"
-            />
-          </h6>
-          <h6 class="sub-items" id="sub-items-12">
-            <div class="sub-item-text">Steps 5 ft</div>
-            <img
-              class="sub-item-image"
-              src="images/image_76ba2961.png"
-            />
-          </h6>
-          <h6 class="sub-items" id="sub-items-14">
-            <div class="sub-item-text">Monkey bar attachment</div>
-            <img
-              class="sub-item-image"
-              style="filter: grayscale(100%)"
-              src="images/image_7ba73527.png"
-            />
-          </h6>
-          <h6 class="sub-items" id="sub-items-14">
-            <div class="sub-item-text">Poly rock climb 7 ft</div>
-            <img
-              class="sub-item-image"
-              style="filter: grayscale(100%)"
-              src="images/image_bc632756.png"
-            />
-          </h6>
-          <h6 class="sub-items" id="sub-items-14">
-            <div class="sub-item-text">Steps 7 ft</div>
-            <img
-              class="sub-item-image"
-              style="filter: grayscale(100%)"
-              src="images/image_33764303.png"
-            />
-          </h6>
+
         </div>
       </div>
       <div class="custom-controls-unified" style="display: none">
@@ -2237,14 +2137,15 @@
                 colorized: model.colorized,
                 toy_color: model.toy_color,
                 frame_color: model.frame_color,
+                trim_color: model.trim_color,
                 ruf: model.ruf,
                 ruf_color: model.ruf_color,
                 flags: model.get_flag_color_list(),
                 joints: model.joints
                   .filter((joint) => joint.connected)
-                  .map((joint) => {
+                  .map((joint, index) => {
                     return {
-                      index: joint.index,
+                      index: index,
                       link: {
                         model_object_id: joint.connected.model.object_id,
                         model_save_index: joint.connected.model.save_index,
@@ -2311,6 +2212,7 @@
               model = Model.instances[model_data.index].clone();
             }
             model.yaw = model_data.yaw;
+            model.slope = model_data.slope || 0;
             model.mesh.rotation.y = model_data.y_rotation;
             model.mesh.position.set(
               model_data.position.x,
@@ -2438,6 +2340,11 @@
             // Restore toy color if saved
             if (model_data.toy_color) {
               model.toy_color = model_data.toy_color;
+            }
+
+            // Restore trim color if saved
+            if (model_data.trim_color) {
+              model.trim_color = model_data.trim_color;
             }
 
             // Apply all default colors (frame colors and toy colors for swings)
@@ -3049,11 +2956,18 @@
                   if (joint.available && joint.model.category != 2) {
                     found = joint.layer == seekingLayer;
 
-                    // Special case: allow layer "8" to connect to layer "handle" for handrails
+                    // Special case: allow layer "8" to connect to layer "handle" for handrails only
                     if (!found && ((seekingLayer === "8" && joint.layer === "handle") ||
                                    (seekingLayer === "handle" && joint.layer === "8"))) {
-                      found = true;
+                      // Only allow this connection for handrails connecting to steps
+                      const isHandrail = this.object_id === 'HGR' || this.object_id === 'HR';
+                      const isConnectingToStep = joint.model.object_id && joint.model.object_id.startsWith('P-STEP-');
+                      if (isHandrail && isConnectingToStep) {
+                        found = true;
+                        console.log('seekingLayer: ', seekingLayer, 'joint.layer: ', joint.layer, 'found: ', found);
+                      }
                     }
+
 
                     if (found) {
                       const categoryMatch = joint.model.category != this.category;
@@ -3063,6 +2977,7 @@
                       const isHandleConnection = seekingLayer === 'handle' || seekingLayer === '8';
 
                       if (isHandrail && isHandleConnection) {
+                        console.log("object Id: ", this.object_id, 'seekingLayer: ', seekingLayer, 'joint.layer: ', joint.layer, 'found: ', found);
                         found = true; // Allow handrails to connect to steps in same category
                       } else {
                         found = categoryMatch; // Original logic for other items
@@ -4162,6 +4077,31 @@
                   } else {
                     // For non-bridge/tunnel objects, remove as before
                     console.log(`Removing connected object ${connected_model.object_id} from tower`);
+
+                    // Special case: if this is a swing beam, also remove connected swings
+                    if (getCategoryFromObjectId(connected_model.object_id) === "swing_beams") {
+                      console.log(`Swing beam ${connected_model.object_id} being deleted from tower - removing connected swings`);
+                      for (let swing_joint of connected_model.joints) {
+                        if (!swing_joint.available && swing_joint.connected && swing_joint !== connected_joint) {
+                          let swing_connected_joint = swing_joint.connected;
+                          let swing_connected_model = swing_connected_joint.model;
+
+                          if (!swing_joint.layer.startsWith("b")) {
+                            // This is a swing, remove it
+                            console.log(`Removing connected swing ${swing_connected_model.object_id}`);
+                            scene.remove(swing_connected_model.mesh);
+
+                            let swing_index = models_with_available_joints.indexOf(swing_connected_model);
+                            if (swing_index != -1)
+                              models_with_available_joints.splice(swing_index, 1);
+
+                            swing_index = picked_meshes.indexOf(swing_connected_model.mesh);
+                            if (swing_index != -1) picked_meshes.splice(swing_index, 1);
+                          }
+                        }
+                      }
+                    }
+
                     scene.remove(connected_model.mesh);
 
                     let index = models_with_available_joints.indexOf(connected_model);
@@ -4933,6 +4873,20 @@
           });
         }
       };
+      const ColorizeTrim = (color) => {
+        picked_mesh.model.trim_color = color;
+
+        let s = color.toString(16);
+        while (s.length < 6) s = "0" + s;
+        let c = new THREE.Color("#" + s);
+
+        picked_mesh.model.mesh.traverse((mesh) => {
+          if (mesh.name && mesh.name.indexOf("_colorize_") != -1 && mesh.material) {
+            mesh.material.color = c;
+          }
+        });
+        console.log(`ColorizeTrim: Set trim color to ${s} for ${picked_mesh.model.object_id}`);
+      };
       const Colorize = (color) => {
         picked_mesh.model.colorized = color;
         picked_mesh.model.toy_color = color; // Also save as toy color for proper JSON persistence
@@ -4953,16 +4907,15 @@
         const tempPickedMesh = picked_mesh;
         picked_mesh = { model: model };
 
+        // Get object configuration once
+        const { objectName, objectConfig } = getObjectInfoById(model.object_id);
+
         // Apply frame color if requested and object has frame configuration
         if (applyFrameColor && model.frame_color) {
-          const { objectName, objectConfig } = getObjectInfoById(model.object_id);
           if (objectConfig && objectConfig.sections && objectConfig.sections.includes('frame') && objectConfig.frame_meshes) {
             Change_frame_color(model.frame_color);
           }
         }
-
-        // Check if this specific object has toy color configuration
-        const { objectName, objectConfig } = getObjectInfoById(model.object_id);
 
         // Check if object has toy section and toy colors configured
         const hasToyColorConfig = (objectConfig &&
@@ -5008,6 +4961,32 @@
           }
         } else {
           console.log("DEBUG: Toy color not applied - conditions not met");
+        }
+
+        // Apply trim color to all objects that have trim support (saved or default blue)
+        if (objectConfig && objectConfig.sections && objectConfig.sections.includes('trim')) {
+          console.log(`Checking trim color for ${model.object_id}: current trim_color =`, model.trim_color);
+
+          // Use saved trim color if available, otherwise default to blue
+          if (!model.trim_color) {
+            model.trim_color = 0x1c4bad; // Default blue color from trim_colors config
+            console.log(`No saved trim color, defaulting to blue for ${model.object_id}`);
+          } else {
+            console.log(`Using saved trim color ${model.trim_color.toString(16)} for ${model.object_id}`);
+          }
+
+          // Use the same approach as the Colorize function for consistency
+          model.colorized = model.trim_color;
+          let s = model.trim_color.toString(16);
+          while (s.length < 6) s = "0" + s;
+          let trimColor = new THREE.Color("#" + s);
+
+          model.mesh.traverse((mesh) => {
+            if (mesh.name && mesh.name.indexOf("_colorize_") != -1 && mesh.material) {
+              mesh.material.color = trimColor;
+            }
+          });
+          console.log(`Applied trim color (${s}) to ${model.object_id}`);
         }
 
         picked_mesh = tempPickedMesh;
@@ -5674,8 +5653,6 @@
           
           // Apply opposite rotation to world group to keep objects aligned
           worldGroup.rotation.y = -cameraYRotation;
-          
-          console.log('World rotation synced:', worldGroup.rotation.y * 180 / Math.PI, 'degrees');
         };
         
         // Apply initial world rotation based on initial camera position
@@ -6610,7 +6587,7 @@
               
               Object.entries(trimColors).forEach(([key, colorData]) => {
                 console.log(`Adding trim color: ${key}`, colorData);
-                trimHtml += `<div onclick="Colorize(${colorData.hex})" class="custom-controls-color" style="background-color: ${colorData.color}" title="${key}"></div>`;
+                trimHtml += `<div onclick="ColorizeTrim(${colorData.hex})" class="custom-controls-color" style="background-color: ${colorData.color}" title="${key}"></div>`;
               });
               
               console.log(`Trim HTML:`, trimHtml);

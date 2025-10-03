@@ -33,11 +33,11 @@
       }
     },
     "roof_canopy_colors": {
-      "blue": {"color": "@roof_blue", "hex": "0x004983"},
       "green": {"color": "@roof_green", "hex": "0x01664b"},
-      "yellow": {"color": "@roof_yellow", "hex": "0xfac606"},
+      "blue": {"color": "@roof_blue", "hex": "0x004983"},
       "red": {"color": "@roof_red", "hex": "0x93293b"},
       "gray": {"color": "@roof_gray", "hex": "0x5b5e67"},
+      "yellow": {"color": "@roof_yellow", "hex": "0xfac606"},
       "tricolor": {"type": "special", "image": "images/image_ae45a138.png"}
     },
     "roof_poly": {
