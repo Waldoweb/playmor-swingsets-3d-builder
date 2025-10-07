@@ -1998,6 +1998,69 @@
         }
       }
 
+      // URL parameter parsing for catalog loading
+      function getURLParameters() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+          catalogId: params.get('catalog-id')
+        };
+      }
+
+      // Wait for all models to be fully loaded with meshes
+      function waitForModelsToLoad() {
+        return new Promise((resolve) => {
+          const checkModelsLoaded = () => {
+            // Count models with loaded meshes
+            const loadedModels = Model.instances.filter(model => model.mesh !== null).length;
+            const totalModels = Model.instances.length;
+
+            // Update progress bar
+            if (totalModels > 0) {
+              const progress = Math.trunc((loadedModels * 100) / totalModels);
+              green_span.style = `width: ${progress}%;`;
+            }
+
+            // Check if all models have their meshes loaded
+            if (loadedModels === totalModels && totalModels > 0) {
+              console.log(`All ${totalModels} models loaded with meshes`);
+              // Hide loading bar
+              blank_slate_div.style = "display: none";
+              resolve();
+            } else {
+              // Check again in 100ms
+              setTimeout(checkModelsLoaded, 100);
+            }
+          };
+          checkModelsLoaded();
+        });
+      }
+
+      // Simple URL catalog loading using existing loadCatalogProject
+      async function loadCatalogFromURL() {
+        const { catalogId } = getURLParameters();
+        if (!catalogId) return false;
+
+        // Wait for catalog data to be loaded
+        await loadCatalogData();
+
+        // Find the project with matching catalog ID
+        const project = catalogProjects.find(p => p.catalogId == catalogId);
+        if (!project) {
+          console.error(`Catalog ID ${catalogId} not found`);
+          return false;
+        }
+
+        // Wait for models to be fully loaded (they're already loading from page initialization)
+        // Don't call Load_models() again as it's already called during page load
+        await waitForModelsToLoad();
+
+        // Use existing loadCatalogProject function
+        await loadCatalogProject(project);
+
+        console.log(`Successfully loaded catalog: "${project.title}"`);
+        return true;
+      }
+
       function startNewProject() {
         hideWelcomeModal();
         localStorage.setItem('yard-builder-visited', 'true');
@@ -2088,8 +2151,13 @@
         }
       }
 
-      function checkFirstVisit() {
-        showWelcomeModal();
+      async function checkFirstVisit() {
+        // Check if there's a catalog-id in URL first
+        const catalogLoaded = await loadCatalogFromURL();
+        if (!catalogLoaded) {
+          // No catalog loaded from URL, show welcome modal
+          showWelcomeModal();
+        }
       }
 
       class Blueprint {
@@ -6648,6 +6716,10 @@
 
         for (let model of Model.instances) model.selected = false;
       };
+
+      // Show loading bar immediately when page starts
+      blank_slate_div.style = "display: block";
+      green_span.style = "width: 0%;";
 
       Load_models();
       initializeObjectIdSystem();
