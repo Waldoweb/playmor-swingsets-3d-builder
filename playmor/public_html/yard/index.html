@@ -55,6 +55,18 @@
         overflow: hidden;
       }
 
+      @keyframes pulse {
+        0% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0.3;
+        }
+      }
+
       .slider {
         -webkit-appearance: none;
         width: 100%;
@@ -914,6 +926,25 @@
         border-color: rgba(255, 255, 255, 0.5);
       }
 
+      .catalog-new-project-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 12px 30px;
+        height: fit-content;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-right: 15px;
+        transition: all 0.3s ease;
+        display: none;
+      }
+
+      .catalog-new-project-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+      }
+
 
       #measurement-display {
         display: none;
@@ -1307,6 +1338,11 @@
                 src="images/image_c5adb9e5.png"
               />
             </div>
+            <div id="controls-buttons-catalog" class="controls-buttons-item" onclick="showCatalogModal()" title="Browse Catalog Sets">
+              <img
+                src="images/image_browse.png"
+              />
+            </div>
             <div
               id="controls-buttons-center-mulch"
               class="controls-buttons-item"
@@ -1563,6 +1599,7 @@
             <!-- Catalog cards will be populated here -->
           </div>
           <div class="catalog-modal-footer">
+            <button onclick="startNewProjectFromCatalog()" class="catalog-new-project-btn">New Project</button>
             <button onclick="hideCatalogModal()" class="catalog-back-btn">Back to Options</button>
           </div>
         </div>
@@ -2066,16 +2103,35 @@
         localStorage.setItem('yard-builder-visited', 'true');
       }
 
+      function startNewProjectFromCatalog() {
+        hideCatalogModal();
+        localStorage.setItem('yard-builder-visited', 'true');
+        window.location.href = '/';
+      }
+
       async function browseCatalog() {
         hideWelcomeModal();
-        await showCatalogModal();
+        await showCatalogModal(false);
         localStorage.setItem('yard-builder-visited', 'true');
       }
 
-      async function showCatalogModal() {
+      async function showCatalogModal(showNewProjectButton = true) {
         const catalogModal = document.getElementById('catalog-modal-container');
         if (catalogModal) {
           catalogModal.style.display = 'flex';
+
+          // Show/hide the New Project button based on parameter
+          const newProjectBtn = document.querySelector('.catalog-new-project-btn');
+          if (newProjectBtn) {
+            newProjectBtn.style.display = showNewProjectButton ? 'inline-block' : 'none';
+          }
+
+          // Show loading indicator while fetching catalog data
+          const container = document.getElementById('catalog-projects-container');
+          if (container) {
+            container.innerHTML = '<div style="color: white; text-align: center; grid-column: 1 / -1; padding: 20px;"><div style="margin-bottom: 10px;">Loading Playmor Catalogs...</div><div class="meter" style="width: 200px; margin: 0 auto;"><span style="width: 100%; animation: pulse 1.5s ease-in-out infinite;"></span></div></div>';
+          }
+
           await loadCatalogData();
           populateCatalogProjects();
         }
@@ -2140,6 +2196,11 @@
           if (typeof blueprint !== 'undefined' && blueprint.restore) {
             blueprint.restore({ state: projectData });
           }
+
+          // Update URL with catalog ID parameter using existing URL logic
+          const newUrl = new URL(window.location);
+          newUrl.searchParams.set('catalog-id', project.catalogId);
+          history.pushState(null, '', newUrl);
 
           // Hide the catalog modal
           hideCatalogModal();
@@ -3522,10 +3583,13 @@
         let m = plug_joint.clone();
         let p = new THREE.Vector3();
         let q = new THREE.Quaternion();
+        let s = new THREE.Vector3();
         plug_joint.getWorldQuaternion(q);
+        plug_joint.getWorldScale(s);
         m.quaternion.copy(q);
         plug_joint.getWorldPosition(p);
         m.position.copy(p);
+        m.scale.copy(s);
 
         let plug_box3 = new THREE.Box3().setFromObject(m);
         //scene . add ( new THREE . Box3Helper ( plug_box3 , 0xffff00 ) )
@@ -3536,10 +3600,13 @@
             let m = mesh.clone();
             let p = new THREE.Vector3();
             let q = new THREE.Quaternion();
+            let s = new THREE.Vector3();
             mesh.getWorldQuaternion(q);
+            mesh.getWorldScale(s);
             m.quaternion.copy(q);
             mesh.getWorldPosition(p);
             m.position.copy(p);
+            m.scale.copy(s);
 
             let host_box3 = new THREE.Box3().setFromObject(m);
             //scene . add ( new THREE . Box3Helper ( host_box3 , 0x0000ff ) )
