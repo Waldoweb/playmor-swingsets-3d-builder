@@ -435,11 +435,42 @@
         border-radius: 20px;
         border: 1px white solid;
         cursor: pointer;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+      }
+
+      .controls-buttons-item:hover {
+        width: auto;
+        min-width: 40px;
+        padding: 0 8px;
+        gap: 6px;
       }
 
       .controls-buttons-item img {
-        width: 100%;
-        height: 100%;
+        width: 28px;
+        height: 28px;
+        flex-shrink: 0;
+      }
+
+      .controls-buttons-item .button-text {
+        font-family: Arial, sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        color: #333;
+        white-space: nowrap;
+        opacity: 0;
+        max-width: 0;
+        overflow: hidden;
+        transition: all 0.2s ease;
+      }
+
+      .controls-buttons-item:hover .button-text {
+        opacity: 1;
+        max-width: 200px;
+        margin-left: 6px;
       }
 
       .bottom-controls {
@@ -1314,42 +1345,33 @@
       <div class="controls">
         <div class="top-controls">
           <div class="controls-buttons">
-            <div id="controls-buttons-info" class="controls-buttons-item">
-              <img
-                src="images/image_a0c48939.png"
-              />
-            </div>
-            <div id="controls-buttons-recenter" class="controls-buttons-item">
-              <img
-                src="images/image_05890187.png"
-              />
+            <div id="controls-buttons-info" class="controls-buttons-item" title="Show a list of parts in your playsets design">
+              <img src="images/image_a0c48939.png" />
+              <span class="button-text">Show Parts</span>
             </div>
             <div
               id="controls-buttons-refresh"
-              style="border: 0px; background: transparent"
               class="controls-buttons-item"
+              title="Reset to configurator"
             >
-              <img
-                src="images/image_18df01d8.png"
-              />
+              <img src="images/image_18df01d8.png" />
+              <span class="button-text">Reset</span>
             </div>
-            <div id="controls-buttons-undo" class="controls-buttons-item">
-              <img
-                src="images/image_c5adb9e5.png"
-              />
+            <div id="controls-buttons-undo" class="controls-buttons-item" title="Undo your last change">
+              <img src="images/image_c5adb9e5.png" />
+              <span class="button-text">Undo</span>
             </div>
-            <div id="controls-buttons-catalog" class="controls-buttons-item" onclick="showCatalogModal()" title="Browse Catalog Sets">
-              <img
-                src="images/image_browse.png"
-              />
+            <div id="controls-buttons-catalog" class="controls-buttons-item" onclick="showCatalogModal()" title="Load pre-designed playsets from our catalog to customize">
+              <img src="images/image_browse.png" />
+              <span class="button-text">Show Catalog Sets</span>
             </div>
             <div
               id="controls-buttons-center-mulch"
               class="controls-buttons-item"
+              title="Center your playset design in the play area"
             >
-              <img
-                src="images/image_0cdd7e4b.png"
-              />
+              <img src="images/image_0cdd7e4b.png" />
+              <span class="button-text">Center Playset</span>
             </div>
           </div>
           <div id="zum_div">
@@ -1375,28 +1397,25 @@
         </div>
         <div class="bottom-controls">
           <div class="controls-buttons">
-            <div id="controls-buttons-mulch" class="controls-buttons-item">
-              <img
-                src="images/image_d574641e.png"
-              />
+            <div id="controls-buttons-mulch" class="controls-buttons-item" title="Edit mulch and border options">
+              <img src="images/image_d574641e.png" />
+              <span class="button-text">Mulch Options</span>
             </div>
-            <div id="controls-buttons-switch" class="controls-buttons-item">
-              <img
-                src="images/image_9c3714ff.png"
-              />
+            <div id="controls-buttons-switch" class="controls-buttons-item" title="Show or hide the background scene">
+              <img src="images/image_9c3714ff.png" />
+              <span class="button-text">Show/Hide Background</span>
             </div>
             <div
               id="controls-buttons-measurement"
               class="controls-buttons-item"
+              title="Show or hide the dimensions of your playset design"
             >
-              <img
-                src="images/image_ab10b2d8.png"
-              />
+              <img src="images/image_ab10b2d8.png" />
+              <span class="button-text">Show/Hide Dimensions</span>
             </div>
-            <div id="controls-buttons-help" class="controls-buttons-item">
-              <img
-                src="images/image_c33b1a9e.png"
-              />
+            <div id="controls-buttons-help" class="controls-buttons-item" title="Show instructions on how to use this configurator">
+              <img src="images/image_c33b1a9e.png" />
+              <span class="button-text">Show Instructions</span>
             </div>
           </div>
           <div id="measurement-display" style="display: none">0 x 0</div>
@@ -1496,20 +1515,17 @@
       </div>
       <div class="bottom-controls-right" style="right: calc(40px + 26vh)">
         <div class="controls-buttons">
-          <div id="controls-buttons-upload" class="controls-buttons-item">
-            <img
-              src="images/image_8c253f38.png"
-            />
+          <div id="controls-buttons-upload" class="controls-buttons-item" title="Upload a design you previously saved">
+            <img src="images/image_8c253f38.png" />
+            <span class="button-text">Upload Design</span>
           </div>
-          <div id="controls-buttons-download" class="controls-buttons-item">
-            <img
-              src="images/image_b63c07cf.png"
-            />
+          <div id="controls-buttons-download" class="controls-buttons-item" title="Download your design for future editing">
+            <img src="images/image_b63c07cf.png" />
+            <span class="button-text">Download Design</span>
           </div>
-          <div id="controls-buttons-mail" class="controls-buttons-item">
-            <img
-              src="images/image_66d66c82.png"
-            />
+          <div id="controls-buttons-mail" class="controls-buttons-item" title="Send your design to Playor for a detailed quote">
+            <img src="images/image_66d66c82.png" />
+            <span class="button-text">Get A Quote</span>
           </div>
         </div>
       </div>
