@@ -245,119 +245,383 @@
       }
 
       .left-bar {
-        position: absolute;
-        height: calc(92vh - 18px);
-        top: 4vh;
-        left: 2.5vh;
-        width: 12.5vh;
-        background: rgba(0, 0, 0, 0.5);
-        border: 4px solid white;
-        padding: 5px;
+        position: fixed;
+        height: 100vh;
+        top: 0;
+        left: 0;
+        width: 200px;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        border-right: 2px solid rgba(255, 255, 255, 0.2);
+        padding: 0;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        transform: translateX(-100%);
+      }
+
+      .left-bar.open {
+        transform: translateX(0);
       }
 
       #sub_step_container {
         width: 100%;
-        height: calc(100% - 20px);
-        overflow-y: scroll;
-        margin: 10px 0;
+        height: 100%;
+        overflow-y: auto;
+        padding: 20px;
+        box-sizing: border-box;
       }
 
       #sub_step_container::-webkit-scrollbar {
-        width: 6px;
+        width: 8px;
       }
 
       #sub_step_container::-webkit-scrollbar-track {
-        background-color: transparent;
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
       }
 
       #sub_step_container::-webkit-scrollbar-thumb {
-        background-color: rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 4px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+      }
+
+      #sub_step_container::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.8);
+        background-clip: content-box;
       }
 
       .steps {
-        height: 14.2%;
-        text-align: center;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
         cursor: pointer;
-        margin: 0px;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+      }
+
+      .steps:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        border-color: rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .steps.active {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border-color: rgba(255, 255, 255, 0.5);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
       }
 
       .step-text {
-        color: #fff;
-        font-size: 1.5vh;
-        height: 15%;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 600;
+        margin-top: 8px;
+        text-align: center;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      }
+
+      .steps.active .step-text {
+        color: white;
       }
 
       .step-image {
-        height: 75%;
-        margin-top: 5%;
+        width: 100%;
+        height: 60px;
+        object-fit: contain;
+        border-radius: 8px;
       }
 
       .right-bar {
-        position: absolute;
-        height: calc(92vh - 18px);
-        top: 4vh;
-        right: -30vh;
-        width: 26vh;
-        background: rgba(0, 0, 0, 0.5);
-        border: 4px solid white;
-        padding: 5px;
-        transition: right 0.5s ease 0s;
+        position: fixed;
+        height: 100vh;
+        top: 0;
+        right: 0;
+        width: 250px;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        border-left: 2px solid rgba(255, 255, 255, 0.2);
+        padding: 0;
+        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        transform: translateX(100%);
         cursor: pointer;
+      }
+
+      .right-bar.open {
+        transform: translateX(0);
       }
 
       .sub_item_container {
         width: 100%;
-        height: calc(100% - 20px);
-        overflow-y: scroll;
-        margin: 10px 0;
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 16px;
+        box-sizing: border-box;
       }
 
       .sub_item_container::-webkit-scrollbar {
-        width: 6px;
+        width: 8px;
       }
 
       .sub_item_container::-webkit-scrollbar-track {
-        background-color: transparent;
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
       }
 
       .sub_item_container::-webkit-scrollbar-thumb {
-        background-color: rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 4px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+      }
+
+      .sub_item_container::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.8);
+        background-clip: content-box;
       }
 
       .sub-items {
         position: relative;
-        width: 18vh;
-        height: 21vh;
-        margin: auto;
-        margin-bottom: 8px;
+        width: calc(100% - 16px);
+        max-width: 180px;
+        height: 140px;
+        margin: 0 auto 12px auto;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        backdrop-filter: blur(5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-sizing: border-box;
+      }
+
+      .sub-items:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      }
+
+      .sub-items.selected {
+        background: linear-gradient(135deg, rgba(52, 152, 219, 0.3), rgba(74, 144, 226, 0.3));
+        border: 2px solid rgba(52, 152, 219, 0.8);
+        box-shadow:
+          0 8px 32px rgba(52, 152, 219, 0.3),
+          0 4px 16px rgba(0, 0, 0, 0.2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        transform: scale(1.02);
+      }
+
+      .sub-items.selected:hover {
+        background: linear-gradient(135deg, rgba(52, 152, 219, 0.4), rgba(74, 144, 226, 0.4));
+        box-shadow:
+          0 12px 40px rgba(52, 152, 219, 0.4),
+          0 6px 20px rgba(0, 0, 0, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
       }
 
       .sub-item-image {
         width: 100%;
+        height: 90px;
+        object-fit: contain;
+        border-radius: 6px;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+
+      .sub-items.selected .sub-item-image {
+        filter: brightness(1.1) contrast(1.1);
       }
 
       .sub-item-text {
         color: white;
-        width: 100%;
+        width: calc(100% - 8px);
         position: absolute;
         text-align: center;
-        bottom: 0px;
-        font-size: 1.8vh;
+        bottom: 6px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 11px;
+        font-weight: 600;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        background: rgba(0, 0, 0, 0.3);
+        padding: 3px 6px;
+        border-radius: 4px;
+        backdrop-filter: blur(5px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .sub-items.selected .sub-item-text {
+        background: rgba(52, 152, 219, 0.8);
+        color: white;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      }
+
+      /* Disabled/Unavailable Item Styles */
+      .sub-items.disabled,
+      .sub-items:has(.sub-item-image[style*="grayscale"]) {
+        background: rgba(255, 255, 255, 0.03);
+        border: 2px solid rgba(255, 255, 255, 0.05);
+        opacity: 0.6;
+        cursor: not-allowed;
+        filter: brightness(0.7);
+      }
+
+      .sub-items.disabled:hover,
+      .sub-items:has(.sub-item-image[style*="grayscale"]):hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+        transform: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .sub-items.disabled .sub-item-image,
+      .sub-items:has(.sub-item-image[style*="grayscale"]) .sub-item-image {
+        filter: grayscale(100%) brightness(0.5) contrast(0.8);
+      }
+
+      .sub-items.disabled .sub-item-text,
+      .sub-items:has(.sub-item-image[style*="grayscale"]) .sub-item-text {
+        background: rgba(128, 128, 128, 0.4);
+        color: rgba(255, 255, 255, 0.6);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+      }
+
+      /* Disabled overlay effect */
+      .sub-items.disabled::after,
+      .sub-items:has(.sub-item-image[style*="grayscale"])::after {
+        content: '🔒';
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        font-size: 16px;
+        opacity: 0.7;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+      }
+
+      /* Alternative lock icon using CSS */
+      .sub-items.disabled::before,
+      .sub-items:has(.sub-item-image[style*="grayscale"])::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.6);
+        border-radius: 50%;
+        backdrop-filter: blur(5px);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 1;
+      }
+
+      .sub-items.disabled:hover::before,
+      .sub-items:has(.sub-item-image[style*="grayscale"]):hover::before {
+        opacity: 1;
       }
 
       #show-right-btn {
-        width: 25px;
-        height: 50px;
-        position: absolute;
-        top: calc(50vh - 25px);
-        right: 3vh;
-        transition: right 0.5s ease 0s;
+        width: 35px;
+        height: 35px;
+        position: fixed;
+        top: calc(50vh - 17.5px);
+        right: 230px;
+        background: rgba(0, 0, 0, 0.8);
         cursor: pointer;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        z-index: 1001;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        box-sizing: border-box;
+      }
+
+      #show-right-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.9);
+      }
+
+      #show-right-btn.hidden {
+        right: 20px;
       }
 
       #show-right-btn img {
-        width: 100%;
-        height: 100%;
+        width: 18px;
+        height: 18px;
+        filter: brightness(0) invert(1);
+        opacity: 0.9;
+        transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: block;
+        margin: auto;
+      }
+
+      #show-right-btn.hidden img {
+        transform: rotate(180deg);
+      }
+
+      #show-left-btn {
+        width: 35px;
+        height: 35px;
+        position: fixed;
+        top: calc(50vh - 17.5px);
+        left: 180px;
+        background: rgba(0, 0, 0, 0.8);
+        cursor: pointer;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        z-index: 1001;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        box-sizing: border-box;
+      }
+
+      #show-left-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.9);
+      }
+
+      #show-left-btn.hidden {
+        left: 20px;
+      }
+
+      #show-left-btn img {
+        width: 18px;
+        height: 18px;
+        filter: brightness(0) invert(1);
+        opacity: 0.9;
+        transform: rotate(180deg);
+        transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: block;
+        margin: auto;
+      }
+
+      #show-left-btn.hidden img {
+        transform: rotate(0deg);
       }
 
       .controls {
@@ -479,10 +743,10 @@
       }
 
       .bottom-controls-right {
-        position: absolute;
+        position: fixed;
         top: calc(100vh - 70px);
-        right: 25px;
-        transition: right 0.5s ease 0s;
+        right: 270px;
+        z-index: 1000;
       }
 
       .custom-controls {
@@ -1508,12 +1772,17 @@
         <div class="sub_step_container" id="sub_step_container">
         </div>
       </div>
-      <div id="show-right-btn" style="right: calc(40px + 26vh)">
+      <div id="show-left-btn">
         <img
           src="images/image_ae5a2d14.png"
         />
       </div>
-      <div class="bottom-controls-right" style="right: calc(40px + 26vh)">
+      <div id="show-right-btn">
+        <img
+          src="images/image_ae5a2d14.png"
+        />
+      </div>
+      <div class="bottom-controls-right">
         <div class="controls-buttons">
           <div id="controls-buttons-upload" class="controls-buttons-item" title="Upload a design you previously saved">
             <img src="images/image_8c253f38.png" />
@@ -1529,7 +1798,7 @@
           </div>
         </div>
       </div>
-      <div class="right-bar" style="right: 10px">
+      <div class="right-bar open">
         <div class="sub_item_container" id="sub_item_container">
 
         </div>
@@ -4728,9 +4997,8 @@
 
               if (!display_items) {
                 // open
-                $(".right-bar").css("right", "10px");
-                $("#show-right-btn").css("right", `calc(26vh + 40px)`);
-                $(".bottom-controls-right").css("right", `calc(26vh + 40px)`);
+                $(".right-bar").addClass("open");
+                $("#show-right-btn").removeClass("hidden");
                 display_items = true;
               }
             });
@@ -5913,7 +6181,7 @@
         down: 40,
       };
       const poi = new THREE.Vector3();
-      let display_items = false;
+      let display_items = true;
       let display_mulch = false;
       let display_email = false;
       let mulch_enabled = true;
@@ -5974,9 +6242,8 @@
 
               if (!display_items) {
                 // open
-                $(".right-bar").css("right", "10px");
-                $("#show-right-btn").css("right", `calc(26vh + 40px)`);
-                $(".bottom-controls-right").css("right", `calc(26vh + 40px)`);
+                $(".right-bar").addClass("open");
+                $("#show-right-btn").removeClass("hidden");
                 display_items = true;
               }
             }
@@ -6015,9 +6282,9 @@
 
                 if (!display_items) {
                   // open
-                  $(".right-bar").css("right", "10px");
-                  $("#show-right-btn").css("right", `calc(26vh + 40px)`);
-                  $(".bottom-controls-right").css("right", `calc(26vh + 40px)`);
+                  $(".right-bar").addClass("open");
+                  $("#show-right-btn").removeClass("hidden");
+                  $(".bottom-controls-right").css("right", "270px");
                   display_items = true;
                 }
               }
@@ -6105,7 +6372,7 @@
           }
           for (let child of cabuse) {
             html +=
-              '<h6 class="sub-items" id="sub-items-' +
+              '<h6 class="sub-items disabled" id="sub-items-' +
               index +
               '" data-object-id="' +
               (child.model.object_id || '') +
@@ -6124,6 +6391,10 @@
 
           $(".sub-items").on("click", (event) => {
             if (event && event.currentTarget) {
+              // Prevent interaction with disabled items
+              if (event.currentTarget.classList.contains('disabled')) {
+                return;
+              }
               let objectId = event.currentTarget.getAttribute('data-object-id');
               if (objectId) {
                 selected_object_id = objectId;
@@ -6193,7 +6464,7 @@
           // Show unavailable objects (grayed out)
           unavailableObjects.forEach(({ objectId, objectInfo, model }) => {
             html +=
-              '<h6 class="sub-items" data-object-id="' + objectId + '">' +
+              '<h6 class="sub-items disabled" data-object-id="' + objectId + '">' +
               '<div class="sub-item-text">' +
               objectInfo.name +
               "</div>" +
@@ -6207,6 +6478,10 @@
 
           $(".sub-items").on("click", (event) => {
             if (event && event.currentTarget) {
+              // Prevent interaction with disabled items
+              if (event.currentTarget.classList.contains('disabled')) {
+                return;
+              }
               let objectId = event.currentTarget.getAttribute('data-object-id');
               if (selected_object_id !== objectId) {
                 selected_object_id = objectId;
@@ -6220,35 +6495,32 @@
         }
       };
       const Highlight_category = function () {
+        // Clear all category selections first
+        $(".steps").removeClass("active");
         $(".steps img").css("opacity", 1);
-        $(".steps img").css("background", "transparent");
 
         // Use object ID-based highlighting if available
         if (selected_category) {
-          $(`.steps[data-category="${selected_category}"] img`).css("opacity", 1);
-          $(`.steps[data-category="${selected_category}"] img`).css("background", "#c0c0c0");
+          $(`.steps[data-category="${selected_category}"]`).addClass("active");
         } else if (typeof category_index !== 'undefined') {
           // Fallback to index-based highlighting
-          $(`#steps-${category_index} img`).css("opacity", 1);
-          $(`#steps-${category_index} img`).css("background", "#c0c0c0");
+          $(`#steps-${category_index}`).addClass("active");
         }
       };
       const Highlight_item = function (override_index) {
+        // Clear all selections first
+        $(".sub-items").removeClass("selected");
         $(".sub-item-image").css("opacity", 1);
-        $(".sub-item-image").css("background", "transparent");
 
         // Use object ID-based highlighting if available
         if (selected_object_id) {
-          $(`.sub-items[data-object-id="${selected_object_id}"] img`).css("opacity", 1);
-          $(`.sub-items[data-object-id="${selected_object_id}"] img`).css("background", "#c0c0c0");
+          $(`.sub-items[data-object-id="${selected_object_id}"]`).addClass("selected");
         } else if (typeof override_index !== 'undefined') {
           // Use provided index
-          $(`#sub-items-${override_index} img`).css("opacity", 1);
-          $(`#sub-items-${override_index} img`).css("background", "#c0c0c0");
+          $(`#sub-items-${override_index}`).addClass("selected");
         } else if (typeof item_index !== 'undefined') {
           // Fallback to item_index
-          $(`#sub-items-${item_index} img`).css("opacity", 1);
-          $(`#sub-items-${item_index} img`).css("background", "#c0c0c0");
+          $(`#sub-items-${item_index}`).addClass("selected");
         }
       };
 
@@ -6320,15 +6592,33 @@
       $("#controls-buttons-download").on("click", (event) => {
         Save();
       });
-      $("#show-right-btn").on("click", (event) => {
-        if (display_items) {
-          $(".right-bar").css("right", "-35vh");
-          $("#show-right-btn").css("right", "3vh");
-          $(".bottom-controls-right").css("right", "15px");
+      let display_categories = true;
+
+      $("#show-left-btn").on("click", (event) => {
+        console.log("Left button clicked! Current state:", display_categories);
+        if (display_categories) {
+          console.log("Closing left sidebar");
+          $(".left-bar").removeClass("open");
+          $("#show-left-btn").addClass("hidden");
         } else {
-          $(".right-bar").css("right", "10px");
-          $("#show-right-btn").css("right", `calc(26vh + 40px)`);
-          $(".bottom-controls-right").css("right", `calc(26vh + 40px)`);
+          console.log("Opening left sidebar");
+          $(".left-bar").addClass("open");
+          $("#show-left-btn").removeClass("hidden");
+        }
+        display_categories = !display_categories;
+      });
+
+      $("#show-right-btn").on("click", (event) => {
+        console.log("Right button clicked! Current state:", display_items);
+        if (display_items) {
+          console.log("Closing right sidebar");
+          $(".right-bar").removeClass("open");
+          $("#show-right-btn").addClass("hidden");
+        } else {
+          console.log("Opening right sidebar");
+          $(".right-bar").addClass("open");
+          $("#show-right-btn").removeClass("hidden");
+          $(".bottom-controls-right").css("right", "270px");
         }
         display_items = !display_items;
       });
@@ -6811,9 +7101,16 @@
       Highlight_category();
       Highlight_item();
 
-      $(".right-bar").css("right", "10px");
-      $("#show-right-btn").css("right", `calc(26vh + 40px)`);
-      $(".bottom-controls-right").css("right", `calc(26vh + 40px)`);
+      // Initialize right sidebar as open
+      $(".right-bar").addClass("open");
+      $("#show-right-btn").removeClass("hidden");
+
+      // Initialize left sidebar as open
+      $(".left-bar").addClass("open");
+      $("#show-left-btn").removeClass("hidden");
+
+      // Ensure mulch options start hidden
+      $(".mulch").hide();
 
       Main();
     </script>
