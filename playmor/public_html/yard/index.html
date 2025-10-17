@@ -2543,9 +2543,10 @@
                 slope: model.slope,
                 mirrorx: model.mirrorx,
                 index: model.index,
-                object_id: model.object_id,
+                object_id: model.object_id || null, // Ensure object_id is always included
                 save_index: model.save_index,
                 yaw: model.yaw,
+                // Save position as fallback for isolated models
                 position: model.mesh.position,
                 y_rotation: model.mesh.rotation.y,
                 colorized: model.colorized,
@@ -2555,11 +2556,31 @@
                 ruf: model.ruf,
                 ruf_color: model.ruf_color,
                 flags: model.get_flag_color_list(),
+                // Store the current GLB URL/path for model change detection
+                glb_path: model.glb_path || null,
+                // Enhanced connection data for relationship-based reconstruction
+                connections: model.joints
+                  .filter((joint) => joint.connected)
+                  .map((joint) => {
+                    return {
+                      my_joint_index: joint.index,
+                      my_joint_layer: joint.layer,
+                      connected_to: {
+                        model_object_id: joint.connected.model.object_id || null,
+                        model_save_index: joint.connected.model.save_index,
+                        joint_index: joint.connected.index,
+                        joint_layer: joint.connected.layer,
+                      },
+                      // Store the connection type and any special properties
+                      connection_type: joint.type || "default",
+                    };
+                  }),
+                // Keep legacy joints format for backward compatibility
                 joints: model.joints
                   .filter((joint) => joint.connected)
-                  .map((joint, index) => {
+                  .map((joint) => {
                     return {
-                      index: index,
+                      index: joint.index,  // Fixed: Use actual joint index instead of map index
                       link: {
                         model_object_id: joint.connected.model.object_id,
                         model_save_index: joint.connected.model.save_index,
@@ -2607,24 +2628,163 @@
 
           skybox.visible = state.skybox.visible;
 
+          // Phase 1: Create all models first without positioning
+          let created_models = [];
           models_with_available_joints = [];
+
           for (let model_data of state.models_data) {
             let model;
 
-            // Try to get model using object_id first (new system)
-            if (model_data.object_id && objectMapping) {
-              const modelIndex = getModelIndexFromObjectId(model_data.object_id);
-              if (modelIndex !== null) {
-                model = Model.instances[modelIndex].clone();
-                model.object_id = model_data.object_id; // Set the object_id on the cloned model
+            // Prioritize object_id based lookup for better model tracking
+            if (model_data.object_id) {
+              // First try to find by object_id in current Model.instances
+              let foundModel = Model.instances.find(m => m.object_id === model_data.object_id);
+              if (foundModel) {
+                model = foundModel.clone();
+                model.object_id = model_data.object_id;
+              } else if (objectMapping) {
+                // Fallback to object mapping lookup
+                const modelIndex = getModelIndexFromObjectId(model_data.object_id);
+                if (modelIndex !== null && modelIndex < Model.instances.length) {
+                  model = Model.instances[modelIndex].clone();
+                  model.object_id = model_data.object_id;
+                } else {
+                  console.warn('Could not find model for object_id:', model_data.object_id, 'trying index fallback');
+                  // Last resort: use saved index if within bounds
+                  if (model_data.index < Model.instances.length) {
+                    model = Model.instances[model_data.index].clone();
+                    model.object_id = model_data.object_id; // Preserve the object_id
+                  } else {
+                    console.error('Cannot restore model: object_id not found and index out of bounds', model_data);
+                    continue; // Skip this model
+                  }
+                }
               } else {
-                console.warn('Could not find model for object_id:', model_data.object_id, 'falling back to index');
-                model = Model.instances[model_data.index].clone();
+                console.warn('ObjectMapping not available, falling back to index for object_id:', model_data.object_id);
+                if (model_data.index < Model.instances.length) {
+                  model = Model.instances[model_data.index].clone();
+                  model.object_id = model_data.object_id;
+                } else {
+                  console.error('Cannot restore model: index out of bounds', model_data);
+                  continue;
+                }
               }
             } else {
-              // Fallback to old index system
-              model = Model.instances[model_data.index].clone();
+              // Fallback to old index system for legacy saves
+              if (model_data.index < Model.instances.length) {
+                model = Model.instances[model_data.index].clone();
+                // Try to assign object_id if we can determine it
+                if (objectMapping) {
+                  model.object_id = getObjectIdFromCategoryIndex(model.category, model.children_index);
+                }
+              } else {
+                console.error('Cannot restore model: no object_id and index out of bounds', model_data);
+                continue;
+              }
             }
+
+            // Store model data for connection reconstruction
+            model.saved_data = model_data;
+            created_models.push(model);
+          }
+
+          // Phase 2: Position models using connection-based reconstruction
+          let positioned_models = new Set();
+          let root_models = [];
+
+          // Find root models (those with no incoming connections or should be positioned first)
+          for (let model of created_models) {
+            let model_data = model.saved_data;
+            let hasIncomingConnections = false;
+
+            // Check if this model is connected TO by other models
+            for (let other_model of created_models) {
+              if (other_model === model) continue;
+              let other_data = other_model.saved_data;
+
+              // Check both new connections format and legacy joints format
+              let connections = other_data.connections || other_data.joints || [];
+              for (let conn of connections) {
+                let target_object_id = conn.connected_to?.model_object_id || conn.link?.model_object_id;
+                if (target_object_id === model_data.object_id) {
+                  hasIncomingConnections = true;
+                  break;
+                }
+              }
+              if (hasIncomingConnections) break;
+            }
+
+            if (!hasIncomingConnections) {
+              console.log('Identified root model:', model_data.object_id);
+              root_models.push(model);
+            } else {
+              console.log('Model has incoming connections:', model_data.object_id);
+            }
+          }
+
+          // Position root models first (use saved positions)
+          for (let model of root_models) {
+            let model_data = model.saved_data;
+            this.applyModelProperties(model, model_data);
+            positioned_models.add(model);
+            models_with_available_joints.push(model);
+          }
+
+          // Phase 3: Position connected models using joint relationships
+          let queue = [...root_models];
+          let max_iterations = created_models.length * 2; // Prevent infinite loops
+          let iterations = 0;
+
+          while (queue.length > 0 && iterations < max_iterations) {
+            iterations++;
+            let current_model = queue.shift();
+            let current_data = current_model.saved_data;
+
+            // Process connections for this model
+            let connections = current_data.connections || current_data.joints || [];
+            for (let conn of connections) {
+              let target_object_id = conn.connected_to?.model_object_id || conn.link?.model_object_id;
+              let target_model = created_models.find(m => m.saved_data.object_id === target_object_id);
+
+              if (target_model && !positioned_models.has(target_model)) {
+                // Position the target model based on connection
+                this.positionModelByConnection(current_model, target_model, conn);
+                this.applyModelProperties(target_model, target_model.saved_data);
+                positioned_models.add(target_model);
+                models_with_available_joints.push(target_model);
+                queue.push(target_model);
+              }
+            }
+          }
+
+          // Phase 4: Handle any remaining unpositioned models (fallback to saved positions)
+          for (let model of created_models) {
+            if (!positioned_models.has(model)) {
+              console.warn('Model not positioned through connections, using saved position:', model.saved_data.object_id);
+              console.log('Model connections:', model.saved_data.connections || model.saved_data.joints);
+
+              // Debug: Check if this model has outgoing connections that failed
+              let connections = model.saved_data.connections || model.saved_data.joints || [];
+              for (let conn of connections) {
+                let target_object_id = conn.connected_to?.model_object_id || conn.link?.model_object_id;
+                let target_model = created_models.find(m => m.saved_data.object_id === target_object_id);
+                console.log(`  -> Connection to ${target_object_id}: ${target_model ? 'found' : 'NOT FOUND'}`);
+                if (target_model) {
+                  console.log(`     Target positioned: ${positioned_models.has(target_model)}`);
+                }
+              }
+
+              this.applyModelProperties(model, model.saved_data);
+              models_with_available_joints.push(model);
+            }
+          }
+
+          // Phase 5: Restore connections using existing logic (but with improved model lookup)
+          this.restoreConnections(created_models);
+        }
+
+        // Helper function to apply model properties
+        applyModelProperties(model, model_data) {
             model.yaw = model_data.yaw;
             model.slope = model_data.slope || 0;
             model.mesh.rotation.y = model_data.y_rotation;
@@ -2635,19 +2795,75 @@
             );
             model.ruf = model_data.ruf;
             model.ruf_color = model_data.ruf_color;
+            // Preserve GLB path if available (for change detection)
+            if (model_data.glb_path) {
+              model.glb_path = model_data.glb_path;
+            }
+
+            // Apply visual properties
+            this.applyVisualProperties(model, model_data);
+        }
+
+        // Helper function to position a model based on connection to another model
+        positionModelByConnection(sourceModel, targetModel, connectionData) {
+            try {
+              // Get the joint indices
+              let sourceJointIndex = connectionData.my_joint_index;
+              let targetJointIndex = connectionData.connected_to?.joint_index || connectionData.link?.joint_index;
+
+              // Find the actual joints by their index property
+              let sourceJoint = sourceModel.joints.find(j => j.index === sourceJointIndex);
+              let targetJoint = targetModel.joints.find(j => j.index === targetJointIndex);
+
+              if (!sourceJoint || !targetJoint) {
+                console.warn('Could not find joints for connection, using saved position');
+                return false;
+              }
+
+              // Calculate target position based on joint relationship
+              // This uses the existing joint positioning logic
+              if (sourceJoint.position && targetJoint.position) {
+                // Get the world position of the source joint
+                let sourceWorldPos = new THREE.Vector3();
+                sourceWorldPos.copy(sourceJoint.position);
+                sourceWorldPos.applyMatrix4(sourceModel.mesh.matrix);
+
+                // Calculate the offset for the target joint
+                let targetLocalPos = new THREE.Vector3();
+                targetLocalPos.copy(targetJoint.position);
+
+                // Position the target model so its joint aligns with the source joint
+                let targetPosition = new THREE.Vector3();
+                targetPosition.copy(sourceWorldPos);
+                targetPosition.sub(targetLocalPos);
+
+                targetModel.mesh.position.copy(targetPosition);
+                return true;
+              }
+            } catch (error) {
+              console.warn('Error positioning model by connection:', error);
+            }
+            return false;
+        }
+
+        // Helper function to apply visual properties (colors, flags, etc.)
+        applyVisualProperties(model, model_data) {
             let flag_mesh_list = model.get_flag_mesh_list();
             for (let i = 0; i < model_data.flags.length; i++) {
               let flag_color = model_data.flags[i];
               let flag_mesh = flag_mesh_list[i];
-              flag_mesh.material.color = new THREE.Color(
-                parseInt("0x" + flag_color, 16)
-              );
+              if (flag_mesh) {
+                flag_mesh.material.color = new THREE.Color(
+                  parseInt("0x" + flag_color, 16)
+                );
+              }
             }
+
+            // Apply roof/canopy settings
             switch (model_data.ruf) {
               case "canopy":
-                {
-                  if (model.roof_poly_mesh)
-                    model.roof_poly_mesh.visible = false;
+                if (model.roof_poly_mesh) model.roof_poly_mesh.visible = false;
+                if (model.roof_canopy_mesh) {
                   model.roof_canopy_mesh.visible = true;
                   if (model.ruf_color == "tricolors") {
                     model.roof_canopy_mesh.traverse((mesh) => {
@@ -2666,113 +2882,201 @@
                 }
                 break;
               case "poly":
-                {
-                  model.roof_canopy_mesh.visible = false;
+                if (model.roof_canopy_mesh) model.roof_canopy_mesh.visible = false;
+                if (model.roof_poly_mesh) {
                   model.roof_poly_mesh.visible = true;
-                  //model . roof_poly_mesh . traverse ( mesh => {
-                  //if ( 'material' in mesh )
-                  //mesh . material . color = new THREE . Color ( { color : model . ruf_color } )
-                  //} )
+                  if (model.ruf_color == "tricolors") {
+                    model.roof_poly_mesh.traverse((mesh) => {
+                      if ("material" in mesh)
+                        mesh.material = model.roof_poly_material.clone();
+                    });
+                  } else {
+                    model.roof_poly_mesh.traverse((mesh) => {
+                      if ("material" in mesh)
+                        mesh.material = new THREE.MeshStandardMaterial({
+                          color: model.ruf_color,
+                          side: THREE.DoubleSide,
+                        });
+                    });
+                  }
                 }
                 break;
             }
-            for (let joint_data of model_data.joints) {
-              let joint = model.joints[joint_data.index];
 
-              // Safety check: ensure joint exists
-              if (!joint) {
-                console.warn('Joint not found at index:', joint_data.index, 'for model with object_id:', model.object_id);
-                continue;
+            // Apply colorization
+            if (model_data.colorized) {
+              model.colorized = model_data.colorized;
+              model.toy_color = model_data.toy_color;
+              model.frame_color = model_data.frame_color;
+              model.trim_color = model_data.trim_color;
+
+              // Apply colors to meshes
+              let color_string = model.colorized.toString(16);
+              if (color_string.length < 5) color_string = "0" + color_string;
+              let color = new THREE.Color(parseInt("0x" + color_string, 16));
+
+              let toy_color_string = (model_data.toy_color || model_data.colorized).toString(16);
+              if (toy_color_string.length < 5) toy_color_string = "0" + toy_color_string;
+              let toy_color = new THREE.Color(parseInt("0x" + toy_color_string, 16));
+
+              let frame_string = (model_data.frame_color || "0");
+              if (frame_string === "cedar_tan") {
+                frame_string = "c0915c";
               }
+              if (frame_string.length < 5) frame_string = "0" + frame_string;
+              let frame_color = new THREE.Color(parseInt("0x" + frame_string, 16));
 
-              if (!joint.connected) {
-                let model2;
+              let trim_string = (model_data.trim_color || "0");
+              if (trim_string.length < 5) trim_string = "0" + trim_string;
+              let trim_color = new THREE.Color(parseInt("0x" + trim_string, 16));
+
+              // Apply colors to meshes based on their names
+              model.mesh.traverse((mesh) => {
+                if (mesh.name && mesh.name.indexOf("_colorize_") != -1 && mesh.material) {
+                  if (mesh.name.indexOf("_frame_") != -1) {
+                    mesh.material.color = frame_color.clone();
+                  } else if (mesh.name.indexOf("_trim_") != -1) {
+                    mesh.material.color = trim_color.clone();
+                  } else if (mesh.name.indexOf("_toy_") != -1) {
+                    mesh.material.color = toy_color.clone();
+                  } else {
+                    mesh.material.color = color.clone();
+                  }
+                  mesh.material.needsUpdate = true;
+                }
+              });
+
+              // Apply default colors using the existing function if available
+              if (typeof applyDefaultColors === 'function') {
+                applyDefaultColors(model);
+              }
+            }
+
+            // Handle frame color restoration with proper cedar_tan support
+            if (model_data.frame_color && typeof Change_frame_color === 'function') {
+              // Temporarily set picked_mesh to apply frame color
+              let original_picked_mesh = picked_mesh;
+              picked_mesh = { model: model };
+              try {
+                Change_frame_color(model_data.frame_color);
+              } catch (error) {
+                console.warn('Error applying frame color:', error);
+              }
+              picked_mesh = original_picked_mesh;
+            }
+        }
+
+        // Helper function to restore connections between models
+        restoreConnections(created_models) {
+          // Create connection map for quick lookup
+          let modelMap = new Map();
+          for (let model of created_models) {
+            modelMap.set(model.saved_data.save_index, model);
+            if (model.saved_data.object_id) {
+              modelMap.set(model.saved_data.object_id, model);
+            }
+          }
+
+          // Restore connections using enhanced lookup
+          for (let model of created_models) {
+            let model_data = model.saved_data;
+            let connections = model_data.connections || model_data.joints || [];
+
+            for (let joint_data of connections) {
+              try {
+                let model2 = null;
 
                 // Try to find connected model using object_id first (new system)
-                if (joint_data.link.model_object_id) {
-                  model2 = models_with_available_joints.find(m => m.object_id === joint_data.link.model_object_id);
+                let target_object_id = joint_data.connected_to?.model_object_id || joint_data.link?.model_object_id;
+                if (target_object_id) {
+                  model2 = modelMap.get(target_object_id);
                   if (!model2) {
-                    console.warn('Could not find connected model for object_id:', joint_data.link.model_object_id, 'falling back to save_index');
+                    console.warn('Could not find connected model for object_id:', target_object_id);
                   }
                 }
 
-                // Fallback to old save_index system
-                if (!model2 && joint_data.link.model_save_index < models_with_available_joints.length) {
-                  model2 = models_with_available_joints[joint_data.link.model_save_index];
+                // Fallback to save_index lookup
+                if (!model2) {
+                  let target_save_index = joint_data.connected_to?.model_save_index || joint_data.link?.model_save_index;
+                  if (target_save_index !== undefined) {
+                    model2 = modelMap.get(target_save_index);
+                  }
                 }
 
                 if (model2) {
-                let joint2 = model2.joints[joint_data.link.joint_index];
+                  let my_joint_index = joint_data.my_joint_index ?? joint_data.index;
+                  let target_joint_index = joint_data.connected_to?.joint_index || joint_data.link?.joint_index;
 
-                if (
-                  joint.layer == "s" ||
-                  joint.layer == "sh" ||
-                  joint.layer == "ds"
-                ) {
-                  let position = model.mesh.position;
-                  let rotation = model.mesh.rotation;
-                  let joint_index = model.joints.indexOf(joint);
-                  model.morph({ layer: joint2.model.joints[0].layer });
-                  joint = model.joints[joint_index];
-                  model.mesh.position.copy(position);
-                  model.mesh.rotation.copy(rotation);
-                }
+                  // Find joints by their index property for more reliable lookup
+                  let joint = model.joints.find(j => j.index === my_joint_index);
+                  let joint2 = model2.joints.find(j => j.index === target_joint_index);
 
-                if (joint.layer == "handle") {
-                  joint.model.mesh.traverse((mesh) => {
-                    if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
-                      mesh.rotation.x = model2.slope * Deg2Rad;
-                  });
-                }
+                  if (joint && joint2) {
 
-                Connect_joints({ joint_1: joint, joint_2: joint2 });
+                    // Handle layer morphing for swings connecting to swing beams
+                    if (joint.layer == "s" || joint.layer == "sh" || joint.layer == "ds") {
+                      // This model is connecting to a swing beam, need to morph to match beam's layer
+                      let target_layer = joint2.model.joints[0].layer;
+                      if (target_layer && target_layer !== joint.layer) {
+                        console.log(`Morphing swing from layer ${joint.layer} to ${target_layer} to match swing beam`);
+                        let position = model.mesh.position.clone();
+                        let rotation = model.mesh.rotation.clone();
+                        let joint_index = joint.index;  // Fixed: Use actual joint index instead of array position
+
+                        // Morph the model to the new layer
+                        model.morph({ layer: target_layer });
+
+                        // Update joint reference after morphing - find by index property
+                        joint = model.joints.find(j => j.index === joint_index) || model.joints[joint_index];
+
+                        // Restore position and rotation
+                        model.mesh.position.copy(position);
+                        model.mesh.rotation.copy(rotation);
+
+                        // Ensure mesh.model references are maintained after morphing
+                        model.mesh.traverse((mesh) => {
+                          mesh.model = model;
+                        });
+
+                        // Apply default colors after morphing
+                        if (typeof applyDefaultColors === 'function') {
+                          applyDefaultColors(model);
+                        }
+                      }
+                    }
+
+                    // Connect the joints - Hide_touched_fences will automatically preserve step railings
+                    Connect_joints({ joint_1: joint, joint_2: joint2 });
+                  }
                 }
+              } catch (error) {
+                console.warn('Error restoring connection:', error, joint_data);
               }
             }
-            if (model_data.colorized) {
-              model.colorized = model_data.colorized;
-
-              let color_string = model.colorized.toString(16);
-              if (color_string.length < 5) color_string = "0" + color_string;
-              if (color_string.length < 6) color_string = "0" + color_string;
-
-              let color = new THREE.Color("#" + color_string);
-
-              model.mesh.traverse((mesh) => {
-                if (mesh.name && mesh.name.indexOf("_colorize_") != -1 && mesh.material)
-                  mesh.material.color = color;
-              });
-            }
-            
-            // Restore frame color or set default cedar_tan if not saved
-            if (model_data.frame_color) {
-              model.frame_color = model_data.frame_color;
-            } else {
-              model.frame_color = 'cedar_tan';
-            }
-
-            // Restore toy color if saved
-            if (model_data.toy_color) {
-              model.toy_color = model_data.toy_color;
-            }
-
-            // Restore trim color if saved
-            if (model_data.trim_color) {
-              model.trim_color = model_data.trim_color;
-            }
-
-            // Apply all default colors (frame colors and toy colors for swings)
-            applyDefaultColors(model);
-            
-            model.mirrorx = model_data.mirrorx;
-            if (model.mirrorx == 1) {
-              model.mesh.scale.z = -1;
-            }
-
-            scene.add(model.mesh);
-            picked_meshes.push(model.mesh);
-            models_with_available_joints.push(model);
           }
+
+          // Add all models to picked_meshes and scene
+          for (let model of created_models) {
+            if (model.mesh) {
+              // Ensure mesh.model references are properly set for interaction
+              model.mesh.traverse((mesh) => {
+                mesh.model = model;
+              });
+
+              picked_meshes.push(model.mesh);
+              scene.add(model.mesh);
+              model.mesh.position.y += 0.05; // Small elevation adjustment
+            } else {
+              console.warn('Model has no mesh:', model.object_id);
+            }
+          }
+          // Final setup - ensure proper interaction state
+          picked_mesh = null;
+          host_joint = null;
+          plug_joint = null;
+          plug_joint_index = -1;
+          plug_model = null;
+          Mode.mode = Mode.normal;
 
           Show_items();
           Update_measurements();
@@ -2795,16 +3099,8 @@
           Mode.mode = Mode.normal;
           Update_measurements();
           Show_items();
-
-          let restore_camera = true;
-          if ("restore_camera" in args) restore_camera = args.restore_camera;
-
-          if (restore_camera) {
-            camera.position.set(0, 10, 10);
-            orbitControls.update();
-        if (window.syncWorldRotationWithCamera) syncWorldRotationWithCamera();
-          }
         }
+        center(args) {}
       }
       class Skybox {
         constructor(args) {
@@ -4345,34 +4641,50 @@
           let model = picked_mesh.model;
 
           html += "<tr>";
-
-          let thumbnail = thumbnailer.nail_it({ model: model });
+   
+            let thumbnail = thumbnailer.nail_it({ model: model });
           const { objectName } = getObjectInfoById(model.object_id);
           let name = objectName || 'Unknown Object';
-          let ruf = "";
-          if (model.roof_canopy_mesh)
-            if (model.roof_canopy_mesh.visible)
-              ruf =
-                Color2Name(model.roof_canopy_mesh.material.color) + " canopy";
-          if (ruf == "" && model.roof_poly_mesh) ruf = "Green poly";
-          let colorized_color_name = "";
 
-          model.mesh.traverse((mesh) => {
-            if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
-              colorized_color_name =
-                Color2Name(new THREE.Color(mesh.material.color)) +
-                " base color";
-          });
+          // Build parts description in new format
+          let options = [];
 
-          if (model.colorized) {
-            colorized_color_name = Color2Name(new THREE.Color(model.colorized));
-            colorized_color_name += " base color";
+          // Add Canopy information
+          if (model.roof_canopy_mesh && model.roof_canopy_mesh.visible) {
+
+            let canopyColor = Color2Name(model.roof_canopy_mesh.material.color);
+            options.push("Canopy: " + canopyColor);
+          }
+          if (model.roof_poly_mesh && model.roof_poly_mesh.visible) {
+            options.push("Canopy: Green Poly");
           }
 
-          let options = [];
-          if (ruf) options.push(ruf);
-          if (colorized_color_name.length > 0 && name.indexOf("floor") < 0)
-            options.push(colorized_color_name);
+          // Add Toy color information
+          if(model.toy_color) {
+            let toyColorName = Color2Name(new THREE.Color(model.toy_color));
+            options.push("Trim: " + toyColorName);
+          }
+
+          // // Add Frame color information
+          // if (model.frame_color && !model.toy_color) {
+          //   let frameColorName;
+          //   if (model.frame_color === "cedar_tan") {
+          //     frameColorName = "Cedar/Tan";
+          //   } else if (model.frame_color === "white") {
+          //     frameColorName = "White";
+          //   } else if (typeof model.frame_color === 'number') {
+          //     frameColorName = Color2Name(new THREE.Color(model.frame_color));
+          //   } else {
+          //     frameColorName = model.frame_color;
+          //   }
+          //   options.push("Frame: " + frameColorName);
+          // }
+
+          // Add Trim color information
+          if (model.trim_color) {
+            let trimColorName = Color2Name(new THREE.Color(model.trim_color));
+            options.push("Trim: " + trimColorName);
+          }
 
           // look for flags
           let flag_list = [];
@@ -4394,13 +4706,17 @@
                 });
             }
           });
-          for (let flag of flag_list)
+
+          // Add flags in new format (Flag 1: Color, Flag 2: Color, etc.)
+          let flagNumber = 1;
+          for (let flag of flag_list) {
             if (flag.count > 0) {
-              let s = flag.count + " " + flag.color_name;
-              if (flag.count == 1) s += " flag";
-              else s += " flags";
-              options.push(s);
+              for (let i = 0; i < flag.count; i++) {
+                options.push("Flag " + flagNumber + ": " + flag.color_name);
+                flagNumber++;
+              }
             }
+          }
 
           part_list.push({
             thumbnail: thumbnail,
@@ -5778,14 +6094,55 @@
       };
       const Color2Name = (color) => {
         let result = "Tri colored";
+        let hex_color = color.getHexString().toLowerCase();
 
-        let hex_color = color.getHexString();
-        if (hex_color == "01664b") result = "Green";
-        if (hex_color == "00664b") result = "Green";
-        if (hex_color == "004983") result = "Blue";
-        if (hex_color == "ffcb05") result = "Yellow";
-        if (hex_color == "93293b") result = "Red";
-        if (hex_color == "5b5e67") result = "Gray";
+        // Create color mapping from color-config.json data
+        const colorMap = {
+          // Basic colors
+          "ffffff": "White",
+          "d2691e": "Cedar/Tan",
+          "d3c6a6": "Cedar/Tan",
+
+          // Roof/Canopy colors (from roof_canopy_colors)
+          "004983": "Blue",     // roof_blue
+          "01664b": "Green",    // roof_green
+          "fac606": "Yellow",   // roof_yellow
+          "93293b": "Red",      // roof_red
+          "5b5e67": "Gray",     // roof_gray
+
+          // Alternative/legacy yellow values that might be used
+          "ffcb05": "Yellow",   // Legacy yellow value
+          "fac605": "Yellow",   // Slight variation
+          "fac607": "Yellow",   // Slight variation
+
+          // Trim colors (from trim_colors - these are darker variants)
+          "264425": "Green",    // trim_green (darker)
+          "1c4bad": "Blue",     // trim_blue (different shade)
+          "800020": "Red",      // trim_red (darker)
+
+          // Additional red color variations that might be used
+          "800021": "Red",      // Slight variation of trim_red
+          "80001f": "Red",      // Slight variation of trim_red
+          "932a3b": "Red",      // Slight variation of roof_red
+          "93293a": "Red",      // Slight variation of roof_red
+
+          // Debug: Add potential problematic values that might be showing as blue
+          "080001f": "Red",     // With extra leading zero
+          "0800020": "Red",     // With extra leading zero
+          // trim_yellow uses same as roof_yellow (fac606)
+          // trim_gray uses same as roof_gray (5b5e67)
+
+          // Flag colors (from flag_colors - same as roof colors)
+          // Already covered above since they use same hex values
+        };
+
+        // Look up the color in our mapping
+        if (colorMap[hex_color]) {
+          result = colorMap[hex_color];
+        } else {
+          // Debug: Log unrecognized colors to help identify issues
+          console.log(`Color2Name: Unrecognized color hex: ${hex_color}`);
+        }
 
         return result;
       };
@@ -5863,36 +6220,52 @@
         part_list = [];
         for (let picked_mesh of picked_meshes) {
           let model = picked_mesh.model;
-
+          
           html += "<tr>";
 
           let thumbnail = thumbnailer.nail_it({ model: model });
           const { objectName } = getObjectInfoById(model.object_id);
           let name = objectName || 'Unknown Object';
-          let ruf = "";
-          if (model.roof_canopy_mesh)
-            if (model.roof_canopy_mesh.visible)
-              ruf =
-                Color2Name(model.roof_canopy_mesh.material.color) + " canopy";
-          if (ruf == "" && model.roof_poly_mesh) ruf = "Green poly";
-          let colorized_color_name = "";
 
-          model.mesh.traverse((mesh) => {
-            if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
-              colorized_color_name =
-                Color2Name(new THREE.Color(mesh.material.color)) +
-                " base color";
-          });
+          // Build parts description in new format
+          let options = [];
 
-          if (model.colorized) {
-            colorized_color_name = Color2Name(new THREE.Color(model.colorized));
-            colorized_color_name += " base color";
+          // Add Canopy information
+          if (model.roof_canopy_mesh && model.roof_canopy_mesh.visible) {
+
+            let canopyColor = Color2Name(model.roof_canopy_mesh.material.color);
+            options.push("Canopy: " + canopyColor);
+          }
+          if (model.roof_poly_mesh && model.roof_poly_mesh.visible) {
+            options.push("Canopy: Green Poly");
+          }
+          
+          // Add Toy color information
+          if(model.toy_color) {
+            let toyColorName = Color2Name(new THREE.Color(model.toy_color));
+            options.push("Trim: " + toyColorName);
           }
 
-          let options = [];
-          if (ruf) options.push(ruf);
-          if (colorized_color_name.length > 0 && name.indexOf("floor") < 0)
-            options.push(colorized_color_name);
+          // // Add Frame color information
+          // if (model.frame_color) {
+          //   let frameColorName;
+          //   if (model.frame_color === "cedar_tan") {
+          //     frameColorName = "Cedar/Tan";
+          //   } else if (model.frame_color === "white") {
+          //     frameColorName = "White";
+          //   } else if (typeof model.frame_color === 'number') {
+          //     frameColorName = Color2Name(new THREE.Color(model.frame_color));
+          //   } else {
+          //     frameColorName = model.frame_color;
+          //   }
+          //   options.push("Frame: " + frameColorName);
+          // }
+
+          // Add Trim color information
+          if (model.trim_color) {
+            let trimColorName = Color2Name(new THREE.Color(model.trim_color));
+            options.push("Trim: " + trimColorName);
+          }
 
           // look for flags
           let flag_list = [];
@@ -5914,13 +6287,17 @@
                 });
             }
           });
-          for (let flag of flag_list)
+
+          // Add flags in new format (Flag 1: Color, Flag 2: Color, etc.)
+          let flagNumber = 1;
+          for (let flag of flag_list) {
             if (flag.count > 0) {
-              let s = flag.count + " " + flag.color_name;
-              if (flag.count == 1) s += " flag";
-              else s += " flags";
-              options.push(s);
+              for (let i = 0; i < flag.count; i++) {
+                options.push("Flag " + flagNumber + ": " + flag.color_name);
+                flagNumber++;
+              }
             }
+          }
 
           part_list.push({
             thumbnail: thumbnail,
