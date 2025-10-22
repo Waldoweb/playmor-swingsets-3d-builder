@@ -436,6 +436,12 @@
     "TIC": {
       "sections": [],
       "colors": {}
+    },
+    "HG": {
+      "sections": ["toy"],
+      "colors": {
+        "toy": "@toy_colors"
+      }
     }
   },
   "default_sections": {
