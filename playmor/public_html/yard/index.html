@@ -4439,6 +4439,11 @@
                           found = true;
                         }
                       }
+
+                      // Special case: allow b8/b10/ds disc swings to connect to "ds" layer joints
+                      if (!found && joint.layer === "ds" && (seekingLayer === "b8" || seekingLayer === "b10" || seekingLayer === "ds")) {
+                        found = true;
+                      }
                     }
 
 
@@ -5007,21 +5012,9 @@
               joint.available = false;
             }
 
-        if (
-          host_joint.model.category == 0 &&
-          host_joint.model.children_index < 2 &&
-          plug_joint.model.category == 1 &&
-          plug_joint.model.children_index > 3
-        ) {
-          let found = false;
-          let i = 0;
-          let beam_swing_joint;
-          while (!found && i < plug_joint.model.joints.length) {
-            beam_swing_joint = plug_joint.model.joints[i++];
-            found = "ds" == beam_swing_joint.layer;
-          }
-          if (found) beam_swing_joint.available = false;
-        }
+        // REMOVED: This code was incorrectly marking the "ds" joint as unavailable
+        // on Disc Swing Beams, preventing Disc Swings from connecting.
+        // The "ds" joint should remain available for Disc Swing connections.
 
         Hide_touched_fences({ parent: host_joint, toucher: plug_joint });
         Hide_touched_fences({ parent: plug_joint, toucher: host_joint });
@@ -5180,7 +5173,9 @@
                        handleToClimber ||
                        // Tire swing compatibility: "s" layer can connect to "tire" layer (MTS only)
                        ((joint.layer === "s" && plug_joint.layer === "tire" &&
-                         plug_joint.model.object_id === 'MTS')));
+                         plug_joint.model.object_id === 'MTS')) ||
+                       // Disc swing compatibility: "ds" layer can connect to "b8"/"b10"/"ds" layer
+                       (joint.layer === "ds" && (plug_joint.layer === "b8" || plug_joint.layer === "b10" || plug_joint.layer === "ds")));
 
                   if (layersMatch) {
                     if (joint.layer != "*") {
@@ -5288,17 +5283,21 @@
                 // Tire swing connecting to b8/b10 swing beam
                 (plug_joint.layer == "tire" && (host_joint.layer == "b8" || host_joint.layer == "b10"))
               ) {
-                scene.remove(plug_model.mesh);
-                // plug_model is a swing
-                // assuming only beams have available layer 's' joints
-                // Special case: if target joint is tire_only, morph to "tire" layer
+                // Determine target layer based on beam type
                 let target_layer = host_joint.tire_only ? "tire" : host_joint.model.joints[0].layer;
-                plug_model.morph({ layer: target_layer });
-                plug_joint = plug_model.joints[plug_joint_index];
-                scene.add(plug_model.mesh);
 
-                // Apply default colors after morphing
-                applyDefaultColors(plug_model);
+                // Only morph if layer actually needs to change
+                if (target_layer && target_layer !== plug_joint.layer) {
+                  scene.remove(plug_model.mesh);
+                  // plug_model is a swing
+                  // assuming only beams have available layer 's' joints
+                  plug_model.morph({ layer: target_layer });
+                  plug_joint = plug_model.joints[plug_joint_index];
+                  scene.add(plug_model.mesh);
+
+                  // Apply default colors after morphing
+                  applyDefaultColors(plug_model);
+                }
               }
 
               // Calculate the proper rotation for connection
@@ -6226,7 +6225,14 @@
         for (let model of models_with_available_joints) {
           for (let joint of model.joints) {
             const available = joint.available;
-            const layerMatch = (plug_joint.layer == "*" || joint.layer == "*" || joint.layer == plug_joint.layer);
+
+            // Standard layer matching
+            let layerMatch = (plug_joint.layer == "*" || joint.layer == "*" || joint.layer == plug_joint.layer);
+
+            // Special case: Disc swings (b8/b10/ds) can connect to "ds" layer joints
+            if (!layerMatch && joint.layer === "ds" && (plug_joint.layer === "b8" || plug_joint.layer === "b10" || plug_joint.layer === "ds")) {
+              layerMatch = true;
+            }
 
             if (available && layerMatch) {
               let position = Ddd2dd({ object3D: joint });
