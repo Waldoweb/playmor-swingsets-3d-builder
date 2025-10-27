@@ -4504,10 +4504,17 @@
 
           for (let model of models_with_available_joints) {
             for (let joint of model.joints) {
+              // Only check available joints
+              if (!joint.available) continue;
+
               if (joint.name && joint.name.includes("tire")) {
                 return true;
               }
               if (joint.layer === "tire" || joint.tire_only) {
+                return true;
+              }
+              // Also check regular "s" layer joints that can accept tire swings
+              if (joint.layer === "s" && !joint.tire_only) {
                 return true;
               }
             }
@@ -5162,9 +5169,9 @@
                                          (plug_joint.layer === "handle" || plug_joint.layer === "8") &&
                                          targetCategory === 'entries_climbers';
 
-                  // Check tire_only restriction: if joint is tire-only, ONLY allow tire layer plugs
+                  // Check tire_only restriction: if joint is tire-only, ONLY allow MTS (tire swing)
                   const layersMatch = joint.tire_only
-                    ? true
+                    ? (plug_joint.model.object_id === 'MTS')
                     : (joint.layer === plug_joint.layer ||
                        // Handle/8 compatibility
                        ((joint.layer === "8" && plug_joint.layer === "handle") ||
