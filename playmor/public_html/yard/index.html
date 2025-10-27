@@ -3728,7 +3728,7 @@
 
                 if (model2) {
                   let my_joint_index = joint_data.my_joint_index ?? joint_data.index;
-                  let target_joint_index = joint_data.connected_to?.joint_index || joint_data.link?.joint_index;
+                  let target_joint_index = joint_data.connected_to?.joint_index ?? joint_data.link?.joint_index;
 
                   // Find joints by their index property for more reliable lookup
                   let joint = model.joints.find(j => j.index === my_joint_index);
@@ -3737,9 +3737,12 @@
                   if (joint && joint2) {
 
                     // Handle layer morphing for swings connecting to swing beams
-                    if (joint.layer == "s" || joint.layer == "sh" || joint.layer == "ds") {
+                    if (joint.layer == "s" || joint.layer == "sh" || joint.layer == "ds" || joint.layer == "tire" ||
+                        // Tire swing connecting to b8/b10 swing beam
+                        (joint.layer == "tire" && (joint2.layer == "b8" || joint2.layer == "b10" || joint2.model.joints[0].layer == "b8" || joint2.model.joints[0].layer == "b10"))) {
                       // This model is connecting to a swing beam, need to morph to match beam's layer
-                      let target_layer = joint2.model.joints[0].layer;
+                      // Special case: if target joint is tire_only, morph to "tire" layer
+                      let target_layer = joint2.tire_only ? "tire" : joint2.model.joints[0].layer;
                       if (target_layer && target_layer !== joint.layer) {
                         console.log(`Morphing swing from layer ${joint.layer} to ${target_layer} to match swing beam`);
                         let position = model.mesh.position.clone();
@@ -4146,7 +4149,9 @@
                 let splits = mesh.name.split(",");
                 mesh.direction = parseInt(splits[1]);
                 mesh.layer = splits[2].toLowerCase();
-                mesh.exclusion_layer = splits.length > 3 ? splits[3] : null;
+                // Check if this is a tire-only joint (joint,0,s,tire)
+                mesh.tire_only = (splits.length > 3 && splits[3].toLowerCase() === "tire");
+                mesh.exclusion_layer = (splits.length > 3 && splits[3].toLowerCase() !== "tire") ? splits[3] : null;
                 mesh.excluder_layer = splits.length > 4 ? splits[4] : null;
                 mesh.available = true;
                 mesh.visible = false;
@@ -4192,7 +4197,9 @@
                 let splits = mesh.name.split(",");
                 mesh.direction = parseInt(splits[1]);
                 mesh.layer = splits[2].toLowerCase();
-                mesh.exclusion_layer = splits.length > 3 ? splits[3] : null;
+                // Check if this is a tire-only joint (joint,0,s,tire)
+                mesh.tire_only = (splits.length > 3 && splits[3].toLowerCase() === "tire");
+                mesh.exclusion_layer = (splits.length > 3 && splits[3].toLowerCase() !== "tire") ? splits[3] : null;
                 mesh.excluder_layer = splits.length > 4 ? splits[4] : null;
                 mesh.available = true;
                 mesh.visible = false;
@@ -4227,6 +4234,11 @@
                 if (mesh.name.toLowerCase().startsWith("joint")) {
                   let splits = mesh.name.split(",");
                   mesh.direction = parseInt(splits[1]);
+                  mesh.layer = splits[2].toLowerCase();
+                  // Check if this is a tire-only joint (joint,0,s,tire)
+                  mesh.tire_only = (splits.length > 3 && splits[3].toLowerCase() === "tire");
+                  mesh.exclusion_layer = (splits.length > 3 && splits[3].toLowerCase() !== "tire") ? splits[3] : null;
+                  mesh.excluder_layer = splits.length > 4 ? splits[4] : null;
                   mesh.available = true;
                   mesh.visible = false;
                   this.joints.push(mesh);
@@ -4268,7 +4280,9 @@
               let splits = mesh.name.split(",");
               mesh.direction = parseInt(splits[1]);
               mesh.layer = splits[2];
-              mesh.exclusion_layer = splits.length > 3 ? splits[3] : null;
+              // Check if this is a tire-only joint (joint,0,s,tire)
+              mesh.tire_only = (splits.length > 3 && splits[3].toLowerCase() === "tire");
+              mesh.exclusion_layer = (splits.length > 3 && splits[3].toLowerCase() !== "tire") ? splits[3] : null;
               mesh.excluder_layer = splits.length > 4 ? splits[4] : null;
               mesh.available = true;
               mesh.connected = null;
@@ -4329,6 +4343,15 @@
         capable(args) {
           let found = false;
 
+          // Special case: Check if this is a tire swing model (MTS only)
+          const isTireSwing = this.object_id === 'MTS' ||
+                              (this.mesh && this.mesh.name && this.mesh.name.includes('Tire Swing') && !this.mesh.name.includes('Vinyl'));
+
+          if (isTireSwing) {
+            // Tire swings are only available if there are models with tire swing compatible joints
+            return this.hasTireSwingJoints();
+          }
+
           // check for an empty tarmac
           if (picked_meshes.length == 0) {
             // bail if wildcard model
@@ -4387,17 +4410,34 @@
                 while (!found && k < model.joints.length) {
                   let joint = model.joints[k++];
                   if (joint.available && joint.model.category != 2) {
-                    found = joint.layer == seekingLayer;
+                    // Check tire_only restriction first
+                    if (joint.tire_only) {
+                      // tire_only joints can ONLY accept tire layer (MTS only)
+                      found = (seekingLayer === "tire" && this.object_id === 'MTS');
+                    } else {
+                      // Normal layer matching
+                      found = joint.layer == seekingLayer;
 
-                    // Special case: allow layer "8" to connect to layer "handle" for handrails only
-                    if (!found && ((seekingLayer === "8" && joint.layer === "handle") ||
-                                   (seekingLayer === "handle" && joint.layer === "8"))) {
-                      // Only allow this connection for handrails connecting to steps
-                      const isHandrail = this.object_id === 'HGR' || this.object_id === 'HR';
-                      const isConnectingToStep = joint.model.object_id && joint.model.object_id.startsWith('P-STEP-');
-                      if (isHandrail && isConnectingToStep) {
-                        found = true;
-                        console.log('seekingLayer: ', seekingLayer, 'joint.layer: ', joint.layer, 'found: ', found);
+                      // Special case: allow layer "8" to connect to layer "handle" for handrails only
+                      if (!found && ((seekingLayer === "8" && joint.layer === "handle") ||
+                                     (seekingLayer === "handle" && joint.layer === "8"))) {
+                        // Only allow this connection for handrails connecting to entries/climbers (steps, ladders, etc.)
+                        const isHandrail = this.object_id === 'HGR' || this.object_id === 'HR';
+                        const isConnectingToStep = joint.model.object_id && joint.model.object_id || null;
+                        const targetCategory = joint.model.object_id ? getCategoryFromObjectId(joint.model.object_id) : null;
+                        const isConnectingToClimber = targetCategory === 'entries_climbers';
+
+                        if (isHandrail && isConnectingToClimber) {
+                          found = true;
+                        }
+                      }
+
+                      // Special case: allow tire swings to connect to regular "s" layer joints (if not tire_only)
+                      if (!found && joint.layer === "s" && seekingLayer === "tire") {
+                        const isTireSwing = this.object_id === 'MTS';
+                        if (isTireSwing) {
+                          found = true;
+                        }
                       }
                     }
 
@@ -4458,6 +4498,23 @@
           }
           return found;
         }
+
+        // Function to check if any loaded models have tire swing compatible joints
+        hasTireSwingJoints() {
+
+          for (let model of models_with_available_joints) {
+            for (let joint of model.joints) {
+              if (joint.name && joint.name.includes("tire")) {
+                return true;
+              }
+              if (joint.layer === "tire" || joint.tire_only) {
+                return true;
+              }
+            }
+          }
+          return false;
+        }
+
         get_flag_mesh_list(args) {
           let flag_list = [];
           this.mesh.traverse((mesh) => {
@@ -4796,6 +4853,12 @@
         const plug_joint = args.plug_joint;
         const host_joint = args.host_joint;
 
+        // Skip collision detection for handles - they are small accessories that attach close to host
+        const isHandle = plug_joint.model.object_id === 'HGR' || plug_joint.model.object_id === 'HR';
+        if (isHandle) {
+          return true;
+        }
+
         let plug_mesh = plug_joint.model.mesh.clone();
         /*
             const yaw = Lookup_yaw ( { 
@@ -4955,6 +5018,109 @@
 
         Hide_touched_fences({ parent: host_joint, toucher: plug_joint });
         Hide_touched_fences({ parent: plug_joint, toucher: host_joint });
+
+        // Apply handle attachment logic for both interactive placement and blueprint restoration
+        if (host_joint.layer === "handle" || plug_joint.layer === "handle") {
+
+          // Determine which is the handle and which is the host
+          let handle_joint, host_step_joint;
+          if (plug_joint.model.object_id === 'HGR' || plug_joint.model.object_id === 'HR') {
+            handle_joint = plug_joint;
+            host_step_joint = host_joint;
+          } else if (host_joint.model.object_id === 'HGR' || host_joint.model.object_id === 'HR') {
+            handle_joint = host_joint;
+            host_step_joint = plug_joint;
+          } else {
+            console.log(`Neither joint is a handle - skipping logic`);
+          }
+
+          if (handle_joint && host_step_joint) {
+
+            // Calculate the proper rotation for the handle
+            const calculatedRotation = Lookup_yaw({
+              host_model_yaw: host_step_joint.model.yaw,
+              host_joint_direction: host_step_joint.direction,
+              plug_joint_direction: handle_joint.direction,
+            }) * Deg2Rad;
+
+            // For blueprint restoration, use saved rotation if available, otherwise use calculated
+            if (window.isRestoringFromBlueprint) {
+              const savedRotation = handle_joint.model.saved_data?.rotation?.y || handle_joint.model.saved_data?.y_rotation;
+
+              if (savedRotation !== undefined) {
+                handle_joint.model.mesh.rotation.y = savedRotation;
+              } else {
+                handle_joint.model.mesh.rotation.y = calculatedRotation;
+              }
+
+            } else {
+              // Interactive placement
+              handle_joint.model.mesh.rotation.y = calculatedRotation;
+            }
+
+            // Apply slope rotation for handles
+            const savedXRotation = window.isRestoringFromBlueprint ? handle_joint.model.saved_data?.rotation?.x : undefined;
+
+            if (savedXRotation !== undefined) {
+              handle_joint.model.mesh.traverse((mesh) => {
+                if (mesh.name && mesh.name.indexOf("_colorize_") != -1) {
+                  mesh.rotation.x = savedXRotation;
+                }
+              });
+            } else {
+              // Calculate slope rotation
+              handle_joint.model.mesh.traverse((mesh) => {
+                if (mesh.name && mesh.name.indexOf("_colorize_") != -1) {
+                  mesh.rotation.x = host_step_joint.model.slope * Deg2Rad;
+                }
+              });
+            }
+          }
+        }
+
+        // Apply tire swing attachment logic
+        // Check for tire swing connections: either old "tire" layer or new tire_only joints
+        const isTireConnection = (host_joint.layer === "tire" && (plug_joint.layer === "swing" || plug_joint.layer === "s")) ||
+                                 ((host_joint.layer === "swing" || host_joint.layer === "s") && plug_joint.layer === "tire") ||
+                                 (host_joint.tire_only && plug_joint.layer === "tire" && plug_joint.model.object_id === 'MTS') ||
+                                 (plug_joint.tire_only && host_joint.layer === "tire" && host_joint.model.object_id === 'MTS');
+
+        if (isTireConnection) {
+
+          // Determine which is the tire swing (MTS only) and which is the host
+          let tire_swing_joint, host_tire_joint;
+          if (plug_joint.model.object_id === 'MTS') {
+            tire_swing_joint = plug_joint;
+            host_tire_joint = host_joint;
+          } else if (host_joint.model.object_id === 'MTS') {
+            tire_swing_joint = host_joint;
+            host_tire_joint = plug_joint;
+          }
+
+          if (tire_swing_joint && host_tire_joint) {
+
+            // Calculate the proper rotation for the tire swing
+            const calculatedRotation = Lookup_yaw({
+              host_model_yaw: host_tire_joint.model.yaw,
+              host_joint_direction: host_tire_joint.direction,
+              plug_joint_direction: tire_swing_joint.direction,
+            }) * Deg2Rad;
+
+            // For blueprint restoration, use saved rotation if available, otherwise use calculated
+            if (window.isRestoringFromBlueprint) {
+              const savedRotation = tire_swing_joint.model.saved_data?.rotation?.y || tire_swing_joint.model.saved_data?.y_rotation;
+
+              if (savedRotation !== undefined) {
+                tire_swing_joint.model.mesh.rotation.y = savedRotation;
+              } else {
+                tire_swing_joint.model.mesh.rotation.y = calculatedRotation;
+              }
+            } else {
+              // Interactive placement
+              tire_swing_joint.model.mesh.rotation.y = calculatedRotation;
+            }
+          }
+        }
       };
       const Tik = (args) => {
         let delta = clock.getDelta();
@@ -4988,17 +5154,33 @@
                   plug_joint.model.tubular
                 ) {
                 } else {
-                  // Check if layers match (including special case for "8" and "handle")
-                  const layersMatch = joint.layer === plug_joint.layer ||
-                                    ((joint.layer === "8" && plug_joint.layer === "handle") ||
-                                     (joint.layer === "handle" && plug_joint.layer === "8"));
+                  // Check if layers match (including special cases)
+                  // Check if plug is a handle trying to connect to entries_climbers category
+                  const isHandrail = plug_joint.model.object_id === 'HGR' || plug_joint.model.object_id === 'HR';
+                  const targetCategory = joint.model.object_id ? getCategoryFromObjectId(joint.model.object_id) : null;
+                  const handleToClimber = isHandrail &&
+                                         (plug_joint.layer === "handle" || plug_joint.layer === "8") &&
+                                         targetCategory === 'entries_climbers';
+
+                  // Check tire_only restriction: if joint is tire-only, ONLY allow tire layer plugs
+                  const layersMatch = joint.tire_only
+                    ? true
+                    : (joint.layer === plug_joint.layer ||
+                       // Handle/8 compatibility
+                       ((joint.layer === "8" && plug_joint.layer === "handle") ||
+                        (joint.layer === "handle" && plug_joint.layer === "8")) ||
+                       // Handle to any entries_climbers (steps, ladders, etc.)
+                       handleToClimber ||
+                       // Tire swing compatibility: "s" layer can connect to "tire" layer (MTS only)
+                       ((joint.layer === "s" && plug_joint.layer === "tire" &&
+                         plug_joint.model.object_id === 'MTS')));
 
                   if (layersMatch) {
                     if (joint.layer != "*") {
-                      // Special case: handrails (HGR, HR) can connect to same category (steps)
-                      const isHandrail = plug_joint.model.object_id === 'HGR' || plug_joint.model.object_id === 'HR';
+                      // Special case: handrails (HGR, HR) can connect to entries_climbers
+                      const isHandrailPlug = plug_joint.model.object_id === 'HGR' || plug_joint.model.object_id === 'HR';
                       const isHandleConnection = joint.layer === 'handle' || joint.layer === '8';
-                      if (isHandrail && isHandleConnection) {
+                      if (isHandrailPlug && (isHandleConnection || handleToClimber)) {
                         we_gud = true;
                       } else {
                         we_gud = joint.model.category != plug_joint.model.category;
@@ -5036,16 +5218,17 @@
                     joint.name.startsWith("joint,") ||
                     joint.name.startsWith("joint_pole");
                 else if (plug_joint.layer === "handle" || plug_joint.layer === "8") {
-                  // Handle joints should always be shown for handrails (including "8" layer)
-                  show_joint = joint.layer === "handle" || joint.layer === "8";
+                  // Handle joints should be shown for handrails connecting to entries_climbers
+                  const jointCategory = joint.model.object_id ? getCategoryFromObjectId(joint.model.object_id) : null;
+                  show_joint = (joint.layer === "handle" || joint.layer === "8") ||
+                               (jointCategory === 'entries_climbers');
                 } else {
                   console.log(`Non-handle joint logic: plug_joint.layer=${plug_joint.layer}, joint.layer=${joint.layer}, show_joint=${show_joint}`);
                 }
 
-                if (
-                  Can_connect({ plug_joint: plug_joint, host_joint: joint }) &&
-                  show_joint
-                ) {
+                const canConnect = Can_connect({ plug_joint: plug_joint, host_joint: joint });
+
+                if (canConnect && show_joint) {
                   let joint_position = Ddd2dd({ object3D: joint });
                   joint.x = joint_position.x - size / 2;
                   joint.y = joint_position.y - size / 2;
@@ -5093,12 +5276,17 @@
               if (
                 host_joint.layer == "s" ||
                 host_joint.layer == "sh" ||
-                host_joint.layer == "ds"
+                host_joint.layer == "ds" ||
+                host_joint.layer == "tire" ||
+                // Tire swing connecting to b8/b10 swing beam
+                (plug_joint.layer == "tire" && (host_joint.layer == "b8" || host_joint.layer == "b10"))
               ) {
                 scene.remove(plug_model.mesh);
                 // plug_model is a swing
                 // assuming only beams have available layer 's' joints
-                plug_model.morph({ layer: host_joint.model.joints[0].layer });
+                // Special case: if target joint is tire_only, morph to "tire" layer
+                let target_layer = host_joint.tire_only ? "tire" : host_joint.model.joints[0].layer;
+                plug_model.morph({ layer: target_layer });
                 plug_joint = plug_model.joints[plug_joint_index];
                 scene.add(plug_model.mesh);
 
@@ -5106,18 +5294,51 @@
                 applyDefaultColors(plug_model);
               }
 
-              plug_model.mesh.rotation.y =
-                Lookup_yaw({
-                  host_model_yaw: host_joint.model.yaw,
-                  host_joint_direction: host_joint.direction,
-                  plug_joint_direction: plug_joint.direction,
-                }) * Deg2Rad;
+              // Calculate the proper rotation for connection
+              const calculatedRotation = Lookup_yaw({
+                host_model_yaw: host_joint.model.yaw,
+                host_joint_direction: host_joint.direction,
+                plug_joint_direction: plug_joint.direction,
+              }) * Deg2Rad;
+
+              // For handles during blueprint restoration, use saved rotation if it's reasonable
+              if (window.isRestoringFromBlueprint && (plug_model.object_id === 'HGR' || plug_model.object_id === 'HR')) {
+                // Check if model has saved rotation data
+                const savedRotation = plug_model.saved_data?.rotation?.y || plug_model.saved_data?.y_rotation;
+
+                if (savedRotation !== undefined) {
+                  plug_model.mesh.rotation.y = savedRotation;
+                } else {
+                  plug_model.mesh.rotation.y = calculatedRotation;
+                }
+              } else {
+                // Normal placement or non-handle objects
+                plug_model.mesh.rotation.y = calculatedRotation;
+              }
 
               if (host_joint.layer == "handle") {
-                plug_model.mesh.traverse((mesh) => {
-                  if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
-                    mesh.rotation.x = host_joint.model.slope * Deg2Rad;
-                });
+                // For blueprint restoration, use saved X rotation if available
+                if (window.isRestoringFromBlueprint && (plug_model.object_id === 'HGR' || plug_model.object_id === 'HR')) {
+                  const savedXRotation = plug_model.saved_data?.rotation?.x;
+                  if (savedXRotation !== undefined) {
+                    plug_model.mesh.traverse((mesh) => {
+                      if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
+                        mesh.rotation.x = savedXRotation;
+                    });
+                  } else {
+                    // Fallback to calculated slope rotation
+                    plug_model.mesh.traverse((mesh) => {
+                      if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
+                        mesh.rotation.x = host_joint.model.slope * Deg2Rad;
+                    });
+                  }
+                } else {
+                  // Normal placement
+                  plug_model.mesh.traverse((mesh) => {
+                    if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
+                      mesh.rotation.x = host_joint.model.slope * Deg2Rad;
+                  });
+                }
               }
 
               let pjp = new THREE.Vector3();
