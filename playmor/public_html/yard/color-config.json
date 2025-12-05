@@ -442,6 +442,18 @@
       "colors": {
         "toy": "@toy_colors"
       }
+    },
+    "HGR": {
+      "sections": ["toy"],
+      "colors": {
+        "toy": "@toy_colors"
+      }
+    },
+    "HR": {
+      "sections": ["toy"],
+      "colors": {
+        "toy": "@toy_colors"
+      }
     }
   },
   "default_sections": {
