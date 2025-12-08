@@ -44,6 +44,7 @@ playmor/public_html/yard/js/extracted_images/
 playmor/public_html/yard/assets/
 playmor/nodevenv/public_html/yard/16/lib/.env
 .claude/
+*.glb
 
 # IDE files
 .vscode/
