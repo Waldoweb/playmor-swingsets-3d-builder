@@ -4928,10 +4928,13 @@
         let m = plug_joint.clone();
         let p = new THREE.Vector3();
         let q = new THREE.Quaternion();
+        let s = new THREE.Vector3();
         plug_joint.getWorldQuaternion(q);
+        plug_joint.getWorldScale(s);
         m.quaternion.copy(q);
         plug_joint.getWorldPosition(p);
         m.position.copy(p);
+        m.scale.copy(s);
 
         let plug_box3 = new THREE.Box3().setFromObject(m);
         //scene . add ( new THREE . Box3Helper ( plug_box3 , 0xffff00 ) )
@@ -4941,10 +4944,13 @@
             let m = mesh.clone();
             let p = new THREE.Vector3();
             let q = new THREE.Quaternion();
+            let s = new THREE.Vector3();
             mesh.getWorldQuaternion(q);
+            mesh.getWorldScale(s);
             m.quaternion.copy(q);
             mesh.getWorldPosition(p);
             m.position.copy(p);
+            m.scale.copy(s);
 
             let host_box3 = new THREE.Box3().setFromObject(m);
             //scene . add ( new THREE . Box3Helper ( host_box3 , 0x0000ff ) )
@@ -5213,7 +5219,11 @@
               if (we_gud) {
                 let show_joint = true;
 
-                if (plug_joint.name.startsWith("joint_pole,")) {
+                // Special case: wildcard joints (bridges/tunnels) should always be shown
+                // when we_gud is true, as they can connect to any compatible tower joint
+                if (joint.layer === "*") {
+                  show_joint = true;
+                } else if (plug_joint.name.startsWith("joint_pole,")) {
                   show_joint = joint.name.startsWith("joint_pole_female");
                 } else if (plug_joint.name.startsWith("joint_c"))
                   show_joint =

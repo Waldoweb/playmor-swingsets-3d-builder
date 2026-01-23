@@ -25,20 +25,25 @@
       "category": "towers",
       "index": 4
     },
+    "P-DSMT": {
+      "name": "DX Summit Tower",
+      "category": "towers",
+      "index": 5
+    },
     "P-KT": {
       "name": "King's Tower",
       "category": "towers",
-      "index": 5
+      "index": 6
     },
     "Bridge": {
       "name": "Bridge",
       "category": "towers",
-      "index": 6
+      "index": 7
     },
     "Tunnel": {
       "name": "Tunnel",
       "category": "towers",
-      "index": 7
+      "index": 8
     },
     "P-AB-3-8": {
       "name": "3 Swing Beam - 8 ft",

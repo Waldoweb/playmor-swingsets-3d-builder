@@ -148,6 +148,22 @@
         "all_meshes": ["Cube603", "Cube603_1001"]
       }
     },
+    "P-DSMT": {
+      "sections": ["roof", "frame", "trim"],
+      "colors": {
+        "frame": "@frame_colors",
+        "roof": {
+          "canopy": "@roof_canopy_colors",
+          "poly": "@roof_poly"
+        },
+        "trim": "@trim_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": ["Cube603_3", "Plane091_3"],
+        "tan_meshes": ["Cube603", "Plane091", "Cube195", "Cube195_1", "Cube195_2"],
+        "all_meshes": ["Cube603", "Cube603_3", "Plane091", "Plane091_3", "Cube195", "Cube195_1", "Cube195_2"]
+      }
+    },
     "P-KT": {
       "sections": ["roof", "frame", "trim"],
       "colors": {
