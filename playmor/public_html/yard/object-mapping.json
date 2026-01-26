@@ -11,7 +11,7 @@
       "index": 1
     },
     "P-WT": {
-      "name": "Watch Tower",
+      "name": "Sky Tower",
       "category": "towers",
       "index": 2
     },
@@ -121,17 +121,17 @@
       "index": 8
     },
     "FK-WT": {
-      "name": "Watch Tower Floor",
+      "name": "5x5 Floor Kit",
       "category": "floors_kits",
       "index": 0
     },
     "FK-DXH": {
-      "name": "DX Sky Tower Floor - Half",
+      "name": "5x5 Floor Kit - Half",
       "category": "floors_kits",
       "index": 1
     },
     "FK-DXF": {
-      "name": "DX Sky Tower Floor - Full",
+      "name": "5x10 Floor Kit",
       "category": "floors_kits",
       "index": 2
     },
