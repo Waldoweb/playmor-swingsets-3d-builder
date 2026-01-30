@@ -60,7 +60,7 @@
       "id": 8,
       "catalogId": 518,
       "title": "#518 Dizzy Delight Swing Set",
-      "description": "Your children will treasure their little days with this Dizzy Delight swing set. They can whittle away many happy hours on the swing options and twirl down the turbo twister slide! From building castles in the sandbox to playing make-believe with the steering wheel and super scope, children will make moments to remember forever!",
+      "description": "Your children will treasure their little days with this Dizzy Delight swing set. They can whittle away many happy hours on the swing options",
       "image": "assets/preview/_518 Dizzy Delight.jpg",
       "catalog": "assets/catalog/_518 Dizzy Delight.json"
     },
@@ -71,6 +71,14 @@
       "description": "Enjoy a picnic lunch, while your youngsters explore the charm of the Backyard Retreat Swing Set!",
       "image": "assets/preview/_549 Backyard Retreat.jpg",
       "catalog": "assets/catalog/_549 Backyard Retreat.json"
+    },
+    {
+      "id": 10,
+      "catalogId": 611,
+      "title": "#611 Summit Escape Swing Set",
+      "description": "Your child's playtime fun will skyrocket with the Summit Escape Swing Set.",
+      "image": "assets/preview/_611 Summit Escape.webp",
+      "catalog": "assets/catalog/_611 Summit Escape.json"
     }
   ]
 }
