@@ -1,0 +1,354 @@
+{
+  "objects": {
+    "P-PT": {
+      "name": "Play Tower",
+      "category": "towers",
+      "index": 0
+    },
+    "P-DPT": {
+      "name": "DX Play Tower",
+      "category": "towers",
+      "index": 1
+    },
+    "P-WT": {
+      "name": "Sky Tower",
+      "category": "towers",
+      "index": 2
+    },
+    "P-ST": {
+      "name": "Summit Tower",
+      "category": "towers",
+      "index": 3
+    },
+    "P-DST": {
+      "name": "DX Sky Tower",
+      "category": "towers",
+      "index": 4
+    },
+    "P-DSMT": {
+      "name": "DX Summit Tower",
+      "category": "towers",
+      "index": 5
+    },
+    "P-KT": {
+      "name": "King's Tower",
+      "category": "towers",
+      "index": 6
+    },
+    "Bridge": {
+      "name": "Bridge",
+      "category": "towers",
+      "index": 7
+    },
+    "Tunnel": {
+      "name": "Tunnel",
+      "category": "towers",
+      "index": 8
+    },
+    "P-AB-3-8": {
+      "name": "3 Swing Beam - 8 ft",
+      "category": "swing_beams",
+      "index": 0
+    },
+    "P-AB-3-10": {
+      "name": "3 Swing Beam - 10 ft",
+      "category": "swing_beams",
+      "index": 1
+    },
+    "P-AB-4-8": {
+      "name": "4 Swing Beam - 8 ft",
+      "category": "swing_beams",
+      "index": 2
+    },
+    "P-AB-4-10": {
+      "name": "4 Swing Beam - 10 ft",
+      "category": "swing_beams",
+      "index": 3
+    },
+    "P-AB-DS-8": {
+      "name": "Disc Swing Beam - 8 ft",
+      "category": "swing_beams",
+      "index": 4
+    },
+    "P-AB-DS-10": {
+      "name": "Disc Swing Beam - 10 ft",
+      "category": "swing_beams",
+      "index": 5
+    },
+    "SS": {
+      "name": "Sling Swing",
+      "category": "swings",
+      "index": 0
+    },
+    "TZR": {
+      "name": "Trapeze",
+      "category": "swings",
+      "index": 1
+    },
+    "BS": {
+      "name": "Baby Swing",
+      "category": "swings",
+      "index": 2
+    },
+    "HG": {
+      "name": "Horse Glider",
+      "category": "swings",
+      "index": 3
+    },
+    "VTS": {
+      "name": "Vinyl Tire Swing",
+      "category": "swings",
+      "index": 4
+    },
+    "BB": {
+      "name": "Ball Swing",
+      "category": "swings",
+      "index": 5
+    },
+    "DS-KR": {
+      "name": "Disc Swing",
+      "category": "swings",
+      "index": 6
+    },
+    "BNS": {
+      "name": "Bird's Nest Swing",
+      "category": "swings",
+      "index": 7
+    },
+    "MTS": {
+      "name": "Tire Swing",
+      "category": "swings",
+      "index": 8
+    },
+    "FK-WT": {
+      "name": "5x5 Floor Kit",
+      "category": "floors_kits",
+      "index": 0
+    },
+    "FK-DXH": {
+      "name": "5x5 Floor Kit - Half",
+      "category": "floors_kits",
+      "index": 1
+    },
+    "FK-DXF": {
+      "name": "5x10 Floor Kit",
+      "category": "floors_kits",
+      "index": 2
+    },
+    "FK-KT": {
+      "name": "King's Tower Floor",
+      "category": "floors_kits",
+      "index": 3
+    },
+    "PT-K": {
+      "name": "Picnic Table Kit",
+      "category": "floors_kits",
+      "index": 4
+    },
+    "KK": {
+      "name": "Kitchen Kit",
+      "category": "floors_kits",
+      "index": 5
+    },
+    "BUB": {
+      "name": "Bubble Panel Kit",
+      "category": "floors_kits",
+      "index": 6
+    },
+    "SR-KT": {
+      "name": "Safety Rail Kit",
+      "category": "floors_kits",
+      "index": 7
+    },
+    "P-STEP-4": {
+      "name": "Steps - 4ft",
+      "category": "entries_climbers",
+      "index": 0
+    },
+    "P-STEP-5": {
+      "name": "Steps - 5ft",
+      "category": "entries_climbers",
+      "index": 1
+    },
+    "P-STEP-7": {
+      "name": "Steps - 7ft",
+      "category": "entries_climbers",
+      "index": 2
+    },
+    "P-GP-10": {
+      "name": "Gang Plank - 4ft",
+      "category": "entries_climbers",
+      "index": 3
+    },
+    "P-GP-12": {
+      "name": "Gang Plank - 5ft",
+      "category": "entries_climbers",
+      "index": 4
+    },
+    "P-RC-5": {
+      "name": "Rock Climb - 5ft",
+      "category": "entries_climbers",
+      "index": 5
+    },
+    "P-RC-7": {
+      "name": "Rock Climb - 7ft",
+      "category": "entries_climbers",
+      "index": 6
+    },
+    "P-CN-5": {
+      "name": "Cargo Net - 5ft",
+      "category": "entries_climbers",
+      "index": 7
+    },
+    "P-CC-5": {
+      "name": "Combo Climb - 5ft",
+      "category": "entries_climbers",
+      "index": 8
+    },
+    "CP": {
+      "name": "Climbing Pole",
+      "category": "entries_climbers",
+      "index": 9
+    },
+    "FP": {
+      "name": "Fireman's Pole",
+      "category": "entries_climbers",
+      "index": 10
+    },
+    "P-MB-A": {
+      "name": "Monkey Bars Attachment - 5ft",
+      "category": "entries_climbers",
+      "index": 11
+    },
+    "P-MB-C": {
+      "name": "Monkey Bars - Stand-Alone 5ft",
+      "category": "entries_climbers",
+      "index": 12
+    },
+    "HGR": {
+      "name": "Hand Grip",
+      "category": "entries_climbers",
+      "index": 13
+    },
+    "HR": {
+      "name": "Hand Rail",
+      "category": "entries_climbers",
+      "index": 14
+    },
+    "WS-10": {
+      "name": "Wave Slide - 5ft",
+      "category": "slides",
+      "index": 0
+    },
+    "SWS-10": {
+      "name": "DX Wave Slide - 5ft",
+      "category": "slides",
+      "index": 1
+    },
+    "SWS-14": {
+      "name": "DX Wave Slide - 7ft",
+      "category": "slides",
+      "index": 2
+    },
+    "TTWS-5": {
+      "name": "Turbo Twister - 5ft",
+      "category": "slides",
+      "index": 3
+    },
+    "TTWSC-5": {
+      "name": "Turbo Twister (Clear) - 5ft",
+      "category": "slides",
+      "index": 4
+    },
+    "TTWS-7": {
+      "name": "Turbo Twister - 7ft",
+      "category": "slides",
+      "index": 5
+    },
+    "TTWSC-7": {
+      "name": "Turbo Twister (Clear) - 7ft",
+      "category": "slides",
+      "index": 6
+    },
+    "SWIS-5": {
+      "name": "Side Winder Slide - 5ft",
+      "category": "slides",
+      "index": 7
+    },
+    "SWIS-7": {
+      "name": "Side Winder Slide - 7ft",
+      "category": "slides",
+      "index": 8
+    },
+    "SUPS-5": {
+      "name": "Super Spiral Slide - 5ft",
+      "category": "slides",
+      "index": 9
+    },
+    "SUPS-7": {
+      "name": "Super Spiral Slide - 7ft",
+      "category": "slides",
+      "index": 10
+    },
+    "SW": {
+      "name": "Steering Wheel",
+      "category": "toys",
+      "index": 0
+    },
+    "SHW": {
+      "name": "Ship's Wheel",
+      "category": "toys",
+      "index": 1
+    },
+    "SSC": {
+      "name": "Super Scope",
+      "category": "toys",
+      "index": 2
+    },
+    "MAIL": {
+      "name": "Mailbox",
+      "category": "toys",
+      "index": 3
+    },
+    "TEL": {
+      "name": "Telephone",
+      "category": "toys",
+      "index": 4
+    },
+    "TIC": {
+      "name": "Tic-Tac-Toe",
+      "category": "toys",
+      "index": 5
+    }
+  },
+  "categories": {
+    "towers": {
+      "name": "Towers",
+      "display_order": 0
+    },
+    "swing_beams": {
+      "name": "Swing Beams",
+      "display_order": 1
+    },
+    "swings": {
+      "name": "Swings",
+      "display_order": 2
+    },
+    "floors_kits": {
+      "name": "Floors + Kits",
+      "display_order": 3
+    },
+    "entries_climbers": {
+      "name": "Entries + Climbers",
+      "display_order": 4
+    },
+    "slides": {
+      "name": "Slides",
+      "display_order": 5
+    },
+    "toys": {
+      "name": "Toys",
+      "display_order": 6
+    }
+  }
+}
