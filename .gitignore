@@ -1,3 +1,7 @@
+# Sensitive files
+.env
+config.php
+
 # Node modules
 node_modules/
 npm-debug.log*
