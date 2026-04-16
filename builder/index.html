@@ -5263,7 +5263,7 @@
                   const distToJoint = camPos.distanceTo(jointWorldPos);
                   raycaster.set(camPos, rayDir);
                   const occluders = picked_meshes.filter(
-                    m => m !== plug_model?.mesh
+                    m => m !== plug_model?.mesh && m !== joint.model.mesh
                   );
                   const hits = raycaster.intersectObjects(occluders, true);
                   const isOccluded = hits.length > 0 && hits[0].distance < distToJoint - 0.1;
