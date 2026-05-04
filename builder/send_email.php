@@ -83,8 +83,8 @@ if (stripos($zeptomailToken, 'Zoho-enczapikey ') !== 0) {
     $zeptomailToken = 'Zoho-enczapikey ' . $zeptomailToken;
 }
 
-$salesEmail = $config['email']['sales_email'] ?? 'sales@playmorswingsets.com';
-if (!filter_var($salesEmail, FILTER_VALIDATE_EMAIL)) {
+$salesEmails = parseEmailList($config['email']['sales_email'] ?? 'sales@playmorswingsets.com');
+if (empty($salesEmails)) {
     http_response_code(500);
     echo json_encode(['error' => 'Invalid sales email configuration']);
     exit();
@@ -150,13 +150,15 @@ foreach ($input['part_list'] as $part) {
 
 // Prepare email payload
 $emailPayload = [
-    'from' => ['address' => 'noreply@playmorswingsets.com'],
-    'to' => [[
-        'email_address' => [
-            'address' => $salesEmail,
-            'name' => 'Sales Team'
-        ]
-    ]],
+    'from' => ['address' => 'sales@playmorswingsets.com'],
+    'to' => array_map(function ($address) {
+        return [
+            'email_address' => [
+                'address' => $address,
+                'name' => 'Sales Team'
+            ]
+        ];
+    }, $salesEmails),
     'cc' => [[
         'email_address' => [
             'address' => $input['email'],
@@ -167,7 +169,7 @@ $emailPayload = [
         'address' => $input['email'],
         'name' => $input['first_name'] . ' ' . $input['last_name']
     ]],
-    'subject' => 'Quote Request from ' . $input['first_name'] . ' ' . $input['last_name'] . ' - Yard Designer',
+    'subject' => 'Quote Request from ' . $input['first_name'] . ' ' . $input['last_name'] . ' - 3D Configurator',
     'htmlbody' => $htmlContent,
     'textbody' => $textContent
 ];
@@ -274,5 +276,24 @@ function generatePartsListHTML($partList) {
     }
     $html .= '</ul>';
     return $html;
+}
+
+function parseEmailList($emails) {
+    if (is_array($emails)) {
+        $emails = implode(',', $emails);
+    }
+
+    $addresses = preg_split('/[,\s;]+/', (string) $emails, -1, PREG_SPLIT_NO_EMPTY);
+    $validAddresses = [];
+
+    foreach ($addresses as $address) {
+        $address = trim($address);
+        if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
+            return [];
+        }
+        $validAddresses[] = $address;
+    }
+
+    return array_values(array_unique($validAddresses));
 }
 ?>
