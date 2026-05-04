@@ -23,17 +23,43 @@ if (!$input) {
     exit();
 }
 
+$requiredFields = ['first_name', 'last_name', 'email', 'phone_number', 'zip_code'];
+foreach ($requiredFields as $field) {
+    if (empty($input[$field])) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Missing required field: ' . $field]);
+        exit();
+    }
+}
+
+if (!filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Invalid customer email address']);
+    exit();
+}
+
+if (empty($input['part_list']) || !is_array($input['part_list'])) {
+    $input['part_list'] = [];
+}
+
 // Load secure configuration
 $config = null;
 if (file_exists(__DIR__ . '/config.php')) {
     $config = include __DIR__ . '/config.php';
-} elseif (file_exists(__DIR__ . '/.env')) {
+}
+
+if (file_exists(__DIR__ . '/.env')) {
     // Parse .env file
     $lines = file(__DIR__ . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    $config = ['zeptomail' => [], 'email' => []];
+    if (!$config) {
+        $config = ['zeptomail' => [], 'email' => []];
+    }
     foreach ($lines as $line) {
         if (strpos($line, '#') === 0) continue; // Skip comments
+        if (strpos($line, '=') === false) continue;
         list($key, $value) = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value, " \t\n\r\0\x0B\"'");
         switch ($key) {
             case 'ZEPTOMAIL_TOKEN':
                 $config['zeptomail']['token'] = $value;
@@ -52,8 +78,17 @@ if (!$config || !isset($config['zeptomail']['token'])) {
 }
 
 // Secure configuration
-$zeptomailToken = $config['zeptomail']['token'];
-$salesEmail = $config['email']['sales_email'];
+$zeptomailToken = trim($config['zeptomail']['token']);
+if (stripos($zeptomailToken, 'Zoho-enczapikey ') !== 0) {
+    $zeptomailToken = 'Zoho-enczapikey ' . $zeptomailToken;
+}
+
+$salesEmail = $config['email']['sales_email'] ?? 'sales@playmorswingsets.com';
+if (!filter_var($salesEmail, FILTER_VALIDATE_EMAIL)) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Invalid sales email configuration']);
+    exit();
+}
 
 // Generate HTML email content
 $htmlContent = "
@@ -128,10 +163,10 @@ $emailPayload = [
             'name' => $input['first_name'] . ' ' . $input['last_name']
         ]
     ]],
-    'reply_to' => [
+    'reply_to' => [[
         'address' => $input['email'],
         'name' => $input['first_name'] . ' ' . $input['last_name']
-    ],
+    ]],
     'subject' => 'Quote Request from ' . $input['first_name'] . ' ' . $input['last_name'] . ' - Yard Designer',
     'htmlbody' => $htmlContent,
     'textbody' => $textContent
@@ -147,6 +182,14 @@ if (!empty($input['design_image'])) {
             'content' => $base64Data,
             'mime_type' => 'image/png',
             'name' => 'design-preview.png',
+            'cid' => 'design-preview'
+        ]];
+    } elseif (strpos($imageData, 'data:image/jpeg;base64,') === 0) {
+        $base64Data = substr($imageData, strlen('data:image/jpeg;base64,'));
+        $emailPayload['inline_images'] = [[
+            'content' => $base64Data,
+            'mime_type' => 'image/jpeg',
+            'name' => 'design-preview.jpg',
             'cid' => 'design-preview'
         ]];
     }
@@ -201,12 +244,19 @@ curl_close($curl);
 
 if ($err) {
     http_response_code(500);
+    error_log('Quote email cURL error: ' . $err);
     echo json_encode(['error' => 'cURL Error: ' . $err]);
-} elseif ($httpCode !== 200) {
+} elseif ($httpCode < 200 || $httpCode >= 300) {
+    error_log('Quote email API error (' . $httpCode . '): ' . $response);
     http_response_code($httpCode);
-    echo json_encode(['error' => 'Email API Error', 'response' => $response]);
+    $decodedResponse = json_decode($response, true);
+    echo json_encode([
+        'error' => 'Email API Error',
+        'status' => $httpCode,
+        'response' => $decodedResponse ?: $response
+    ]);
 } else {
-    echo json_encode(['success' => true, 'message' => 'Email sent successfully']);
+    echo json_encode(['success' => true, 'message' => 'Email sent successfully', 'status' => $httpCode]);
 }
 
 function generatePartsListHTML($partList) {
