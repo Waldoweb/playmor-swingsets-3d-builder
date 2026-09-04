@@ -3843,83 +3843,166 @@
         center(args) {}
       }
       class Skybox {
+        // Palette and shape of the generated sky. Tweak these to restyle the
+        // background. The sky is a cylinder rather than a box so the horizon
+        // sits at a constant distance and stays flat as the camera orbits.
+        static sky = {
+          zenith: "#3f86cf",
+          mid: "#8ec3ea",
+          horizon: "#e2f0fa",
+          ground: "#6f9b46",
+          clouds: 0.55, // 0 = clear sky, 1 = heavy overcast
+          radius: 70,
+          height: 60,
+          segments: 96, // higher = rounder horizon
+          grass_tile: 33, // world units per grass tile
+        };
+
         constructor(args) {
-          this.front;
-          this.back;
-          this.left;
-          this.right;
-          this.up;
-          this.down;
-          this.mesh = null;
           this.visible = true;
-          this.boxGeometry = new THREE.BoxGeometry(100, 50, 100);
 
-          this.mesh = new THREE.Mesh(
-            this.boxGeometry,
-            new THREE.MeshStandardMaterial()
-          );
+          // A Group, so the ground can be a flat quad. A cylinder end cap is a
+          // triangle fan whose seam does not close exactly, and rays sent
+          // straight down that seam fall through the gap and register no hit —
+          // which would break item placement, since the ground is the raycast
+          // target used to position what the pointer is carrying.
+          this.mesh = new THREE.Group();
           this.mesh.name = "_skybox_";
-          scene.add(this.mesh);
-          this.mesh.position.set(0, 25, 0);
-          this.mesh.visible = this.visible;
 
-          Load_image_base_64({ base_64: Assets[6] }).then((resolution) => {
-            this.left = resolution.resolution;
-            Load_image_base_64({ base_64: Assets[7] }).then((resolution) => {
-              this.right = resolution.resolution;
-              Load_image_base_64({ base_64: Assets[8] }).then((resolution) => {
-                this.down = resolution.resolution;
-                let down_texture = new THREE.CanvasTexture(this.down);
-                down_texture.wrapS = down_texture.wrapT = THREE.RepeatWrapping;
-                down_texture.repeat.set(3, 3);
-                down_texture.needsUpdate = true;
-                Load_image_base_64({ base_64: Assets[9] }).then(
-                  (resolution) => {
-                    this.front = resolution.resolution;
-                    let front_texture = new THREE.CanvasTexture(this.front);
-                    Load_image_base_64({ base_64: Assets[10] }).then(
-                      (resolution) => {
-                        this.back = resolution.resolution;
-                        scene.remove(this.mesh);
-                        this.mesh = new THREE.Mesh(
-                          new THREE.BoxGeometry(100, 50, 100),
-                          [
-                            new THREE.MeshBasicMaterial({
-                              map: new THREE.CanvasTexture(this.right),
-                              side: THREE.BackSide,
-                            }),
-                            new THREE.MeshBasicMaterial({
-                              map: new THREE.CanvasTexture(this.back),
-                              side: THREE.BackSide,
-                            }),
-                            new THREE.MeshBasicMaterial({
-                              map: front_texture,
-                              side: THREE.BackSide,
-                            }),
-                            new THREE.MeshBasicMaterial({
-                              map: down_texture,
-                              side: THREE.BackSide,
-                            }),
-                            new THREE.MeshBasicMaterial({
-                              map: new THREE.CanvasTexture(this.left),
-                              side: THREE.BackSide,
-                            }),
-                            new THREE.MeshBasicMaterial({
-                              map: front_texture,
-                              side: THREE.BackSide,
-                            }),
-                          ]
-                        );
-                        scene.add(this.mesh);
-                        this.mesh.position.set(0, 25, 0);
-                        this.mesh.visible = this.visible;
-                      }
-                    );
-                  }
-                );
-              });
-            });
+          let walls = new THREE.Mesh(
+            new THREE.CylinderGeometry(
+              Skybox.sky.radius,
+              Skybox.sky.radius,
+              Skybox.sky.height,
+              Skybox.sky.segments,
+              1,
+              true // open ended: the caps are separate meshes below
+            ),
+            new THREE.MeshBasicMaterial({
+              map: this.wall_texture(),
+              side: THREE.BackSide,
+            })
+          );
+          walls.position.y = Skybox.sky.height / 2;
+          this.mesh.add(walls);
+
+          let top = new THREE.Mesh(
+            new THREE.CircleGeometry(Skybox.sky.radius, Skybox.sky.segments),
+            new THREE.MeshBasicMaterial({
+              color: new THREE.Color(Skybox.sky.zenith),
+              side: THREE.DoubleSide,
+            })
+          );
+          top.rotation.x = Math.PI / 2;
+          top.position.y = Skybox.sky.height;
+          this.mesh.add(top);
+
+          // Runs past the wall on every side; the overhang is hidden behind it.
+          let ground_size = Skybox.sky.radius * 3;
+          this.ground_material = new THREE.MeshBasicMaterial({
+            color: new THREE.Color(Skybox.sky.ground),
+            side: THREE.DoubleSide,
           });
+          let ground = new THREE.Mesh(
+            new THREE.PlaneGeometry(ground_size, ground_size),
+            this.ground_material
+          );
+          ground.rotation.x = -Math.PI / 2;
+          this.mesh.add(ground);
+
+          this.mesh.visible = this.visible;
+          scene.add(this.mesh);
+
+          Load_image_base_64({ base_64: Assets[8] }).then((resolution) => {
+            let ground_texture = new THREE.CanvasTexture(resolution.resolution);
+            ground_texture.wrapS = ground_texture.wrapT =
+              THREE.RepeatWrapping;
+            let tiles = ground_size / Skybox.sky.grass_tile;
+            ground_texture.repeat.set(tiles, tiles);
+            ground_texture.needsUpdate = true;
+            this.ground_material.map = ground_texture;
+            this.ground_material.color.set("white");
+            this.ground_material.needsUpdate = true;
+          });
+        }
+        // One texture wrapped once around the cylinder: a vertical sky gradient
+        // with soft clouds. Each cloud is also drawn one canvas width to either
+        // side, so the pattern meets itself seamlessly at the wrap point.
+        wall_texture(seed) {
+          const width = 2048;
+          const height = 512;
+
+          let canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          let context = canvas.getContext("2d");
+
+          let gradient = context.createLinearGradient(0, 0, 0, height);
+          gradient.addColorStop(0.0, Skybox.sky.zenith);
+          gradient.addColorStop(0.55, Skybox.sky.mid);
+          gradient.addColorStop(1.0, Skybox.sky.horizon);
+          context.fillStyle = gradient;
+          context.fillRect(0, 0, width, height);
+
+          if (Skybox.sky.clouds > 0) {
+            let clouds = document.createElement("canvas");
+            clouds.width = width;
+            clouds.height = height;
+            let cloud_context = clouds.getContext("2d");
+
+            // Deterministic pseudo-random so every reload looks the same.
+            let n = (seed || 0) * 9781 + 1;
+            const random = () => {
+              n = (n * 1103515245 + 12345) % 2147483648;
+              return n / 2147483648;
+            };
+
+            let alpha = (0.55 * Skybox.sky.clouds).toFixed(3);
+            for (let i = 0; i < 48; i++) {
+              let x = random() * width;
+              let y = 0.1 * height + random() * 0.45 * height;
+              let rx = 110 + random() * 220;
+              let ry = rx * (0.16 + random() * 0.16);
+
+              for (let wrap of [-width, 0, width]) {
+                let cx = x + wrap;
+                cloud_context.save();
+                cloud_context.translate(cx, y);
+                cloud_context.scale(1, ry / rx);
+                cloud_context.translate(-cx, -y);
+                let blob = cloud_context.createRadialGradient(
+                  cx,
+                  y,
+                  0,
+                  cx,
+                  y,
+                  rx
+                );
+                blob.addColorStop(0, "rgba(255,255,255," + alpha + ")");
+                blob.addColorStop(1, "rgba(255,255,255,0)");
+                cloud_context.fillStyle = blob;
+                cloud_context.fillRect(cx - rx, y - rx, rx * 2, rx * 2);
+                cloud_context.restore();
+              }
+            }
+
+            // Dissolve the clouds into the haze as they near the horizon.
+            cloud_context.globalCompositeOperation = "destination-in";
+            let haze_mask = cloud_context.createLinearGradient(0, 0, 0, height);
+            haze_mask.addColorStop(0.0, "rgba(0,0,0,1)");
+            haze_mask.addColorStop(0.6, "rgba(0,0,0,1)");
+            haze_mask.addColorStop(0.85, "rgba(0,0,0,0)");
+            cloud_context.fillStyle = haze_mask;
+            cloud_context.fillRect(0, 0, width, height);
+
+            cloud_context.globalCompositeOperation = "source-over";
+            context.drawImage(clouds, 0, 0);
+          }
+
+          let texture = new THREE.CanvasTexture(canvas);
+          texture.wrapS = THREE.RepeatWrapping;
+          texture.needsUpdate = true;
+          return texture;
         }
         toggle(args) {
           this.visible = !this.visible;
