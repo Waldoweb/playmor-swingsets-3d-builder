@@ -7600,6 +7600,12 @@
         orbitControls.enableDamping = false;
         orbitControls.maxPolarAngle = Math.PI / 2 - 0.01;
         orbitControls.maxDistance = 49;
+        // Pan across the ground rather than in screen space. Screen-space
+        // panning drags the orbit target vertically, and the camera follows it
+        // below y=0, putting the viewer underneath the yard. maxPolarAngle only
+        // stops the camera dropping below the target — it does not stop the
+        // target itself from moving. With this off, the target stays at y=0.
+        orbitControls.screenSpacePanning = false;
 
         mulch = new Mulch();
         skybox = new Skybox();
