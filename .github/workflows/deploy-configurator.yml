@@ -1,0 +1,75 @@
+name: Deploy configurator
+
+# Only builder/ is deployed, and only when something in it actually changed.
+# Edits to the README or the Python dev tools at the repo root do not trigger
+# a deploy. Adding or editing this workflow does not either.
+on:
+  push:
+    branches: [main]
+    paths: ["builder/**"]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "List what would change without writing to the server"
+        type: boolean
+        default: true
+
+env:
+  DEPLOY_PATH: /home/weldon/webapps/Playmor-Swingsets-Bricks/builder
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Never let two deploys write to the same folder at once.
+    concurrency:
+      group: deploy-configurator
+      cancel-in-progress: false
+
+    steps:
+      # Shallow: the full history is ~219 MB because of categories.js and the
+      # GLBs. We only ever need the tip of main.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Add SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Rsync builder/ to server
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          SSH_TARGET: ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+        run: |
+          FLAGS="-avz --human-readable --delete"
+          if [ "$DRY_RUN" = "true" ]; then
+            FLAGS="$FLAGS --dry-run"
+            echo "::notice::Dry run — nothing will be written to the server."
+          fi
+
+          # The trailing slash on builder/ copies its *contents* into
+          # DEPLOY_PATH rather than nesting a builder/ folder inside it.
+          #
+          # config.php and .env hold the live Zeptomail credentials. They are
+          # gitignored, so they exist only on the server — without these
+          # excludes, --delete removes them and quote emails stop working.
+          #
+          # The rest are dev-only files that have no business in a public
+          # webroot. Excluded paths are also protected from --delete, so
+          # anything already on the server is left untouched.
+          rsync $FLAGS \
+            --exclude 'config.php' \
+            --exclude '.env' \
+            --exclude '.gitignore' \
+            --exclude 'README.md' \
+            --exclude 'screenshot.png' \
+            --exclude 'import_export_glb.py' \
+            --exclude 'tools/' \
+            --exclude 'js/export_background_images.py' \
+            --exclude 'js/extracted_images/' \
+            -e "ssh -i ~/.ssh/id_ed25519" \
+            builder/ \
+            "$SSH_TARGET:$DEPLOY_PATH/"
