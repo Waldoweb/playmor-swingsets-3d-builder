@@ -28,7 +28,7 @@ jobs:
     steps:
       # Shallow: the full history is ~219 MB because of categories.js and the
       # GLBs. We only ever need the tip of main.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 1
 
@@ -44,7 +44,11 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run }}
           SSH_TARGET: ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
         run: |
-          FLAGS="-avz --human-readable --delete"
+          # --checksum, not the default size+mtime check. Every run starts
+          # from a fresh checkout, so all mtimes are new and rsync would judge
+          # every file changed and re-send all ~52 MB each deploy. Comparing
+          # content hashes instead means only genuinely changed files move.
+          FLAGS="-avz --checksum --human-readable --delete"
           if [ "$DRY_RUN" = "true" ]; then
             FLAGS="$FLAGS --dry-run"
             echo "::notice::Dry run — nothing will be written to the server."
