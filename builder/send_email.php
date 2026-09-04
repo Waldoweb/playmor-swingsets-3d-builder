@@ -67,6 +67,9 @@ if (file_exists(__DIR__ . '/.env')) {
             case 'SALES_EMAIL':
                 $config['email']['sales_email'] = $value;
                 break;
+            case 'QUOTE_DAILY_CAP':
+                $config['email']['daily_cap'] = $value;
+                break;
         }
     }
 }
@@ -87,6 +90,29 @@ $salesEmails = parseEmailList($config['email']['sales_email'] ?? 'sales@playmors
 if (empty($salesEmails)) {
     http_response_code(500);
     echo json_encode(['error' => 'Invalid sales email configuration']);
+    exit();
+}
+
+// Daily send cap. This endpoint is public and unauthenticated, and it delivers
+// mail to a caller-supplied CC address, so anyone who finds it can script it.
+// The cap does not stop that — it bounds it, keeping a bad day off the
+// Zeptomail quota and away from the sending domain's reputation.
+//
+// Set well above real traffic: a genuine customer should never meet it.
+// Override with QUOTE_DAILY_CAP in .env, or email.daily_cap in config.php.
+// Set it to 0 to disable the cap entirely.
+$dailyCap = $config['email']['daily_cap'] ?? 200;
+$dailyCap = is_numeric($dailyCap) ? (int) $dailyCap : 200;
+$counterFile = $config['email']['counter_file']
+    ?? sys_get_temp_dir() . '/playmor_quote_count.json';
+
+if ($dailyCap > 0 && !recordSendAgainstDailyCap($counterFile, $dailyCap)) {
+    error_log('Quote daily cap of ' . $dailyCap . ' reached; refusing send.');
+    http_response_code(429);
+    echo json_encode([
+        'error' => 'We have reached today\'s limit on quote requests. Please email '
+            . 'sales@playmorswingsets.com and we will take care of you right away.'
+    ]);
     exit();
 }
 
@@ -259,6 +285,50 @@ if ($err) {
     ]);
 } else {
     echo json_encode(['success' => true, 'message' => 'Email sent successfully', 'status' => $httpCode]);
+}
+
+/**
+ * Counts one send against today's total and says whether it may proceed.
+ *
+ * Fails OPEN by design: any problem reading, locking or writing the counter
+ * returns true and the quote goes out. A customer has just spent real effort
+ * designing a playset, and losing that is worse than letting an abuser past a
+ * limiter that is only there to bound damage in the first place.
+ *
+ * Counts attempts rather than successes, so a script hammering a payload that
+ * Zeptomail rejects still burns the day's budget.
+ */
+function recordSendAgainstDailyCap($file, $cap) {
+    $handle = @fopen($file, 'c+');
+    if ($handle === false) {
+        error_log('Quote cap: cannot open counter ' . $file . '; allowing send.');
+        return true;
+    }
+
+    if (!flock($handle, LOCK_EX)) {
+        fclose($handle);
+        error_log('Quote cap: cannot lock counter; allowing send.');
+        return true;
+    }
+
+    $today = date('Y-m-d');
+    $state = json_decode((string) stream_get_contents($handle), true);
+    $count = (is_array($state) && isset($state['date']) && $state['date'] === $today)
+        ? (int) ($state['count'] ?? 0)
+        : 0;
+
+    $allowed = $count < $cap;
+    if ($allowed) {
+        ftruncate($handle, 0);
+        rewind($handle);
+        fwrite($handle, json_encode(['date' => $today, 'count' => $count + 1]));
+        fflush($handle);
+    }
+
+    flock($handle, LOCK_UN);
+    fclose($handle);
+
+    return $allowed;
 }
 
 function generatePartsListHTML($partList) {
