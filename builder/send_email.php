@@ -268,7 +268,10 @@ $response = curl_exec($curl);
 $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 $err = curl_error($curl);
 
-curl_close($curl);
+// No curl_close(): a no-op since PHP 8.0 and deprecated in 8.5, where the
+// notice prints into the response body and breaks the frontend's JSON.parse,
+// turning a successful send into a "quote failed" alert. The handle is freed
+// when it goes out of scope.
 
 if ($err) {
     http_response_code(500);
