@@ -880,6 +880,41 @@
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
       }
 
+      /* Shown only when a model's geometry is still being fetched, and only
+         after a short delay, so a cached model never flashes a spinner. */
+      .sub-items.loading::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        border-radius: 6px;
+        z-index: 1;
+      }
+
+      .sub-items.loading::after {
+        content: "";
+        position: absolute;
+        top: calc(50% - 14px);
+        left: calc(50% - 14px);
+        width: 28px;
+        height: 28px;
+        border: 3px solid rgba(255, 255, 255, 0.25);
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        z-index: 2;
+      }
+
+      .sub-items.loading {
+        cursor: progress;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .sub-items.loading::after {
+          animation: spin 2.4s linear infinite;
+        }
+      }
+
       .sub-items.selected {
         background: linear-gradient(135deg, rgba(206, 3, 12, 0.3), rgba(165, 2, 9, 0.3));
         border: 2px solid rgba(206, 3, 12, 0.8);
@@ -4301,6 +4336,27 @@
           if (this.mesh) return Promise.resolve(this);
           if (this._loading) return this._loading;
 
+          // Wait for the manifest before choosing where to load from. Without
+          // this, anything asking for geometry during the first moments after
+          // page load — the category prefetch does exactly that — finds
+          // modelManifest still null and silently takes the base64 fallback.
+          // That looks fine today and breaks the moment the base64 is removed.
+          this._loading = Promise.resolve(configsReady)
+            .catch(() => {})
+            .then(() => this._load_sources())
+            .then(() => {
+              this._loading = null;
+              return this;
+            })
+            .catch((error) => {
+              this._loading = null;
+              console.error("Failed to load model", this.object_id, error);
+              throw error;
+            });
+
+          return this._loading;
+        }
+        _load_sources() {
           const entry =
             modelManifest && this.object_id
               ? modelManifest.products[this.object_id]
@@ -4332,27 +4388,15 @@
           // Sequential, not parallel: adopt() appends to this.meshes/layers and
           // leaves this.mesh pointing at the last one, so order is meaningful
           // for multi-layer products.
-          this._loading = sources
-            .reduce(
-              (chain, source) =>
-                chain.then(() =>
-                  source.layer === null || source.layer === undefined
-                    ? this.adopt({ base_64: source.src })
-                    : this.adopt({ base_64: source.src, layer: source.layer })
-                ),
-              Promise.resolve()
-            )
-            .then(() => {
-              this._loading = null;
-              return this;
-            })
-            .catch((error) => {
-              this._loading = null;
-              console.error("Failed to load model", this.object_id, error);
-              throw error;
-            });
-
-          return this._loading;
+          return sources.reduce(
+            (chain, source) =>
+              chain.then(() =>
+                source.layer === null || source.layer === undefined
+                  ? this.adopt({ base_64: source.src })
+                  : this.adopt({ base_64: source.src, layer: source.layer })
+              ),
+            Promise.resolve()
+          );
         }
         /**
          * `base_64` may be a data URI or a URL — GLTFLoader accepts either, so
@@ -7088,6 +7132,91 @@
         }, 1000);
       };
       
+      /** The template for an object_id, or null. */
+      const Model_for_object_id = (objectId) =>
+        objectId ? Model.instances.find((m) => m.object_id === objectId) || null : null;
+
+      /**
+       * Start fetching a model's geometry without waiting for it. Used from
+       * hover and from the background category prefetch, so that by the time
+       * someone actually clicks, the fetch is usually already done. Failures
+       * are ignored here — the click path reports them.
+       */
+      const Prefetch_model = (objectId) => {
+        const model = Model_for_object_id(objectId);
+        if (model && !model.mesh) model.ensure_loaded().catch(() => {});
+      };
+
+      /**
+       * Run a catalog click, showing a spinner on the clicked tile if the
+       * geometry takes long enough to notice.
+       *
+       * The delay matters: a cached model resolves in a few milliseconds, and
+       * a spinner that appears and vanishes in that time reads as a glitch.
+       */
+      const Run_item_click = async (element, objectId) => {
+        let spinner = null;
+        if (element) {
+          spinner = setTimeout(() => element.classList.add("loading"), 120);
+        }
+        try {
+          await Item_clicked();
+        } finally {
+          if (spinner !== null) clearTimeout(spinner);
+          if (element) element.classList.remove("loading");
+        }
+      };
+
+      /**
+       * Quietly pull down the models in the category the user is looking at,
+       * so the common case — browse a category, click something in it — has
+       * the geometry ready.
+       *
+       * Deliberately restrained: only products that can actually be placed
+       * right now, two at a time, and nothing at all when the browser reports
+       * a metered or slow connection. Prefetching everything would give back
+       * the download we just removed.
+       */
+      let prefetch_token = 0;
+      // Only the first few of a category. Pulling a whole category is easy to
+      // write and gives back most of the download we just removed — the towers
+      // category alone is about 6 MB, and someone places exactly one tower.
+      // Hover prefetch covers the rest precisely, so this only needs to cover
+      // the "clicked something near the top without pausing" case.
+      const PREFETCH_PER_CATEGORY = 3;
+      const PREFETCH_CONCURRENCY = 2;
+
+      const Prefetch_current_category = () => {
+        const link = navigator.connection;
+        if (link && (link.saveData || /2g/.test(link.effectiveType || ""))) return;
+        if (typeof Categories === "undefined" || !Categories[category_index]) return;
+
+        const token = ++prefetch_token;
+
+        const start = () => {
+          if (token !== prefetch_token) return; // category changed; abandon
+          const queue = (Categories[category_index].children || [])
+            .filter((child) => child.model && !child.model.mesh && child.model.capable())
+            .slice(0, PREFETCH_PER_CATEGORY)
+            .map((child) => child.model);
+
+          const pump = () => {
+            if (token !== prefetch_token) return;
+            const model = queue.shift();
+            if (!model) return;
+            model.ensure_loaded().catch(() => {}).then(pump);
+          };
+          for (let i = 0; i < PREFETCH_CONCURRENCY; i++) pump();
+        };
+
+        // Let the page finish its own work first; this is speculative.
+        if (typeof requestIdleCallback === "function") {
+          requestIdleCallback(start, { timeout: 2000 });
+        } else {
+          setTimeout(start, 500);
+        }
+      };
+
       const Item_clicked = async (args) => {
         picked_mesh = null;
         host_joint = null;
@@ -8092,16 +8221,25 @@
               if (objectId) {
                 selected_object_id = objectId;
                 Highlight_item();
-                Item_clicked();
+                Run_item_click(event.currentTarget, objectId);
               } else {
                 // Fallback to index-based system
                 var index = event.currentTarget.id.replace(/^\D+/g, "");
                 item_index = parseInt(index);
                 Highlight_item(switchboard[category_index].indexOf(item_index));
-                Item_clicked();
+                Run_item_click(event.currentTarget, null);
               }
             }
           });
+
+          // Hovering is a strong hint the item is about to be clicked, so
+          // start the fetch now rather than on mousedown.
+          $(".sub-items").on("mouseenter", (event) => {
+            if (!event.currentTarget.classList.contains("disabled"))
+              Prefetch_model(event.currentTarget.getAttribute("data-object-id"));
+          });
+
+          Prefetch_current_category();
         } else if (objectMapping && selected_category) {
           // Fallback to objectMapping system
           let availableObjects = [];
@@ -8179,9 +8317,16 @@
               if (selected_object_id !== objectId) {
                 selected_object_id = objectId;
                 Highlight_item();
-                Item_clicked();
+                Run_item_click(event.currentTarget, objectId);
               }
             }
+          });
+
+          // Hovering is a strong hint the item is about to be clicked, so
+          // start the fetch now rather than on mousedown.
+          $(".sub-items").on("mouseenter", (event) => {
+            if (!event.currentTarget.classList.contains("disabled"))
+              Prefetch_model(event.currentTarget.getAttribute("data-object-id"));
           });
         } else {
           console.warn('Cannot show items: no Categories or objectMapping/selected_category available');
@@ -8395,6 +8540,14 @@
       const configsReady = initializeConfigs().then(() => {
         // After configs are loaded, update existing models with object_ids
         updateExistingModelObjectIds();
+
+        // The catalog is rendered before object-mapping.json arrives, so every
+        // tile goes out with data-object-id="". Clicks still worked, falling
+        // back to an index lookup, but anything keyed on the id — the hover
+        // prefetch — silently did nothing. Re-render now that ids exist.
+        if (typeof sub_item_container !== "undefined" && sub_item_container) {
+          Show_items();
+        }
       });
 
       // Function to update existing models with object_ids
