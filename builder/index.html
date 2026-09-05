@@ -6565,21 +6565,53 @@
         }
         return result;
       };
+      // Both loaders reject on failure as well as resolving on success. They
+      // used to only listen for success, so a 404 or an undecodable image left
+      // the promise pending for ever — the caller simply stopped, with nothing
+      // in the console. That was survivable when every asset was a data URI
+      // embedded in the page. Now that models and textures are separate files
+      // a stale index.html can reference something that no longer exists, and
+      // that needs to be an error you can see, not a silent hang.
       const Load_image_base_64 = (args) => {
         return new Promise((resolve, reject) => {
+          if (!args.base_64) {
+            reject(new Error("No image source given"));
+            return;
+          }
           let img = document.createElement("img");
           img.addEventListener("load", function (event) {
             resolve({ resolution: img });
+          });
+          img.addEventListener("error", function () {
+            reject(new Error("Could not load image: " + String(args.base_64).slice(0, 120)));
           });
           img.src = args.base_64;
         });
       };
       const Load_base_64 = (args) => {
         return new Promise((resolve, reject) => {
+          if (!args.base_64) {
+            reject(new Error("No model source given"));
+            return;
+          }
           let loader = new THREE.GLTFLoader();
-          loader.load(args.base_64, (glb) => {
-            resolve({ resolution: glb.scene });
-          });
+          loader.load(
+            args.base_64,
+            (glb) => {
+              resolve({ resolution: glb.scene });
+            },
+            undefined,
+            (error) => {
+              reject(
+                new Error(
+                  "Could not load model: " +
+                    String(args.base_64).slice(0, 120) +
+                    " — " +
+                    (error && error.message ? error.message : error)
+                )
+              );
+            }
+          );
         });
       };
       const Load_file = (args) => {
