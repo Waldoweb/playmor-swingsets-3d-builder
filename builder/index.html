@@ -4578,8 +4578,28 @@
               : null;
           return entry ? entry.joints : this.joints;
         }
+        /**
+         * The host joints this product is being tested against.
+         *
+         * With no argument: every joint in the scene, i.e. "can this be placed
+         * anywhere?" — what the catalog has always asked. Pass { joint } to ask
+         * the narrower question the joint-first flow needs: "can this go *here*?"
+         */
+        candidate_host_joints(args) {
+          if (args && args.joint) return [args.joint];
+          const joints = [];
+          for (const model of models_with_available_joints)
+            for (const joint of model.joints) joints.push(joint);
+          return joints;
+        }
+        /** As above, but for the wildcard pass, which inspects a model's joint pair. */
+        candidate_host_models(args) {
+          if (args && args.joint) return args.joint.model ? [args.joint.model] : [];
+          return models_with_available_joints;
+        }
         capable(args) {
           let found = false;
+          const hosts = this.candidate_host_joints(args);
 
           // Special case: Check if this is a tire swing model (MTS only)
           const isTireSwing = this.object_id === 'MTS' ||
@@ -4587,7 +4607,7 @@
 
           if (isTireSwing) {
             // Tire swings are only available if there are models with tire swing compatible joints
-            return this.hasTireSwingJoints();
+            return this.hasTireSwingJoints(args);
           }
 
           // check for an empty tarmac
@@ -4601,12 +4621,10 @@
 
           // check for available joints
           let availableJointCount = 0;
-          for (let model of models_with_available_joints) {
-            for (let joint of model.joints) {
-              if (joint.available) {
-                availableJointCount++;
-                if (!found) found = true;
-              }
+          for (const joint of hosts) {
+            if (joint.available) {
+              availableJointCount++;
+              if (!found) found = true;
             }
           }
           // no available joints to connect to
@@ -4622,15 +4640,13 @@
           if (found) {
             // search for an available valid host joint that's not a wildcard
             let valid = 0;
-            for (let model of models_with_available_joints) {
-              for (let joint of model.joints) {
-                if (
-                  joint.available &&
-                  joint.layer[0] > "0" &&
-                  joint.layer[0] <= "9"
-                ) {
-                  valid++;
-                }
+            for (const joint of hosts) {
+              if (
+                joint.available &&
+                joint.layer[0] > "0" &&
+                joint.layer[0] <= "9"
+              ) {
+                valid++;
               }
             }
             const result = valid != 0;
@@ -4642,13 +4658,10 @@
             let i = 0;
             while (!found && i < own_joints.length) {
               const seekingLayer = own_joints[i].layer;
-              let j = 0;
-              while (!found && j < models_with_available_joints.length) {
-                let model = models_with_available_joints[j++];
-                let k = 0;
-                while (!found && k < model.joints.length) {
-                  let joint = model.joints[k++];
-                  if (joint.available && joint.model.category != 2) {
+              let h = 0;
+              while (!found && h < hosts.length) {
+                let joint = hosts[h++];
+                if (joint.available && joint.model.category != 2) {
                     // Check tire_only restriction first
                     if (joint.tire_only) {
                       // tire_only joints can ONLY accept tire layer (MTS only)
@@ -4704,7 +4717,6 @@
                                              joints [ i ] . name . indexOf ( 'female' ) >= 0 )
                                             return true
                                         */
-                    }
                   }
                 }
               }
@@ -4713,9 +4725,10 @@
           }
 
           // if no exact match is available look for available wildcards
+          const host_models = this.candidate_host_models(args);
           i = 0;
-          while (!found && i < models_with_available_joints.length) {
-            let model = models_with_available_joints[i++];
+          while (!found && i < host_models.length) {
+            let model = host_models[i++];
 
             // wildcards only can have 2 joints
             if (model.joints.length > 1) {
@@ -4744,10 +4757,10 @@
         }
 
         // Function to check if any loaded models have tire swing compatible joints
-        hasTireSwingJoints() {
+        hasTireSwingJoints(args) {
 
-          for (let model of models_with_available_joints) {
-            for (let joint of model.joints) {
+          {
+            for (const joint of this.candidate_host_joints(args)) {
               // Only check available joints
               if (!joint.available) continue;
 
