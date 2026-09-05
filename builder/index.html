@@ -3934,7 +3934,14 @@
           this.mesh.visible = this.visible;
           scene.add(this.mesh);
 
-          Load_image_base_64({ base_64: Assets[8] }).then((resolution) => {
+          // Wait for the texture manifest before resolving a source. Mulch,
+          // Skybox and the joint sprite are all built during Main(), which
+          // runs well before the configs land — without this they would
+          // quietly fall back to the base64 in assets.js, which works only
+          // until that file is stripped.
+          configsReady.catch(() => {}).then(() =>
+            Load_image_base_64({ base_64: Texture_source("ground_grass") })
+          ).then((resolution) => {
             let ground_texture = new THREE.CanvasTexture(resolution.resolution);
             ground_texture.wrapS = ground_texture.wrapT =
               THREE.RepeatWrapping;
@@ -4041,21 +4048,28 @@
           this.plane_textures = [];
           this.plane_texture_index = 0;
 
-          Load_image_base_64({ base_64: Assets[0] }).then((resolution) => {
+          // Wait for the texture manifest before resolving a source. Mulch,
+          // Skybox and the joint sprite are all built during Main(), which
+          // runs well before the configs land — without this they would
+          // quietly fall back to the base64 in assets.js, which works only
+          // until that file is stripped.
+          configsReady.catch(() => {}).then(() =>
+            Load_image_base_64({ base_64: Texture_source("mulch_border_h") })
+          ).then((resolution) => {
             let xtexture = new THREE.CanvasTexture(resolution.resolution);
             xtexture.wrapS = xtexture.wrapT = THREE.RepeatWrapping;
             xtexture.repeat.set(this.width, 0.5);
             xtexture.needsUpdate = true;
             this.bounds_textures.push(xtexture);
 
-            Load_image_base_64({ base_64: Assets[1] }).then((resolution) => {
+            Load_image_base_64({ base_64: Texture_source("mulch_border_v") }).then((resolution) => {
               let ztexture = new THREE.CanvasTexture(resolution.resolution);
               ztexture.wrapS = ztexture.wrapT = THREE.RepeatWrapping;
               ztexture.repeat.set(0.5, this.depth);
               ztexture.needsUpdate = true;
               this.bounds_textures.push(ztexture);
 
-              Load_image_base_64({ base_64: Assets[2] }).then((resolution) => {
+              Load_image_base_64({ base_64: Texture_source("mulch_border_pink") }).then((resolution) => {
                 let xtexture = new THREE.CanvasTexture(resolution.resolution);
                 xtexture.wrapS = xtexture.wrapT = THREE.RepeatWrapping;
                 xtexture.repeat.set(this.width, 1);
@@ -4067,7 +4081,7 @@
                 ztexture.needsUpdate = true;
                 this.bounds_textures.push(ztexture);
 
-                Load_image_base_64({ base_64: Assets[3] }).then(
+                Load_image_base_64({ base_64: Texture_source("mulch_tar") }).then(
                   (resolution) => {
                     let texture = new THREE.CanvasTexture(
                       resolution.resolution
@@ -4077,7 +4091,7 @@
                     texture.needsUpdate = true;
                     this.plane_textures.push(texture);
 
-                    Load_image_base_64({ base_64: Assets[4] }).then(
+                    Load_image_base_64({ base_64: Texture_source("mulch_blue") }).then(
                       (resolution) => {
                         let texture = new THREE.CanvasTexture(
                           resolution.resolution
@@ -7898,7 +7912,10 @@
         Resize();
         //instructions_dialog . style . display = 'block'
 
-        Load_image_base_64({ base_64: Assets[5] }).then((resolution) => {
+        // Same gating as the mulch and ground textures below.
+        configsReady.catch(() => {}).then(() =>
+          Load_image_base_64({ base_64: Texture_source("joint_ring") })
+        ).then((resolution) => {
           joint_image = resolution.resolution;
           joint_image_frame = 0;
           joint_image_frames = joint_image.width / joint_image.height;
@@ -8520,6 +8537,52 @@
       // capable() answer "can this be placed?" without the geometry being
       // loaded, which is what makes on-demand model loading possible.
       let modelManifest = null;
+      // The mulch and ground textures, moved out of assets.js into files.
+      let textureManifest = null;
+
+      // Falls back to the base64 still in assets.js while that file exists, so
+      // this can ship before the textures are stripped from it.
+      const TEXTURE_FALLBACK_INDEX = {
+        mulch_border_h: 0,
+        mulch_border_v: 1,
+        mulch_border_pink: 2,
+        mulch_tar: 3,
+        mulch_blue: 4,
+        joint_ring: 5,
+        ground_grass: 8,
+      };
+
+      /** URL or data URI for a texture — either works as an <img> src. */
+      const Texture_source = (name) => {
+        const file =
+          textureManifest && textureManifest.textures
+            ? textureManifest.textures[name]
+            : null;
+        if (file) return "textures/" + encodeURIComponent(file);
+        const index = TEXTURE_FALLBACK_INDEX[name];
+        const embedded =
+          typeof Assets !== "undefined" && index !== undefined
+            ? Assets[index]
+            : null;
+        if (!embedded) console.error("No source for texture", name);
+        return embedded;
+      };
+
+      const loadTextureManifest = async () => {
+        try {
+          // Revalidated for the same reason as the model manifest: the
+          // filenames it names are content-hashed, so a stale copy points at
+          // files that no longer exist.
+          const response = await fetch('textures/manifest.json', { cache: 'no-cache' });
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          textureManifest = await response.json();
+        } catch (error) {
+          console.error('Failed to load texture manifest:', error);
+          textureManifest = null;
+        }
+      };
 
       const loadModelManifest = async () => {
         // Retried once. Since the geometry left categories.js this file is the
@@ -8578,7 +8641,7 @@
       
       // Load configuration on page load
       const initializeConfigs = async () => {
-        await Promise.all([loadColorConfig(), loadObjectMapping(), loadModelManifest()]);
+        await Promise.all([loadColorConfig(), loadObjectMapping(), loadModelManifest(), loadTextureManifest()]);
         console.log('All configurations loaded. Ready for color popup.');
       };
       
