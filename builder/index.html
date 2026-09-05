@@ -3081,7 +3081,7 @@
       // Load catalog data from JSON file
       async function loadCatalogData() {
         try {
-          const response = await fetch('catalog.json');
+          const response = await fetch('catalog.json', { cache: 'no-cache' });
           const data = await response.json();
           catalogProjects = data.catalog;
         } catch (error) {
@@ -3221,7 +3221,10 @@
             projectData = project.state;
           } else if (project.catalog) {
             // New approach: fetch JSON from catalog file
-            const response = await fetch(project.catalog);
+            // Revalidate: these files hold the saved positions of every part
+            // in the set, so a correction to a set has to actually reach
+            // someone who already loaded it. A 304 keeps that cheap.
+            const response = await fetch(project.catalog, { cache: 'no-cache' });
             if (!response.ok) {
               throw new Error(`Failed to fetch catalog file: ${project.catalog}`);
             }
