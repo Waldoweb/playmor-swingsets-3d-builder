@@ -880,6 +880,41 @@
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
       }
 
+      /* Shown only when a model's geometry is still being fetched, and only
+         after a short delay, so a cached model never flashes a spinner. */
+      .sub-items.loading::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        border-radius: 6px;
+        z-index: 1;
+      }
+
+      .sub-items.loading::after {
+        content: "";
+        position: absolute;
+        top: calc(50% - 14px);
+        left: calc(50% - 14px);
+        width: 28px;
+        height: 28px;
+        border: 3px solid rgba(255, 255, 255, 0.25);
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        z-index: 2;
+      }
+
+      .sub-items.loading {
+        cursor: progress;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .sub-items.loading::after {
+          animation: spin 2.4s linear infinite;
+        }
+      }
+
       .sub-items.selected {
         background: linear-gradient(135deg, rgba(206, 3, 12, 0.3), rgba(165, 2, 9, 0.3));
         border: 2px solid rgba(206, 3, 12, 0.8);
@@ -3078,35 +3113,6 @@
         };
       }
 
-      // Wait for all models to be fully loaded with meshes
-      function waitForModelsToLoad() {
-        return new Promise((resolve) => {
-          const checkModelsLoaded = () => {
-            // Count models with loaded meshes
-            const loadedModels = Model.instances.filter(model => model.mesh !== null).length;
-            const totalModels = Model.instances.length;
-
-            // Update progress bar
-            if (totalModels > 0) {
-              const progress = Math.trunc((loadedModels * 100) / totalModels);
-              green_span.style = `width: ${progress}%;`;
-            }
-
-            // Check if all models have their meshes loaded
-            if (loadedModels === totalModels && totalModels > 0) {
-              console.log(`All ${totalModels} models loaded with meshes`);
-              // Hide loading bar
-              blank_slate_div.style = "display: none";
-              resolve();
-            } else {
-              // Check again in 100ms
-              setTimeout(checkModelsLoaded, 100);
-            }
-          };
-          checkModelsLoaded();
-        });
-      }
-
       // Simple URL catalog loading using existing loadCatalogProject
       async function loadCatalogFromURL() {
         const { catalogId } = getURLParameters();
@@ -3122,11 +3128,8 @@
           return false;
         }
 
-        // Wait for models to be fully loaded (they're already loading from page initialization)
-        // Don't call Load_models() again as it's already called during page load
-        await waitForModelsToLoad();
-
-        // Use existing loadCatalogProject function
+        // No blanket wait for all 64 models here any more: loadCatalogProject
+        // loads exactly the ones this project uses.
         await loadCatalogProject(project);
 
         console.log(`Successfully loaded catalog: "${project.title}"`);
@@ -3232,6 +3235,9 @@
 
           // Load the project state using existing Blueprint functionality
           if (typeof blueprint !== 'undefined' && blueprint.restore) {
+            // restore() clones templates, so their geometry has to be in hand
+            // first. Only the products this design actually uses.
+            await Ensure_models_for_state(projectData);
             blueprint.restore({ state: projectData });
           }
 
@@ -3928,7 +3934,13 @@
           this.mesh.visible = this.visible;
           scene.add(this.mesh);
 
-          Load_image_base_64({ base_64: Assets[8] }).then((resolution) => {
+          // Wait for the texture manifest before resolving a source. Mulch,
+          // Skybox and the joint sprite are all built during Main(), which
+          // runs well before the configs land — without this they would
+          // resolve their source before the manifest exists.
+          configsReady.catch(() => {}).then(() =>
+            Load_image_base_64({ base_64: Texture_source("ground_grass") })
+          ).then((resolution) => {
             let ground_texture = new THREE.CanvasTexture(resolution.resolution);
             ground_texture.wrapS = ground_texture.wrapT =
               THREE.RepeatWrapping;
@@ -4035,21 +4047,27 @@
           this.plane_textures = [];
           this.plane_texture_index = 0;
 
-          Load_image_base_64({ base_64: Assets[0] }).then((resolution) => {
+          // Wait for the texture manifest before resolving a source. Mulch,
+          // Skybox and the joint sprite are all built during Main(), which
+          // runs well before the configs land — without this they would
+          // resolve their source before the manifest exists.
+          configsReady.catch(() => {}).then(() =>
+            Load_image_base_64({ base_64: Texture_source("mulch_border_h") })
+          ).then((resolution) => {
             let xtexture = new THREE.CanvasTexture(resolution.resolution);
             xtexture.wrapS = xtexture.wrapT = THREE.RepeatWrapping;
             xtexture.repeat.set(this.width, 0.5);
             xtexture.needsUpdate = true;
             this.bounds_textures.push(xtexture);
 
-            Load_image_base_64({ base_64: Assets[1] }).then((resolution) => {
+            Load_image_base_64({ base_64: Texture_source("mulch_border_v") }).then((resolution) => {
               let ztexture = new THREE.CanvasTexture(resolution.resolution);
               ztexture.wrapS = ztexture.wrapT = THREE.RepeatWrapping;
               ztexture.repeat.set(0.5, this.depth);
               ztexture.needsUpdate = true;
               this.bounds_textures.push(ztexture);
 
-              Load_image_base_64({ base_64: Assets[2] }).then((resolution) => {
+              Load_image_base_64({ base_64: Texture_source("mulch_border_pink") }).then((resolution) => {
                 let xtexture = new THREE.CanvasTexture(resolution.resolution);
                 xtexture.wrapS = xtexture.wrapT = THREE.RepeatWrapping;
                 xtexture.repeat.set(this.width, 1);
@@ -4061,7 +4079,7 @@
                 ztexture.needsUpdate = true;
                 this.bounds_textures.push(ztexture);
 
-                Load_image_base_64({ base_64: Assets[3] }).then(
+                Load_image_base_64({ base_64: Texture_source("mulch_tar") }).then(
                   (resolution) => {
                     let texture = new THREE.CanvasTexture(
                       resolution.resolution
@@ -4071,7 +4089,7 @@
                     texture.needsUpdate = true;
                     this.plane_textures.push(texture);
 
-                    Load_image_base_64({ base_64: Assets[4] }).then(
+                    Load_image_base_64({ base_64: Texture_source("mulch_blue") }).then(
                       (resolution) => {
                         let texture = new THREE.CanvasTexture(
                           resolution.resolution
@@ -4221,15 +4239,17 @@
             if ("children_index" in args)
               this.children_index = args.children_index;
             if ("category_child" in args) {
+              // Kept so ensure_loaded() can fall back to the embedded base64
+              // if models/manifest.json is unavailable.
+              this.category_child = args.category_child;
               if ("tubular" in args.category_child)
                 this.tubular = args.category_child.tubular;
-              if ("glb" in args.category_child)
-                this.adopt({ base_64: args.category_child.glb });
-              if ("glbs" in args.category_child)
-                for (let glb of args.category_child.glbs)
-                  this.adopt({ base_64: glb.glb, layer: glb.layer });
               if ("slope" in args.category_child)
                 this.slope = args.category_child.slope;
+              // Geometry is deliberately not loaded here. Templates stay empty
+              // until something actually needs to place one — see
+              // ensure_loaded(). capable() answers from the manifest, so an
+              // unloaded template still shows correctly in the catalog.
             }
           }
 
@@ -4287,8 +4307,88 @@
             this.joints.splice(0, 0, joint);
           }
         }
+        /**
+         * Load this template's geometry, once. Returns the same promise to
+         * every caller while a load is in flight, so two clicks on the same
+         * product don't fetch it twice.
+         *
+         * Sources come from the manifest, falling back to the base64 still
+         * embedded in categories.js. That fallback is what makes this step
+         * safe to ship on its own: if models/ is missing or manifest.json
+         * fails, every product still loads exactly as it did before.
+         */
+        ensure_loaded() {
+          if (this.mesh) return Promise.resolve(this);
+          if (this._loading) return this._loading;
+
+          // Wait for the manifest before choosing where to load from. Without
+          // this, anything asking for geometry during the first moments after
+          // page load — the category prefetch does exactly that — finds
+          // modelManifest still null and silently takes the base64 fallback.
+          // That looks fine today and breaks the moment the base64 is removed.
+          this._loading = Promise.resolve(configsReady)
+            .catch(() => {})
+            .then(() => this._load_sources())
+            .then(() => {
+              this._loading = null;
+              return this;
+            })
+            .catch((error) => {
+              this._loading = null;
+              console.error("Failed to load model", this.object_id, error);
+              throw error;
+            });
+
+          return this._loading;
+        }
+        _load_sources() {
+          const entry =
+            modelManifest && this.object_id
+              ? modelManifest.products[this.object_id]
+              : null;
+
+          // The manifest is the only source now: categories.js no longer
+          // carries the geometry, so there is nothing to fall back to. An
+          // absent entry is a real failure, not a reason to look elsewhere.
+          if (!entry) {
+            return Promise.reject(
+              new Error(
+                `No manifest entry for ${this.object_id || "unknown model"}` +
+                  (modelManifest ? "" : " (models/manifest.json did not load)")
+              )
+            );
+          }
+
+          const sources = entry.files.map((f) => ({
+            src: "models/" + encodeURIComponent(f.file),
+            layer: f.layer,
+          }));
+
+          if (!sources.length) {
+            return Promise.reject(
+              new Error(`Manifest lists no files for ${this.object_id}`)
+            );
+          }
+
+          // Sequential, not parallel: adopt() appends to this.meshes/layers and
+          // leaves this.mesh pointing at the last one, so order is meaningful
+          // for multi-layer products.
+          return sources.reduce(
+            (chain, source) =>
+              chain.then(() =>
+                source.layer === null || source.layer === undefined
+                  ? this.adopt({ base_64: source.src })
+                  : this.adopt({ base_64: source.src, layer: source.layer })
+              ),
+            Promise.resolve()
+          );
+        }
+        /**
+         * `base_64` may be a data URI or a URL — GLTFLoader accepts either, so
+         * the name is historical.
+         */
         adopt(args) {
-          Load_base_64({ base_64: args.base_64 }).then((resolution) => {
+          return Load_base_64({ base_64: args.base_64 }).then((resolution) => {
             this.mesh = resolution.resolution;
 
             if ("layer" in args) {
@@ -4324,14 +4424,15 @@
 
             this.sort_joints();
 
-            if (++adopted == 72) {
-              blank_slate_div.style = "display : none";
-            } else {
-              green_span.style =
-                "width :" + Math.trunc((adopted * 100) / 72) + "%;";
-            }
-
-            Show_items();
+            // The startup progress counter that used to live here counted
+            // adopts up to a hardcoded 72 and hid the loading screen. Loading
+            // is no longer a startup phase, so the loading screen is now
+            // dismissed once the configs and manifest are in — see Main().
+            //
+            // The Show_items() call that used to follow is also gone: it was
+            // there to re-grey the catalog as geometry streamed in, and
+            // capable() no longer depends on geometry.
+            return this;
           });
         }
         promise(args) {
@@ -4457,6 +4558,26 @@
 
           return clone;
         }
+        /**
+         * The joints this product would have if placed, described rather than
+         * measured. capable() only ever reads .layer off these, and reading
+         * them from the manifest means it works before the GLB has loaded.
+         *
+         * Falls back to the live geometry when the manifest is missing, so a
+         * failed manifest fetch degrades to the original behaviour instead of
+         * emptying the catalog.
+         *
+         * Note this is the *template's* joints — what the product could
+         * connect with. The availability of joints on already-placed models is
+         * a property of those instances and is still read from them directly.
+         */
+        template_joints() {
+          const entry =
+            modelManifest && this.object_id
+              ? modelManifest.products[this.object_id]
+              : null;
+          return entry ? entry.joints : this.joints;
+        }
         capable(args) {
           let found = false;
 
@@ -4473,7 +4594,7 @@
           if (picked_meshes.length == 0) {
             // bail if wildcard model
             let jokers = 0;
-            for (let joint of this.joints) if (joint.layer == "*") jokers++;
+            for (let joint of this.template_joints()) if (joint.layer == "*") jokers++;
             const result = jokers == 0 && this.category == 0;
             return result;
           }
@@ -4493,10 +4614,11 @@
           if (!found) return false;
 
           // check if i'm a wildcard
+          const own_joints = this.template_joints();
           let i = 0;
           found = false;
-          while (!found && i < this.joints.length)
-            found = "*" == this.joints[i++].layer;
+          while (!found && i < own_joints.length)
+            found = "*" == own_joints[i++].layer;
           if (found) {
             // search for an available valid host joint that's not a wildcard
             let valid = 0;
@@ -4518,8 +4640,8 @@
           // not a wildcard seek an available exact match
           if (!found) {
             let i = 0;
-            while (!found && i < this.joints.length) {
-              const seekingLayer = this.joints[i].layer;
+            while (!found && i < own_joints.length) {
+              const seekingLayer = own_joints[i].layer;
               let j = 0;
               while (!found && j < models_with_available_joints.length) {
                 let model = models_with_available_joints[j++];
@@ -6358,7 +6480,11 @@
       const Open_file = (args) => {
         let fileReader = new FileReader();
         fileReader.onload = function (event) {
-          blueprint.restore({ state: event.target.result });
+          // Same as the catalog path: fetch the design's models before
+          // restore() tries to clone templates that have no geometry yet.
+          Ensure_models_for_state(event.target.result)
+            .then(() => blueprint.restore({ state: event.target.result }))
+            .catch((error) => console.error("Could not open design", error));
         };
         fileReader.readAsText(args.files[0]);
       };
@@ -6439,21 +6565,53 @@
         }
         return result;
       };
+      // Both loaders reject on failure as well as resolving on success. They
+      // used to only listen for success, so a 404 or an undecodable image left
+      // the promise pending for ever — the caller simply stopped, with nothing
+      // in the console. That was survivable when every asset was a data URI
+      // embedded in the page. Now that models and textures are separate files
+      // a stale index.html can reference something that no longer exists, and
+      // that needs to be an error you can see, not a silent hang.
       const Load_image_base_64 = (args) => {
         return new Promise((resolve, reject) => {
+          if (!args.base_64) {
+            reject(new Error("No image source given"));
+            return;
+          }
           let img = document.createElement("img");
           img.addEventListener("load", function (event) {
             resolve({ resolution: img });
+          });
+          img.addEventListener("error", function () {
+            reject(new Error("Could not load image: " + String(args.base_64).slice(0, 120)));
           });
           img.src = args.base_64;
         });
       };
       const Load_base_64 = (args) => {
         return new Promise((resolve, reject) => {
+          if (!args.base_64) {
+            reject(new Error("No model source given"));
+            return;
+          }
           let loader = new THREE.GLTFLoader();
-          loader.load(args.base_64, (glb) => {
-            resolve({ resolution: glb.scene });
-          });
+          loader.load(
+            args.base_64,
+            (glb) => {
+              resolve({ resolution: glb.scene });
+            },
+            undefined,
+            (error) => {
+              reject(
+                new Error(
+                  "Could not load model: " +
+                    String(args.base_64).slice(0, 120) +
+                    " — " +
+                    (error && error.message ? error.message : error)
+                )
+              );
+            }
+          );
         });
       };
       const Load_file = (args) => {
@@ -6995,7 +7153,148 @@
         }, 1000);
       };
       
-      const Item_clicked = (args) => {
+      /** The template for an object_id, or null. */
+      const Model_for_object_id = (objectId) =>
+        objectId ? Model.instances.find((m) => m.object_id === objectId) || null : null;
+
+      /**
+       * Start fetching a model's geometry without waiting for it. Used from
+       * hover and from the background category prefetch, so that by the time
+       * someone actually clicks, the fetch is usually already done. Failures
+       * are ignored here — the click path reports them.
+       */
+      const Prefetch_model = (objectId) => {
+        const model = Model_for_object_id(objectId);
+        if (model && !model.mesh) model.ensure_loaded().catch(() => {});
+      };
+
+      /**
+       * Load the geometry a saved design needs, before it is rebuilt.
+       *
+       * restore() rebuilds a design by cloning templates, which requires their
+       * geometry. Rather than loading all 64 and waiting, this reads the
+       * object_ids out of the design and fetches only those — for the catalog
+       * sets that is around a dozen products rather than the whole library.
+       *
+       * Legacy saves that predate object_id identify models by their index in
+       * Model.instances. There is no way to know which those are without
+       * loading them, so those fall back to loading everything.
+       */
+      const Ensure_models_for_state = async (stateJson) => {
+        let state;
+        try {
+          state = typeof stateJson === "string" ? JSON.parse(stateJson) : stateJson;
+        } catch (error) {
+          console.error("Could not read design state", error);
+          return;
+        }
+
+        const entries = (state && state.models_data) || [];
+        if (!entries.length) return;
+
+        const templates = entries.some((entry) => !entry.object_id)
+          ? Model.instances.filter((model) => model.category_child)
+          : [
+              ...new Set(
+                entries
+                  .map((entry) => Model_for_object_id(entry.object_id))
+                  .filter(Boolean)
+              ),
+            ];
+
+        const pending = templates.filter((model) => !model.mesh);
+        if (!pending.length) return;
+
+        blank_slate_div.style = "display: block";
+        green_span.style = "width: 0%;";
+        let done = 0;
+        await Promise.all(
+          pending.map((model) =>
+            model
+              .ensure_loaded()
+              .catch((error) =>
+                console.error("Model failed to load", model.object_id, error)
+              )
+              .then(() => {
+                done++;
+                green_span.style = `width: ${Math.trunc((done * 100) / pending.length)}%;`;
+              })
+          )
+        );
+        blank_slate_div.style = "display: none";
+      };
+
+      /**
+       * Run a catalog click, showing a spinner on the clicked tile if the
+       * geometry takes long enough to notice.
+       *
+       * The delay matters: a cached model resolves in a few milliseconds, and
+       * a spinner that appears and vanishes in that time reads as a glitch.
+       */
+      const Run_item_click = async (element, objectId) => {
+        let spinner = null;
+        if (element) {
+          spinner = setTimeout(() => element.classList.add("loading"), 120);
+        }
+        try {
+          await Item_clicked();
+        } finally {
+          if (spinner !== null) clearTimeout(spinner);
+          if (element) element.classList.remove("loading");
+        }
+      };
+
+      /**
+       * Quietly pull down the models in the category the user is looking at,
+       * so the common case — browse a category, click something in it — has
+       * the geometry ready.
+       *
+       * Deliberately restrained: only products that can actually be placed
+       * right now, two at a time, and nothing at all when the browser reports
+       * a metered or slow connection. Prefetching everything would give back
+       * the download we just removed.
+       */
+      let prefetch_token = 0;
+      // Only the first few of a category. Pulling a whole category is easy to
+      // write and gives back most of the download we just removed — the towers
+      // category alone is about 6 MB, and someone places exactly one tower.
+      // Hover prefetch covers the rest precisely, so this only needs to cover
+      // the "clicked something near the top without pausing" case.
+      const PREFETCH_PER_CATEGORY = 3;
+      const PREFETCH_CONCURRENCY = 2;
+
+      const Prefetch_current_category = () => {
+        const link = navigator.connection;
+        if (link && (link.saveData || /2g/.test(link.effectiveType || ""))) return;
+        if (typeof Categories === "undefined" || !Categories[category_index]) return;
+
+        const token = ++prefetch_token;
+
+        const start = () => {
+          if (token !== prefetch_token) return; // category changed; abandon
+          const queue = (Categories[category_index].children || [])
+            .filter((child) => child.model && !child.model.mesh && child.model.capable())
+            .slice(0, PREFETCH_PER_CATEGORY)
+            .map((child) => child.model);
+
+          const pump = () => {
+            if (token !== prefetch_token) return;
+            const model = queue.shift();
+            if (!model) return;
+            model.ensure_loaded().catch(() => {}).then(pump);
+          };
+          for (let i = 0; i < PREFETCH_CONCURRENCY; i++) pump();
+        };
+
+        // Let the page finish its own work first; this is speculative.
+        if (typeof requestIdleCallback === "function") {
+          requestIdleCallback(start, { timeout: 2000 });
+        } else {
+          setTimeout(start, 500);
+        }
+      };
+
+      const Item_clicked = async (args) => {
         picked_mesh = null;
         host_joint = null;
         plug_joint = null;
@@ -7024,6 +7323,18 @@
         const model = Model.instances.find(m => m.object_id === objectId);
         if (!model) {
           console.warn(`No model found for object_id: ${objectId}`);
+          return;
+        }
+
+        // The template may not have geometry yet. clone() needs it, so wait.
+        try {
+          await model.ensure_loaded();
+        } catch (error) {
+          console.error(`Could not load geometry for ${objectId}`, error);
+          return;
+        }
+        if (!model.mesh) {
+          console.warn(`No geometry available for ${objectId}`);
           return;
         }
 
@@ -7631,7 +7942,10 @@
         Resize();
         //instructions_dialog . style . display = 'block'
 
-        Load_image_base_64({ base_64: Assets[5] }).then((resolution) => {
+        // Same gating as the mulch and ground textures below.
+        configsReady.catch(() => {}).then(() =>
+          Load_image_base_64({ base_64: Texture_source("joint_ring") })
+        ).then((resolution) => {
           joint_image = resolution.resolution;
           joint_image_frame = 0;
           joint_image_frames = joint_image.width / joint_image.height;
@@ -7729,7 +8043,6 @@
       };
     </script>
 
-    <script src="./js/assets.js"></script>
     <script src="./js/categories.js"></script>
     <script src="./js/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -7987,16 +8300,25 @@
               if (objectId) {
                 selected_object_id = objectId;
                 Highlight_item();
-                Item_clicked();
+                Run_item_click(event.currentTarget, objectId);
               } else {
                 // Fallback to index-based system
                 var index = event.currentTarget.id.replace(/^\D+/g, "");
                 item_index = parseInt(index);
                 Highlight_item(switchboard[category_index].indexOf(item_index));
-                Item_clicked();
+                Run_item_click(event.currentTarget, null);
               }
             }
           });
+
+          // Hovering is a strong hint the item is about to be clicked, so
+          // start the fetch now rather than on mousedown.
+          $(".sub-items").on("mouseenter", (event) => {
+            if (!event.currentTarget.classList.contains("disabled"))
+              Prefetch_model(event.currentTarget.getAttribute("data-object-id"));
+          });
+
+          Prefetch_current_category();
         } else if (objectMapping && selected_category) {
           // Fallback to objectMapping system
           let availableObjects = [];
@@ -8074,9 +8396,16 @@
               if (selected_object_id !== objectId) {
                 selected_object_id = objectId;
                 Highlight_item();
-                Item_clicked();
+                Run_item_click(event.currentTarget, objectId);
               }
             }
+          });
+
+          // Hovering is a strong hint the item is about to be clicked, so
+          // start the fetch now rather than on mousedown.
+          $(".sub-items").on("mouseenter", (event) => {
+            if (!event.currentTarget.classList.contains("disabled"))
+              Prefetch_model(event.currentTarget.getAttribute("data-object-id"));
           });
         } else {
           console.warn('Cannot show items: no Categories or objectMapping/selected_category available');
@@ -8233,7 +8562,71 @@
       // Load color configuration and object mapping
       let colorConfig = null;
       let objectMapping = null;
-      
+      // Each product's joints, generated by tools/build_models.js. Lets
+      // capable() answer "can this be placed?" without the geometry being
+      // loaded, which is what makes on-demand model loading possible.
+      let modelManifest = null;
+      // The mulch and ground textures, moved out of assets.js into files.
+      let textureManifest = null;
+
+      /** URL for a texture, from textures/manifest.json. */
+      const Texture_source = (name) => {
+        const file =
+          textureManifest && textureManifest.textures
+            ? textureManifest.textures[name]
+            : null;
+        if (!file) {
+          console.error("No source for texture", name,
+            textureManifest ? "" : "(textures/manifest.json did not load)");
+          return null;
+        }
+        return "textures/" + encodeURIComponent(file);
+      };
+
+      const loadTextureManifest = async () => {
+        try {
+          // Revalidated for the same reason as the model manifest: the
+          // filenames it names are content-hashed, so a stale copy points at
+          // files that no longer exist.
+          const response = await fetch('textures/manifest.json', { cache: 'no-cache' });
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          textureManifest = await response.json();
+        } catch (error) {
+          console.error('Failed to load texture manifest:', error);
+          textureManifest = null;
+        }
+      };
+
+      const loadModelManifest = async () => {
+        // Retried once. Since the geometry left categories.js this file is the
+        // only route to any model, so a single dropped request would leave the
+        // builder unable to place anything.
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            // Always revalidate. Model filenames carry a content hash so they
+            // can be cached forever, which only works if the index pointing at
+            // them is never stale — a cached manifest names files that no
+            // longer exist, and every model 404s. 'no-cache' still allows a
+            // 304, so the cost is one conditional request.
+            const response = await fetch('models/manifest.json', { cache: 'no-cache' });
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            modelManifest = await response.json();
+            return;
+          } catch (error) {
+            console.error(
+              `Failed to load model manifest (attempt ${attempt + 1} of 2):`,
+              error
+            );
+            modelManifest = null;
+            if (attempt === 0) await new Promise((r) => setTimeout(r, 600));
+          }
+        }
+      };
+
       const loadColorConfig = async () => {
         try {
           const response = await fetch('color-config.json');
@@ -8263,13 +8656,22 @@
       
       // Load configuration on page load
       const initializeConfigs = async () => {
-        await Promise.all([loadColorConfig(), loadObjectMapping()]);
+        await Promise.all([loadColorConfig(), loadObjectMapping(), loadModelManifest(), loadTextureManifest()]);
         console.log('All configurations loaded. Ready for color popup.');
       };
       
-      initializeConfigs().then(() => {
+      // Held so startup can wait on the same run rather than fetching twice.
+      const configsReady = initializeConfigs().then(() => {
         // After configs are loaded, update existing models with object_ids
         updateExistingModelObjectIds();
+
+        // The catalog is rendered before object-mapping.json arrives, so every
+        // tile goes out with data-object-id="". Clicks still worked, falling
+        // back to an index lookup, but anything keyed on the id — the hover
+        // prefetch — silently did nothing. Re-render now that ids exist.
+        if (typeof sub_item_container !== "undefined" && sub_item_container) {
+          Show_items();
+        }
       });
 
       // Function to update existing models with object_ids
@@ -8685,6 +9087,17 @@
       // Show loading bar immediately when page starts
       blank_slate_div.style = "display: block";
       green_span.style = "width: 0%;";
+
+      // Geometry is no longer fetched at startup, so there is nothing to wait
+      // for beyond the configs and the joint manifest. Whichever settles last
+      // dismisses the loading screen; a failed fetch still dismisses it,
+      // because the app stays usable without them.
+      configsReady
+        .catch(() => {})
+        .then(() => {
+          green_span.style = "width: 100%;";
+          blank_slate_div.style = "display: none";
+        });
 
       Load_models();
       initializeObjectIdSystem();
