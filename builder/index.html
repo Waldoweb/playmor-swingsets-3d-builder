@@ -3105,44 +3105,6 @@
         };
       }
 
-      /**
-       * Load every catalog template's geometry, reporting progress.
-       *
-       * This used to poll until each Model.instances entry had a mesh, which
-       * worked only because every model was loaded at startup. Templates are
-       * now empty until used, so waiting for that condition would never
-       * finish — it has to ask for the geometry rather than wait for it.
-       *
-       * Still loads all of them, which the catalog path needs today. Narrowing
-       * it to just the models a project actually uses is a separate step.
-       */
-      async function waitForModelsToLoad() {
-        const templates = (typeof Categories !== "undefined" ? Categories : [])
-          .flatMap((category) => category.children || [])
-          .map((child) => child.model)
-          .filter(Boolean);
-
-        if (!templates.length) return;
-
-        blank_slate_div.style = "display: block";
-        let done = 0;
-        await Promise.all(
-          templates.map((model) =>
-            model
-              .ensure_loaded()
-              .catch((error) =>
-                console.error("Model failed to load", model.object_id, error)
-              )
-              .then(() => {
-                done++;
-                green_span.style = `width: ${Math.trunc((done * 100) / templates.length)}%;`;
-              })
-          )
-        );
-        console.log(`All ${templates.length} catalog models loaded`);
-        blank_slate_div.style = "display: none";
-      }
-
       // Simple URL catalog loading using existing loadCatalogProject
       async function loadCatalogFromURL() {
         const { catalogId } = getURLParameters();
@@ -3158,11 +3120,8 @@
           return false;
         }
 
-        // Wait for models to be fully loaded (they're already loading from page initialization)
-        // Don't call Load_models() again as it's already called during page load
-        await waitForModelsToLoad();
-
-        // Use existing loadCatalogProject function
+        // No blanket wait for all 64 models here any more: loadCatalogProject
+        // loads exactly the ones this project uses.
         await loadCatalogProject(project);
 
         console.log(`Successfully loaded catalog: "${project.title}"`);
@@ -3265,6 +3224,9 @@
 
           // Load the project state using existing Blueprint functionality
           if (typeof blueprint !== 'undefined' && blueprint.restore) {
+            // restore() clones templates, so their geometry has to be in hand
+            // first. Only the products this design actually uses.
+            await Ensure_models_for_state(projectData);
             blueprint.restore({ state: projectData });
           }
 
@@ -6495,7 +6457,11 @@
       const Open_file = (args) => {
         let fileReader = new FileReader();
         fileReader.onload = function (event) {
-          blueprint.restore({ state: event.target.result });
+          // Same as the catalog path: fetch the design's models before
+          // restore() tries to clone templates that have no geometry yet.
+          Ensure_models_for_state(event.target.result)
+            .then(() => blueprint.restore({ state: event.target.result }))
+            .catch((error) => console.error("Could not open design", error));
         };
         fileReader.readAsText(args.files[0]);
       };
@@ -7145,6 +7111,62 @@
       const Prefetch_model = (objectId) => {
         const model = Model_for_object_id(objectId);
         if (model && !model.mesh) model.ensure_loaded().catch(() => {});
+      };
+
+      /**
+       * Load the geometry a saved design needs, before it is rebuilt.
+       *
+       * restore() rebuilds a design by cloning templates, which requires their
+       * geometry. Rather than loading all 64 and waiting, this reads the
+       * object_ids out of the design and fetches only those — for the catalog
+       * sets that is around a dozen products rather than the whole library.
+       *
+       * Legacy saves that predate object_id identify models by their index in
+       * Model.instances. There is no way to know which those are without
+       * loading them, so those fall back to loading everything.
+       */
+      const Ensure_models_for_state = async (stateJson) => {
+        let state;
+        try {
+          state = typeof stateJson === "string" ? JSON.parse(stateJson) : stateJson;
+        } catch (error) {
+          console.error("Could not read design state", error);
+          return;
+        }
+
+        const entries = (state && state.models_data) || [];
+        if (!entries.length) return;
+
+        const templates = entries.some((entry) => !entry.object_id)
+          ? Model.instances.filter((model) => model.category_child)
+          : [
+              ...new Set(
+                entries
+                  .map((entry) => Model_for_object_id(entry.object_id))
+                  .filter(Boolean)
+              ),
+            ];
+
+        const pending = templates.filter((model) => !model.mesh);
+        if (!pending.length) return;
+
+        blank_slate_div.style = "display: block";
+        green_span.style = "width: 0%;";
+        let done = 0;
+        await Promise.all(
+          pending.map((model) =>
+            model
+              .ensure_loaded()
+              .catch((error) =>
+                console.error("Model failed to load", model.object_id, error)
+              )
+              .then(() => {
+                done++;
+                green_span.style = `width: ${Math.trunc((done * 100) / pending.length)}%;`;
+              })
+          )
+        );
+        blank_slate_div.style = "display: none";
       };
 
       /**
