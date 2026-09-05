@@ -8512,7 +8512,12 @@
 
       const loadModelManifest = async () => {
         try {
-          const response = await fetch('models/manifest.json');
+          // Always revalidate. Model filenames carry a content hash so they can
+          // be cached forever, which only works if the index pointing at them
+          // is never stale — a cached manifest names files that no longer
+          // exist, and every model 404s. 'no-cache' still allows a 304, so the
+          // cost is one conditional request.
+          const response = await fetch('models/manifest.json', { cache: 'no-cache' });
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }

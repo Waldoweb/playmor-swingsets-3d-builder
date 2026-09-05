@@ -22,6 +22,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 
 const CATEGORIES_JS = "js/categories.js";
 const OBJECT_MAPPING = "object-mapping.json";
@@ -46,6 +47,16 @@ function buildObjectIdLookup(objectMapping) {
     lookup.set(`${category.display_order}:${info.index}`, objectId);
   }
   return lookup;
+}
+
+/**
+ * Short content hash, folded into the filename so a model can be cached
+ * forever and still update the moment its bytes change. Changing a model
+ * changes its name, so there is no stale-cache window and no cache-busting
+ * query string to remember.
+ */
+function contentHash(buffer) {
+  return crypto.createHash("sha256").update(buffer).digest("hex").slice(0, 8);
 }
 
 /** Decode a `data:...;base64,` URI to a Buffer. */
@@ -120,6 +131,13 @@ function main() {
 
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
+  // Filenames carry a content hash, so a rebuild leaves the previous
+  // generation behind under its old name. Clear them, or the directory grows
+  // without bound and rsync ships models nothing references.
+  for (const existing of fs.readdirSync(OUT_DIR)) {
+    if (existing.endsWith(".glb")) fs.unlinkSync(path.join(OUT_DIR, existing));
+  }
+
   const products = {};
   const problems = [];
   let fileCount = 0;
@@ -150,8 +168,9 @@ function main() {
 
       for (const source of sources) {
         const buffer = decodeDataUri(source.dataUri);
-        const filename =
-          source.layer === null ? `${objectId}.glb` : `${objectId}__${source.layer}.glb`;
+        const stem =
+          source.layer === null ? objectId : `${objectId}__${source.layer}`;
+        const filename = `${stem}.${contentHash(buffer)}.glb`;
         fs.writeFileSync(path.join(OUT_DIR, filename), buffer);
         fileCount++;
         byteCount += buffer.length;
