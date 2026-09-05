@@ -1,0 +1,82 @@
+name: Deploy dev configurator
+
+# Same pipeline as deploy-configurator.yml, pointed at the dev-builder branch
+# and the /dev-builder folder alongside the live one. The two cannot collide:
+# production rsyncs into .../builder, and dev-builder is a sibling of it, not
+# a child, so neither deploy's --delete can reach into the other.
+on:
+  push:
+    branches: [dev-builder]
+    paths: ["builder/**"]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "List what would change without writing to the server"
+        type: boolean
+        default: true
+
+env:
+  DEPLOY_PATH: /home/weldon/webapps/Playmor-Swingsets-Bricks/dev-builder
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-dev-configurator
+      cancel-in-progress: false
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      # Injected at deploy time, never committed. A noindex tag living in the
+      # tracked index.html would ride a branch merge straight into production
+      # and deindex the real builder.
+      - name: Keep the dev copy out of search results
+        run: |
+          python3 - <<'PY'
+          path = "builder/index.html"
+          html = open(path, encoding="utf-8").read()
+          anchor = '<meta charset="utf-8" />'
+          tag = anchor + '\n    <meta name="robots" content="noindex, nofollow" />'
+          assert anchor in html, "charset meta not found — cannot inject noindex"
+          open(path, "w", encoding="utf-8").write(html.replace(anchor, tag, 1))
+          print("noindex injected")
+          PY
+          grep -q 'name="robots"' builder/index.html || { echo "noindex missing"; exit 1; }
+
+      - name: Add SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Rsync builder/ to the dev folder
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          SSH_TARGET: ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+        run: |
+          # --checksum because every run is a fresh checkout with new mtimes.
+          FLAGS="-avz --checksum --human-readable --delete"
+          if [ "$DRY_RUN" = "true" ]; then
+            FLAGS="$FLAGS --dry-run"
+            echo "::notice::Dry run — nothing will be written to the server."
+          fi
+
+          # config.php and .env are the dev folder's own: they carry its
+          # counter_file and sales address, and must survive every deploy.
+          rsync $FLAGS \
+            --exclude 'config.php' \
+            --exclude '.env' \
+            --exclude '.gitignore' \
+            --exclude 'README.md' \
+            --exclude 'screenshot.png' \
+            --exclude 'import_export_glb.py' \
+            --exclude 'tools/' \
+            --exclude 'js/export_background_images.py' \
+            --exclude 'js/extracted_images/' \
+            -e "ssh -i ~/.ssh/id_ed25519" \
+            builder/ \
+            "$SSH_TARGET:$DEPLOY_PATH/"
