@@ -5447,20 +5447,60 @@
         return true;
       };
 
-      const Draw_joint_ring = (joint, highlighted) => {
+      // PlayMor red, the same value the buttons use.
+      const ADD_MARKER_RED = "#ce030c";
+      const reduced_motion =
+        window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      /**
+       * The "you can add something here" marker: a small red dot with a plus,
+       * under a slow halo pulse.
+       *
+       * Drawn rather than blitted from the joint sprite so it can be small —
+       * a full set shows ten of these at once, and the old rings were big
+       * enough to read as clutter over the model.
+       *
+       * The pulse is in the halo, not the dot. Scaling the dot itself makes
+       * ten markers appear to wobble; a halo breathing behind a fixed dot
+       * reads as a hint. The hit target stays the sprite-sized box, so the
+       * marker can shrink without becoming fiddly to click.
+       */
+      const Draw_add_marker = (joint, highlighted) => {
         const size = joint_image.height / 2;
-        const grow = highlighted ? size * 0.35 : 0;
-        context.drawImage(
-          joint_image,
-          joint_image_frame * joint_image.height,
-          0,
-          joint_image.height,
-          joint_image.height,
-          joint.x - grow / 2,
-          joint.y - grow / 2,
-          size + grow,
-          size + grow
-        );
+        const cx = joint.x + size / 2;
+        const cy = joint.y + size / 2;
+        const r = highlighted ? 11 : 8;
+
+        context.save();
+
+        if (!reduced_motion) {
+          const phase = 0.5 + 0.5 * Math.sin(performance.now() / 620);
+          context.beginPath();
+          context.arc(cx, cy, r + 3 + phase * 6, 0, Math.PI * 2);
+          context.fillStyle = "rgba(206, 3, 12, " + (0.3 * (1 - phase)).toFixed(3) + ")";
+          context.fill();
+        }
+
+        context.beginPath();
+        context.arc(cx, cy, r, 0, Math.PI * 2);
+        context.fillStyle = ADD_MARKER_RED;
+        context.fill();
+        context.lineWidth = 1.5;
+        context.strokeStyle = "rgba(255, 255, 255, 0.92)";
+        context.stroke();
+
+        const arm = r * 0.48;
+        context.beginPath();
+        context.moveTo(cx - arm, cy);
+        context.lineTo(cx + arm, cy);
+        context.moveTo(cx, cy - arm);
+        context.lineTo(cx, cy + arm);
+        context.strokeStyle = "#ffffff";
+        context.lineWidth = Math.max(2, r * 0.26);
+        context.lineCap = "round";
+        context.stroke();
+
+        context.restore();
       };
 
       /** Is this screen point inside a joint's ring? */
@@ -5670,7 +5710,7 @@
                 continue;
               }
               if (Locate_joint_ring(joint, joint.layer, null)) {
-                Draw_joint_ring(joint, joint === selected_host_joint);
+                Draw_add_marker(joint, joint === selected_host_joint);
                 browse_joints.push(joint);
               }
             }
