@@ -3070,33 +3070,42 @@
         };
       }
 
-      // Wait for all models to be fully loaded with meshes
-      function waitForModelsToLoad() {
-        return new Promise((resolve) => {
-          const checkModelsLoaded = () => {
-            // Count models with loaded meshes
-            const loadedModels = Model.instances.filter(model => model.mesh !== null).length;
-            const totalModels = Model.instances.length;
+      /**
+       * Load every catalog template's geometry, reporting progress.
+       *
+       * This used to poll until each Model.instances entry had a mesh, which
+       * worked only because every model was loaded at startup. Templates are
+       * now empty until used, so waiting for that condition would never
+       * finish — it has to ask for the geometry rather than wait for it.
+       *
+       * Still loads all of them, which the catalog path needs today. Narrowing
+       * it to just the models a project actually uses is a separate step.
+       */
+      async function waitForModelsToLoad() {
+        const templates = (typeof Categories !== "undefined" ? Categories : [])
+          .flatMap((category) => category.children || [])
+          .map((child) => child.model)
+          .filter(Boolean);
 
-            // Update progress bar
-            if (totalModels > 0) {
-              const progress = Math.trunc((loadedModels * 100) / totalModels);
-              green_span.style = `width: ${progress}%;`;
-            }
+        if (!templates.length) return;
 
-            // Check if all models have their meshes loaded
-            if (loadedModels === totalModels && totalModels > 0) {
-              console.log(`All ${totalModels} models loaded with meshes`);
-              // Hide loading bar
-              blank_slate_div.style = "display: none";
-              resolve();
-            } else {
-              // Check again in 100ms
-              setTimeout(checkModelsLoaded, 100);
-            }
-          };
-          checkModelsLoaded();
-        });
+        blank_slate_div.style = "display: block";
+        let done = 0;
+        await Promise.all(
+          templates.map((model) =>
+            model
+              .ensure_loaded()
+              .catch((error) =>
+                console.error("Model failed to load", model.object_id, error)
+              )
+              .then(() => {
+                done++;
+                green_span.style = `width: ${Math.trunc((done * 100) / templates.length)}%;`;
+              })
+          )
+        );
+        console.log(`All ${templates.length} catalog models loaded`);
+        blank_slate_div.style = "display: none";
       }
 
       // Simple URL catalog loading using existing loadCatalogProject
@@ -4210,15 +4219,17 @@
             if ("children_index" in args)
               this.children_index = args.children_index;
             if ("category_child" in args) {
+              // Kept so ensure_loaded() can fall back to the embedded base64
+              // if models/manifest.json is unavailable.
+              this.category_child = args.category_child;
               if ("tubular" in args.category_child)
                 this.tubular = args.category_child.tubular;
-              if ("glb" in args.category_child)
-                this.adopt({ base_64: args.category_child.glb });
-              if ("glbs" in args.category_child)
-                for (let glb of args.category_child.glbs)
-                  this.adopt({ base_64: glb.glb, layer: glb.layer });
               if ("slope" in args.category_child)
                 this.slope = args.category_child.slope;
+              // Geometry is deliberately not loaded here. Templates stay empty
+              // until something actually needs to place one — see
+              // ensure_loaded(). capable() answers from the manifest, so an
+              // unloaded template still shows correctly in the catalog.
             }
           }
 
@@ -4276,8 +4287,79 @@
             this.joints.splice(0, 0, joint);
           }
         }
+        /**
+         * Load this template's geometry, once. Returns the same promise to
+         * every caller while a load is in flight, so two clicks on the same
+         * product don't fetch it twice.
+         *
+         * Sources come from the manifest, falling back to the base64 still
+         * embedded in categories.js. That fallback is what makes this step
+         * safe to ship on its own: if models/ is missing or manifest.json
+         * fails, every product still loads exactly as it did before.
+         */
+        ensure_loaded() {
+          if (this.mesh) return Promise.resolve(this);
+          if (this._loading) return this._loading;
+
+          const entry =
+            modelManifest && this.object_id
+              ? modelManifest.products[this.object_id]
+              : null;
+
+          let sources;
+          if (entry) {
+            sources = entry.files.map((f) => ({
+              src: "models/" + encodeURIComponent(f.file),
+              layer: f.layer,
+            }));
+          } else if (this.category_child) {
+            const child = this.category_child;
+            sources =
+              "glbs" in child
+                ? child.glbs.map((g) => ({ src: g.glb, layer: g.layer }))
+                : "glb" in child
+                ? [{ src: child.glb, layer: undefined }]
+                : [];
+          } else {
+            sources = [];
+          }
+
+          if (!sources.length) {
+            console.warn("No geometry source for model", this.object_id);
+            return Promise.resolve(this);
+          }
+
+          // Sequential, not parallel: adopt() appends to this.meshes/layers and
+          // leaves this.mesh pointing at the last one, so order is meaningful
+          // for multi-layer products.
+          this._loading = sources
+            .reduce(
+              (chain, source) =>
+                chain.then(() =>
+                  source.layer === null || source.layer === undefined
+                    ? this.adopt({ base_64: source.src })
+                    : this.adopt({ base_64: source.src, layer: source.layer })
+                ),
+              Promise.resolve()
+            )
+            .then(() => {
+              this._loading = null;
+              return this;
+            })
+            .catch((error) => {
+              this._loading = null;
+              console.error("Failed to load model", this.object_id, error);
+              throw error;
+            });
+
+          return this._loading;
+        }
+        /**
+         * `base_64` may be a data URI or a URL — GLTFLoader accepts either, so
+         * the name is historical.
+         */
         adopt(args) {
-          Load_base_64({ base_64: args.base_64 }).then((resolution) => {
+          return Load_base_64({ base_64: args.base_64 }).then((resolution) => {
             this.mesh = resolution.resolution;
 
             if ("layer" in args) {
@@ -4313,14 +4395,15 @@
 
             this.sort_joints();
 
-            if (++adopted == 72) {
-              blank_slate_div.style = "display : none";
-            } else {
-              green_span.style =
-                "width :" + Math.trunc((adopted * 100) / 72) + "%;";
-            }
-
-            Show_items();
+            // The startup progress counter that used to live here counted
+            // adopts up to a hardcoded 72 and hid the loading screen. Loading
+            // is no longer a startup phase, so the loading screen is now
+            // dismissed once the configs and manifest are in — see Main().
+            //
+            // The Show_items() call that used to follow is also gone: it was
+            // there to re-grey the catalog as geometry streamed in, and
+            // capable() no longer depends on geometry.
+            return this;
           });
         }
         promise(args) {
@@ -7005,7 +7088,7 @@
         }, 1000);
       };
       
-      const Item_clicked = (args) => {
+      const Item_clicked = async (args) => {
         picked_mesh = null;
         host_joint = null;
         plug_joint = null;
@@ -7034,6 +7117,18 @@
         const model = Model.instances.find(m => m.object_id === objectId);
         if (!model) {
           console.warn(`No model found for object_id: ${objectId}`);
+          return;
+        }
+
+        // The template may not have geometry yet. clone() needs it, so wait.
+        try {
+          await model.ensure_loaded();
+        } catch (error) {
+          console.error(`Could not load geometry for ${objectId}`, error);
+          return;
+        }
+        if (!model.mesh) {
+          console.warn(`No geometry available for ${objectId}`);
           return;
         }
 
@@ -8296,7 +8391,8 @@
         console.log('All configurations loaded. Ready for color popup.');
       };
       
-      initializeConfigs().then(() => {
+      // Held so startup can wait on the same run rather than fetching twice.
+      const configsReady = initializeConfigs().then(() => {
         // After configs are loaded, update existing models with object_ids
         updateExistingModelObjectIds();
       });
@@ -8714,6 +8810,17 @@
       // Show loading bar immediately when page starts
       blank_slate_div.style = "display: block";
       green_span.style = "width: 0%;";
+
+      // Geometry is no longer fetched at startup, so there is nothing to wait
+      // for beyond the configs and the joint manifest. Whichever settles last
+      // dismisses the loading screen; a failed fetch still dismisses it,
+      // because the app stays usable without them.
+      configsReady
+        .catch(() => {})
+        .then(() => {
+          green_span.style = "width: 100%;";
+          blank_slate_div.style = "display: none";
+        });
 
       Load_models();
       initializeObjectIdSystem();
