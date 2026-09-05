@@ -1,0 +1,4127 @@
+{
+  "generated_by": "tools/build_models.js",
+  "generated_at": "2026-09-05T13:59:08.057Z",
+  "product_count": 64,
+  "products": {
+    "P-PT": {
+      "name": "Play Tower",
+      "category": "towers",
+      "category_index": 0,
+      "children_index": 0,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-PT.glb",
+          "bytes": 653120,
+          "joints": [
+            "joint,1,6",
+            "joint,3,6",
+            "joint_back,2,end_rail",
+            "joint_beam_back,2,b8,5,3",
+            "joint_beam_front,0,b8,6,2",
+            "joint_front,0,end_rail",
+            "joint_l,0,6,1,2",
+            "joint_l,0,scope",
+            "joint_l,0,wheel",
+            "joint_l,2,6,3,4",
+            "joint_l,2,scope",
+            "joint_l,2,wheel",
+            "joint_pole_female,0,6,2,1",
+            "joint_pole_female,2,6,4,3",
+            "joint_r,0,6,1,2",
+            "joint_r,0,scope",
+            "joint_r,0,wheel",
+            "joint_r,2,6,3,4",
+            "joint_r,2,scope",
+            "joint_r,2,wheel"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,1,6",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,3,6",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_back,2,end_rail",
+          "direction": 2,
+          "layer": "end_rail",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_beam_back,2,b8,5,3",
+          "direction": 2,
+          "layer": "b8",
+          "tire_only": false,
+          "exclusion_layer": "5",
+          "excluder_layer": "3"
+        },
+        {
+          "name": "joint_beam_front,0,b8,6,2",
+          "direction": 0,
+          "layer": "b8",
+          "tire_only": false,
+          "exclusion_layer": "6",
+          "excluder_layer": "2"
+        },
+        {
+          "name": "joint_front,0,end_rail",
+          "direction": 0,
+          "layer": "end_rail",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,0,6,1,2",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "1",
+          "excluder_layer": "2"
+        },
+        {
+          "name": "joint_l,0,scope",
+          "direction": 0,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,0,wheel",
+          "direction": 0,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,2,6,3,4",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "3",
+          "excluder_layer": "4"
+        },
+        {
+          "name": "joint_l,2,scope",
+          "direction": 2,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,2,wheel",
+          "direction": 2,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_pole_female,0,6,2,1",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "2",
+          "excluder_layer": "1"
+        },
+        {
+          "name": "joint_pole_female,2,6,4,3",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "4",
+          "excluder_layer": "3"
+        },
+        {
+          "name": "joint_r,0,6,1,2",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "1",
+          "excluder_layer": "2"
+        },
+        {
+          "name": "joint_r,0,scope",
+          "direction": 0,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,0,wheel",
+          "direction": 0,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,2,6,3,4",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "3",
+          "excluder_layer": "4"
+        },
+        {
+          "name": "joint_r,2,scope",
+          "direction": 2,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,2,wheel",
+          "direction": 2,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-DPT": {
+      "name": "DX Play Tower",
+      "category": "towers",
+      "category_index": 0,
+      "children_index": 1,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-DPT.glb",
+          "bytes": 1030180,
+          "joints": [
+            "joint,0,5",
+            "joint,0,scope",
+            "joint,1,5",
+            "joint,1,6",
+            "joint,1,scope",
+            "joint,1,wheel",
+            "joint,2,wheel",
+            "joint,3,5",
+            "joint,3,6",
+            "joint,3,scope",
+            "joint,3,wheel",
+            "joint_back,2,end_rail",
+            "joint_beam,2,b8,3,2",
+            "joint_front,0,end_rail",
+            "joint_l,0,5",
+            "joint_l,1,5",
+            "joint_l,1,6",
+            "joint_l,2,6,1,2",
+            "joint_l,3,5",
+            "joint_l,3,6",
+            "joint_pole_female,2,6,2,1",
+            "joint_r,0,5",
+            "joint_r,1,5",
+            "joint_r,1,6",
+            "joint_r,2,6,1,2",
+            "joint_r,3,5",
+            "joint_r,3,6"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,5",
+          "direction": 0,
+          "layer": "5",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,scope",
+          "direction": 0,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,1,5",
+          "direction": 1,
+          "layer": "5",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,1,6",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,1,scope",
+          "direction": 1,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,1,wheel",
+          "direction": 1,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,2,wheel",
+          "direction": 2,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,3,5",
+          "direction": 3,
+          "layer": "5",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,3,6",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,3,scope",
+          "direction": 3,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,3,wheel",
+          "direction": 3,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_back,2,end_rail",
+          "direction": 2,
+          "layer": "end_rail",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_beam,2,b8,3,2",
+          "direction": 2,
+          "layer": "b8",
+          "tire_only": false,
+          "exclusion_layer": "3",
+          "excluder_layer": "2"
+        },
+        {
+          "name": "joint_front,0,end_rail",
+          "direction": 0,
+          "layer": "end_rail",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,0,5",
+          "direction": 0,
+          "layer": "5",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,1,5",
+          "direction": 1,
+          "layer": "5",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,1,6",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,2,6,1,2",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "1",
+          "excluder_layer": "2"
+        },
+        {
+          "name": "joint_l,3,5",
+          "direction": 3,
+          "layer": "5",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,3,6",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_pole_female,2,6,2,1",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "2",
+          "excluder_layer": "1"
+        },
+        {
+          "name": "joint_r,0,5",
+          "direction": 0,
+          "layer": "5",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,1,5",
+          "direction": 1,
+          "layer": "5",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,1,6",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,2,6,1,2",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "1",
+          "excluder_layer": "2"
+        },
+        {
+          "name": "joint_r,3,5",
+          "direction": 3,
+          "layer": "5",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,3,6",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-WT": {
+      "name": "Sky Tower",
+      "category": "towers",
+      "category_index": 0,
+      "children_index": 2,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-WT.glb",
+          "bytes": 801164,
+          "joints": [
+            "joint,0,floor_center_watch",
+            "joint,1,6,4,5",
+            "joint,3,6,9,10",
+            "joint_back,2,end_rail",
+            "joint_back_l,0,wheel",
+            "joint_back_l,2,6,7,6",
+            "joint_back_l,2,mailbox_or_phone",
+            "joint_back_l,2,scope",
+            "joint_back_r,0,wheel",
+            "joint_back_r,2,6,7,6",
+            "joint_back_r,2,scope",
+            "joint_beam_back,2,b8,8,6",
+            "joint_beam_front,0,b8,3,1",
+            "joint_floor_center,0,picnic",
+            "joint_front,0,end_rail",
+            "joint_front_l,0,6,2,1",
+            "joint_front_l,0,mailbox_or_phone",
+            "joint_front_l,0,scope",
+            "joint_front_l,2,wheel",
+            "joint_front_r,0,6,2,1",
+            "joint_front_r,0,scope",
+            "joint_front_r,2,wheel",
+            "joint_left,3,end_rail",
+            "joint_left_l,3,6,10,9",
+            "joint_left_r,3,6,10,9",
+            "joint_pole_female,0,6,1,2",
+            "joint_pole_female,2,6,67",
+            "joint_right,1,end_rail",
+            "joint_right_l,1,6,5,4",
+            "joint_right_r,1,6,5,4"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,floor_center_watch",
+          "direction": 0,
+          "layer": "floor_center_watch",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,1,6,4,5",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "4",
+          "excluder_layer": "5"
+        },
+        {
+          "name": "joint,3,6,9,10",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "9",
+          "excluder_layer": "10"
+        },
+        {
+          "name": "joint_back,2,end_rail",
+          "direction": 2,
+          "layer": "end_rail",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_back_l,0,wheel",
+          "direction": 0,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_back_l,2,6,7,6",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "7",
+          "excluder_layer": "6"
+        },
+        {
+          "name": "joint_back_l,2,mailbox_or_phone",
+          "direction": 2,
+          "layer": "mailbox_or_phone",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_back_l,2,scope",
+          "direction": 2,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_back_r,0,wheel",
+          "direction": 0,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_back_r,2,6,7,6",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "7",
+          "excluder_layer": "6"
+        },
+        {
+          "name": "joint_back_r,2,scope",
+          "direction": 2,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_beam_back,2,b8,8,6",
+          "direction": 2,
+          "layer": "b8",
+          "tire_only": false,
+          "exclusion_layer": "8",
+          "excluder_layer": "6"
+        },
+        {
+          "name": "joint_beam_front,0,b8,3,1",
+          "direction": 0,
+          "layer": "b8",
+          "tire_only": false,
+          "exclusion_layer": "3",
+          "excluder_layer": "1"
+        },
+        {
+          "name": "joint_floor_center,0,picnic",
+          "direction": 0,
+          "layer": "picnic",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_front,0,end_rail",
+          "direction": 0,
+          "layer": "end_rail",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_front_l,0,6,2,1",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "2",
+          "excluder_layer": "1"
+        },
+        {
+          "name": "joint_front_l,0,mailbox_or_phone",
+          "direction": 0,
+          "layer": "mailbox_or_phone",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_front_l,0,scope",
+          "direction": 0,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_front_l,2,wheel",
+          "direction": 2,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_front_r,0,6,2,1",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "2",
+          "excluder_layer": "1"
+        },
+        {
+          "name": "joint_front_r,0,scope",
+          "direction": 0,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_front_r,2,wheel",
+          "direction": 2,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_left,3,end_rail",
+          "direction": 3,
+          "layer": "end_rail",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_left_l,3,6,10,9",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "10",
+          "excluder_layer": "9"
+        },
+        {
+          "name": "joint_left_r,3,6,10,9",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "10",
+          "excluder_layer": "9"
+        },
+        {
+          "name": "joint_pole_female,0,6,1,2",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "1",
+          "excluder_layer": "2"
+        },
+        {
+          "name": "joint_pole_female,2,6,67",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "67",
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_right,1,end_rail",
+          "direction": 1,
+          "layer": "end_rail",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_right_l,1,6,5,4",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "5",
+          "excluder_layer": "4"
+        },
+        {
+          "name": "joint_right_r,1,6,5,4",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "5",
+          "excluder_layer": "4"
+        }
+      ]
+    },
+    "P-ST": {
+      "name": "Summit Tower",
+      "category": "towers",
+      "category_index": 0,
+      "children_index": 3,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-ST.glb",
+          "bytes": 720568,
+          "joints": [
+            "joint,0,s,tire",
+            "Joint_beam_left,3,b8,5,6",
+            "Joint_beam_right,1,b8,3,1",
+            "joint_l,0,6",
+            "joint_l,1,mailbox_or_phone",
+            "joint_l,1,scope",
+            "joint_l,1,wheel",
+            "joint_l,2,6",
+            "joint_l,3,scope",
+            "joint_l,3,wheel",
+            "joint_left_l,3,6,5,4",
+            "joint_left_r,3,6,5,4",
+            "joint_pole_female,0,6",
+            "joint_pole_female,1,6,1,2",
+            "joint_pole_female,2,6",
+            "joint_pole_female,3,6,4,5",
+            "joint_r,0,6",
+            "joint_r,1,scope",
+            "joint_r,1,wheel",
+            "joint_r,2,6",
+            "joint_r,3,mailbox_or_phone",
+            "joint_r,3,scope",
+            "joint_r,3,wheel",
+            "joint_right_l,1,6,2,1",
+            "joint_right_r,1,6,2,1"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,s,tire",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": true,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "Joint_beam_left,3,b8,5,6",
+          "direction": 3,
+          "layer": "b8",
+          "tire_only": false,
+          "exclusion_layer": "5",
+          "excluder_layer": "6"
+        },
+        {
+          "name": "Joint_beam_right,1,b8,3,1",
+          "direction": 1,
+          "layer": "b8",
+          "tire_only": false,
+          "exclusion_layer": "3",
+          "excluder_layer": "1"
+        },
+        {
+          "name": "joint_l,0,6",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,1,mailbox_or_phone",
+          "direction": 1,
+          "layer": "mailbox_or_phone",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,1,scope",
+          "direction": 1,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,1,wheel",
+          "direction": 1,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,2,6",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,3,scope",
+          "direction": 3,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,3,wheel",
+          "direction": 3,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_left_l,3,6,5,4",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "5",
+          "excluder_layer": "4"
+        },
+        {
+          "name": "joint_left_r,3,6,5,4",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "5",
+          "excluder_layer": "4"
+        },
+        {
+          "name": "joint_pole_female,0,6",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_pole_female,1,6,1,2",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "1",
+          "excluder_layer": "2"
+        },
+        {
+          "name": "joint_pole_female,2,6",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_pole_female,3,6,4,5",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "4",
+          "excluder_layer": "5"
+        },
+        {
+          "name": "joint_r,0,6",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,1,scope",
+          "direction": 1,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,1,wheel",
+          "direction": 1,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,2,6",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,3,mailbox_or_phone",
+          "direction": 3,
+          "layer": "mailbox_or_phone",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,3,scope",
+          "direction": 3,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,3,wheel",
+          "direction": 3,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_right_l,1,6,2,1",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "2",
+          "excluder_layer": "1"
+        },
+        {
+          "name": "joint_right_r,1,6,2,1",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "2",
+          "excluder_layer": "1"
+        }
+      ]
+    },
+    "P-DST": {
+      "name": "DX Sky Tower",
+      "category": "towers",
+      "category_index": 0,
+      "children_index": 4,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-DST.glb",
+          "bytes": 932144,
+          "joints": [
+            "joint,1,6,4,5",
+            "joint,1,8,6,7",
+            "joint,2,8,8,9",
+            "joint,3,6,13,14",
+            "joint,3,8,11,12",
+            "joint_back,2,end_rail",
+            "joint_back,2,kitchen,7,6",
+            "joint_back_l,2,8,9,8",
+            "joint_back_r,2,8,9,8",
+            "joint_beam_back,2,b10,10,8",
+            "joint_beam_front,0,b8,3,1",
+            "joint_floor_back,0,picnic",
+            "joint_floor_front,0,picnic,6,7",
+            "joint_front,0,end_rail",
+            "joint_front_l,0,6,2,1",
+            "joint_front_r,0,6,2,1",
+            "joint_l,0,6,1,2",
+            "joint_l,0,wheel",
+            "joint_l,2,8,8,9",
+            "joint_l,2,scope",
+            "joint_left_l,3,6,14,13",
+            "joint_left_l,3,8,12,11",
+            "joint_left_r,3,6,14,13",
+            "joint_left_r,3,8,12,11",
+            "joint_pole_female_f,0,6,1,2",
+            "joint_r,0,6,1,2",
+            "joint_r,0,wheel",
+            "joint_r,2,8,8,9",
+            "joint_r,2,scope",
+            "joint_right_l,1,6,5,4",
+            "joint_right_l,1,8,7,6",
+            "joint_right_r,1,6,5,4",
+            "joint_right_r,1,8,7,6",
+            "jointj,0,floor_deluxe"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,1,6,4,5",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "4",
+          "excluder_layer": "5"
+        },
+        {
+          "name": "joint,1,8,6,7",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "6",
+          "excluder_layer": "7"
+        },
+        {
+          "name": "joint,2,8,8,9",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "8",
+          "excluder_layer": "9"
+        },
+        {
+          "name": "joint,3,6,13,14",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "13",
+          "excluder_layer": "14"
+        },
+        {
+          "name": "joint,3,8,11,12",
+          "direction": 3,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "11",
+          "excluder_layer": "12"
+        },
+        {
+          "name": "joint_back,2,end_rail",
+          "direction": 2,
+          "layer": "end_rail",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_back,2,kitchen,7,6",
+          "direction": 2,
+          "layer": "kitchen",
+          "tire_only": false,
+          "exclusion_layer": "7",
+          "excluder_layer": "6"
+        },
+        {
+          "name": "joint_back_l,2,8,9,8",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "9",
+          "excluder_layer": "8"
+        },
+        {
+          "name": "joint_back_r,2,8,9,8",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "9",
+          "excluder_layer": "8"
+        },
+        {
+          "name": "joint_beam_back,2,b10,10,8",
+          "direction": 2,
+          "layer": "b10",
+          "tire_only": false,
+          "exclusion_layer": "10",
+          "excluder_layer": "8"
+        },
+        {
+          "name": "joint_beam_front,0,b8,3,1",
+          "direction": 0,
+          "layer": "b8",
+          "tire_only": false,
+          "exclusion_layer": "3",
+          "excluder_layer": "1"
+        },
+        {
+          "name": "joint_floor_back,0,picnic",
+          "direction": 0,
+          "layer": "picnic",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_floor_front,0,picnic,6,7",
+          "direction": 0,
+          "layer": "picnic",
+          "tire_only": false,
+          "exclusion_layer": "6",
+          "excluder_layer": "7"
+        },
+        {
+          "name": "joint_front,0,end_rail",
+          "direction": 0,
+          "layer": "end_rail",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_front_l,0,6,2,1",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "2",
+          "excluder_layer": "1"
+        },
+        {
+          "name": "joint_front_r,0,6,2,1",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "2",
+          "excluder_layer": "1"
+        },
+        {
+          "name": "joint_l,0,6,1,2",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "1",
+          "excluder_layer": "2"
+        },
+        {
+          "name": "joint_l,0,wheel",
+          "direction": 0,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,2,8,8,9",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "8",
+          "excluder_layer": "9"
+        },
+        {
+          "name": "joint_l,2,scope",
+          "direction": 2,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_left_l,3,6,14,13",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "14",
+          "excluder_layer": "13"
+        },
+        {
+          "name": "joint_left_l,3,8,12,11",
+          "direction": 3,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "12",
+          "excluder_layer": "11"
+        },
+        {
+          "name": "joint_left_r,3,6,14,13",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "14",
+          "excluder_layer": "13"
+        },
+        {
+          "name": "joint_left_r,3,8,12,11",
+          "direction": 3,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "12",
+          "excluder_layer": "11"
+        },
+        {
+          "name": "joint_pole_female_f,0,6,1,2",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "1",
+          "excluder_layer": "2"
+        },
+        {
+          "name": "joint_r,0,6,1,2",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "1",
+          "excluder_layer": "2"
+        },
+        {
+          "name": "joint_r,0,wheel",
+          "direction": 0,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,2,8,8,9",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "8",
+          "excluder_layer": "9"
+        },
+        {
+          "name": "joint_r,2,scope",
+          "direction": 2,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_right_l,1,6,5,4",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "5",
+          "excluder_layer": "4"
+        },
+        {
+          "name": "joint_right_l,1,8,7,6",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "7",
+          "excluder_layer": "6"
+        },
+        {
+          "name": "joint_right_r,1,6,5,4",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "5",
+          "excluder_layer": "4"
+        },
+        {
+          "name": "joint_right_r,1,8,7,6",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "7",
+          "excluder_layer": "6"
+        },
+        {
+          "name": "jointj,0,floor_deluxe",
+          "direction": 0,
+          "layer": "floor_deluxe",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-DSMT": {
+      "name": "DX Summit Tower",
+      "category": "towers",
+      "category_index": 0,
+      "children_index": 5,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-DSMT.glb",
+          "bytes": 954480,
+          "joints": [
+            "joint,0,8,6,7",
+            "joint,0,floor_center_watch",
+            "joint,0,s,tire",
+            "joint,1,6,4,5",
+            "joint,1,8,8,9",
+            "joint,2,6",
+            "joint,3,6,1,2",
+            "joint,3,8,8,9",
+            "joint_back,1,end_rail",
+            "joint_back,1,kitchen,7,6",
+            "joint_back_l,1,8,9,8",
+            "joint_back_r,1,8,9,8",
+            "joint_beam_back,1,b10,10,8",
+            "joint_beam_front,3,b10,10,8",
+            "joint_floor_front,0,picnic,6,7",
+            "joint_front,3,end_rail",
+            "joint_front,3,kitchen,7,6",
+            "joint_front_l,2,6",
+            "joint_front_l,3,8,8,9",
+            "joint_front_r,2,6",
+            "joint_front_r,3,8,8,9",
+            "joint_l,1,scope",
+            "joint_l,1,wheel",
+            "joint_l,3,scope",
+            "joint_l,3,wheel",
+            "joint_l_8,1,scope",
+            "joint_l_8,1,wheel",
+            "joint_l_8,3,scope",
+            "joint_l_8,3,wheel",
+            "joint_left_l,1,6,5,4",
+            "joint_left_r,1,6,5,4",
+            "joint_r,1,scope",
+            "joint_r,1,wheel",
+            "joint_r,3,scope",
+            "joint_r,3,wheel",
+            "joint_r_8,1,scope",
+            "joint_r_8,1,wheel",
+            "joint_r_8,3,scope",
+            "joint_r_8,3,wheel",
+            "joint_right_l,0,8,7,6",
+            "joint_right_l,3,6,2,1",
+            "joint_right_r,0,8,7,6",
+            "joint_right_r,3,6,2,1"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,8,6,7",
+          "direction": 0,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "6",
+          "excluder_layer": "7"
+        },
+        {
+          "name": "joint,0,floor_center_watch",
+          "direction": 0,
+          "layer": "floor_center_watch",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,s,tire",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": true,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,1,6,4,5",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "4",
+          "excluder_layer": "5"
+        },
+        {
+          "name": "joint,1,8,8,9",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "8",
+          "excluder_layer": "9"
+        },
+        {
+          "name": "joint,2,6",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,3,6,1,2",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "1",
+          "excluder_layer": "2"
+        },
+        {
+          "name": "joint,3,8,8,9",
+          "direction": 3,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "8",
+          "excluder_layer": "9"
+        },
+        {
+          "name": "joint_back,1,end_rail",
+          "direction": 1,
+          "layer": "end_rail",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_back,1,kitchen,7,6",
+          "direction": 1,
+          "layer": "kitchen",
+          "tire_only": false,
+          "exclusion_layer": "7",
+          "excluder_layer": "6"
+        },
+        {
+          "name": "joint_back_l,1,8,9,8",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "9",
+          "excluder_layer": "8"
+        },
+        {
+          "name": "joint_back_r,1,8,9,8",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "9",
+          "excluder_layer": "8"
+        },
+        {
+          "name": "joint_beam_back,1,b10,10,8",
+          "direction": 1,
+          "layer": "b10",
+          "tire_only": false,
+          "exclusion_layer": "10",
+          "excluder_layer": "8"
+        },
+        {
+          "name": "joint_beam_front,3,b10,10,8",
+          "direction": 3,
+          "layer": "b10",
+          "tire_only": false,
+          "exclusion_layer": "10",
+          "excluder_layer": "8"
+        },
+        {
+          "name": "joint_floor_front,0,picnic,6,7",
+          "direction": 0,
+          "layer": "picnic",
+          "tire_only": false,
+          "exclusion_layer": "6",
+          "excluder_layer": "7"
+        },
+        {
+          "name": "joint_front,3,end_rail",
+          "direction": 3,
+          "layer": "end_rail",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_front,3,kitchen,7,6",
+          "direction": 3,
+          "layer": "kitchen",
+          "tire_only": false,
+          "exclusion_layer": "7",
+          "excluder_layer": "6"
+        },
+        {
+          "name": "joint_front_l,2,6",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_front_l,3,8,8,9",
+          "direction": 3,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "8",
+          "excluder_layer": "9"
+        },
+        {
+          "name": "joint_front_r,2,6",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_front_r,3,8,8,9",
+          "direction": 3,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "8",
+          "excluder_layer": "9"
+        },
+        {
+          "name": "joint_l,1,scope",
+          "direction": 1,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,1,wheel",
+          "direction": 1,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,3,scope",
+          "direction": 3,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l,3,wheel",
+          "direction": 3,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l_8,1,scope",
+          "direction": 1,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l_8,1,wheel",
+          "direction": 1,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l_8,3,scope",
+          "direction": 3,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_l_8,3,wheel",
+          "direction": 3,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_left_l,1,6,5,4",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "5",
+          "excluder_layer": "4"
+        },
+        {
+          "name": "joint_left_r,1,6,5,4",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "5",
+          "excluder_layer": "4"
+        },
+        {
+          "name": "joint_r,1,scope",
+          "direction": 1,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,1,wheel",
+          "direction": 1,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,3,scope",
+          "direction": 3,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r,3,wheel",
+          "direction": 3,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r_8,1,scope",
+          "direction": 1,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r_8,1,wheel",
+          "direction": 1,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r_8,3,scope",
+          "direction": 3,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_r_8,3,wheel",
+          "direction": 3,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_right_l,0,8,7,6",
+          "direction": 0,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "7",
+          "excluder_layer": "6"
+        },
+        {
+          "name": "joint_right_l,3,6,2,1",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "2",
+          "excluder_layer": "1"
+        },
+        {
+          "name": "joint_right_r,0,8,7,6",
+          "direction": 0,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "7",
+          "excluder_layer": "6"
+        },
+        {
+          "name": "joint_right_r,3,6,2,1",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": "2",
+          "excluder_layer": "1"
+        }
+      ]
+    },
+    "P-KT": {
+      "name": "King’s Tower",
+      "category": "towers",
+      "category_index": 0,
+      "children_index": 6,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-KT.glb",
+          "bytes": 785584,
+          "joints": [
+            "joint,1,0",
+            "joint,2,end_rail",
+            "joint,0,8,1,2001",
+            "joint,0,8,1,2002",
+            "joint,0,8,1,2003",
+            "joint,0,8,1,2004",
+            "joint,0,8,1,2005",
+            "joint,0,8,1,2006",
+            "joint,0,scope",
+            "joint,0,wheel",
+            "joint,1,8,3,4",
+            "joint,1,mailbox_or_phone",
+            "joint,2,8,6,7001",
+            "joint,2,8,6,7002",
+            "joint,2,8,6,7003",
+            "joint,2,8,6,7004",
+            "joint,2,8,6,7005",
+            "joint,2,8,6,7006",
+            "joint,2,scope",
+            "joint,2,wheel",
+            "joint,3,8,8,9",
+            "joint,3,mailbox_or_phone",
+            "joint_beam_left,3,b10,10,8",
+            "joint_beam_right,1,b10,5,3",
+            "joint_floor_center,0,floor_center_king",
+            "joint_floor_center,0,picnic",
+            "joint_left,1,end_rail",
+            "joint_left,1,kitchen",
+            "joint_left,3,end_rail",
+            "joint_left,3,kitchen",
+            "Joint_left_l,3,8,9,8",
+            "Joint_left_r,3,8,9,8",
+            "Joint_right_l,1,8,4,3",
+            "Joint_right_r,1,8,4,3"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,1,0",
+          "direction": 1,
+          "layer": "0",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,2,end_rail",
+          "direction": 2,
+          "layer": "end_rail",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,8,1,2001",
+          "direction": 0,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "1",
+          "excluder_layer": "2001"
+        },
+        {
+          "name": "joint,0,8,1,2002",
+          "direction": 0,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "1",
+          "excluder_layer": "2002"
+        },
+        {
+          "name": "joint,0,8,1,2003",
+          "direction": 0,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "1",
+          "excluder_layer": "2003"
+        },
+        {
+          "name": "joint,0,8,1,2004",
+          "direction": 0,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "1",
+          "excluder_layer": "2004"
+        },
+        {
+          "name": "joint,0,8,1,2005",
+          "direction": 0,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "1",
+          "excluder_layer": "2005"
+        },
+        {
+          "name": "joint,0,8,1,2006",
+          "direction": 0,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "1",
+          "excluder_layer": "2006"
+        },
+        {
+          "name": "joint,0,scope",
+          "direction": 0,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,wheel",
+          "direction": 0,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,1,8,3,4",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "3",
+          "excluder_layer": "4"
+        },
+        {
+          "name": "joint,1,mailbox_or_phone",
+          "direction": 1,
+          "layer": "mailbox_or_phone",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,2,8,6,7001",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "6",
+          "excluder_layer": "7001"
+        },
+        {
+          "name": "joint,2,8,6,7002",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "6",
+          "excluder_layer": "7002"
+        },
+        {
+          "name": "joint,2,8,6,7003",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "6",
+          "excluder_layer": "7003"
+        },
+        {
+          "name": "joint,2,8,6,7004",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "6",
+          "excluder_layer": "7004"
+        },
+        {
+          "name": "joint,2,8,6,7005",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "6",
+          "excluder_layer": "7005"
+        },
+        {
+          "name": "joint,2,8,6,7006",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "6",
+          "excluder_layer": "7006"
+        },
+        {
+          "name": "joint,2,scope",
+          "direction": 2,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,2,wheel",
+          "direction": 2,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,3,8,8,9",
+          "direction": 3,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "8",
+          "excluder_layer": "9"
+        },
+        {
+          "name": "joint,3,mailbox_or_phone",
+          "direction": 3,
+          "layer": "mailbox_or_phone",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_beam_left,3,b10,10,8",
+          "direction": 3,
+          "layer": "b10",
+          "tire_only": false,
+          "exclusion_layer": "10",
+          "excluder_layer": "8"
+        },
+        {
+          "name": "joint_beam_right,1,b10,5,3",
+          "direction": 1,
+          "layer": "b10",
+          "tire_only": false,
+          "exclusion_layer": "5",
+          "excluder_layer": "3"
+        },
+        {
+          "name": "joint_floor_center,0,floor_center_king",
+          "direction": 0,
+          "layer": "floor_center_king",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_floor_center,0,picnic",
+          "direction": 0,
+          "layer": "picnic",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_left,1,end_rail",
+          "direction": 1,
+          "layer": "end_rail",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_left,1,kitchen",
+          "direction": 1,
+          "layer": "kitchen",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_left,3,end_rail",
+          "direction": 3,
+          "layer": "end_rail",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_left,3,kitchen",
+          "direction": 3,
+          "layer": "kitchen",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "Joint_left_l,3,8,9,8",
+          "direction": 3,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "9",
+          "excluder_layer": "8"
+        },
+        {
+          "name": "Joint_left_r,3,8,9,8",
+          "direction": 3,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "9",
+          "excluder_layer": "8"
+        },
+        {
+          "name": "Joint_right_l,1,8,4,3",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "4",
+          "excluder_layer": "3"
+        },
+        {
+          "name": "Joint_right_r,1,8,4,3",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": "4",
+          "excluder_layer": "3"
+        }
+      ]
+    },
+    "Bridge": {
+      "name": "Bridge",
+      "category": "towers",
+      "category_index": 0,
+      "children_index": 7,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "Bridge.glb",
+          "bytes": 427816,
+          "joints": [
+            "joint_back,2,*",
+            "joint_front,0,*"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint_back,2,*",
+          "direction": 2,
+          "layer": "*",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_front,0,*",
+          "direction": 0,
+          "layer": "*",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "Tunnel": {
+      "name": "Tunnel",
+      "category": "towers",
+      "category_index": 0,
+      "children_index": 8,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "Tunnel.glb",
+          "bytes": 193576,
+          "joints": [
+            "joint,0,*",
+            "joint,2,*"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,*",
+          "direction": 0,
+          "layer": "*",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,2,*",
+          "direction": 2,
+          "layer": "*",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-AB-3-8": {
+      "name": "3 Swing Beam - 8 ft",
+      "category": "swing_beams",
+      "category_index": 1,
+      "children_index": 0,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-AB-3-8.glb",
+          "bytes": 75528,
+          "joints": [
+            "joint,0,b8",
+            "joint_female_1,0,s",
+            "joint_female_2,0,s",
+            "joint_female_3,0,s,_x_0",
+            "joint_female_3,0,sh,_x_0"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,b8",
+          "direction": 0,
+          "layer": "b8",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_female_1,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_female_2,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_female_3,0,s,_x_0",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": "_x_0",
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_female_3,0,sh,_x_0",
+          "direction": 0,
+          "layer": "sh",
+          "tire_only": false,
+          "exclusion_layer": "_x_0",
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-AB-3-10": {
+      "name": "3 Swing Beam - 10 ft",
+      "category": "swing_beams",
+      "category_index": 1,
+      "children_index": 1,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-AB-3-10.glb",
+          "bytes": 75456,
+          "joints": [
+            "joint,0,b10",
+            "joint,0,sh,_x_0",
+            "joint_swing_1_female,0,s",
+            "joint_swing_2_female,0,s",
+            "joint_swing_3_female,0,s,_x_0"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,b10",
+          "direction": 0,
+          "layer": "b10",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,sh,_x_0",
+          "direction": 0,
+          "layer": "sh",
+          "tire_only": false,
+          "exclusion_layer": "_x_0",
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_swing_1_female,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_swing_2_female,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_swing_3_female,0,s,_x_0",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": "_x_0",
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-AB-4-8": {
+      "name": "4 Swing Beam - 8 ft",
+      "category": "swing_beams",
+      "category_index": 1,
+      "children_index": 2,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-AB-4-8.glb",
+          "bytes": 75444,
+          "joints": [
+            "Joint,0,b8",
+            "joint,0,sh,_x_0",
+            "joint_female_1,0,s",
+            "joint_female_2,0,s",
+            "joint_female_3,0,s",
+            "joint_female_4,0,s,_x_0"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "Joint,0,b8",
+          "direction": 0,
+          "layer": "b8",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,sh,_x_0",
+          "direction": 0,
+          "layer": "sh",
+          "tire_only": false,
+          "exclusion_layer": "_x_0",
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_female_1,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_female_2,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_female_3,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_female_4,0,s,_x_0",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": "_x_0",
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-AB-4-10": {
+      "name": "4 Swing Beam - 10 ft",
+      "category": "swing_beams",
+      "category_index": 1,
+      "children_index": 3,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-AB-4-10.glb",
+          "bytes": 75556,
+          "joints": [
+            "joint,0,b10",
+            "joint,0,sh,_x_0",
+            "joint_swing_1_female,0,s",
+            "joint_swing_2_female,0,s",
+            "joint_swing_3_female,0,s",
+            "joint_swing_4_female,0,s,_x_0"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,b10",
+          "direction": 0,
+          "layer": "b10",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,sh,_x_0",
+          "direction": 0,
+          "layer": "sh",
+          "tire_only": false,
+          "exclusion_layer": "_x_0",
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_swing_1_female,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_swing_2_female,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_swing_3_female,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_swing_4_female,0,s,_x_0",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": "_x_0",
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-AB-DS-8": {
+      "name": "Disc Swing Beam - 8 ft",
+      "category": "swing_beams",
+      "category_index": 1,
+      "children_index": 4,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-AB-DS-8.glb",
+          "bytes": 75952,
+          "joints": [
+            "joint,0,b8",
+            "joint,0,sh,_x_0",
+            "joint_disc_swing_female,0,ds",
+            "joint_swing_female_1,0,s",
+            "joint_swing_female_2,0,s",
+            "joint_swing_female_3,0,s,_x_0"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,b8",
+          "direction": 0,
+          "layer": "b8",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,sh,_x_0",
+          "direction": 0,
+          "layer": "sh",
+          "tire_only": false,
+          "exclusion_layer": "_x_0",
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_disc_swing_female,0,ds",
+          "direction": 0,
+          "layer": "ds",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_swing_female_1,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_swing_female_2,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_swing_female_3,0,s,_x_0",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": "_x_0",
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-AB-DS-10": {
+      "name": "Disc Swing Beam - 10 ft",
+      "category": "swing_beams",
+      "category_index": 1,
+      "children_index": 5,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-AB-DS-10.glb",
+          "bytes": 75860,
+          "joints": [
+            "joint,0,b10",
+            "joint_1,0,s",
+            "joint_2,0,s",
+            "joint_3,0,s,_x_0",
+            "joint_4,0,sh,_x_0",
+            "joint_disc_swing_female,0,ds"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,b10",
+          "direction": 0,
+          "layer": "b10",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_1,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_2,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_3,0,s,_x_0",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": "_x_0",
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_4,0,sh,_x_0",
+          "direction": 0,
+          "layer": "sh",
+          "tire_only": false,
+          "exclusion_layer": "_x_0",
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_disc_swing_female,0,ds",
+          "direction": 0,
+          "layer": "ds",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "SS": {
+      "name": "Sling Swing",
+      "category": "swings",
+      "category_index": 2,
+      "children_index": 0,
+      "multi_layer": true,
+      "files": [
+        {
+          "layer": "b8",
+          "file": "SS__b8.glb",
+          "bytes": 177884,
+          "joints": [
+            "joint,0,s"
+          ]
+        },
+        {
+          "layer": "b10",
+          "file": "SS__b10.glb",
+          "bytes": 270812,
+          "joints": [
+            "joint,0,s"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "TZR": {
+      "name": "Trapeze",
+      "category": "swings",
+      "category_index": 2,
+      "children_index": 1,
+      "multi_layer": true,
+      "files": [
+        {
+          "layer": "b8",
+          "file": "TZR__b8.glb",
+          "bytes": 128256,
+          "joints": [
+            "joint,0,s"
+          ]
+        },
+        {
+          "layer": "b10",
+          "file": "TZR__b10.glb",
+          "bytes": 136704,
+          "joints": [
+            "joint,0,s"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "BS": {
+      "name": "Baby Swing",
+      "category": "swings",
+      "category_index": 2,
+      "children_index": 2,
+      "multi_layer": true,
+      "files": [
+        {
+          "layer": "b8",
+          "file": "BS__b8.glb",
+          "bytes": 631384,
+          "joints": [
+            "joint,0,s",
+            "joint,2,s"
+          ]
+        },
+        {
+          "layer": "b10",
+          "file": "BS__b10.glb",
+          "bytes": 741844,
+          "joints": [
+            "joint,0,s",
+            "joint,2,s"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,2,s",
+          "direction": 2,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,2,s",
+          "direction": 2,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "HG": {
+      "name": "Horse Glider",
+      "category": "swings",
+      "category_index": 2,
+      "children_index": 3,
+      "multi_layer": true,
+      "files": [
+        {
+          "layer": "b8",
+          "file": "HG__b8.glb",
+          "bytes": 679724,
+          "joints": [
+            "joint,1,sh"
+          ]
+        },
+        {
+          "layer": "b10",
+          "file": "HG__b10.glb",
+          "bytes": 544808,
+          "joints": [
+            "joint,1,sh"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,1,sh",
+          "direction": 1,
+          "layer": "sh",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,1,sh",
+          "direction": 1,
+          "layer": "sh",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "VTS": {
+      "name": "Vinyl Tire Swing",
+      "category": "swings",
+      "category_index": 2,
+      "children_index": 4,
+      "multi_layer": true,
+      "files": [
+        {
+          "layer": "b8",
+          "file": "VTS__b8.glb",
+          "bytes": 115496,
+          "joints": [
+            "joint,0,s"
+          ]
+        },
+        {
+          "layer": "b10",
+          "file": "VTS__b10.glb",
+          "bytes": 115496,
+          "joints": [
+            "joint,0,s"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "BB": {
+      "name": "Ball Swing",
+      "category": "swings",
+      "category_index": 2,
+      "children_index": 5,
+      "multi_layer": true,
+      "files": [
+        {
+          "layer": "b8",
+          "file": "BB__b8.glb",
+          "bytes": 181976,
+          "joints": [
+            "joint,0,s"
+          ]
+        },
+        {
+          "layer": "b10",
+          "file": "BB__b10.glb",
+          "bytes": 181848,
+          "joints": [
+            "joint,0,s"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "DS-KR": {
+      "name": "Disc Swing",
+      "category": "swings",
+      "category_index": 2,
+      "children_index": 6,
+      "multi_layer": true,
+      "files": [
+        {
+          "layer": "b8",
+          "file": "DS-KR__b8.glb",
+          "bytes": 45752,
+          "joints": [
+            "joint,0,ds"
+          ]
+        },
+        {
+          "layer": "b10",
+          "file": "DS-KR__b10.glb",
+          "bytes": 45764,
+          "joints": [
+            "joint,0,ds"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,ds",
+          "direction": 0,
+          "layer": "ds",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,ds",
+          "direction": 0,
+          "layer": "ds",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "BNS": {
+      "name": "Bird’s Nest Swing",
+      "category": "swings",
+      "category_index": 2,
+      "children_index": 7,
+      "multi_layer": true,
+      "files": [
+        {
+          "layer": "b8",
+          "file": "BNS__b8.glb",
+          "bytes": 124152,
+          "joints": [
+            "joint,0,s"
+          ]
+        },
+        {
+          "layer": "b10",
+          "file": "BNS__b10.glb",
+          "bytes": 102920,
+          "joints": [
+            "joint,0,s"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "MTS": {
+      "name": "Tire Swing",
+      "category": "swings",
+      "category_index": 2,
+      "children_index": 8,
+      "multi_layer": true,
+      "files": [
+        {
+          "layer": "b8",
+          "file": "MTS__b8.glb",
+          "bytes": 263500,
+          "joints": [
+            "joint,0,s"
+          ]
+        },
+        {
+          "layer": "b10",
+          "file": "MTS__b10.glb",
+          "bytes": 273008,
+          "joints": [
+            "joint,0,s"
+          ]
+        },
+        {
+          "layer": "tire",
+          "file": "MTS__tire.glb",
+          "bytes": 274084,
+          "joints": [
+            "joint,0,s"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "FK-WT": {
+      "name": "5x5 Floor Kit",
+      "category": "floors_kits",
+      "category_index": 3,
+      "children_index": 0,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "FK-WT.glb",
+          "bytes": 349712,
+          "joints": [
+            "joint,0,floor_center_watch"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,floor_center_watch",
+          "direction": 0,
+          "layer": "floor_center_watch",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "FK-DXH": {
+      "name": "5x5 Floor Kit - Half",
+      "category": "floors_kits",
+      "category_index": 3,
+      "children_index": 1,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "FK-DXH.glb",
+          "bytes": 349924,
+          "joints": [
+            "joint_left,1,floor_deluxe",
+            "joint_right,3,floor_deluxe"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint_left,1,floor_deluxe",
+          "direction": 1,
+          "layer": "floor_deluxe",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_right,3,floor_deluxe",
+          "direction": 3,
+          "layer": "floor_deluxe",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "FK-DXF": {
+      "name": "5x10 Floor Kit",
+      "category": "floors_kits",
+      "category_index": 3,
+      "children_index": 2,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "FK-DXF.glb",
+          "bytes": 361452,
+          "joints": [
+            "joint,1,floor_deluxe"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,1,floor_deluxe",
+          "direction": 1,
+          "layer": "floor_deluxe",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "FK-KT": {
+      "name": "King’s Tower Floor,",
+      "category": "floors_kits",
+      "category_index": 3,
+      "children_index": 3,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "FK-KT.glb",
+          "bytes": 354724,
+          "joints": [
+            "joint,0,floor_center_king"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,floor_center_king",
+          "direction": 0,
+          "layer": "floor_center_king",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "PT-K": {
+      "name": "Picnic Table Kit",
+      "category": "floors_kits",
+      "category_index": 3,
+      "children_index": 4,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "PT-K.glb",
+          "bytes": 108280,
+          "joints": [
+            "joint,0,picnic",
+            "joint,1,picnic"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,picnic",
+          "direction": 0,
+          "layer": "picnic",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,1,picnic",
+          "direction": 1,
+          "layer": "picnic",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "KK": {
+      "name": "Kitchen Kit",
+      "category": "floors_kits",
+      "category_index": 3,
+      "children_index": 5,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "KK.glb",
+          "bytes": 530036,
+          "joints": [
+            "Joint,2,kitchen"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "Joint,2,kitchen",
+          "direction": 2,
+          "layer": "kitchen",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "BUB": {
+      "name": "Bubble Panel Kit",
+      "category": "floors_kits",
+      "category_index": 3,
+      "children_index": 6,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "BUB.glb",
+          "bytes": 140064,
+          "joints": [
+            "joint,0,*"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,*",
+          "direction": 0,
+          "layer": "*",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "SR-KT": {
+      "name": "Safety Rail Kit",
+      "category": "floors_kits",
+      "category_index": 3,
+      "children_index": 7,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "SR-KT.glb",
+          "bytes": 15392,
+          "joints": [
+            "joint,2,end_rail",
+            "joint,0,0"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,2,end_rail",
+          "direction": 2,
+          "layer": "end_rail",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint,0,0",
+          "direction": 0,
+          "layer": "0",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-STEP-4": {
+      "name": "Steps - 4ft",
+      "category": "entries_climbers",
+      "category_index": 4,
+      "children_index": 0,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-STEP-4.glb",
+          "bytes": 94864,
+          "joints": [
+            "joint_right_handle,0,handle",
+            "joint_left_handle,0,handle",
+            "Joint_!,0,5"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint_right_handle,0,handle",
+          "direction": 0,
+          "layer": "handle",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_left_handle,0,handle",
+          "direction": 0,
+          "layer": "handle",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "Joint_!,0,5",
+          "direction": 0,
+          "layer": "5",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ],
+      "slope": -62
+    },
+    "P-STEP-5": {
+      "name": "Steps - 5ft",
+      "category": "entries_climbers",
+      "category_index": 4,
+      "children_index": 1,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-STEP-5.glb",
+          "bytes": 93768,
+          "joints": [
+            "joint_right_handle,0,handle",
+            "joint_left_handle,0,handle",
+            "Joint_!,0,6"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint_right_handle,0,handle",
+          "direction": 0,
+          "layer": "handle",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_left_handle,0,handle",
+          "direction": 0,
+          "layer": "handle",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "Joint_!,0,6",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ],
+      "slope": -68
+    },
+    "P-STEP-7": {
+      "name": "Steps - 7ft",
+      "category": "entries_climbers",
+      "category_index": 4,
+      "children_index": 2,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-STEP-7.glb",
+          "bytes": 130912,
+          "joints": [
+            "joint_right_handle,0,handle",
+            "joint_left_handle,0,handle",
+            "Joint_!,0,8"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint_right_handle,0,handle",
+          "direction": 0,
+          "layer": "handle",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "joint_left_handle,0,handle",
+          "direction": 0,
+          "layer": "handle",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
+          "name": "Joint_!,0,8",
+          "direction": 0,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ],
+      "slope": -73
+    },
+    "P-GP-10": {
+      "name": "Gang Plank - 4ft",
+      "category": "entries_climbers",
+      "category_index": 4,
+      "children_index": 3,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-GP-10.glb",
+          "bytes": 1151276,
+          "joints": [
+            "joint,0,5"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,5",
+          "direction": 0,
+          "layer": "5",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-GP-12": {
+      "name": "Gang Plank - 5ft",
+      "category": "entries_climbers",
+      "category_index": 4,
+      "children_index": 4,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-GP-12.glb",
+          "bytes": 1148828,
+          "joints": [
+            "joint,0,6"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,6",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-RC-5": {
+      "name": "Rock Climb - 5ft",
+      "category": "entries_climbers",
+      "category_index": 4,
+      "children_index": 5,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-RC-5.glb",
+          "bytes": 1111300,
+          "joints": [
+            "joint,2,6"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,2,6",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-RC-7": {
+      "name": "Rock Climb - 7ft",
+      "category": "entries_climbers",
+      "category_index": 4,
+      "children_index": 6,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-RC-7.glb",
+          "bytes": 1200168,
+          "joints": [
+            "joint,0,8"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,8",
+          "direction": 0,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-CN-5": {
+      "name": "Cargo Net - 5ft",
+      "category": "entries_climbers",
+      "category_index": 4,
+      "children_index": 7,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-CN-5.glb",
+          "bytes": 1183936,
+          "joints": [
+            "joint,0,6"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,6",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-CC-5": {
+      "name": "Combo Climb - 5ft",
+      "category": "entries_climbers",
+      "category_index": 4,
+      "children_index": 8,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-CC-5.glb",
+          "bytes": 2173224,
+          "joints": [
+            "joint_c,0,6"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint_c,0,6",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "CP": {
+      "name": "Climbing Pole",
+      "category": "entries_climbers",
+      "category_index": 4,
+      "children_index": 9,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "CP.glb",
+          "bytes": 80760,
+          "joints": [
+            "joint_pole,1,6"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint_pole,1,6",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "FP": {
+      "name": "Fireman’s Pole",
+      "category": "entries_climbers",
+      "category_index": 4,
+      "children_index": 10,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "FP.glb",
+          "bytes": 31832,
+          "joints": [
+            "joint_pole,1,6"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint_pole,1,6",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-MB-A": {
+      "name": "Monkey Bars Attachment - 5ft",
+      "category": "entries_climbers",
+      "category_index": 4,
+      "children_index": 11,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-MB-A.glb",
+          "bytes": 129756,
+          "joints": [
+            "joint,2,6"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,2,6",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "P-MB-C": {
+      "name": "Monkey Bars - Stand-Alone 5ft",
+      "category": "entries_climbers",
+      "category_index": 4,
+      "children_index": 12,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-MB-C.glb",
+          "bytes": 98688,
+          "joints": [
+            "joint,0,8"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,8",
+          "direction": 0,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "HGR": {
+      "name": "Hand Grip",
+      "category": "entries_climbers",
+      "category_index": 4,
+      "children_index": 13,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "HGR.glb",
+          "bytes": 38864,
+          "joints": [
+            "joint,2,handle"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,2,handle",
+          "direction": 2,
+          "layer": "handle",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "HR": {
+      "name": "Hand Rail",
+      "category": "entries_climbers",
+      "category_index": 4,
+      "children_index": 14,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "HR.glb",
+          "bytes": 17052,
+          "joints": [
+            "joint,2,handle"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,2,handle",
+          "direction": 2,
+          "layer": "handle",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "WS-10": {
+      "name": "Wave Slide - 5ft",
+      "category": "slides",
+      "category_index": 5,
+      "children_index": 0,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "WS-10.glb",
+          "bytes": 33700,
+          "joints": [
+            "joint,0,6"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,6",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "SWS-10": {
+      "name": "DX Wave Slide - 5ft",
+      "category": "slides",
+      "category_index": 5,
+      "children_index": 1,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "SWS-10.glb",
+          "bytes": 75348,
+          "joints": [
+            "joint,0,6"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,6",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "SWS-14": {
+      "name": "DX Wave Slide - 7ft",
+      "category": "slides",
+      "category_index": 5,
+      "children_index": 2,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "SWS-14.glb",
+          "bytes": 131248,
+          "joints": [
+            "joint,0,8"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,8",
+          "direction": 0,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "TTWS-5": {
+      "name": "Turbo Twister - 5ft",
+      "category": "slides",
+      "category_index": 5,
+      "children_index": 3,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "TTWS-5.glb",
+          "bytes": 453308,
+          "joints": [
+            "joint_c,1,6"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint_c,1,6",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ],
+      "tubular": true
+    },
+    "TTWSC-5": {
+      "name": "Turbo Twister (Clear) - 5ft",
+      "category": "slides",
+      "category_index": 5,
+      "children_index": 4,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "TTWSC-5.glb",
+          "bytes": 572688,
+          "joints": [
+            "joint_c,1,6"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint_c,1,6",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ],
+      "tubular": true
+    },
+    "TTWS-7": {
+      "name": "Turbo Twister - 7ft",
+      "category": "slides",
+      "category_index": 5,
+      "children_index": 5,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "TTWS-7.glb",
+          "bytes": 365996,
+          "joints": [
+            "joint_c,1,8"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint_c,1,8",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ],
+      "tubular": true
+    },
+    "TTWSC-7": {
+      "name": "Turbo Twister (Clear) - 7ft",
+      "category": "slides",
+      "category_index": 5,
+      "children_index": 6,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "TTWSC-7.glb",
+          "bytes": 479648,
+          "joints": [
+            "joint_c,1,8"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint_c,1,8",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ],
+      "tubular": true
+    },
+    "SWIS-5": {
+      "name": "Side Winder Slide - 5ft",
+      "category": "slides",
+      "category_index": 5,
+      "children_index": 7,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "SWIS-5.glb",
+          "bytes": 242252,
+          "joints": [
+            "joint_c,1,6"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint_c,1,6",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ],
+      "tubular": true
+    },
+    "SWIS-7": {
+      "name": "Side Winder Slide - 7ft",
+      "category": "slides",
+      "category_index": 5,
+      "children_index": 8,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "SWIS-7.glb",
+          "bytes": 294532,
+          "joints": [
+            "joint_c,1,8"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint_c,1,8",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ],
+      "tubular": true
+    },
+    "SUPS-5": {
+      "name": "Super Spiral Slide - 5ft",
+      "category": "slides",
+      "category_index": 5,
+      "children_index": 9,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "SUPS-5.glb",
+          "bytes": 108712,
+          "joints": [
+            "joint,2,6"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,2,6",
+          "direction": 2,
+          "layer": "6",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "SUPS-7": {
+      "name": "Super Spiral Slide - 7ft",
+      "category": "slides",
+      "category_index": 5,
+      "children_index": 10,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "SUPS-7.glb",
+          "bytes": 127428,
+          "joints": [
+            "joint,3,8"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,3,8",
+          "direction": 3,
+          "layer": "8",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "SW": {
+      "name": "Steering Wheel",
+      "category": "toys",
+      "category_index": 6,
+      "children_index": 0,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "SW.glb",
+          "bytes": 86068,
+          "joints": [
+            "joint,0,wheel"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,wheel",
+          "direction": 0,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "SHW": {
+      "name": "Ship’s Wheel",
+      "category": "toys",
+      "category_index": 6,
+      "children_index": 1,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "SHW.glb",
+          "bytes": 95408,
+          "joints": [
+            "joint,0,wheel"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,wheel",
+          "direction": 0,
+          "layer": "wheel",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "SSC": {
+      "name": "Super Scope",
+      "category": "toys",
+      "category_index": 6,
+      "children_index": 2,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "SSC.glb",
+          "bytes": 86488,
+          "joints": [
+            "joint,0,scope"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,scope",
+          "direction": 0,
+          "layer": "scope",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "MAIL": {
+      "name": "Mailbox",
+      "category": "toys",
+      "category_index": 6,
+      "children_index": 3,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "MAIL.glb",
+          "bytes": 31680,
+          "joints": [
+            "joint,0,mailbox_or_phone"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,mailbox_or_phone",
+          "direction": 0,
+          "layer": "mailbox_or_phone",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "TEL": {
+      "name": "Telephone",
+      "category": "toys",
+      "category_index": 6,
+      "children_index": 4,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "TEL.glb",
+          "bytes": 44740,
+          "joints": [
+            "joint,0,mailbox_or_phone"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,mailbox_or_phone",
+          "direction": 0,
+          "layer": "mailbox_or_phone",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    },
+    "TIC": {
+      "name": "Tic-Tac-Toe",
+      "category": "toys",
+      "category_index": 6,
+      "children_index": 5,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "TIC.glb",
+          "bytes": 507772,
+          "joints": [
+            "joint,0,*"
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,*",
+          "direction": 0,
+          "layer": "*",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        }
+      ]
+    }
+  }
+}
