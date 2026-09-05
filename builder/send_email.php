@@ -70,6 +70,12 @@ if (file_exists(__DIR__ . '/.env')) {
             case 'QUOTE_DAILY_CAP':
                 $config['email']['daily_cap'] = $value;
                 break;
+            // Needed by any second install on the same server — a dev copy
+            // sharing the default counter path would spend the live site's
+            // daily allowance.
+            case 'QUOTE_COUNTER_FILE':
+                $config['email']['counter_file'] = $value;
+                break;
         }
     }
 }
