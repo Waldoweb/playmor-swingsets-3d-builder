@@ -3937,8 +3937,7 @@
           // Wait for the texture manifest before resolving a source. Mulch,
           // Skybox and the joint sprite are all built during Main(), which
           // runs well before the configs land — without this they would
-          // quietly fall back to the base64 in assets.js, which works only
-          // until that file is stripped.
+          // resolve their source before the manifest exists.
           configsReady.catch(() => {}).then(() =>
             Load_image_base_64({ base_64: Texture_source("ground_grass") })
           ).then((resolution) => {
@@ -4051,8 +4050,7 @@
           // Wait for the texture manifest before resolving a source. Mulch,
           // Skybox and the joint sprite are all built during Main(), which
           // runs well before the configs land — without this they would
-          // quietly fall back to the base64 in assets.js, which works only
-          // until that file is stripped.
+          // resolve their source before the manifest exists.
           configsReady.catch(() => {}).then(() =>
             Load_image_base_64({ base_64: Texture_source("mulch_border_h") })
           ).then((resolution) => {
@@ -8013,7 +8011,6 @@
       };
     </script>
 
-    <script src="./js/assets.js"></script>
     <script src="./js/categories.js"></script>
     <script src="./js/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -8540,32 +8537,18 @@
       // The mulch and ground textures, moved out of assets.js into files.
       let textureManifest = null;
 
-      // Falls back to the base64 still in assets.js while that file exists, so
-      // this can ship before the textures are stripped from it.
-      const TEXTURE_FALLBACK_INDEX = {
-        mulch_border_h: 0,
-        mulch_border_v: 1,
-        mulch_border_pink: 2,
-        mulch_tar: 3,
-        mulch_blue: 4,
-        joint_ring: 5,
-        ground_grass: 8,
-      };
-
-      /** URL or data URI for a texture — either works as an <img> src. */
+      /** URL for a texture, from textures/manifest.json. */
       const Texture_source = (name) => {
         const file =
           textureManifest && textureManifest.textures
             ? textureManifest.textures[name]
             : null;
-        if (file) return "textures/" + encodeURIComponent(file);
-        const index = TEXTURE_FALLBACK_INDEX[name];
-        const embedded =
-          typeof Assets !== "undefined" && index !== undefined
-            ? Assets[index]
-            : null;
-        if (!embedded) console.error("No source for texture", name);
-        return embedded;
+        if (!file) {
+          console.error("No source for texture", name,
+            textureManifest ? "" : "(textures/manifest.json did not load)");
+          return null;
+        }
+        return "textures/" + encodeURIComponent(file);
       };
 
       const loadTextureManifest = async () => {

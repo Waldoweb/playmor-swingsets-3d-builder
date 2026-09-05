@@ -93,12 +93,15 @@ def convert(name: str, ext: str, data: bytes):
 
 
 def main():
-    if not os.path.exists(ASSETS_JS):
-        sys.exit(f"Missing {ASSETS_JS}. Run this from the builder/ directory.")
+    if not os.path.isdir("js"):
+        sys.exit("Run this from the builder/ directory.")
     os.makedirs(OUT_DIR, exist_ok=True)
 
-    source = open(ASSETS_JS, encoding="utf-8", errors="replace").read()
-    embedded = extract(source)
+    # assets.js is gone once the textures have been extracted — that is the
+    # normal end state, not an error. textures/ is the source from then on.
+    embedded = {}
+    if os.path.exists(ASSETS_JS):
+        embedded = extract(open(ASSETS_JS, encoding="utf-8", errors="replace").read())
 
     existing = {}
     for filename in os.listdir(OUT_DIR):
