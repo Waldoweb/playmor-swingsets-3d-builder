@@ -3037,6 +3037,11 @@
       let dashOffset = 0;
       let shadows = true;
       let joint_image = null;
+      // Joint-first flow: the opening the user has clicked, and the joints
+      // currently drawn as targets. Null selection means the catalog behaves
+      // exactly as it always has.
+      let selected_host_joint = null;
+      let browse_joints = [];
       let joint_image_frame = 0;
       let joint_image_frames = 0;
       let file_button;
@@ -5396,6 +5401,79 @@
           }
         }
       };
+      /**
+       * Decide where a joint's ring belongs on screen, and whether to draw it
+       * at all. Sets joint.x / joint.y, which double as the click target, and
+       * pushes them off-screen when the joint is hidden behind the structure.
+       *
+       * `attach_layer` is the layer of whatever would attach here: the held
+       * part's layer while placing, or the joint's own while browsing. Numeric
+       * layers are entries, climbers and slides, whose host joint sits at rail
+       * height while the part meets the ground, so the ring is nudged down to
+       * where the part will actually land.
+       */
+      const Locate_joint_ring = (joint, attach_layer, ignore_mesh) => {
+        joint.updateMatrixWorld();
+        const world = new THREE.Vector3().setFromMatrixPosition(joint.matrixWorld);
+        const dir = new THREE.Vector3().subVectors(world, camera.position).normalize();
+        const distance = camera.position.distanceTo(world);
+        raycaster.set(camera.position, dir);
+        const occluders = picked_meshes.filter(
+          (m) => m !== ignore_mesh && m !== joint.model.mesh
+        );
+        const hits = raycaster.intersectObjects(occluders, true);
+        if (hits.length > 0 && hits[0].distance < distance - 0.1) {
+          joint.x = -9999;
+          joint.y = -9999;
+          return false;
+        }
+
+        const size = joint_image.height / 2;
+        const grounded =
+          attach_layer && attach_layer[0] >= "1" && attach_layer[0] <= "9";
+        let point;
+        if (grounded) {
+          const wh = 0.5 * renderer.getContext().canvas.width;
+          const hh = 0.5 * renderer.getContext().canvas.height;
+          const wp = world.clone();
+          wp.y -= 0.3;
+          const pr = wp.project(camera);
+          point = new THREE.Vector2(pr.x * wh + wh, -(pr.y * hh) + hh);
+        } else {
+          point = Ddd2dd({ object3D: joint });
+        }
+        joint.x = point.x - size / 2;
+        joint.y = point.y - size / 2;
+        return true;
+      };
+
+      const Draw_joint_ring = (joint, highlighted) => {
+        const size = joint_image.height / 2;
+        const grow = highlighted ? size * 0.35 : 0;
+        context.drawImage(
+          joint_image,
+          joint_image_frame * joint_image.height,
+          0,
+          joint_image.height,
+          joint_image.height,
+          joint.x - grow / 2,
+          joint.y - grow / 2,
+          size + grow,
+          size + grow
+        );
+      };
+
+      /** Is this screen point inside a joint's ring? */
+      const Joint_hit = (joint, point) => {
+        const size = joint_image.height / 2;
+        return (
+          point.x > joint.x &&
+          point.x < joint.x + size &&
+          point.y > joint.y &&
+          point.y < joint.y + size
+        );
+      };
+
       const Tik = (args) => {
         let delta = clock.getDelta();
         shader_time += delta;
@@ -5565,6 +5643,38 @@
                 }
               }
             }
+        }
+
+        // Browse mode: nothing is being carried, so every free joint is shown
+        // as a target the user can click to ask "what fits here?".
+        browse_joints = [];
+        if (
+          Mode.normal == Mode.mode &&
+          !plug_model &&
+          joint_image &&
+          picked_meshes.length > 0
+        ) {
+          // Once something has been attached here the opening is gone, so drop
+          // the selection rather than filtering the catalog against a joint
+          // that can no longer take anything. Runs once, since clearing it
+          // makes this false.
+          if (selected_host_joint && !selected_host_joint.available) {
+            selected_host_joint = null;
+            Show_items();
+          }
+          for (let model of models_with_available_joints) {
+            for (let joint of model.joints) {
+              if (!joint.available) {
+                joint.x = -9999;
+                joint.y = -9999;
+                continue;
+              }
+              if (Locate_joint_ring(joint, joint.layer, null)) {
+                Draw_joint_ring(joint, joint === selected_host_joint);
+                browse_joints.push(joint);
+              }
+            }
+          }
         }
 
         // rotate the plug
@@ -8027,6 +8137,42 @@
 
           Pointers.delta.set(0, 0);
 
+          // Clicking a ring while empty-handed picks the opening to fill, and
+          // the catalog narrows to what fits it. Clicking away clears it.
+          if (Mode.normal == Mode.mode && !plug_model && browse_joints.length) {
+            // Rings overlap where joints cluster — a tower's scope and wheel
+            // mounts sit almost on top of each other. Take the one whose
+            // centre is nearest the click rather than whichever comes first,
+            // or the far joint becomes unselectable.
+            const size = joint_image.height / 2;
+            let hit = null;
+            let nearest = Infinity;
+            for (const joint of browse_joints) {
+              if (!Joint_hit(joint, Pointers.position)) continue;
+              const dx = joint.x + size / 2 - Pointers.position.x;
+              const dy = joint.y + size / 2 - Pointers.position.y;
+              const d = dx * dx + dy * dy;
+              if (d < nearest) {
+                nearest = d;
+                hit = joint;
+              }
+            }
+            if (hit) {
+              if (hit !== selected_host_joint) {
+                selected_host_joint = hit;
+                Show_items();
+              }
+              // Return before Pointer_down(): the ring sits on top of its own
+              // model, so falling through would also select that model and pop
+              // up its colour/delete toolbar over the choice just made.
+              return;
+            }
+            if (selected_host_joint) {
+              selected_host_joint = null;
+              Show_items();
+            }
+          }
+
           Pointer_down();
         });
         canvas.addEventListener("pointermove", function (event) {
@@ -8264,7 +8410,9 @@
           switchboard[category_index] = [];
           for (let child of Categories[category_index].children) {
             child.index = index;
-            const isCapable = child.model.capable();
+            const isCapable = child.model.capable(
+              selected_host_joint ? { joint: selected_host_joint } : undefined
+            );
             if (isCapable) {
               html +=
                 '<h6 class="sub-items" id="sub-items-' +
