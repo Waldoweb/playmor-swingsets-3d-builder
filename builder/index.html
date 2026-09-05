@@ -4324,27 +4324,27 @@
               ? modelManifest.products[this.object_id]
               : null;
 
-          let sources;
-          if (entry) {
-            sources = entry.files.map((f) => ({
-              src: "models/" + encodeURIComponent(f.file),
-              layer: f.layer,
-            }));
-          } else if (this.category_child) {
-            const child = this.category_child;
-            sources =
-              "glbs" in child
-                ? child.glbs.map((g) => ({ src: g.glb, layer: g.layer }))
-                : "glb" in child
-                ? [{ src: child.glb, layer: undefined }]
-                : [];
-          } else {
-            sources = [];
+          // The manifest is the only source now: categories.js no longer
+          // carries the geometry, so there is nothing to fall back to. An
+          // absent entry is a real failure, not a reason to look elsewhere.
+          if (!entry) {
+            return Promise.reject(
+              new Error(
+                `No manifest entry for ${this.object_id || "unknown model"}` +
+                  (modelManifest ? "" : " (models/manifest.json did not load)")
+              )
+            );
           }
 
+          const sources = entry.files.map((f) => ({
+            src: "models/" + encodeURIComponent(f.file),
+            layer: f.layer,
+          }));
+
           if (!sources.length) {
-            console.warn("No geometry source for model", this.object_id);
-            return Promise.resolve(this);
+            return Promise.reject(
+              new Error(`Manifest lists no files for ${this.object_id}`)
+            );
           }
 
           // Sequential, not parallel: adopt() appends to this.meshes/layers and
@@ -8511,22 +8511,30 @@
       let modelManifest = null;
 
       const loadModelManifest = async () => {
-        try {
-          // Always revalidate. Model filenames carry a content hash so they can
-          // be cached forever, which only works if the index pointing at them
-          // is never stale — a cached manifest names files that no longer
-          // exist, and every model 404s. 'no-cache' still allows a 304, so the
-          // cost is one conditional request.
-          const response = await fetch('models/manifest.json', { cache: 'no-cache' });
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        // Retried once. Since the geometry left categories.js this file is the
+        // only route to any model, so a single dropped request would leave the
+        // builder unable to place anything.
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            // Always revalidate. Model filenames carry a content hash so they
+            // can be cached forever, which only works if the index pointing at
+            // them is never stale — a cached manifest names files that no
+            // longer exist, and every model 404s. 'no-cache' still allows a
+            // 304, so the cost is one conditional request.
+            const response = await fetch('models/manifest.json', { cache: 'no-cache' });
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            modelManifest = await response.json();
+            return;
+          } catch (error) {
+            console.error(
+              `Failed to load model manifest (attempt ${attempt + 1} of 2):`,
+              error
+            );
+            modelManifest = null;
+            if (attempt === 0) await new Promise((r) => setTimeout(r, 600));
           }
-          modelManifest = await response.json();
-        } catch (error) {
-          // Not fatal: Model.template_joints() falls back to reading the
-          // loaded geometry, which is exactly how this worked before.
-          console.error('Failed to load model manifest:', error);
-          modelManifest = null;
         }
       };
 

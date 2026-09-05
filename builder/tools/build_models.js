@@ -131,12 +131,31 @@ function main() {
 
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
-  // Filenames carry a content hash, so a rebuild leaves the previous
-  // generation behind under its old name. Clear them, or the directory grows
-  // without bound and rsync ships models nothing references.
-  for (const existing of fs.readdirSync(OUT_DIR)) {
-    if (existing.endsWith(".glb")) fs.unlinkSync(path.join(OUT_DIR, existing));
+  // Does categories.js still carry the geometry? If so it is the source and we
+  // rewrite models/ from it. If not, models/ is the source and we only rebuild
+  // the manifest from the files already there.
+  const embedded = categories.some((category) =>
+    (category.children || []).some((child) => {
+      const first = "glbs" in child ? (child.glbs[0] || {}).glb : child.glb;
+      return typeof first === "string" && first.startsWith("data:");
+    })
+  );
+
+  // stem -> current filename, e.g. "P-PT" -> "P-PT.7d028968.glb"
+  const existingFiles = new Map();
+  for (const name of fs.readdirSync(OUT_DIR)) {
+    const match = name.match(/^(.+)\.[0-9a-f]{8}\.glb$/);
+    if (match) existingFiles.set(match[1], name);
   }
+
+  if (embedded) {
+    // Filenames carry a content hash, so a rebuild would otherwise leave the
+    // previous generation behind for rsync to ship.
+    for (const name of fs.readdirSync(OUT_DIR)) {
+      if (name.endsWith(".glb")) fs.unlinkSync(path.join(OUT_DIR, name));
+    }
+  }
+  let preservedCount = 0;
 
   const products = {};
   const problems = [];
@@ -167,12 +186,27 @@ function main() {
       const joints = [];
 
       for (const source of sources) {
-        const buffer = decodeDataUri(source.dataUri);
         const stem =
           source.layer === null ? objectId : `${objectId}__${source.layer}`;
-        const filename = `${stem}.${contentHash(buffer)}.glb`;
-        fs.writeFileSync(path.join(OUT_DIR, filename), buffer);
-        fileCount++;
+
+        // Two modes. While categories.js still carries the base64, that is the
+        // source and the files are written from it. Once it has been stripped,
+        // models/ *is* the source and we only re-read what is already there.
+        let buffer, filename;
+        if (typeof source.dataUri === "string" && source.dataUri.startsWith("data:")) {
+          buffer = decodeDataUri(source.dataUri);
+          filename = `${stem}.${contentHash(buffer)}.glb`;
+          fs.writeFileSync(path.join(OUT_DIR, filename), buffer);
+          fileCount++;
+        } else {
+          filename = existingFiles.get(stem);
+          if (!filename) {
+            problems.push(`No model file for ${stem} — expected models/${stem}.<hash>.glb`);
+            continue;
+          }
+          buffer = fs.readFileSync(path.join(OUT_DIR, filename));
+          preservedCount++;
+        }
         byteCount += buffer.length;
 
         const names = readJoints(buffer);
@@ -204,8 +238,13 @@ function main() {
   fs.writeFileSync(path.join(OUT_DIR, "manifest.json"), JSON.stringify(manifest, null, 2));
 
   const jointTotal = Object.values(products).reduce((n, p) => n + p.joints.length, 0);
+  console.log(`source   : ${embedded ? "categories.js (embedded base64)" : OUT_DIR + " (files)"}`);
   console.log(`products : ${Object.keys(products).length}`);
-  console.log(`glb files: ${fileCount}  (${(byteCount / 1048576).toFixed(1)} MB)`);
+  console.log(
+    `glb files: ${fileCount + preservedCount}` +
+      (embedded ? ` written` : ` read`) +
+      `  (${(byteCount / 1048576).toFixed(1)} MB)`
+  );
   console.log(`joints   : ${jointTotal}`);
   console.log(`manifest : ${OUT_DIR}/manifest.json`);
 
