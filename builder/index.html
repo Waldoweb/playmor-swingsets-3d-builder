@@ -1434,8 +1434,10 @@
         background: rgba(0, 0, 0, 0.3);
         border-radius: 4vh;
         padding: 40px;
-        width: 60vh;
-        max-width: 90vw;
+        /* Sized from the width it needs, not the viewport height. This was
+           60vh, so a short browser window produced a narrow modal and the two
+           cards were squeezed until their titles wrapped to three lines. */
+        width: min(560px, 90vw);
         text-align: center;
         font-family: Arial, sans-serif;
         color: white;
@@ -1459,10 +1461,16 @@
         display: flex;
         gap: 20px;
         justify-content: center;
+        /* Below roughly a phone width the two cards can't sit side by side
+           without crushing again, so let them stack instead. */
+        flex-wrap: wrap;
       }
 
       .welcome-option {
-        flex: 1;
+        /* Grow to share the row, but never narrower than the title needs.
+           Once both cards can't hold 200px they wrap onto separate rows. */
+        flex: 1 1 200px;
+        min-width: 200px;
         padding: 20px;
         padding-top: 100px;
         border: 2px solid rgba(255, 255, 255, 0.2);
