@@ -3084,6 +3084,52 @@
           return plug_layer === "b8" || plug_layer === "b10" || plug_layer === "ds";
         return false;
       };
+
+      /**
+       * Which deck height a spanning part has already committed to, if any.
+       *
+       * A bridge or tunnel has a `deck` mount at each end and fits any height,
+       * but both ends have to meet the same one — you cannot span from a 5 ft
+       * deck to a 7 ft one. Once either end is attached, that height is settled
+       * for the other.
+       */
+      const Deck_height_locked_to = (model) => {
+        if (!model || !model.joints) return null;
+        for (const joint of model.joints) {
+          if (joint.layer !== "deck") continue;
+          const other = joint.connected;
+          if (other && Is_deck_layer(other.layer)) return other.layer;
+        }
+        return null;
+      };
+
+      /**
+       * Do these two agree on deck height?
+       *
+       * Checked from both sides, because either can be the one already
+       * committed: attaching a bridge to a second tower constrains the bridge,
+       * and attaching a second tower to the bridge's free end constrains the
+       * tower, since any free joint acts as a host here.
+       */
+      const Deck_heights_agree = (plug_joint, host_joint) => {
+        if (plug_joint.layer === "deck") {
+          const locked = Deck_height_locked_to(plug_joint.model);
+          if (locked && locked !== host_joint.layer) return false;
+        }
+        if (host_joint.layer === "deck") {
+          const locked = Deck_height_locked_to(host_joint.model);
+          if (locked && locked !== plug_joint.layer) return false;
+        }
+        return true;
+      };
+
+      /**
+       * The whole question, at the level of two actual joints: right kind of
+       * opening, and no constraint the parts have already taken on.
+       */
+      const Joints_connect = (plug_joint, host_joint) =>
+        Layers_connect(plug_joint.layer, host_joint.layer) &&
+        Deck_heights_agree(plug_joint, host_joint);
       let joint_image_frame = 0;
       let joint_image_frames = 0;
       let file_button;
@@ -6204,7 +6250,7 @@
        */
       const Find_plug_joint_for = (model, host_joint) => {
         for (const joint of model.joints) {
-          if (!Layers_connect(joint.layer, host_joint.layer)) continue;
+          if (!Joints_connect(joint, host_joint)) continue;
           if (
             Can_connect({
               plug_joint: joint,
@@ -7021,7 +7067,7 @@
         for (let model of models_with_available_joints) {
           for (let joint of model.joints) {
             const available = joint.available;
-            const layerMatch = Layers_connect(plug_joint.layer, joint.layer);
+            const layerMatch = Joints_connect(plug_joint, joint);
 
             if (available && layerMatch) {
               let position = Ddd2dd({ object3D: joint });
