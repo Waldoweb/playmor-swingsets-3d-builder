@@ -6003,56 +6003,94 @@
                 Pointers.position.y < host_joint.y + joint_image.height / 2;
 
               if (canConnect && inClickArea) {
-                // undo
-                blueprint.add_snapshot();
-
-                // orient the model & mesh
-                plug_model.yaw = Lookup_yaw({
-                  host_model_yaw: host_joint.model.yaw,
-                  host_joint_direction: host_joint.direction,
-                  plug_joint_direction: plug_joint.direction,
-                });
-                plug_model.mesh.rotation.y = plug_model.yaw * Deg2Rad;
-
-                let pjp = new THREE.Vector3();
-                plug_joint.getWorldPosition(pjp);
-                let mjp = new THREE.Vector3();
-                plug_model.mesh.getWorldPosition(mjp);
-                let p = new THREE.Vector3();
-                p.subVectors(mjp, pjp);
-                let hjp = new THREE.Vector3();
-                host_joint.getWorldPosition(hjp);
-                p.add(hjp);
-
-                if (p.y < 0) p.y = 0;
-                plug_model.mesh.position.copy(p);
-
-                // actually connect the joints
-                Connect_joints({ joint_1: host_joint, joint_2: plug_joint });
-
-                models_with_available_joints.push(plug_model);
-                picked_meshes.push(plug_model.mesh);
-                plug_model = null;
-                plug_joint = null;
-                Mode.mode = Mode.normal;
-                
-                // Hide rotation hint when object is successfully placed
-                document.getElementById('rotation-hint').style.display = 'none';
-                /*
-                        if ( box3Helper ) scene . remove ( box3Helper )
-                        box = new THREE . Box3 ()
-                        for ( let mesh of picked_meshes )
-                            box . expandByObject ( mesh )
-                        box3Helper = new THREE . Box3Helper ( box , 0xffff00 )
-                        scene . add ( box3Helper )
-                        */
-                Show_items();
-                // Set_up_email ()
-                Update_measurements();
+                Attach_plug_to(host_joint);
               }
             }
             break;
         }
+      };
+
+      /**
+       * Which of a candidate model's joints would mate with this opening.
+       * Mirrors the layer rules Find_closest_available_joint uses, then checks
+       * the part actually fits once positioned there.
+       */
+      const Find_plug_joint_for = (model, host_joint) => {
+        for (const joint of model.joints) {
+          const layer_match =
+            joint.layer == "*" ||
+            host_joint.layer == "*" ||
+            host_joint.layer == joint.layer ||
+            (host_joint.layer === "ds" &&
+              (joint.layer === "b8" || joint.layer === "b10" || joint.layer === "ds"));
+          if (!layer_match) continue;
+          if (
+            Can_connect({
+              plug_joint: joint,
+              host_joint: host_joint,
+              exclude_preview: model,
+            })
+          )
+            return joint;
+        }
+        return null;
+      };
+
+      /**
+       * Commit the held model onto a host joint: orient it, move it so the two
+       * joints coincide, connect them, and hand the scene back in normal mode.
+       *
+       * Extracted so a click on a marker and a click on a catalog tile take
+       * exactly the same path — the joint-first flow places directly, without
+       * the user having to aim at the marker a second time.
+       */
+      const Attach_plug_to = (host_joint) => {
+      // undo
+      blueprint.add_snapshot();
+
+      // orient the model & mesh
+      plug_model.yaw = Lookup_yaw({
+        host_model_yaw: host_joint.model.yaw,
+        host_joint_direction: host_joint.direction,
+        plug_joint_direction: plug_joint.direction,
+      });
+      plug_model.mesh.rotation.y = plug_model.yaw * Deg2Rad;
+
+      let pjp = new THREE.Vector3();
+      plug_joint.getWorldPosition(pjp);
+      let mjp = new THREE.Vector3();
+      plug_model.mesh.getWorldPosition(mjp);
+      let p = new THREE.Vector3();
+      p.subVectors(mjp, pjp);
+      let hjp = new THREE.Vector3();
+      host_joint.getWorldPosition(hjp);
+      p.add(hjp);
+
+      if (p.y < 0) p.y = 0;
+      plug_model.mesh.position.copy(p);
+
+      // actually connect the joints
+      Connect_joints({ joint_1: host_joint, joint_2: plug_joint });
+
+      models_with_available_joints.push(plug_model);
+      picked_meshes.push(plug_model.mesh);
+      plug_model = null;
+      plug_joint = null;
+      Mode.mode = Mode.normal;
+      
+      // Hide rotation hint when object is successfully placed
+      document.getElementById('rotation-hint').style.display = 'none';
+      /*
+              if ( box3Helper ) scene . remove ( box3Helper )
+              box = new THREE . Box3 ()
+              for ( let mesh of picked_meshes )
+                  box . expandByObject ( mesh )
+              box3Helper = new THREE . Box3Helper ( box , 0xffff00 )
+              scene . add ( box3Helper )
+              */
+      Show_items();
+      // Set_up_email ()
+      Update_measurements();
       };
 
       zum_slider.oninput = (args) => {
@@ -7575,6 +7613,25 @@
 
         for (let model of Model.instances) model.selected = false;
         //plug_model . selected = true
+
+        // Joint-first: an opening was chosen before the part, so place it there
+        // now rather than dropping into plugging mode and asking the user to
+        // aim at the same marker again.
+        if (selected_host_joint && selected_host_joint.available) {
+          const mate = Find_plug_joint_for(plug_model, selected_host_joint);
+          if (mate) {
+            plug_joint = mate;
+            plug_joint_index = plug_model.joints.indexOf(mate);
+            Attach_plug_to(selected_host_joint);
+            selected_host_joint = null;
+            selected_object_id = null;
+            Show_items();
+            return;
+          }
+          // Nothing on this part mates with that opening — fall through to the
+          // normal flow rather than silently doing nothing.
+          console.warn("No joint on", objectId, "fits the selected opening");
+        }
 
         if (picked_meshes.length > 0) {
           plug_joint = null;
