@@ -5276,6 +5276,52 @@
           //}
         });
       };
+      /**
+       * Re-derive availability for "same opening, described twice" joints.
+       *
+       * The last position on every swing beam is authored as two joints at the
+       * same point: an "s" for a regular swing and an "sh" for a horse glider,
+       * sharing an exclusion group with no excluder field. They are two ways to
+       * describe one opening, so filling either one fills the spot — but
+       * nothing enforced that, and the unused twin kept offering a marker over
+       * a position that was already taken.
+       *
+       * The older tower convention — a fifth name field naming the group a
+       * joint excludes — is handled in Connect_joints and deliberately left
+       * alone here. Those groups list several genuinely separate openings (the
+       * King's Tower puts six in one group), so blocking them as a set would be
+       * wrong. A null excluder_layer is what tells the two conventions apart,
+       * and it separates them exactly across every model in the manifest.
+       *
+       * Written as a re-sync rather than a step inside connect and disconnect
+       * because deletion unwinds joints through half a dozen category-specific
+       * branches. Recomputing from what is actually connected keeps all of them
+       * honest, and only ever touches joints this rule itself turned off.
+       */
+      const Sync_exclusion_groups = () => {
+        for (const model of models_with_available_joints) {
+          const groups = new Map();
+          for (const joint of model.joints) {
+            if (!joint.exclusion_layer || joint.excluder_layer) continue;
+            if (!groups.has(joint.exclusion_layer))
+              groups.set(joint.exclusion_layer, []);
+            groups.get(joint.exclusion_layer).push(joint);
+          }
+          for (const members of groups.values()) {
+            const taken = members.some((joint) => joint.connected);
+            for (const joint of members) {
+              if (joint.connected) continue;
+              if (taken) {
+                joint.available = false;
+                joint.excluded_by_group = true;
+              } else if (joint.excluded_by_group) {
+                joint.available = true;
+                joint.excluded_by_group = false;
+              }
+            }
+          }
+        }
+      };
       const Connect_joints = (args) => {
         let host_joint = args.joint_1;
         let plug_joint = args.joint_2;
@@ -5400,6 +5446,8 @@
             }
           }
         }
+
+        Sync_exclusion_groups();
       };
       /**
        * Decide where a joint's ring belongs on screen, and whether to draw it
@@ -5492,6 +5540,12 @@
 
       // PlayMor red, the same value the buttons use.
       const ADD_MARKER_RED = "#ce030c";
+      // The chosen opening switches to blue. Red says "you could add here";
+      // once one is picked, every other marker still says that, so the picked
+      // one needs to stop looking like the rest rather than just grow a little.
+      const ADD_MARKER_BLUE = "#0b6fc4";
+      const ADD_MARKER_BLUE_RGB = "11, 111, 196";
+      const ADD_MARKER_RED_RGB = "206, 3, 12";
       const reduced_motion =
         window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -5513,6 +5567,7 @@
         const cx = joint.x + size / 2;
         const cy = joint.y + size / 2;
         const r = highlighted ? 11 : 8;
+        const rgb = highlighted ? ADD_MARKER_BLUE_RGB : ADD_MARKER_RED_RGB;
 
         context.save();
 
@@ -5522,14 +5577,14 @@
           const phase = (performance.now() % 1600) / 1600;
           context.beginPath();
           context.arc(cx, cy, r + 1 + phase * 5, 0, Math.PI * 2);
-          context.strokeStyle = "rgba(206, 3, 12, " + (0.7 * (1 - phase)).toFixed(3) + ")";
+          context.strokeStyle = "rgba(" + rgb + ", " + (0.7 * (1 - phase)).toFixed(3) + ")";
           context.lineWidth = 2.5;
           context.stroke();
         }
 
         context.beginPath();
         context.arc(cx, cy, r, 0, Math.PI * 2);
-        context.fillStyle = ADD_MARKER_RED;
+        context.fillStyle = highlighted ? ADD_MARKER_BLUE : ADD_MARKER_RED;
         context.fill();
         context.lineWidth = 1.5;
         context.strokeStyle = "rgba(255, 255, 255, 0.92)";
@@ -6048,42 +6103,71 @@
        * the user having to aim at the marker a second time.
        */
       const Attach_plug_to = (host_joint) => {
-      // undo
-      blueprint.add_snapshot();
+        // Swings carry a separate mesh per beam length, so morph to the one
+        // matching this beam before attaching. Skip it and a swing built for a
+        // 10ft beam goes onto an 8ft one, hanging from a drop that starts
+        // above the beam it is supposedly attached to.
+        //
+        // The plugging flow does this while the user hovers over a joint. The
+        // joint-first flow has no hover step, so it has to happen here — and
+        // here is the right place for both, since this is the one function
+        // that commits a part.
+        if (
+          host_joint.layer == "s" ||
+          host_joint.layer == "sh" ||
+          host_joint.layer == "ds" ||
+          host_joint.layer == "tire" ||
+          (plug_joint.layer == "tire" &&
+            (host_joint.layer == "b8" || host_joint.layer == "b10"))
+        ) {
+          const target_layer = host_joint.tire_only
+            ? "tire"
+            : host_joint.model.joints[0].layer;
+          if (target_layer && target_layer !== plug_joint.layer) {
+            scene.remove(plug_model.mesh);
+            plug_model.morph({ layer: target_layer });
+            plug_joint = plug_model.joints[plug_joint_index];
+            scene.add(plug_model.mesh);
+            applyDefaultColors(plug_model);
+          }
+        }
 
-      // orient the model & mesh
-      plug_model.yaw = Lookup_yaw({
+        // undo
+        blueprint.add_snapshot();
+
+        // orient the model & mesh
+        plug_model.yaw = Lookup_yaw({
         host_model_yaw: host_joint.model.yaw,
         host_joint_direction: host_joint.direction,
         plug_joint_direction: plug_joint.direction,
-      });
-      plug_model.mesh.rotation.y = plug_model.yaw * Deg2Rad;
+        });
+        plug_model.mesh.rotation.y = plug_model.yaw * Deg2Rad;
 
-      let pjp = new THREE.Vector3();
-      plug_joint.getWorldPosition(pjp);
-      let mjp = new THREE.Vector3();
-      plug_model.mesh.getWorldPosition(mjp);
-      let p = new THREE.Vector3();
-      p.subVectors(mjp, pjp);
-      let hjp = new THREE.Vector3();
-      host_joint.getWorldPosition(hjp);
-      p.add(hjp);
+        let pjp = new THREE.Vector3();
+        plug_joint.getWorldPosition(pjp);
+        let mjp = new THREE.Vector3();
+        plug_model.mesh.getWorldPosition(mjp);
+        let p = new THREE.Vector3();
+        p.subVectors(mjp, pjp);
+        let hjp = new THREE.Vector3();
+        host_joint.getWorldPosition(hjp);
+        p.add(hjp);
 
-      if (p.y < 0) p.y = 0;
-      plug_model.mesh.position.copy(p);
+        if (p.y < 0) p.y = 0;
+        plug_model.mesh.position.copy(p);
 
-      // actually connect the joints
-      Connect_joints({ joint_1: host_joint, joint_2: plug_joint });
+        // actually connect the joints
+        Connect_joints({ joint_1: host_joint, joint_2: plug_joint });
 
-      models_with_available_joints.push(plug_model);
-      picked_meshes.push(plug_model.mesh);
-      plug_model = null;
-      plug_joint = null;
-      Mode.mode = Mode.normal;
+        models_with_available_joints.push(plug_model);
+        picked_meshes.push(plug_model.mesh);
+        plug_model = null;
+        plug_joint = null;
+        Mode.mode = Mode.normal;
       
-      // Hide rotation hint when object is successfully placed
-      document.getElementById('rotation-hint').style.display = 'none';
-      /*
+        // Hide rotation hint when object is successfully placed
+        document.getElementById('rotation-hint').style.display = 'none';
+        /*
               if ( box3Helper ) scene . remove ( box3Helper )
               box = new THREE . Box3 ()
               for ( let mesh of picked_meshes )
@@ -6091,9 +6175,9 @@
               box3Helper = new THREE . Box3Helper ( box , 0xffff00 )
               scene . add ( box3Helper )
               */
-      Show_items();
-      // Set_up_email ()
-      Update_measurements();
+        Show_items();
+        // Set_up_email ()
+        Update_measurements();
       };
 
       zum_slider.oninput = (args) => {
@@ -6486,6 +6570,8 @@
                   joint.connected = null;
                 }
           }
+
+        Sync_exclusion_groups();
 
         Hide_options();
         Show_items();
