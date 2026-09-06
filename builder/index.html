@@ -6600,226 +6600,107 @@
       };
 
 
+      /**
+       * Does this stand on its own ground?
+       *
+       * The towers, and only the towers. A bridge is filed with them but has
+       * nothing except attachment joints — it spans between two decks and has
+       * no legs — so it needs something holding each end.
+       */
+      const Is_free_standing = (model) => {
+        if (!model) return false;
+        const own = model.template_joints ? model.template_joints() : model.joints || [];
+        const attaches_only =
+          own.length > 0 && own.every((joint) => Is_attachment_only_layer(joint.layer));
+        return !attaches_only && model.category == 0;
+      };
+
+      /**
+       * Everything that comes away when these models go.
+       *
+       * A part stays only while something holds it up — a path of connections
+       * back to a model that stands on its own ground. Delete a tower and its
+       * steps lose their only support, so they go, and the handrails on those
+       * steps go with them, and the swings on its beams, however deep the chain
+       * runs.
+       *
+       * This replaces four category-specific cascades that each walked a fixed
+       * number of levels: the tower branch removed what was directly attached
+       * and then hand-coded one extra level for swing beams only, so deleting a
+       * tower left the handrails of its steps hanging in mid-air. Depth was a
+       * constant in the code rather than a property of the design.
+       *
+       * Asking what is still supported also keeps a bridge when one of its two
+       * towers is deleted, which the old code did by naming Bridge and Tunnel
+       * and checking their other connections by hand.
+       */
+      const Orphaned_by = (doomed) => {
+        const supported = new Set();
+        const queue = [];
+        for (const model of models_with_available_joints) {
+          if (doomed.has(model) || !Is_free_standing(model)) continue;
+          supported.add(model);
+          queue.push(model);
+        }
+        while (queue.length) {
+          for (const joint of queue.shift().joints) {
+            const other = joint.connected && joint.connected.model;
+            if (!other || doomed.has(other) || supported.has(other)) continue;
+            supported.add(other);
+            queue.push(other);
+          }
+        }
+        return models_with_available_joints.filter(
+          (model) => !doomed.has(model) && !supported.has(model)
+        );
+      };
+
+      /** Take a model out of the scene and off the lists. */
+      const Remove_model = (model) => {
+        scene.remove(model.mesh);
+        let index = models_with_available_joints.indexOf(model);
+        if (index != -1) models_with_available_joints.splice(index, 1);
+        index = picked_meshes.indexOf(model.mesh);
+        if (index != -1) picked_meshes.splice(index, 1);
+      };
+
       const Trash_picked_mesh = (args) => {
         // undo
         blueprint.add_snapshot();
 
-        let model = picked_mesh.model;
+        const doomed = new Set([picked_mesh.model]);
+        for (const orphan of Orphaned_by(doomed)) doomed.add(orphan);
 
-        // Handle deletion logic based on category name instead of category index
-        // First try to get category directly from object ID using object mapping
-        let categoryName = getCategoryFromObjectId(model.object_id);
-        
-        console.log(`Trash_picked_mesh: deleting ${model.object_id} from category ${categoryName}`);
+        for (const model of doomed) {
+          for (const joint of model.joints) {
+            const other = joint.connected;
+            joint.connected = null;
+            joint.available = true;
+            if (!other) continue;
 
-        switch (categoryName) {
-          case "towers":
-            // Check if this is a bridge or tunnel (they are categorized as towers but behave differently)
-            if (model.object_id === "Bridge" || model.object_id === "Tunnel") {
-              // When deleting a bridge or tunnel, just delete that specific object
-              console.log(`Deleting ${model.object_id.toLowerCase()} object`);
-              // Note: The general disconnection logic after the switch statement will handle
-              // making connected joints available, so we don't need to do it here
-            } else {
-              // When deleting a regular tower, remove connected objects but preserve bridges/tunnels with other connections
-              console.log(`Deleting tower ${model.object_id}, checking connected objects`);
-              for (let joint of model.joints) {
-                if (!joint.available && joint.connected) {
-                  let connected_joint = joint.connected;
-                  let connected_model = connected_joint.model;
+            // Only tidy up the far side if it is staying. Freeing a joint on
+            // something also being removed is what used to leave half-cleaned
+            // models behind and throw on the next deletion.
+            if (doomed.has(other.model)) continue;
+            other.available = true;
+            other.connected = null;
 
-                  // Check if this is a bridge or tunnel
-                  if (connected_model.object_id === "Bridge" || connected_model.object_id === "Tunnel") {
-                    // Check if the bridge/tunnel has other tower connections
-                    let hasOtherTowerConnections = false;
-                    for (let bridge_joint of connected_model.joints) {
-                      if (!bridge_joint.available && bridge_joint.connected && bridge_joint !== connected_joint) {
-                        let other_connected_model = bridge_joint.connected.model;
-                        // Check if the other connected object is a tower (not the one being deleted)
-                        if (other_connected_model !== model &&
-                            getCategoryFromObjectId(other_connected_model.object_id) === "towers" &&
-                            other_connected_model.object_id !== "Bridge" &&
-                            other_connected_model.object_id !== "Tunnel") {
-                          hasOtherTowerConnections = true;
-                          break;
-                        }
-                      }
-                    }
-
-                    if (hasOtherTowerConnections) {
-                      // Don't delete the bridge/tunnel, just disconnect this joint
-                      console.log(`Preserving ${connected_model.object_id} - it has other tower connections`);
-                      connected_joint.available = true;
-                      connected_joint.connected = null;
-                      joint.available = true;
-                      joint.connected = null;
-                    } else {
-                      // No other tower connections, safe to delete
-                      console.log(`Removing ${connected_model.object_id} - no other tower connections`);
-                      scene.remove(connected_model.mesh);
-
-                      let index = models_with_available_joints.indexOf(connected_model);
-                      if (index != -1)
-                        models_with_available_joints.splice(index, 1);
-
-                      index = picked_meshes.indexOf(connected_model.mesh);
-                      if (index != -1) picked_meshes.splice(index, 1);
-
-                      joint.available = true;
-                      joint.connected = null;
-                    }
-                  } else {
-                    // For non-bridge/tunnel objects, remove as before
-                    console.log(`Removing connected object ${connected_model.object_id} from tower`);
-
-                    // Special case: if this is a swing beam, also remove connected swings
-                    if (getCategoryFromObjectId(connected_model.object_id) === "swing_beams") {
-                      console.log(`Swing beam ${connected_model.object_id} being deleted from tower - removing connected swings`);
-                      for (let swing_joint of connected_model.joints) {
-                        if (!swing_joint.available && swing_joint.connected && swing_joint !== connected_joint) {
-                          let swing_connected_joint = swing_joint.connected;
-                          let swing_connected_model = swing_connected_joint.model;
-
-                          if (!swing_joint.layer.startsWith("b")) {
-                            // This is a swing, remove it
-                            console.log(`Removing connected swing ${swing_connected_model.object_id}`);
-                            scene.remove(swing_connected_model.mesh);
-
-                            let swing_index = models_with_available_joints.indexOf(swing_connected_model);
-                            if (swing_index != -1)
-                              models_with_available_joints.splice(swing_index, 1);
-
-                            swing_index = picked_meshes.indexOf(swing_connected_model.mesh);
-                            if (swing_index != -1) picked_meshes.splice(swing_index, 1);
-                          }
-                        }
-                      }
-                    }
-
-                    scene.remove(connected_model.mesh);
-
-                    let index = models_with_available_joints.indexOf(connected_model);
-                    if (index != -1)
-                      models_with_available_joints.splice(index, 1);
-
-                    index = picked_meshes.indexOf(connected_model.mesh);
-                    if (index != -1) picked_meshes.splice(index, 1);
-
-                    joint.available = true;
-                    joint.connected = null;
-                  }
-                }
-              }
+            if (other.model.mesh) {
+              Show_touched_fences({ joint: joint, mesh: other.model.mesh });
             }
-            break;
-          case "swing_beams":
-            // swing beam
-            for (let joint of model.joints) {
-              if (!joint.available && joint.connected) {
-                let connected_joint = joint.connected;
-                let connected_model = connected_joint.model;
-
-                if (joint.layer.startsWith("b")) {
-                  connected_joint.available = true;
-                  connected_joint.connected = null;
-                } else {
-                  scene.remove(connected_model.mesh);
-
-                  let index =
-                    models_with_available_joints.indexOf(connected_model);
-                  if (index != -1)
-                    models_with_available_joints.splice(index, 1);
-
-                  index = picked_meshes.indexOf(connected_model.mesh);
-                  if (index != -1) picked_meshes.splice(index, 1);
+            if (other.excluder_layer) {
+              for (const sibling of other.model.joints)
+                if (sibling.exclusion_layer == other.excluder_layer) {
+                  sibling.available = true;
+                  sibling.connected = null;
                 }
-                joint.available = true;
-                joint.connected = null;
-              }
             }
-            break;
-          case "swings":
-            // No special deletion logic for swings currently
-            break;
-          case "floors_kits":
-            // No special deletion logic for floors_kits currently
-            break;
-          case "entries_climbers":
-            // entry/climber
-            for (let joint of model.joints) {
-              if (!joint.available && joint.connected) {
-                let connected_joint = joint.connected;
-                let connected_model = connected_joint.model;
-
-                if (joint.layer.startsWith("handle")) {
-                  // Only remove connected handrails when deleting steps, not the reverse
-                  // Steps have handle joints, handrails connect TO handle joints
-                  const isHandrail = model.object_id === 'HGR' || model.object_id === 'HR';
-                  if (!isHandrail) {
-                    // This is a step being deleted, so remove connected handrails
-                    console.log(`Deleting step ${model.object_id}, removing connected handrail ${connected_model.object_id}`);
-                    scene.remove(connected_model.mesh);
-
-                    let index =
-                      models_with_available_joints.indexOf(connected_model);
-                    if (index != -1)
-                      models_with_available_joints.splice(index, 1);
-
-                    index = picked_meshes.indexOf(connected_model.mesh);
-                    if (index != -1) picked_meshes.splice(index, 1);
-                  } else {
-                    // This is a handrail being deleted, just disconnect but don't remove the step
-                    console.log(`Deleting handrail ${model.object_id}, keeping connected step ${connected_model.object_id}`);
-                    // Make both joints available again
-                    connected_joint.available = true;
-                    connected_joint.connected = null;
-                  }
-                  // Always make the current model's joint available when disconnecting
-                  joint.available = true;
-                  joint.connected = null;
-                }
-              }
-            }
-            break;
-          case "slides":
-            // No special deletion logic for slides currently
-            break;
-          case "toys":
-            // No special deletion logic for toys currently
-            break;
-          default:
-            console.log(`Unknown category: ${categoryName} for object ${model.object_id}`);
-            break;
+          }
         }
 
-        scene.remove(model.mesh);
+        for (const model of doomed) Remove_model(model);
 
-        let index = models_with_available_joints.indexOf(model);
-        if (index != -1) models_with_available_joints.splice(index, 1);
-
-        index = picked_meshes.indexOf(model.mesh);
-        if (index != -1) picked_meshes.splice(index, 1);
-
-        for (let joint of picked_mesh.model.joints)
-          if (!joint.available) {
-            let connected_joint = joint.connected;
-            connected_joint.available = true;
-            connected_joint.connected = null;
-            joint.connected = null;
-
-            Show_touched_fences({
-              joint: joint,
-              mesh: connected_joint.model.mesh,
-            });
-
-            if (connected_joint.excluder_layer)
-              for (let joint of connected_joint.model.joints)
-                if (joint.exclusion_layer == connected_joint.excluder_layer) {
-                  joint.available = true;
-                  joint.connected = null;
-                }
-          }
-
+        picked_mesh = null;
         Sync_sockets();
 
         Hide_options();
