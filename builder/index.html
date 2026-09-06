@@ -5441,9 +5441,10 @@
               0,
               camera.position.z - world.z
             ).normalize();
-            // Slightly past straight-on, so joints at the silhouette edge stay
-            // put instead of blinking as the camera orbits through them.
-            if (outward.normalize().dot(to_camera) < -0.1) {
+            // Just short of straight-on: a marker drops out a little before
+            // its joint reaches the silhouette, rather than clinging to the
+            // edge as the model turns away.
+            if (outward.normalize().dot(to_camera) < 0.15) {
               joint.x = -9999;
               joint.y = -9999;
               return false;
@@ -5513,7 +5514,7 @@
           // disc fading outward, which at low opacity was barely perceptible.
           const phase = (performance.now() % 1600) / 1600;
           context.beginPath();
-          context.arc(cx, cy, r + 1 + phase * 9, 0, Math.PI * 2);
+          context.arc(cx, cy, r + 1 + phase * 5, 0, Math.PI * 2);
           context.strokeStyle = "rgba(206, 3, 12, " + (0.7 * (1 - phase)).toFixed(3) + ")";
           context.lineWidth = 2.5;
           context.stroke();
