@@ -3047,6 +3047,43 @@
       let browse_sockets = [];
       /** Can anything still go here? */
       const Socket_is_open = (socket) => socket.joints.some((j) => j.available);
+
+      /**
+       * Is this a deck height rather than a named socket?
+       *
+       * The numeric layers are the height of the deck a part mounts to:
+       * 5 = 4 ft, 6 = 5 ft, 8 = 7 ft, read straight off the parts that use them
+       * (Steps 7ft and Rock Climb 7ft are both layer 8). Layer 0 is deliberately
+       * not one of these — it is King's Tower's rail mount, which is why the
+       * test starts at 1.
+       */
+      const Is_deck_layer = (layer) =>
+        typeof layer === "string" && layer[0] > "0" && layer[0] <= "9";
+
+      /**
+       * Does a part with this layer fit a socket with that one?
+       *
+       * The rule was written out separately in three places, which is how a
+       * fourth clause ends up in two of them. Stated once:
+       *
+       *   equal   the ordinary case
+       *   deck    parts that fit any deck height — bridges, tunnels, the bubble
+       *           panel and the tic-tac-toe board, which span or fill a deck
+       *           opening whatever height it is at
+       *   ds      a disc-swing beam's hanger also takes the beam layers
+       *   *       matches anything; nothing in the catalog uses it any more,
+       *           kept so a model that has not been given a real layer still
+       *           behaves as it did
+       */
+      const Layers_connect = (plug_layer, host_layer) => {
+        if (plug_layer === host_layer) return true;
+        if (plug_layer === "*" || host_layer === "*") return true;
+        if (plug_layer === "deck") return Is_deck_layer(host_layer);
+        if (host_layer === "deck") return Is_deck_layer(plug_layer);
+        if (host_layer === "ds")
+          return plug_layer === "b8" || plug_layer === "b10" || plug_layer === "ds";
+        return false;
+      };
       let joint_image_frame = 0;
       let joint_image_frames = 0;
       let file_button;
@@ -4712,26 +4749,23 @@
           // can't add disconnected models
           if (!found) return false;
 
-          // check if i'm a wildcard
+          // A deck part fits any deck height, so it is placeable as long as
+          // some deck opening is free. This branch always meant that — it
+          // searched for a numeric host layer — but was keyed on the wildcard
+          // that those parts used to carry.
           const own_joints = this.template_joints();
           let i = 0;
           found = false;
-          while (!found && i < own_joints.length)
-            found = "*" == own_joints[i++].layer;
+          while (!found && i < own_joints.length) {
+            const layer = own_joints[i++].layer;
+            found = layer === "*" || layer === "deck";
+          }
           if (found) {
-            // search for an available valid host joint that's not a wildcard
             let valid = 0;
             for (const joint of hosts) {
-              if (
-                joint.available &&
-                joint.layer[0] > "0" &&
-                joint.layer[0] <= "9"
-              ) {
-                valid++;
-              }
+              if (joint.available && Is_deck_layer(joint.layer)) valid++;
             }
-            const result = valid != 0;
-            return result;
+            return valid != 0;
           }
 
           // not a wildcard seek an available exact match
@@ -6170,13 +6204,7 @@
        */
       const Find_plug_joint_for = (model, host_joint) => {
         for (const joint of model.joints) {
-          const layer_match =
-            joint.layer == "*" ||
-            host_joint.layer == "*" ||
-            host_joint.layer == joint.layer ||
-            (host_joint.layer === "ds" &&
-              (joint.layer === "b8" || joint.layer === "b10" || joint.layer === "ds"));
-          if (!layer_match) continue;
+          if (!Layers_connect(joint.layer, host_joint.layer)) continue;
           if (
             Can_connect({
               plug_joint: joint,
@@ -6993,14 +7021,7 @@
         for (let model of models_with_available_joints) {
           for (let joint of model.joints) {
             const available = joint.available;
-
-            // Standard layer matching
-            let layerMatch = (plug_joint.layer == "*" || joint.layer == "*" || joint.layer == plug_joint.layer);
-
-            // Special case: Disc swings (b8/b10/ds) can connect to "ds" layer joints
-            if (!layerMatch && joint.layer === "ds" && (plug_joint.layer === "b8" || plug_joint.layer === "b10" || plug_joint.layer === "ds")) {
-              layerMatch = true;
-            }
+            const layerMatch = Layers_connect(plug_joint.layer, joint.layer);
 
             if (available && layerMatch) {
               let position = Ddd2dd({ object3D: joint });

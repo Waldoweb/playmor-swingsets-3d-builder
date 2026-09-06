@@ -21,6 +21,24 @@
     "at 0.296. Anything from 0.09 to 0.29 gives the same answer."
   ],
 
+  "layer_overrides": {
+    "Bridge": { "from": "*", "to": "deck" },
+    "Tunnel": { "from": "*", "to": "deck" },
+    "BUB":    { "from": "*", "to": "deck" },
+    "TIC":    { "from": "*", "to": "deck" }
+  },
+  "_layer_overrides_note": [
+    "Applied to the model files themselves by tools/set_joint_layers.js, because",
+    "the app parses a joint's layer out of the GLB at run time -- unlike marker",
+    "offsets and cut-outs, this cannot be corrected in the manifest.",
+    "",
+    "These four carried '*', which matches EVERY socket in the catalog: a Bridge",
+    "could be hung off a swing hanger. Bridge and Tunnel span between decks, the",
+    "Bubble Panel goes wherever a climb goes, and Tic-Tac-Toe wherever a slide",
+    "goes -- all deck parts. 'deck' matches any deck height (5 = 4ft, 6 = 5ft,",
+    "8 = 7ft) and nothing else, which is a narrow rule in place of a wildcard."
+  ],
+
   "cutouts": {
     "TIC": [0.57, 0.25, 1.0]
   },

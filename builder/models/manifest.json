@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-06T19:15:47.107Z",
+  "generated_at": "2026-09-06T19:18:55.740Z",
   "product_count": 64,
   "products": {
     "P-PT": {
@@ -5111,11 +5111,11 @@
       "files": [
         {
           "layer": null,
-          "file": "Bridge.f8fac55d.glb",
-          "bytes": 427816,
+          "file": "Bridge.248e014c.glb",
+          "bytes": 427820,
           "joints": [
-            "joint_back,2,*",
-            "joint_front,0,*"
+            "joint_back,2,deck",
+            "joint_front,0,deck"
           ],
           "sockets": [
             {
@@ -5125,13 +5125,13 @@
                 -1.45
               ],
               "accepts": [
-                "*"
+                "deck"
               ],
               "facings": [
                 2
               ],
               "joints": [
-                "joint_back,2,*"
+                "joint_back,2,deck"
               ]
             },
             {
@@ -5141,13 +5141,13 @@
                 1.463
               ],
               "accepts": [
-                "*"
+                "deck"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint_front,0,*"
+                "joint_front,0,deck"
               ]
             }
           ]
@@ -5155,17 +5155,17 @@
       ],
       "joints": [
         {
-          "name": "joint_back,2,*",
+          "name": "joint_back,2,deck",
           "direction": 2,
-          "layer": "*",
+          "layer": "deck",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_front,0,*",
+          "name": "joint_front,0,deck",
           "direction": 0,
-          "layer": "*",
+          "layer": "deck",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -5181,11 +5181,11 @@
       "files": [
         {
           "layer": null,
-          "file": "Tunnel.337bf211.glb",
-          "bytes": 193576,
+          "file": "Tunnel.738280f4.glb",
+          "bytes": 193584,
           "joints": [
-            "joint,0,*",
-            "joint,2,*"
+            "joint,0,deck",
+            "joint,2,deck"
           ],
           "sockets": [
             {
@@ -5195,13 +5195,13 @@
                 0.99
               ],
               "accepts": [
-                "*"
+                "deck"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint,0,*"
+                "joint,0,deck"
               ]
             },
             {
@@ -5211,13 +5211,13 @@
                 -0.99
               ],
               "accepts": [
-                "*"
+                "deck"
               ],
               "facings": [
                 2
               ],
               "joints": [
-                "joint,2,*"
+                "joint,2,deck"
               ]
             }
           ]
@@ -5225,17 +5225,17 @@
       ],
       "joints": [
         {
-          "name": "joint,0,*",
+          "name": "joint,0,deck",
           "direction": 0,
-          "layer": "*",
+          "layer": "deck",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint,2,*",
+          "name": "joint,2,deck",
           "direction": 2,
-          "layer": "*",
+          "layer": "deck",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -7201,10 +7201,10 @@
       "files": [
         {
           "layer": null,
-          "file": "BUB.c37d498f.glb",
-          "bytes": 140064,
+          "file": "BUB.b459c1d9.glb",
+          "bytes": 140068,
           "joints": [
-            "joint,0,*"
+            "joint,0,deck"
           ],
           "sockets": [
             {
@@ -7214,13 +7214,13 @@
                 0.01
               ],
               "accepts": [
-                "*"
+                "deck"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint,0,*"
+                "joint,0,deck"
               ]
             }
           ]
@@ -7228,9 +7228,9 @@
       ],
       "joints": [
         {
-          "name": "joint,0,*",
+          "name": "joint,0,deck",
           "direction": 0,
-          "layer": "*",
+          "layer": "deck",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -8870,10 +8870,10 @@
       "files": [
         {
           "layer": null,
-          "file": "TIC.53d71fb7.glb",
-          "bytes": 507772,
+          "file": "TIC.5778c87e.glb",
+          "bytes": 507776,
           "joints": [
-            "joint,0,*"
+            "joint,0,deck"
           ],
           "sockets": [
             {
@@ -8883,13 +8883,13 @@
                 0.08
               ],
               "accepts": [
-                "*"
+                "deck"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint,0,*"
+                "joint,0,deck"
               ]
             }
           ]
@@ -8897,9 +8897,9 @@
       ],
       "joints": [
         {
-          "name": "joint,0,*",
+          "name": "joint,0,deck",
           "direction": 0,
-          "layer": "*",
+          "layer": "deck",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
