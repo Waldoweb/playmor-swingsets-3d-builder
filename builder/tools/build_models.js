@@ -247,6 +247,11 @@ function main() {
         files,
         joints: joints.map(parseJoint),
       };
+      // How much railing this part removes, for the few whose joint carries no
+      // geometry of its own. See tools/sockets.config.json.
+      const cutout = (socketConfig.cutouts || {})[objectId];
+      if (cutout) products[objectId].cutout = cutout;
+
       if ("tubular" in child) products[objectId].tubular = child.tubular;
       if ("slope" in child) products[objectId].slope = child.slope;
     });

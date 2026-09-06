@@ -5270,86 +5270,89 @@
 
         return true;
       };
+      /**
+       * The volume a joint carves out of its host's railing.
+       *
+       * This is the joint's own geometry: slides and climbers carry a box on
+       * the joint node itself — a Wave Slide's measures 0.57 x 0.25 x 1.00 —
+       * and the fence code hides any slat that box touches. Toys carry none,
+       * which is right, because a scope mounts on a rail rather than replacing
+       * one.
+       *
+       * Tic-Tac-Toe was authored like a toy but goes where a slide goes, so it
+       * left every slat standing. Where a part declares a cut-out in the
+       * manifest, that box is used instead, placed and oriented exactly as the
+       * joint's own would have been.
+       */
+      const Joint_cut_box = (joint) => {
+        const position = new THREE.Vector3();
+        const quaternion = new THREE.Quaternion();
+        const scale = new THREE.Vector3();
+        joint.getWorldPosition(position);
+        joint.getWorldQuaternion(quaternion);
+        joint.getWorldScale(scale);
+
+        const probe = joint.clone();
+        probe.position.copy(position);
+        probe.quaternion.copy(quaternion);
+        probe.scale.copy(scale);
+        const box = new THREE.Box3().setFromObject(probe);
+        if (!box.isEmpty()) return box;
+
+        const entry =
+          modelManifest && joint.model && joint.model.object_id
+            ? modelManifest.products[joint.model.object_id]
+            : null;
+        const declared = entry && entry.cutout;
+        if (!declared) return box;
+
+        // Grow an axis-aligned box around the declared one's eight corners,
+        // which is the same result the joint's own geometry would have given.
+        const matrix = new THREE.Matrix4().compose(position, quaternion, scale);
+        const hx = declared[0] / 2, hy = declared[1] / 2, hz = declared[2] / 2;
+        const corner = new THREE.Vector3();
+        const out = new THREE.Box3();
+        for (let i = 0; i < 8; i++) {
+          corner
+            .set(i & 1 ? hx : -hx, i & 2 ? hy : -hy, i & 4 ? hz : -hz)
+            .applyMatrix4(matrix);
+          out.expandByPoint(corner);
+        }
+        return out;
+      };
+
+      /** The world-space box of one of a model's meshes, for the fence tests. */
+      const Mesh_world_box = (mesh) => {
+        const position = new THREE.Vector3();
+        const quaternion = new THREE.Quaternion();
+        const scale = new THREE.Vector3();
+        mesh.getWorldPosition(position);
+        mesh.getWorldQuaternion(quaternion);
+        mesh.getWorldScale(scale);
+
+        const probe = mesh.clone();
+        probe.position.copy(position);
+        probe.quaternion.copy(quaternion);
+        probe.scale.copy(scale);
+        return new THREE.Box3().setFromObject(probe);
+      };
+
       const Show_touched_fences = (args) => {
-        let plug_joint = args.joint;
-        let mesh = args.mesh;
+        const plug_box3 = Joint_cut_box(args.joint);
 
-        let m = plug_joint.clone();
-        let p = new THREE.Vector3();
-        let q = new THREE.Quaternion();
-        let s = new THREE.Vector3();
-        plug_joint.getWorldQuaternion(q);
-        plug_joint.getWorldScale(s);
-        m.quaternion.copy(q);
-        plug_joint.getWorldPosition(p);
-        m.position.copy(p);
-        m.scale.copy(s);
-
-        let plug_box3 = new THREE.Box3().setFromObject(m);
-        //scene . add ( new THREE . Box3Helper ( plug_box3 , 0xffff00 ) )
-
-        mesh.traverse((mesh) => {
+        args.mesh.traverse((mesh) => {
           if (mesh.name.toLowerCase().indexOf("fence") > -1) {
-            let m = mesh.clone();
-            let p = new THREE.Vector3();
-            let q = new THREE.Quaternion();
-            let s = new THREE.Vector3();
-            mesh.getWorldQuaternion(q);
-            mesh.getWorldScale(s);
-            m.quaternion.copy(q);
-            mesh.getWorldPosition(p);
-            m.position.copy(p);
-            m.scale.copy(s);
-
-            let host_box3 = new THREE.Box3().setFromObject(m);
-            //scene . add ( new THREE . Box3Helper ( host_box3 , 0x0000ff ) )
-
-            if (plug_box3.intersectsBox(host_box3)) {
-              mesh.visible = true;
-            }
+            if (plug_box3.intersectsBox(Mesh_world_box(mesh))) mesh.visible = true;
           }
         });
       };
       const Hide_touched_fences = (args) => {
-        let plug_joint = args.toucher;
-        let host_joint = args.parent;
+        const plug_box3 = Joint_cut_box(args.toucher);
 
-        let m = plug_joint.clone();
-        let p = new THREE.Vector3();
-        let q = new THREE.Quaternion();
-        let s = new THREE.Vector3();
-        plug_joint.getWorldQuaternion(q);
-        plug_joint.getWorldScale(s);
-        m.quaternion.copy(q);
-        plug_joint.getWorldPosition(p);
-        m.position.copy(p);
-        m.scale.copy(s);
-
-        let plug_box3 = new THREE.Box3().setFromObject(m);
-        //scene . add ( new THREE . Box3Helper ( plug_box3 , 0xffff00 ) )
-
-        host_joint.model.mesh.traverse((mesh) => {
-          //if ( ! mesh . name . toLowerCase () . startsWith ( 'joint' ) ) {
+        args.parent.model.mesh.traverse((mesh) => {
           if (mesh.name.toLowerCase().indexOf("fence") > -1) {
-            let m = mesh.clone();
-            let p = new THREE.Vector3();
-            let q = new THREE.Quaternion();
-            let s = new THREE.Vector3();
-            mesh.getWorldQuaternion(q);
-            mesh.getWorldScale(s);
-            m.quaternion.copy(q);
-            mesh.getWorldPosition(p);
-            m.position.copy(p);
-            m.scale.copy(s);
-
-            let host_box3 = new THREE.Box3().setFromObject(m);
-            //scene . add ( new THREE . Box3Helper ( host_box3 , 0x0000ff ) )
-
-            if (plug_box3.intersectsBox(host_box3)) {
-              mesh.visible = false;
-            }
+            if (plug_box3.intersectsBox(Mesh_world_box(mesh))) mesh.visible = false;
           }
-          //}
         });
       };
       /**

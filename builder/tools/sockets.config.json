@@ -21,6 +21,23 @@
     "at 0.296. Anything from 0.09 to 0.29 gives the same answer."
   ],
 
+  "cutouts": {
+    "TIC": [0.57, 0.25, 1.0]
+  },
+  "_cutouts_note": [
+    "How much of a host's railing a part removes, for parts whose joint is a",
+    "bare empty and so carves nothing.",
+    "",
+    "Slides and climbers carry this as geometry on the joint itself, and the",
+    "fence code hides any slat that box touches. Toys correctly carry none --",
+    "they mount on a rail rather than replacing it. Tic-Tac-Toe was authored",
+    "like a toy but goes where a slide goes, so every slat stayed standing.",
+    "It takes the Wave Slide's box exactly.",
+    "",
+    "Declared here rather than added to the GLB: giving a node geometry means",
+    "writing accessors and buffer bytes, where this is one line and readable."
+  ],
+
   "marker_offsets": {
     "picnic": [0, 0.393, 0]
   },

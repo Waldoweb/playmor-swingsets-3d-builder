@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-06T12:52:49.433Z",
+  "generated_at": "2026-09-06T19:15:47.107Z",
   "product_count": 64,
   "products": {
     "P-PT": {
@@ -8904,6 +8904,11 @@
           "exclusion_layer": null,
           "excluder_layer": null
         }
+      ],
+      "cutout": [
+        0.57,
+        0.25,
+        1
       ]
     }
   }
