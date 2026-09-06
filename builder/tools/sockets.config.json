@@ -1,0 +1,38 @@
+{
+  "_comment": [
+    "Configuration for socket derivation (tools/sockets.js).",
+    "",
+    "A socket is one physical opening. Joints that sit at the same point are",
+    "the same opening described more than once -- because a joint can hold only",
+    "one layer and one facing, so a post that takes either a scope or a wheel",
+    "needs two joints, and a mount that allows two facings needs two more.",
+    "",
+    "Nothing in the catalog accepts two parts at one spot, so proximity is the",
+    "whole rule and there is no exclusion table here. Keep it that way: if two",
+    "joints share a point but are really different openings, the fix belongs in",
+    "marker_offsets or in the model, not in a list of exceptions."
+  ],
+
+  "cluster_epsilon": 0.1,
+  "_cluster_epsilon_note": [
+    "Joints closer than this are one opening. Chosen from the measured gap in",
+    "the data: the widest pair that must merge is scope/wheel at 0.084, and the",
+    "nearest pair that must NOT merge is a tower's centre-vs-rail alternatives",
+    "at 0.296. Anything from 0.09 to 0.29 gives the same answer."
+  ],
+
+  "marker_offsets": {
+    "picnic": [0, 0.393, 0]
+  },
+  "_marker_offsets_note": [
+    "Where to DRAW a socket's dot, when that differs from where the part",
+    "attaches. Placement is untouched -- only the marker moves.",
+    "",
+    "picnic: the table mounts to the posts above the floor, but its joint was",
+    "authored down at floor height, so its dot landed on top of the floor kit's.",
+    "The table itself is correctly placed, so the joint stays and the dot rises",
+    "0.393 to the table top (0.153 -> 0.546). This also separates the two, which",
+    "is what stops the clustering below from merging two genuinely different",
+    "openings."
+  ]
+}

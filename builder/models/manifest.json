@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-05T15:52:53.590Z",
+  "generated_at": "2026-09-06T04:55:29.930Z",
   "product_count": 64,
   "products": {
     "P-PT": {
@@ -35,6 +35,276 @@
             "joint_r,2,6,3,4",
             "joint_r,2,scope",
             "joint_r,2,wheel"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0.762,
+                1.87,
+                0
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,6"
+              ]
+            },
+            {
+              "marker": [
+                -0.762,
+                1.87,
+                0
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint,3,6"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0,
+                -0.615
+              ],
+              "accepts": [
+                "end_rail"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back,2,end_rail"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.56,
+                -0.485
+              ],
+              "accepts": [
+                "b8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_beam_back,2,b8,5,3"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.56,
+                0.519
+              ],
+              "accepts": [
+                "b8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_beam_front,0,b8,6,2"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0,
+                0.62
+              ],
+              "accepts": [
+                "end_rail"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front,0,end_rail"
+              ]
+            },
+            {
+              "marker": [
+                -0.357,
+                1.87,
+                0.611
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_l,0,6,1,2"
+              ]
+            },
+            {
+              "marker": [
+                -0.357,
+                2.339,
+                0.585
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                0,
+                2
+              ],
+              "joints": [
+                "joint_l,0,scope",
+                "joint_l,2,wheel"
+              ]
+            },
+            {
+              "marker": [
+                -0.36,
+                2.292,
+                -0.557
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                0,
+                2
+              ],
+              "joints": [
+                "joint_l,0,wheel",
+                "joint_l,2,scope"
+              ]
+            },
+            {
+              "marker": [
+                0.355,
+                1.87,
+                -0.611
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_l,2,6,3,4"
+              ]
+            },
+            {
+              "marker": [
+                -0.001,
+                1.87,
+                0.611
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_pole_female,0,6,2,1"
+              ]
+            },
+            {
+              "marker": [
+                0.001,
+                1.87,
+                -0.611
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_pole_female,2,6,4,3"
+              ]
+            },
+            {
+              "marker": [
+                0.357,
+                1.87,
+                0.611
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_r,0,6,1,2"
+              ]
+            },
+            {
+              "marker": [
+                0.346,
+                2.339,
+                0.593
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                0,
+                2
+              ],
+              "joints": [
+                "joint_r,0,scope",
+                "joint_r,2,wheel"
+              ]
+            },
+            {
+              "marker": [
+                0.341,
+                2.294,
+                -0.557
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                0,
+                2
+              ],
+              "joints": [
+                "joint_r,0,wheel",
+                "joint_r,2,scope"
+              ]
+            },
+            {
+              "marker": [
+                -0.355,
+                1.87,
+                -0.611
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_r,2,6,3,4"
+              ]
+            }
           ]
         }
       ],
@@ -240,6 +510,401 @@
             "joint_r,2,6,1,2",
             "joint_r,3,5",
             "joint_r,3,6"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                -0.007,
+                1.557,
+                1.228
+              ],
+              "accepts": [
+                "5"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,5"
+              ]
+            },
+            {
+              "marker": [
+                -0.009,
+                2.023,
+                1.193
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                0,
+                2
+              ],
+              "joints": [
+                "joint,0,scope",
+                "joint,2,wheel"
+              ]
+            },
+            {
+              "marker": [
+                0.761,
+                1.544,
+                0.555
+              ],
+              "accepts": [
+                "5"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,5"
+              ]
+            },
+            {
+              "marker": [
+                0.761,
+                1.846,
+                -0.584
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,6"
+              ]
+            },
+            {
+              "marker": [
+                0.73,
+                2.02,
+                0.553
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                1,
+                3
+              ],
+              "joints": [
+                "joint,1,scope",
+                "joint,3,wheel"
+              ]
+            },
+            {
+              "marker": [
+                -0.713,
+                1.975,
+                0.568
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                1,
+                3
+              ],
+              "joints": [
+                "joint,1,wheel",
+                "joint,3,scope"
+              ]
+            },
+            {
+              "marker": [
+                -0.761,
+                1.544,
+                0.555
+              ],
+              "accepts": [
+                "5"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint,3,5"
+              ]
+            },
+            {
+              "marker": [
+                -0.761,
+                1.846,
+                -0.584
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint,3,6"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0,
+                -1.227
+              ],
+              "accepts": [
+                "end_rail"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back,2,end_rail"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.56,
+                -1.114
+              ],
+              "accepts": [
+                "b8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_beam,2,b8,3,2"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0,
+                1.234
+              ],
+              "accepts": [
+                "end_rail"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front,0,end_rail"
+              ]
+            },
+            {
+              "marker": [
+                -0.312,
+                1.557,
+                1.228
+              ],
+              "accepts": [
+                "5"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_l,0,5"
+              ]
+            },
+            {
+              "marker": [
+                0.761,
+                1.544,
+                0.825
+              ],
+              "accepts": [
+                "5"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_l,1,5"
+              ]
+            },
+            {
+              "marker": [
+                0.761,
+                1.846,
+                -0.318
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_l,1,6"
+              ]
+            },
+            {
+              "marker": [
+                0.343,
+                1.846,
+                -1.232
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_l,2,6,1,2"
+              ]
+            },
+            {
+              "marker": [
+                -0.761,
+                1.544,
+                0.291
+              ],
+              "accepts": [
+                "5"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_l,3,5"
+              ]
+            },
+            {
+              "marker": [
+                -0.761,
+                1.846,
+                -0.857
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_l,3,6"
+              ]
+            },
+            {
+              "marker": [
+                -0.002,
+                1.846,
+                -1.232
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_pole_female,2,6,2,1"
+              ]
+            },
+            {
+              "marker": [
+                0.31,
+                1.557,
+                1.228
+              ],
+              "accepts": [
+                "5"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_r,0,5"
+              ]
+            },
+            {
+              "marker": [
+                0.761,
+                1.544,
+                0.291
+              ],
+              "accepts": [
+                "5"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_r,1,5"
+              ]
+            },
+            {
+              "marker": [
+                0.761,
+                1.846,
+                -0.854
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_r,1,6"
+              ]
+            },
+            {
+              "marker": [
+                -0.343,
+                1.846,
+                -1.232
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_r,2,6,1,2"
+              ]
+            },
+            {
+              "marker": [
+                -0.761,
+                1.544,
+                0.825
+              ],
+              "accepts": [
+                "5"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_r,3,5"
+              ]
+            },
+            {
+              "marker": [
+                -0.761,
+                1.846,
+                -0.318
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_r,3,6"
+              ]
+            }
           ]
         }
       ],
@@ -504,6 +1169,488 @@
             "joint_right,1,end_rail",
             "joint_right_l,1,6,5,4",
             "joint_right_r,1,6,5,4"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0.153,
+                0
+              ],
+              "accepts": [
+                "floor_center_watch"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,floor_center_watch"
+              ]
+            },
+            {
+              "marker": [
+                0.762,
+                1.785,
+                0
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,6,4,5"
+              ]
+            },
+            {
+              "marker": [
+                -0.762,
+                1.785,
+                0
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint,3,6,9,10"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0,
+                -0.777
+              ],
+              "accepts": [
+                "end_rail"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back,2,end_rail"
+              ]
+            },
+            {
+              "marker": [
+                0.312,
+                2.205,
+                -0.711
+              ],
+              "accepts": [
+                "wheel"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_back_l,0,wheel"
+              ]
+            },
+            {
+              "marker": [
+                0.312,
+                1.785,
+                -0.765
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back_l,2,6,7,6"
+              ]
+            },
+            {
+              "marker": [
+                0.661,
+                2.565,
+                -0.611
+              ],
+              "accepts": [
+                "mailbox_or_phone"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back_l,2,mailbox_or_phone"
+              ]
+            },
+            {
+              "marker": [
+                0.312,
+                2.685,
+                -0.735
+              ],
+              "accepts": [
+                "scope"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back_l,2,scope"
+              ]
+            },
+            {
+              "marker": [
+                -0.312,
+                2.205,
+                -0.711
+              ],
+              "accepts": [
+                "wheel"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_back_r,0,wheel"
+              ]
+            },
+            {
+              "marker": [
+                -0.312,
+                1.785,
+                -0.765
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back_r,2,6,7,6"
+              ]
+            },
+            {
+              "marker": [
+                -0.312,
+                2.685,
+                -0.735
+              ],
+              "accepts": [
+                "scope"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back_r,2,scope"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.56,
+                -0.661
+              ],
+              "accepts": [
+                "b8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_beam_back,2,b8,8,6"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.56,
+                0.661
+              ],
+              "accepts": [
+                "b8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_beam_front,0,b8,3,1"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0.393,
+                0
+              ],
+              "accepts": [
+                "picnic"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_floor_center,0,picnic"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0,
+                0.777
+              ],
+              "accepts": [
+                "end_rail"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front,0,end_rail"
+              ]
+            },
+            {
+              "marker": [
+                -0.312,
+                1.785,
+                0.765
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front_l,0,6,2,1"
+              ]
+            },
+            {
+              "marker": [
+                -0.661,
+                2.565,
+                0.611
+              ],
+              "accepts": [
+                "mailbox_or_phone"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front_l,0,mailbox_or_phone"
+              ]
+            },
+            {
+              "marker": [
+                -0.312,
+                2.685,
+                0.738
+              ],
+              "accepts": [
+                "scope"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front_l,0,scope"
+              ]
+            },
+            {
+              "marker": [
+                -0.312,
+                2.205,
+                0.706
+              ],
+              "accepts": [
+                "wheel"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_front_l,2,wheel"
+              ]
+            },
+            {
+              "marker": [
+                0.312,
+                1.785,
+                0.765
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front_r,0,6,2,1"
+              ]
+            },
+            {
+              "marker": [
+                0.312,
+                2.685,
+                0.738
+              ],
+              "accepts": [
+                "scope"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front_r,0,scope"
+              ]
+            },
+            {
+              "marker": [
+                0.312,
+                2.205,
+                0.706
+              ],
+              "accepts": [
+                "wheel"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_front_r,2,wheel"
+              ]
+            },
+            {
+              "marker": [
+                -0.78,
+                0,
+                0
+              ],
+              "accepts": [
+                "end_rail"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left,3,end_rail"
+              ]
+            },
+            {
+              "marker": [
+                -0.762,
+                1.785,
+                -0.27
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left_l,3,6,10,9"
+              ]
+            },
+            {
+              "marker": [
+                -0.762,
+                1.785,
+                0.27
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left_r,3,6,10,9"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                1.785,
+                0.764
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_pole_female,0,6,1,2"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                1.785,
+                -0.764
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_pole_female,2,6,67"
+              ]
+            },
+            {
+              "marker": [
+                0.783,
+                0,
+                0
+              ],
+              "accepts": [
+                "end_rail"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_right,1,end_rail"
+              ]
+            },
+            {
+              "marker": [
+                0.762,
+                1.785,
+                0.27
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_right_l,1,6,5,4"
+              ]
+            },
+            {
+              "marker": [
+                0.762,
+                1.785,
+                -0.27
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_right_r,1,6,5,4"
+              ]
+            }
           ]
         }
       ],
@@ -787,6 +1934,408 @@
             "joint_r,3,wheel",
             "joint_right_l,1,6,2,1",
             "joint_right_r,1,6,2,1"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                1.5,
+                0
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,s,tire"
+              ]
+            },
+            {
+              "marker": [
+                -0.675,
+                2.545,
+                0
+              ],
+              "accepts": [
+                "b8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "Joint_beam_left,3,b8,5,6"
+              ]
+            },
+            {
+              "marker": [
+                0.678,
+                2.545,
+                0
+              ],
+              "accepts": [
+                "b8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "Joint_beam_right,1,b8,3,1"
+              ]
+            },
+            {
+              "marker": [
+                -0.296,
+                1.792,
+                0.762
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_l,0,6"
+              ]
+            },
+            {
+              "marker": [
+                0.612,
+                2.557,
+                0.642
+              ],
+              "accepts": [
+                "mailbox_or_phone"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_l,1,mailbox_or_phone"
+              ]
+            },
+            {
+              "marker": [
+                0.74,
+                2.648,
+                0.283
+              ],
+              "accepts": [
+                "scope"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_l,1,scope"
+              ]
+            },
+            {
+              "marker": [
+                -0.716,
+                2.188,
+                0.283
+              ],
+              "accepts": [
+                "wheel"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_l,1,wheel"
+              ]
+            },
+            {
+              "marker": [
+                0.296,
+                1.792,
+                -0.762
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_l,2,6"
+              ]
+            },
+            {
+              "marker": [
+                -0.741,
+                2.648,
+                0.283
+              ],
+              "accepts": [
+                "scope"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_l,3,scope"
+              ]
+            },
+            {
+              "marker": [
+                0.716,
+                2.188,
+                0.283
+              ],
+              "accepts": [
+                "wheel"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_l,3,wheel"
+              ]
+            },
+            {
+              "marker": [
+                -0.763,
+                1.792,
+                -0.305
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left_l,3,6,5,4"
+              ]
+            },
+            {
+              "marker": [
+                -0.763,
+                1.792,
+                0.305
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left_r,3,6,5,4"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                1.792,
+                0.762
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_pole_female,0,6"
+              ]
+            },
+            {
+              "marker": [
+                0.763,
+                1.792,
+                0
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_pole_female,1,6,1,2"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                1.792,
+                -0.762
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_pole_female,2,6"
+              ]
+            },
+            {
+              "marker": [
+                -0.763,
+                1.792,
+                0
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_pole_female,3,6,4,5"
+              ]
+            },
+            {
+              "marker": [
+                0.296,
+                1.792,
+                0.762
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_r,0,6"
+              ]
+            },
+            {
+              "marker": [
+                0.74,
+                2.648,
+                -0.284
+              ],
+              "accepts": [
+                "scope"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_r,1,scope"
+              ]
+            },
+            {
+              "marker": [
+                -0.716,
+                2.188,
+                -0.284
+              ],
+              "accepts": [
+                "wheel"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_r,1,wheel"
+              ]
+            },
+            {
+              "marker": [
+                -0.296,
+                1.792,
+                -0.762
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_r,2,6"
+              ]
+            },
+            {
+              "marker": [
+                -0.612,
+                2.557,
+                -0.655
+              ],
+              "accepts": [
+                "mailbox_or_phone"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_r,3,mailbox_or_phone"
+              ]
+            },
+            {
+              "marker": [
+                -0.741,
+                2.648,
+                -0.284
+              ],
+              "accepts": [
+                "scope"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_r,3,scope"
+              ]
+            },
+            {
+              "marker": [
+                0.716,
+                2.188,
+                -0.284
+              ],
+              "accepts": [
+                "wheel"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_r,3,wheel"
+              ]
+            },
+            {
+              "marker": [
+                0.763,
+                1.792,
+                0.305
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_right_l,1,6,2,1"
+              ]
+            },
+            {
+              "marker": [
+                0.763,
+                1.792,
+                -0.305
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_right_r,1,6,2,1"
+              ]
+            }
           ]
         }
       ],
@@ -1039,6 +2588,452 @@
             "joint_right_r,1,6,5,4",
             "joint_right_r,1,8,7,6",
             "jointj,0,floor_deluxe"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0.764,
+                1.833,
+                0.719
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,6,4,5"
+              ]
+            },
+            {
+              "marker": [
+                0.764,
+                2.452,
+                -0.737
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,8,6,7"
+              ]
+            },
+            {
+              "marker": [
+                -0.003,
+                2.452,
+                -1.523
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint,2,8,8,9"
+              ]
+            },
+            {
+              "marker": [
+                -0.764,
+                1.833,
+                0.719
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint,3,6,13,14"
+              ]
+            },
+            {
+              "marker": [
+                -0.764,
+                2.452,
+                -0.737
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint,3,8,11,12"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0,
+                -1.565
+              ],
+              "accepts": [
+                "end_rail",
+                "kitchen"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back,2,end_rail",
+                "joint_back,2,kitchen,7,6"
+              ]
+            },
+            {
+              "marker": [
+                0.29,
+                2.452,
+                -1.524
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back_l,2,8,9,8",
+                "joint_l,2,8,8,9"
+              ]
+            },
+            {
+              "marker": [
+                -0.29,
+                2.452,
+                -1.524
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back_r,2,8,9,8",
+                "joint_r,2,8,8,9"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.2,
+                -1.413
+              ],
+              "accepts": [
+                "b10"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_beam_back,2,b10,10,8"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.56,
+                1.427
+              ],
+              "accepts": [
+                "b8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_beam_front,0,b8,3,1"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0.546,
+                0.684
+              ],
+              "accepts": [
+                "picnic"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_floor_back,0,picnic"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0.546,
+                -0.684
+              ],
+              "accepts": [
+                "picnic"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_floor_front,0,picnic,6,7"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0,
+                1.565
+              ],
+              "accepts": [
+                "end_rail"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front,0,end_rail"
+              ]
+            },
+            {
+              "marker": [
+                -0.29,
+                1.833,
+                1.515
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front_l,0,6,2,1",
+                "joint_l,0,6,1,2"
+              ]
+            },
+            {
+              "marker": [
+                0.29,
+                1.833,
+                1.524
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front_r,0,6,2,1",
+                "joint_r,0,6,1,2"
+              ]
+            },
+            {
+              "marker": [
+                -0.295,
+                2.868,
+                -1.471
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                0,
+                2
+              ],
+              "joints": [
+                "joint_l,0,wheel",
+                "joint_l,2,scope"
+              ]
+            },
+            {
+              "marker": [
+                -0.764,
+                1.833,
+                0.998
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left_l,3,6,14,13"
+              ]
+            },
+            {
+              "marker": [
+                -0.764,
+                2.452,
+                -0.448
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left_l,3,8,12,11"
+              ]
+            },
+            {
+              "marker": [
+                -0.764,
+                1.833,
+                0.431
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left_r,3,6,14,13"
+              ]
+            },
+            {
+              "marker": [
+                -0.764,
+                2.452,
+                -1.013
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left_r,3,8,12,11"
+              ]
+            },
+            {
+              "marker": [
+                0.003,
+                1.833,
+                1.524
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_pole_female_f,0,6,1,2"
+              ]
+            },
+            {
+              "marker": [
+                0.272,
+                2.877,
+                -1.471
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                0,
+                2
+              ],
+              "joints": [
+                "joint_r,0,wheel",
+                "joint_r,2,scope"
+              ]
+            },
+            {
+              "marker": [
+                0.764,
+                1.833,
+                0.998
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_right_l,1,6,5,4"
+              ]
+            },
+            {
+              "marker": [
+                0.764,
+                2.452,
+                -0.448
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_right_l,1,8,7,6"
+              ]
+            },
+            {
+              "marker": [
+                0.764,
+                1.833,
+                0.432
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_right_r,1,6,5,4"
+              ]
+            },
+            {
+              "marker": [
+                0.764,
+                2.452,
+                -1.013
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_right_r,1,8,7,6"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0.153,
+                0
+              ],
+              "accepts": [
+                "floor_deluxe"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "jointj,0,floor_deluxe"
+              ]
+            }
           ]
         }
       ],
@@ -1372,6 +3367,564 @@
             "joint_right_l,3,6,2,1",
             "joint_right_r,0,8,7,6",
             "joint_right_r,3,6,2,1"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0.031,
+                2.452,
+                1.58
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,8,6,7"
+              ]
+            },
+            {
+              "marker": [
+                0.011,
+                0.16,
+                0.838
+              ],
+              "accepts": [
+                "floor_center_watch"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,floor_center_watch"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                1.5,
+                -0.421
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,s,tire"
+              ]
+            },
+            {
+              "marker": [
+                0.772,
+                1.792,
+                -0.421
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,6,4,5"
+              ]
+            },
+            {
+              "marker": [
+                0.778,
+                2.452,
+                0.836
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,8,8,9"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                1.792,
+                -1.121
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint,2,6"
+              ]
+            },
+            {
+              "marker": [
+                -0.773,
+                1.792,
+                -0.421
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint,3,6,1,2"
+              ]
+            },
+            {
+              "marker": [
+                -0.769,
+                2.452,
+                0.836
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint,3,8,8,9"
+              ]
+            },
+            {
+              "marker": [
+                0.817,
+                0,
+                0.838
+              ],
+              "accepts": [
+                "end_rail",
+                "kitchen"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_back,1,end_rail",
+                "joint_back,1,kitchen,7,6"
+              ]
+            },
+            {
+              "marker": [
+                0.778,
+                2.452,
+                1.119
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_back_l,1,8,9,8"
+              ]
+            },
+            {
+              "marker": [
+                0.778,
+                2.452,
+                0.558
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_back_r,1,8,9,8"
+              ]
+            },
+            {
+              "marker": [
+                0.673,
+                3.2,
+                0.838
+              ],
+              "accepts": [
+                "b10"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_beam_back,1,b10,10,8"
+              ]
+            },
+            {
+              "marker": [
+                -0.667,
+                3.2,
+                0.838
+              ],
+              "accepts": [
+                "b10"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_beam_front,3,b10,10,8"
+              ]
+            },
+            {
+              "marker": [
+                -0.02,
+                0.546,
+                0.838
+              ],
+              "accepts": [
+                "picnic"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_floor_front,0,picnic,6,7"
+              ]
+            },
+            {
+              "marker": [
+                -0.829,
+                0,
+                0.838
+              ],
+              "accepts": [
+                "end_rail",
+                "kitchen"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_front,3,end_rail",
+                "joint_front,3,kitchen,7,6"
+              ]
+            },
+            {
+              "marker": [
+                0.3,
+                1.792,
+                -1.121
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_front_l,2,6"
+              ]
+            },
+            {
+              "marker": [
+                -0.77,
+                2.452,
+                1.119
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_front_l,3,8,8,9"
+              ]
+            },
+            {
+              "marker": [
+                -0.3,
+                1.792,
+                -1.121
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_front_r,2,6"
+              ]
+            },
+            {
+              "marker": [
+                -0.77,
+                2.452,
+                0.558
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_front_r,3,8,8,9"
+              ]
+            },
+            {
+              "marker": [
+                0.75,
+                2.235,
+                -0.68
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                1,
+                3
+              ],
+              "joints": [
+                "joint_l,1,scope",
+                "joint_l,3,wheel"
+              ]
+            },
+            {
+              "marker": [
+                -0.724,
+                2.188,
+                -0.68
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                1,
+                3
+              ],
+              "joints": [
+                "joint_l,1,wheel",
+                "joint_l,3,scope"
+              ]
+            },
+            {
+              "marker": [
+                0.756,
+                2.938,
+                0.57
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                1,
+                3
+              ],
+              "joints": [
+                "joint_l_8,1,scope",
+                "joint_l_8,3,wheel"
+              ]
+            },
+            {
+              "marker": [
+                -0.721,
+                2.868,
+                0.552
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                1,
+                3
+              ],
+              "joints": [
+                "joint_l_8,1,wheel",
+                "joint_l_8,3,scope"
+              ]
+            },
+            {
+              "marker": [
+                0.772,
+                1.792,
+                -0.14
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_left_l,1,6,5,4"
+              ]
+            },
+            {
+              "marker": [
+                0.772,
+                1.792,
+                -0.701
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_left_r,1,6,5,4"
+              ]
+            },
+            {
+              "marker": [
+                0.75,
+                2.235,
+                -0.16
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                1,
+                3
+              ],
+              "joints": [
+                "joint_r,1,scope",
+                "joint_r,3,wheel"
+              ]
+            },
+            {
+              "marker": [
+                -0.724,
+                2.188,
+                -0.16
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                1,
+                3
+              ],
+              "joints": [
+                "joint_r,1,wheel",
+                "joint_r,3,scope"
+              ]
+            },
+            {
+              "marker": [
+                0.756,
+                2.938,
+                1.12
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                1,
+                3
+              ],
+              "joints": [
+                "joint_r_8,1,scope",
+                "joint_r_8,3,wheel"
+              ]
+            },
+            {
+              "marker": [
+                -0.721,
+                2.868,
+                1.115
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                1,
+                3
+              ],
+              "joints": [
+                "joint_r_8,1,wheel",
+                "joint_r_8,3,scope"
+              ]
+            },
+            {
+              "marker": [
+                -0.243,
+                2.452,
+                1.58
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_right_l,0,8,7,6"
+              ]
+            },
+            {
+              "marker": [
+                -0.772,
+                1.792,
+                -0.701
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_right_l,3,6,2,1"
+              ]
+            },
+            {
+              "marker": [
+                0.293,
+                2.452,
+                1.58
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_right_r,0,8,7,6"
+              ]
+            },
+            {
+              "marker": [
+                -0.772,
+                1.792,
+                -0.14
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_right_r,3,6,2,1"
+              ]
+            }
           ]
         }
       ],
@@ -1768,6 +4321,484 @@
             "Joint_left_r,3,8,9,8",
             "Joint_right_l,1,8,4,3",
             "Joint_right_r,1,8,4,3"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                1.224,
+                0.463,
+                0
+              ],
+              "accepts": [
+                "0"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,0"
+              ]
+            },
+            {
+              "marker": [
+                1.224,
+                0,
+                0
+              ],
+              "accepts": [
+                "end_rail",
+                "kitchen"
+              ],
+              "facings": [
+                1,
+                2
+              ],
+              "joints": [
+                "joint,2,end_rail",
+                "joint_left,1,end_rail",
+                "joint_left,1,kitchen"
+              ]
+            },
+            {
+              "marker": [
+                0.156,
+                2.485,
+                0.768
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,8,1,2001"
+              ]
+            },
+            {
+              "marker": [
+                -0.156,
+                2.485,
+                0.768
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,8,1,2002"
+              ]
+            },
+            {
+              "marker": [
+                -0.467,
+                2.485,
+                0.768
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,8,1,2003"
+              ]
+            },
+            {
+              "marker": [
+                -0.778,
+                2.485,
+                0.768
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,8,1,2004"
+              ]
+            },
+            {
+              "marker": [
+                0.467,
+                2.485,
+                0.768
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,8,1,2005"
+              ]
+            },
+            {
+              "marker": [
+                0.778,
+                2.485,
+                0.768
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,8,1,2006"
+              ]
+            },
+            {
+              "marker": [
+                -0.006,
+                2.953,
+                0.733
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                0,
+                2
+              ],
+              "joints": [
+                "joint,0,scope",
+                "joint,2,wheel"
+              ]
+            },
+            {
+              "marker": [
+                -0.007,
+                2.881,
+                -0.715
+              ],
+              "accepts": [
+                "scope",
+                "wheel"
+              ],
+              "facings": [
+                0,
+                2
+              ],
+              "joints": [
+                "joint,0,wheel",
+                "joint,2,scope"
+              ]
+            },
+            {
+              "marker": [
+                1.223,
+                2.445,
+                0
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,8,3,4"
+              ]
+            },
+            {
+              "marker": [
+                1.061,
+                3.151,
+                0.663
+              ],
+              "accepts": [
+                "mailbox_or_phone"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,mailbox_or_phone"
+              ]
+            },
+            {
+              "marker": [
+                -0.156,
+                2.485,
+                -0.801
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint,2,8,6,7001"
+              ]
+            },
+            {
+              "marker": [
+                0.156,
+                2.485,
+                -0.801
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint,2,8,6,7002"
+              ]
+            },
+            {
+              "marker": [
+                0.467,
+                2.485,
+                -0.801
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint,2,8,6,7003"
+              ]
+            },
+            {
+              "marker": [
+                -0.467,
+                2.485,
+                -0.801
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint,2,8,6,7004"
+              ]
+            },
+            {
+              "marker": [
+                -0.778,
+                2.485,
+                -0.801
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint,2,8,6,7005"
+              ]
+            },
+            {
+              "marker": [
+                0.778,
+                2.485,
+                -0.801
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint,2,8,6,7006"
+              ]
+            },
+            {
+              "marker": [
+                -1.244,
+                2.485,
+                0
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint,3,8,8,9"
+              ]
+            },
+            {
+              "marker": [
+                -1.061,
+                3.125,
+                -0.65
+              ],
+              "accepts": [
+                "mailbox_or_phone"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint,3,mailbox_or_phone"
+              ]
+            },
+            {
+              "marker": [
+                -1.183,
+                3.2,
+                0
+              ],
+              "accepts": [
+                "b10"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_beam_left,3,b10,10,8"
+              ]
+            },
+            {
+              "marker": [
+                1.183,
+                3.2,
+                0
+              ],
+              "accepts": [
+                "b10"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_beam_right,1,b10,5,3"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0.153,
+                0
+              ],
+              "accepts": [
+                "floor_center_king"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_floor_center,0,floor_center_king"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0.546,
+                0
+              ],
+              "accepts": [
+                "picnic"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_floor_center,0,picnic"
+              ]
+            },
+            {
+              "marker": [
+                -1.216,
+                0,
+                0
+              ],
+              "accepts": [
+                "end_rail",
+                "kitchen"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left,3,end_rail",
+                "joint_left,3,kitchen"
+              ]
+            },
+            {
+              "marker": [
+                -1.244,
+                2.485,
+                -0.33
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "Joint_left_l,3,8,9,8"
+              ]
+            },
+            {
+              "marker": [
+                -1.244,
+                2.485,
+                0.33
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "Joint_left_r,3,8,9,8"
+              ]
+            },
+            {
+              "marker": [
+                1.223,
+                2.445,
+                0.33
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "Joint_right_l,1,8,4,3"
+              ]
+            },
+            {
+              "marker": [
+                1.223,
+                2.445,
+                -0.33
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "Joint_right_r,1,8,4,3"
+              ]
+            }
           ]
         }
       ],
@@ -2060,6 +5091,40 @@
           "joints": [
             "joint_back,2,*",
             "joint_front,0,*"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0.365,
+                -1.45
+              ],
+              "accepts": [
+                "*"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back,2,*"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0.365,
+                1.463
+              ],
+              "accepts": [
+                "*"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front,0,*"
+              ]
+            }
           ]
         }
       ],
@@ -2096,6 +5161,40 @@
           "joints": [
             "joint,0,*",
             "joint,2,*"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0.457,
+                0.99
+              ],
+              "accepts": [
+                "*"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,*"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0.457,
+                -0.99
+              ],
+              "accepts": [
+                "*"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint,2,*"
+              ]
+            }
           ]
         }
       ],
@@ -2135,6 +5234,74 @@
             "joint_female_2,0,s",
             "joint_female_3,0,s,_x_0",
             "joint_female_3,0,sh,_x_0"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.64,
+                4.25
+              ],
+              "accepts": [
+                "b8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,b8"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                3.463
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_female_1,0,s"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                2.21
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_female_2,0,s"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                0.958
+              ],
+              "accepts": [
+                "s",
+                "sh"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_female_3,0,s,_x_0",
+                "joint_female_3,0,sh,_x_0"
+              ]
+            }
           ]
         }
       ],
@@ -2198,6 +5365,74 @@
             "joint_swing_1_female,0,s",
             "joint_swing_2_female,0,s",
             "joint_swing_3_female,0,s,_x_0"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                3.161,
+                4.215
+              ],
+              "accepts": [
+                "b10"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,b10"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.071,
+                0.958
+              ],
+              "accepts": [
+                "s",
+                "sh"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,sh,_x_0",
+                "joint_swing_3_female,0,s,_x_0"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.071,
+                3.463
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_swing_1_female,0,s"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.071,
+                2.21
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_swing_2_female,0,s"
+              ]
+            }
           ]
         }
       ],
@@ -2262,6 +5497,90 @@
             "joint_female_2,0,s",
             "joint_female_3,0,s",
             "joint_female_4,0,s,_x_0"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.654,
+                5.345
+              ],
+              "accepts": [
+                "b8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "Joint,0,b8"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                0.958
+              ],
+              "accepts": [
+                "s",
+                "sh"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,sh,_x_0",
+                "joint_female_4,0,s,_x_0"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                4.685
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_female_1,0,s"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                3.463
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_female_2,0,s"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                2.25
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_female_3,0,s"
+              ]
+            }
           ]
         }
       ],
@@ -2334,6 +5653,90 @@
             "joint_swing_2_female,0,s",
             "joint_swing_3_female,0,s",
             "joint_swing_4_female,0,s,_x_0"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                3.161,
+                5.345
+              ],
+              "accepts": [
+                "b10"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,b10"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.071,
+                0.958
+              ],
+              "accepts": [
+                "s",
+                "sh"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,sh,_x_0",
+                "joint_swing_4_female,0,s,_x_0"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.071,
+                4.685
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_swing_1_female,0,s"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.071,
+                3.463
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_swing_2_female,0,s"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.071,
+                2.21
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_swing_3_female,0,s"
+              ]
+            }
           ]
         }
       ],
@@ -2406,6 +5809,90 @@
             "joint_swing_female_1,0,s",
             "joint_swing_female_2,0,s",
             "joint_swing_female_3,0,s,_x_0"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.625,
+                4.25
+              ],
+              "accepts": [
+                "b8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,b8"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                0.958
+              ],
+              "accepts": [
+                "s",
+                "sh"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,sh,_x_0",
+                "joint_swing_female_3,0,s,_x_0"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.744,
+                -1.081
+              ],
+              "accepts": [
+                "ds"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_disc_swing_female,0,ds"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                3.463
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_swing_female_1,0,s"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                2.21
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_swing_female_2,0,s"
+              ]
+            }
           ]
         }
       ],
@@ -2478,6 +5965,90 @@
             "joint_3,0,s,_x_0",
             "joint_4,0,sh,_x_0",
             "joint_disc_swing_female,0,ds"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                3.161,
+                4.215
+              ],
+              "accepts": [
+                "b10"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,b10"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.071,
+                3.463
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_1,0,s"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.071,
+                2.21
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_2,0,s"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.071,
+                0.958
+              ],
+              "accepts": [
+                "s",
+                "sh"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_3,0,s,_x_0",
+                "joint_4,0,sh,_x_0"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.301,
+                -1.061
+              ],
+              "accepts": [
+                "ds"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_disc_swing_female,0,ds"
+              ]
+            }
           ]
         }
       ],
@@ -2545,6 +6116,24 @@
           "bytes": 177884,
           "joints": [
             "joint,0,s"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.42,
+                0
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,s"
+              ]
+            }
           ]
         },
         {
@@ -2553,6 +6142,24 @@
           "bytes": 270812,
           "joints": [
             "joint,0,s"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                3.03,
+                0
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,s"
+              ]
+            }
           ]
         }
       ],
@@ -2588,6 +6195,24 @@
           "bytes": 128256,
           "joints": [
             "joint,0,s"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.42,
+                0
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,s"
+              ]
+            }
           ]
         },
         {
@@ -2596,6 +6221,24 @@
           "bytes": 136704,
           "joints": [
             "joint,0,s"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.99,
+                0
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,s"
+              ]
+            }
           ]
         }
       ],
@@ -2632,6 +6275,26 @@
           "joints": [
             "joint,0,s",
             "joint,2,s"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0.01,
+                2.465,
+                0
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0,
+                2
+              ],
+              "joints": [
+                "joint,0,s",
+                "joint,2,s"
+              ]
+            }
           ]
         },
         {
@@ -2641,6 +6304,26 @@
           "joints": [
             "joint,0,s",
             "joint,2,s"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                3.075,
+                0
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0,
+                2
+              ],
+              "joints": [
+                "joint,0,s",
+                "joint,2,s"
+              ]
+            }
           ]
         }
       ],
@@ -2692,6 +6375,24 @@
           "bytes": 679724,
           "joints": [
             "joint,1,sh"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.48,
+                0
+              ],
+              "accepts": [
+                "sh"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,sh"
+              ]
+            }
           ]
         },
         {
@@ -2700,6 +6401,24 @@
           "bytes": 544808,
           "joints": [
             "joint,1,sh"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                3.106,
+                0
+              ],
+              "accepts": [
+                "sh"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,sh"
+              ]
+            }
           ]
         }
       ],
@@ -2735,6 +6454,24 @@
           "bytes": 115496,
           "joints": [
             "joint,0,s"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.4,
+                0
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,s"
+              ]
+            }
           ]
         },
         {
@@ -2743,6 +6480,24 @@
           "bytes": 115496,
           "joints": [
             "joint,0,s"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                3.01,
+                0
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,s"
+              ]
+            }
           ]
         }
       ],
@@ -2778,6 +6533,24 @@
           "bytes": 181976,
           "joints": [
             "joint,0,s"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.455,
+                0
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,s"
+              ]
+            }
           ]
         },
         {
@@ -2786,6 +6559,24 @@
           "bytes": 181848,
           "joints": [
             "joint,0,s"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                3.115,
+                0
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,s"
+              ]
+            }
           ]
         }
       ],
@@ -2821,6 +6612,24 @@
           "bytes": 45752,
           "joints": [
             "joint,0,ds"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.673,
+                0
+              ],
+              "accepts": [
+                "ds"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,ds"
+              ]
+            }
           ]
         },
         {
@@ -2829,6 +6638,24 @@
           "bytes": 45764,
           "joints": [
             "joint,0,ds"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                3.314,
+                0
+              ],
+              "accepts": [
+                "ds"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,ds"
+              ]
+            }
           ]
         }
       ],
@@ -2864,6 +6691,24 @@
           "bytes": 124152,
           "joints": [
             "joint,0,s"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.461,
+                0
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,s"
+              ]
+            }
           ]
         },
         {
@@ -2872,6 +6717,24 @@
           "bytes": 102920,
           "joints": [
             "joint,0,s"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                3.07,
+                0
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,s"
+              ]
+            }
           ]
         }
       ],
@@ -2907,6 +6770,24 @@
           "bytes": 263500,
           "joints": [
             "joint,0,s"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.411,
+                0
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,s"
+              ]
+            }
           ]
         },
         {
@@ -2915,6 +6796,24 @@
           "bytes": 273008,
           "joints": [
             "joint,0,s"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                3.075,
+                0
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,s"
+              ]
+            }
           ]
         },
         {
@@ -2923,6 +6822,24 @@
           "bytes": 274084,
           "joints": [
             "joint,0,s"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                1.445,
+                0
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,s"
+              ]
+            }
           ]
         }
       ],
@@ -2966,6 +6883,24 @@
           "bytes": 349712,
           "joints": [
             "joint,0,floor_center_watch"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0.153,
+                0
+              ],
+              "accepts": [
+                "floor_center_watch"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,floor_center_watch"
+              ]
+            }
           ]
         }
       ],
@@ -2994,6 +6929,26 @@
           "joints": [
             "joint_left,1,floor_deluxe",
             "joint_right,3,floor_deluxe"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0.153,
+                -0.001
+              ],
+              "accepts": [
+                "floor_deluxe"
+              ],
+              "facings": [
+                1,
+                3
+              ],
+              "joints": [
+                "joint_left,1,floor_deluxe",
+                "joint_right,3,floor_deluxe"
+              ]
+            }
           ]
         }
       ],
@@ -3029,6 +6984,24 @@
           "bytes": 361452,
           "joints": [
             "joint,1,floor_deluxe"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0.153,
+                0
+              ],
+              "accepts": [
+                "floor_deluxe"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,floor_deluxe"
+              ]
+            }
           ]
         }
       ],
@@ -3056,6 +7029,24 @@
           "bytes": 354724,
           "joints": [
             "joint,0,floor_center_king"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0.153,
+                0
+              ],
+              "accepts": [
+                "floor_center_king"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,floor_center_king"
+              ]
+            }
           ]
         }
       ],
@@ -3084,6 +7075,26 @@
           "joints": [
             "joint,0,picnic",
             "joint,1,picnic"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0.443,
+                0
+              ],
+              "accepts": [
+                "picnic"
+              ],
+              "facings": [
+                0,
+                1
+              ],
+              "joints": [
+                "joint,0,picnic",
+                "joint,1,picnic"
+              ]
+            }
           ]
         }
       ],
@@ -3119,6 +7130,24 @@
           "bytes": 530036,
           "joints": [
             "Joint,2,kitchen"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                -0.051,
+                0.08
+              ],
+              "accepts": [
+                "kitchen"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "Joint,2,kitchen"
+              ]
+            }
           ]
         }
       ],
@@ -3146,6 +7175,24 @@
           "bytes": 140064,
           "joints": [
             "joint,0,*"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0,
+                0.01
+              ],
+              "accepts": [
+                "*"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,*"
+              ]
+            }
           ]
         }
       ],
@@ -3174,6 +7221,40 @@
           "joints": [
             "joint,2,end_rail",
             "joint,0,0"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0,
+                0
+              ],
+              "accepts": [
+                "end_rail"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint,2,end_rail"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0.463,
+                0
+              ],
+              "accepts": [
+                "0"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,0"
+              ]
+            }
           ]
         }
       ],
@@ -3211,6 +7292,56 @@
             "joint_right_handle,0,handle",
             "joint_left_handle,0,handle",
             "Joint_!,0,5"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0.225,
+                1.06,
+                0.476
+              ],
+              "accepts": [
+                "handle"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_right_handle,0,handle"
+              ]
+            },
+            {
+              "marker": [
+                -0.225,
+                1.06,
+                0.476
+              ],
+              "accepts": [
+                "handle"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_left_handle,0,handle"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                1.566,
+                0.637
+              ],
+              "accepts": [
+                "5"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "Joint_!,0,5"
+              ]
+            }
           ]
         }
       ],
@@ -3257,6 +7388,56 @@
             "joint_right_handle,0,handle",
             "joint_left_handle,0,handle",
             "Joint_!,0,6"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                -0.24,
+                1.511,
+                -0.259
+              ],
+              "accepts": [
+                "handle"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_right_handle,0,handle"
+              ]
+            },
+            {
+              "marker": [
+                0.24,
+                1.511,
+                -0.259
+              ],
+              "accepts": [
+                "handle"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_left_handle,0,handle"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                1.81,
+                -0.082
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "Joint_!,0,6"
+              ]
+            }
           ]
         }
       ],
@@ -3303,6 +7484,56 @@
             "joint_right_handle,0,handle",
             "joint_left_handle,0,handle",
             "Joint_!,0,8"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0.227,
+                2,
+                0.517
+              ],
+              "accepts": [
+                "handle"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_right_handle,0,handle"
+              ]
+            },
+            {
+              "marker": [
+                -0.219,
+                2,
+                0.517
+              ],
+              "accepts": [
+                "handle"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_left_handle,0,handle"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.48,
+                0.643
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "Joint_!,0,8"
+              ]
+            }
           ]
         }
       ],
@@ -3347,6 +7578,24 @@
           "bytes": 1151276,
           "joints": [
             "joint,0,5"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                1.546,
+                3.298
+              ],
+              "accepts": [
+                "5"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,5"
+              ]
+            }
           ]
         }
       ],
@@ -3374,6 +7623,24 @@
           "bytes": 1148828,
           "joints": [
             "joint,0,6"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                1.89,
+                3.318
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,6"
+              ]
+            }
           ]
         }
       ],
@@ -3401,6 +7668,24 @@
           "bytes": 1111300,
           "joints": [
             "joint,2,6"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                1.846,
+                -0.815
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint,2,6"
+              ]
+            }
           ]
         }
       ],
@@ -3428,6 +7713,24 @@
           "bytes": 1200168,
           "joints": [
             "joint,0,8"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.465,
+                0.847
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,8"
+              ]
+            }
           ]
         }
       ],
@@ -3455,6 +7758,24 @@
           "bytes": 1183936,
           "joints": [
             "joint,0,6"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                1.83,
+                0
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,6"
+              ]
+            }
           ]
         }
       ],
@@ -3482,6 +7803,24 @@
           "bytes": 2173224,
           "joints": [
             "joint_c,0,6"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                1.867,
+                0.727
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_c,0,6"
+              ]
+            }
           ]
         }
       ],
@@ -3509,6 +7848,24 @@
           "bytes": 80760,
           "joints": [
             "joint_pole,1,6"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0.391,
+                1.85,
+                0
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_pole,1,6"
+              ]
+            }
           ]
         }
       ],
@@ -3536,6 +7893,24 @@
           "bytes": 31832,
           "joints": [
             "joint_pole,1,6"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0.411,
+                1.85,
+                0
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_pole,1,6"
+              ]
+            }
           ]
         }
       ],
@@ -3563,6 +7938,24 @@
           "bytes": 129756,
           "joints": [
             "joint,2,6"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                1.83,
+                -0.226
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint,2,6"
+              ]
+            }
           ]
         }
       ],
@@ -3590,6 +7983,24 @@
           "bytes": 98688,
           "joints": [
             "joint,0,8"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.345,
+                2.99
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,8"
+              ]
+            }
           ]
         }
       ],
@@ -3617,6 +8028,24 @@
           "bytes": 38864,
           "joints": [
             "joint,2,handle"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0,
+                0.195
+              ],
+              "accepts": [
+                "handle"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint,2,handle"
+              ]
+            }
           ]
         }
       ],
@@ -3644,6 +8073,24 @@
           "bytes": 17052,
           "joints": [
             "joint,2,handle"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                -0.001,
+                0.552
+              ],
+              "accepts": [
+                "handle"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint,2,handle"
+              ]
+            }
           ]
         }
       ],
@@ -3671,6 +8118,24 @@
           "bytes": 33700,
           "joints": [
             "joint,0,6"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                1.89,
+                2.728
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,6"
+              ]
+            }
           ]
         }
       ],
@@ -3698,6 +8163,24 @@
           "bytes": 75348,
           "joints": [
             "joint,0,6"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                1.846,
+                2.328
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,6"
+              ]
+            }
           ]
         }
       ],
@@ -3725,6 +8208,24 @@
           "bytes": 131248,
           "joints": [
             "joint,0,8"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.445,
+                -0.091
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,8"
+              ]
+            }
           ]
         }
       ],
@@ -3752,6 +8253,24 @@
           "bytes": 453308,
           "joints": [
             "joint_c,1,6"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0.551,
+                1.829,
+                0
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_c,1,6"
+              ]
+            }
           ]
         }
       ],
@@ -3780,6 +8299,24 @@
           "bytes": 572688,
           "joints": [
             "joint_c,1,6"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0.551,
+                1.829,
+                0
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_c,1,6"
+              ]
+            }
           ]
         }
       ],
@@ -3808,6 +8345,24 @@
           "bytes": 365996,
           "joints": [
             "joint_c,1,8"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0.551,
+                2.438,
+                0
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_c,1,8"
+              ]
+            }
           ]
         }
       ],
@@ -3836,6 +8391,24 @@
           "bytes": 479648,
           "joints": [
             "joint_c,1,8"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0.631,
+                2.438,
+                0
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_c,1,8"
+              ]
+            }
           ]
         }
       ],
@@ -3864,6 +8437,24 @@
           "bytes": 242252,
           "joints": [
             "joint_c,1,6"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                1.855,
+                0
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_c,1,6"
+              ]
+            }
           ]
         }
       ],
@@ -3892,6 +8483,24 @@
           "bytes": 294532,
           "joints": [
             "joint_c,1,8"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0.041,
+                2.465,
+                0
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_c,1,8"
+              ]
+            }
           ]
         }
       ],
@@ -3920,6 +8529,24 @@
           "bytes": 108712,
           "joints": [
             "joint,2,6"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0.367,
+                1.829,
+                -1.009
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint,2,6"
+              ]
+            }
           ]
         }
       ],
@@ -3947,6 +8574,24 @@
           "bytes": 127428,
           "joints": [
             "joint,3,8"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                -0.978,
+                2.438,
+                -0.318
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint,3,8"
+              ]
+            }
           ]
         }
       ],
@@ -3974,6 +8619,24 @@
           "bytes": 86068,
           "joints": [
             "joint,0,wheel"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0,
+                0
+              ],
+              "accepts": [
+                "wheel"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,wheel"
+              ]
+            }
           ]
         }
       ],
@@ -4001,6 +8664,24 @@
           "bytes": 95408,
           "joints": [
             "joint,0,wheel"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0,
+                0
+              ],
+              "accepts": [
+                "wheel"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,wheel"
+              ]
+            }
           ]
         }
       ],
@@ -4028,6 +8709,24 @@
           "bytes": 86488,
           "joints": [
             "joint,0,scope"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0,
+                0
+              ],
+              "accepts": [
+                "scope"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,scope"
+              ]
+            }
           ]
         }
       ],
@@ -4055,6 +8754,24 @@
           "bytes": 31680,
           "joints": [
             "joint,0,mailbox_or_phone"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0,
+                0
+              ],
+              "accepts": [
+                "mailbox_or_phone"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,mailbox_or_phone"
+              ]
+            }
           ]
         }
       ],
@@ -4082,6 +8799,24 @@
           "bytes": 44740,
           "joints": [
             "joint,0,mailbox_or_phone"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0,
+                0
+              ],
+              "accepts": [
+                "mailbox_or_phone"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,mailbox_or_phone"
+              ]
+            }
           ]
         }
       ],
@@ -4109,6 +8844,24 @@
           "bytes": 507772,
           "joints": [
             "joint,0,*"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0,
+                0.08
+              ],
+              "accepts": [
+                "*"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,*"
+              ]
+            }
           ]
         }
       ],

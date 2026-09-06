@@ -24,8 +24,11 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
+const { readJointPositions, deriveSockets } = require("./sockets");
+
 const CATEGORIES_JS = "js/categories.js";
 const OBJECT_MAPPING = "object-mapping.json";
+const SOCKET_CONFIG = "tools/sockets.config.json";
 const OUT_DIR = "models";
 
 /** Pull the Categories array out of categories.js using real JS semantics. */
@@ -128,6 +131,9 @@ function main() {
   const categories = loadCategories();
   const objectMapping = JSON.parse(fs.readFileSync(OBJECT_MAPPING, "utf8"));
   const lookup = buildObjectIdLookup(objectMapping);
+  const socketConfig = fs.existsSync(SOCKET_CONFIG)
+    ? JSON.parse(fs.readFileSync(SOCKET_CONFIG, "utf8"))
+    : {};
 
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
@@ -210,7 +216,24 @@ function main() {
         byteCount += buffer.length;
 
         const names = readJoints(buffer);
-        files.push({ layer: source.layer, file: filename, bytes: buffer.length, joints: names });
+
+        // Sockets are per file, not per product: a multi-layer swing repeats
+        // its joints once per beam length, and only the active layer's are in
+        // the scene. Deriving per file keeps each set with the geometry it
+        // belongs to.
+        const sockets = deriveSockets(
+          readJointPositions(buffer, sanitizeNodeName),
+          parseJoint,
+          socketConfig
+        );
+
+        files.push({
+          layer: source.layer,
+          file: filename,
+          bytes: buffer.length,
+          joints: names,
+          sockets,
+        });
         joints.push(...names);
       }
 
@@ -238,6 +261,14 @@ function main() {
   fs.writeFileSync(path.join(OUT_DIR, "manifest.json"), JSON.stringify(manifest, null, 2));
 
   const jointTotal = Object.values(products).reduce((n, p) => n + p.joints.length, 0);
+  let socketTotal = 0;
+  let mergedTotal = 0;
+  for (const product of Object.values(products)) {
+    for (const file of product.files) {
+      socketTotal += file.sockets.length;
+      mergedTotal += file.joints.length - file.sockets.length;
+    }
+  }
   console.log(`source   : ${embedded ? "categories.js (embedded base64)" : OUT_DIR + " (files)"}`);
   console.log(`products : ${Object.keys(products).length}`);
   console.log(
@@ -246,6 +277,7 @@ function main() {
       `  (${(byteCount / 1048576).toFixed(1)} MB)`
   );
   console.log(`joints   : ${jointTotal}`);
+  console.log(`sockets  : ${socketTotal}  (${mergedTotal} joints merged into a shared opening)`);
   console.log(`manifest : ${OUT_DIR}/manifest.json`);
 
   if (problems.length) {
