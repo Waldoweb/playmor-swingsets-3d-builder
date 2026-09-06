@@ -3358,6 +3358,40 @@
         }
       }
 
+      /**
+       * Find the joint a saved connection refers to.
+       *
+       * Saves keyed on joint.index, an array position handed out while a model
+       * is cloned. That is stable only for as long as the model file is, and it
+       * has not been: the shipped catalog sets already hold connections the
+       * layer rules reject — a Super Scope recorded against a deck rail, a
+       * steering-wheel mount holding a set of steps — because those indices
+       * were written against a joint ordering the models no longer have. The
+       * designs still look right, because every model also stores an absolute
+       * position; it is only the connection bookkeeping that has rotted, which
+       * is exactly what decides which openings are shown as free.
+       *
+       * Names are the stable key. They are unique within every model file (all
+       * 74 checked), they survive a re-export, and they say what they mean when
+       * you read the saved file. The index is still honoured so designs saved
+       * before this keep loading.
+       *
+       * Names also fix the lookup after a morph, where index is actively
+       * unsafe: the index counter restarts for each layer mesh, so a Baby
+       * Swing carries index 0 three times and the search takes whichever comes
+       * first. Within one layer's joints, which is what morph leaves behind,
+       * names are unambiguous.
+       */
+      const Find_saved_joint = (model, name, index) => {
+        if (!model || !model.joints) return null;
+        if (name) {
+          const by_name = model.joints.find((joint) => joint.name === name);
+          if (by_name) return by_name;
+        }
+        if (index === undefined || index === null) return null;
+        return model.joints.find((joint) => joint.index === index) || null;
+      };
+
       class Blueprint {
         static states = [];
 
@@ -3415,11 +3449,16 @@
                   .filter((joint) => joint.connected)
                   .map((joint) => {
                     return {
+                      // Name first: it is what restore reads. The index is
+                      // still written so a design saved now still opens in a
+                      // build from before this change.
+                      my_joint_name: joint.name,
                       my_joint_index: joint.index,
                       my_joint_layer: joint.layer,
                       connected_to: {
                         model_object_id: joint.connected.model.object_id || null,
                         model_save_index: joint.connected.model.save_index,
+                        joint_name: joint.connected.name,
                         joint_index: joint.connected.index,
                         joint_layer: joint.connected.layer,
                       },
@@ -3432,10 +3471,12 @@
                   .filter((joint) => joint.connected)
                   .map((joint) => {
                     return {
-                      index: joint.index,  // Fixed: Use actual joint index instead of map index
+                      name: joint.name,
+                      index: joint.index,
                       link: {
                         model_object_id: joint.connected.model.object_id,
                         model_save_index: joint.connected.model.save_index,
+                        joint_name: joint.connected.name,
                         joint_index: joint.connected.index,
                       },
                     };
@@ -3659,13 +3700,16 @@
         // Helper function to position a model based on connection to another model
         positionModelByConnection(sourceModel, targetModel, connectionData) {
             try {
-              // Get the joint indices
-              let sourceJointIndex = connectionData.my_joint_index;
-              let targetJointIndex = connectionData.connected_to?.joint_index || connectionData.link?.joint_index;
-
-              // Find the actual joints by their index property
-              let sourceJoint = sourceModel.joints.find(j => j.index === sourceJointIndex);
-              let targetJoint = targetModel.joints.find(j => j.index === targetJointIndex);
+              let sourceJoint = Find_saved_joint(
+                sourceModel,
+                connectionData.my_joint_name,
+                connectionData.my_joint_index
+              );
+              let targetJoint = Find_saved_joint(
+                targetModel,
+                connectionData.connected_to?.joint_name || connectionData.link?.joint_name,
+                connectionData.connected_to?.joint_index || connectionData.link?.joint_index
+              );
 
               if (!sourceJoint || !targetJoint) {
                 console.warn('Could not find joints for connection, using saved position');
@@ -3856,12 +3900,16 @@
                 }
 
                 if (model2) {
-                  let my_joint_index = joint_data.my_joint_index ?? joint_data.index;
-                  let target_joint_index = joint_data.connected_to?.joint_index ?? joint_data.link?.joint_index;
-
-                  // Find joints by their index property for more reliable lookup
-                  let joint = model.joints.find(j => j.index === my_joint_index);
-                  let joint2 = model2.joints.find(j => j.index === target_joint_index);
+                  let joint = Find_saved_joint(
+                    model,
+                    joint_data.my_joint_name ?? joint_data.name,
+                    joint_data.my_joint_index ?? joint_data.index
+                  );
+                  let joint2 = Find_saved_joint(
+                    model2,
+                    joint_data.connected_to?.joint_name ?? joint_data.link?.joint_name,
+                    joint_data.connected_to?.joint_index ?? joint_data.link?.joint_index
+                  );
 
                   if (joint && joint2) {
 
@@ -3876,13 +3924,18 @@
                         console.log(`Morphing swing from layer ${joint.layer} to ${target_layer} to match swing beam`);
                         let position = model.mesh.position.clone();
                         let rotation = model.mesh.rotation.clone();
-                        let joint_index = joint.index;  // Fixed: Use actual joint index instead of array position
+                        // By name, not index: morph rebuilds the joint list from
+                        // the new layer's mesh, and the index counter restarts
+                        // per layer, so indices are not unique across a
+                        // multi-layer swing. Names are.
+                        const joint_name = joint.name;
+                        const joint_index = joint.index;
 
-                        // Morph the model to the new layer
                         model.morph({ layer: target_layer });
 
-                        // Update joint reference after morphing - find by index property
-                        joint = model.joints.find(j => j.index === joint_index) || model.joints[joint_index];
+                        joint =
+                          Find_saved_joint(model, joint_name, joint_index) ||
+                          model.joints[joint_index];
 
                         // Restore position and rotation
                         model.mesh.position.copy(position);
