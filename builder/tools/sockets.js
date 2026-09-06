@@ -162,7 +162,7 @@ function deriveSockets(joints, parseJoint, config) {
 
     let socket = sockets.find((s) => distance(s.marker, marker) <= epsilon);
     if (!socket) {
-      socket = { marker, accepts: [], facings: [], joints: [] };
+      socket = { marker, offset, accepts: [], facings: [], joints: [] };
       sockets.push(socket);
     }
     if (!socket.accepts.includes(parsed.layer)) socket.accepts.push(parsed.layer);
@@ -170,12 +170,18 @@ function deriveSockets(joints, parseJoint, config) {
     socket.joints.push(joint.name);
   }
 
-  return sockets.map((socket) => ({
-    marker: socket.marker.map(round),
-    accepts: socket.accepts.slice().sort(),
-    facings: socket.facings.slice().sort((a, b) => a - b),
-    joints: socket.joints,
-  }));
+  return sockets.map((socket) => {
+    const out = {
+      marker: socket.marker.map(round),
+      accepts: socket.accepts.slice().sort(),
+      facings: socket.facings.slice().sort((a, b) => a - b),
+      joints: socket.joints,
+    };
+    // Emitted only where it is not zero, so the common socket stays compact
+    // and a reader can see at a glance which markers have been moved.
+    if (socket.offset.some((v) => v !== 0)) out.marker_offset = socket.offset;
+    return out;
+  });
 }
 
 module.exports = { readJointPositions, deriveSockets };

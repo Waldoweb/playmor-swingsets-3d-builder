@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-06T04:55:29.930Z",
+  "generated_at": "2026-09-06T12:52:49.433Z",
   "product_count": 64,
   "products": {
     "P-PT": {
@@ -1393,6 +1393,11 @@
               ],
               "joints": [
                 "joint_floor_center,0,picnic"
+              ],
+              "marker_offset": [
+                0,
+                0.393,
+                0
               ]
             },
             {
@@ -2768,6 +2773,11 @@
               ],
               "joints": [
                 "joint_floor_back,0,picnic"
+              ],
+              "marker_offset": [
+                0,
+                0.393,
+                0
               ]
             },
             {
@@ -2784,6 +2794,11 @@
               ],
               "joints": [
                 "joint_floor_front,0,picnic,6,7"
+              ],
+              "marker_offset": [
+                0,
+                0.393,
+                0
               ]
             },
             {
@@ -3593,6 +3608,11 @@
               ],
               "joints": [
                 "joint_floor_front,0,picnic,6,7"
+              ],
+              "marker_offset": [
+                0,
+                0.393,
+                0
               ]
             },
             {
@@ -4715,6 +4735,11 @@
               ],
               "joints": [
                 "joint_floor_center,0,picnic"
+              ],
+              "marker_offset": [
+                0,
+                0.393,
+                0
               ]
             },
             {
@@ -7093,6 +7118,11 @@
               "joints": [
                 "joint,0,picnic",
                 "joint,1,picnic"
+              ],
+              "marker_offset": [
+                0,
+                0.393,
+                0
               ]
             }
           ]

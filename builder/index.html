@@ -3040,8 +3040,13 @@
       // Joint-first flow: the opening the user has clicked, and the joints
       // currently drawn as targets. Null selection means the catalog behaves
       // exactly as it always has.
-      let selected_host_joint = null;
-      let browse_joints = [];
+      // The opening the user has picked, and every opening currently on screen.
+      // Sockets rather than joints: one dot per place a part can go, however
+      // many joints describe it.
+      let selected_socket = null;
+      let browse_sockets = [];
+      /** Can anything still go here? */
+      const Socket_is_open = (socket) => socket.joints.some((j) => j.available);
       let joint_image_frame = 0;
       let joint_image_frames = 0;
       let file_button;
@@ -4584,6 +4589,72 @@
           return entry ? entry.joints : this.joints;
         }
         /**
+         * This model's openings, as a person sees them.
+         *
+         * A joint holds one layer and one facing, so a post taking either a
+         * scope or a wheel is two joints, and a mount allowing two facings is
+         * two more. tools/build_models.js works out which joints describe the
+         * same opening and writes the grouping into the manifest; this maps it
+         * onto the live joints by name, which is exact because names are unique
+         * within a file.
+         *
+         * Falls back to one socket per joint when the manifest is absent, so
+         * markers still work if models/manifest.json fails to load.
+         *
+         * Cached against the active mesh: morph() swaps in a different layer's
+         * geometry and a different set of joints, which invalidates this.
+         */
+        sockets() {
+          if (this._sockets && this._sockets_mesh === this.mesh) return this._sockets;
+
+          const solo = () =>
+            this.joints.map((joint) => ({ model: this, joints: [joint], offset: null }));
+
+          const entry =
+            modelManifest && this.object_id
+              ? modelManifest.products[this.object_id]
+              : null;
+          let list;
+          if (!entry || !entry.files || !entry.files.length) {
+            list = solo();
+          } else {
+            // Multi-layer products carry one set of sockets per beam length and
+            // only the active layer's joints are in the scene.
+            let file = entry.files[0];
+            if (entry.files.length > 1) {
+              const index = this.meshes.indexOf(this.mesh);
+              const layer = index >= 0 ? this.layers[index] : null;
+              file = entry.files.find((f) => f.layer === layer) || file;
+            }
+
+            const by_name = new Map();
+            for (const joint of this.joints)
+              if (!by_name.has(joint.name)) by_name.set(joint.name, joint);
+
+            list = [];
+            for (const socket of file.sockets || []) {
+              const joints = socket.joints
+                .map((name) => by_name.get(name))
+                .filter(Boolean);
+              if (!joints.length) continue;
+              list.push({
+                model: this,
+                joints,
+                offset: socket.marker_offset
+                  ? new THREE.Vector3().fromArray(socket.marker_offset)
+                  : null,
+              });
+            }
+            // A manifest that does not describe this geometry is worse than no
+            // manifest: silently dropping joints would hide real openings.
+            if (!list.length) list = solo();
+          }
+
+          this._sockets = list;
+          this._sockets_mesh = this.mesh;
+          return list;
+        }
+        /**
          * The host joints this product is being tested against.
          *
          * With no argument: every joint in the scene, i.e. "can this be placed
@@ -4591,6 +4662,10 @@
          * the narrower question the joint-first flow needs: "can this go *here*?"
          */
         candidate_host_joints(args) {
+          // A socket is several joints describing one opening, so "can this go
+          // here?" means "does it fit any of them that is still free?".
+          if (args && args.socket)
+            return args.socket.joints.filter((joint) => joint.available);
           if (args && args.joint) return [args.joint];
           const joints = [];
           for (const model of models_with_available_joints)
@@ -4599,6 +4674,7 @@
         }
         /** As above, but for the wildcard pass, which inspects a model's joint pair. */
         candidate_host_models(args) {
+          if (args && args.socket) return args.socket.model ? [args.socket.model] : [];
           if (args && args.joint) return args.joint.model ? [args.joint.model] : [];
           return models_with_available_joints;
         }
@@ -5277,46 +5353,46 @@
         });
       };
       /**
-       * Re-derive availability for "same opening, described twice" joints.
+       * Close an opening once something is in it.
        *
-       * The last position on every swing beam is authored as two joints at the
-       * same point: an "s" for a regular swing and an "sh" for a horse glider,
-       * sharing an exclusion group with no excluder field. They are two ways to
-       * describe one opening, so filling either one fills the spot — but
-       * nothing enforced that, and the unused twin kept offering a marker over
-       * a position that was already taken.
+       * A socket is one physical spot described by several joints — a post that
+       * takes either a scope or a wheel, a hanger that takes a swing or a
+       * glider, a mount that allows two facings. Nothing in the catalog accepts
+       * two parts at one spot, so filling any joint fills the spot and the rest
+       * have to stop offering themselves. Without this the twin keeps its
+       * marker over a position that is already taken, and clicking it does
+       * nothing, because the part that would go there no longer fits.
        *
-       * The older tower convention — a fifth name field naming the group a
-       * joint excludes — is handled in Connect_joints and deliberately left
-       * alone here. Those groups list several genuinely separate openings (the
-       * King's Tower puts six in one group), so blocking them as a set would be
-       * wrong. A null excluder_layer is what tells the two conventions apart,
-       * and it separates them exactly across every model in the manifest.
+       * This replaces the two conventions that grew up to express the same
+       * thing on part of the catalog: the `_x_0` tag on swing beams, which was
+       * never implemented, and which covered six spots out of the thirty-eight
+       * that need it. Grouping by geometry covers all of them and needs no
+       * markup, so scope/wheel and rail/kitchen are handled without anyone
+       * having to remember to tag them.
+       *
+       * The five-field `g4/g5` tower groups are a different rule and stay in
+       * Connect_joints: those are distinct positions half a unit apart that
+       * conflict spatially, not one spot described twice.
        *
        * Written as a re-sync rather than a step inside connect and disconnect
        * because deletion unwinds joints through half a dozen category-specific
        * branches. Recomputing from what is actually connected keeps all of them
-       * honest, and only ever touches joints this rule itself turned off.
+       * honest, and only ever reopens joints this rule itself closed.
        */
-      const Sync_exclusion_groups = () => {
+      const Sync_sockets = () => {
         for (const model of models_with_available_joints) {
-          const groups = new Map();
-          for (const joint of model.joints) {
-            if (!joint.exclusion_layer || joint.excluder_layer) continue;
-            if (!groups.has(joint.exclusion_layer))
-              groups.set(joint.exclusion_layer, []);
-            groups.get(joint.exclusion_layer).push(joint);
-          }
-          for (const members of groups.values()) {
-            const taken = members.some((joint) => joint.connected);
-            for (const joint of members) {
+          if (!model.mesh) continue;
+          for (const socket of model.sockets()) {
+            if (socket.joints.length < 2) continue;
+            const taken = socket.joints.some((joint) => joint.connected);
+            for (const joint of socket.joints) {
               if (joint.connected) continue;
               if (taken) {
                 joint.available = false;
-                joint.excluded_by_group = true;
-              } else if (joint.excluded_by_group) {
+                joint.closed_by_socket = true;
+              } else if (joint.closed_by_socket) {
                 joint.available = true;
-                joint.excluded_by_group = false;
+                joint.closed_by_socket = false;
               }
             }
           }
@@ -5447,7 +5523,7 @@
           }
         }
 
-        Sync_exclusion_groups();
+        Sync_sockets();
       };
       /**
        * Decide where a joint's ring belongs on screen, and whether to draw it
@@ -5483,9 +5559,14 @@
         return model._elongated;
       };
 
-      const Locate_joint_ring = (joint, attach_layer, ignore_mesh) => {
+      const Locate_joint_ring = (joint, attach_layer, ignore_mesh, marker_offset) => {
         joint.updateMatrixWorld();
         const world = new THREE.Vector3().setFromMatrixPosition(joint.matrixWorld);
+        // Where the dot belongs, when that is not where the part attaches. The
+        // picnic table mounts above its floor but its joint was authored at
+        // floor height, so its dot would sit on the floor kit's. Visibility is
+        // tested at the dot rather than the joint, so the two agree.
+        if (marker_offset) world.add(marker_offset);
 
         const dir = new THREE.Vector3().subVectors(world, camera.position).normalize();
         const distance = camera.position.distanceTo(world);
@@ -5522,17 +5603,14 @@
         const size = joint_image.height / 2;
         const grounded =
           attach_layer && attach_layer[0] >= "1" && attach_layer[0] <= "9";
-        let point;
-        if (grounded) {
-          const wh = 0.5 * renderer.getContext().canvas.width;
-          const hh = 0.5 * renderer.getContext().canvas.height;
-          const wp = world.clone();
-          wp.y -= 0.3;
-          const pr = wp.project(camera);
-          point = new THREE.Vector2(pr.x * wh + wh, -(pr.y * hh) + hh);
-        } else {
-          point = Ddd2dd({ object3D: joint });
-        }
+        const wh = 0.5 * renderer.getContext().canvas.width;
+        const hh = 0.5 * renderer.getContext().canvas.height;
+        const wp = world.clone();
+        // Numeric layers are entries, climbers and slides, whose host joint
+        // sits at rail height while the part meets the ground.
+        if (grounded) wp.y -= 0.3;
+        const pr = wp.project(camera);
+        const point = new THREE.Vector2(pr.x * wh + wh, -(pr.y * hh) + hh);
         joint.x = point.x - size / 2;
         joint.y = point.y - size / 2;
         return true;
@@ -5788,7 +5866,7 @@
 
         // Browse mode: nothing is being carried, so every free joint is shown
         // as a target the user can click to ask "what fits here?".
-        browse_joints = [];
+        browse_sockets = [];
         if (
           Mode.normal == Mode.mode &&
           !plug_model &&
@@ -5799,8 +5877,8 @@
           // the selection rather than filtering the catalog against a joint
           // that can no longer take anything. Runs once, since clearing it
           // makes this false.
-          if (selected_host_joint && !selected_host_joint.available) {
-            selected_host_joint = null;
+          if (selected_socket && !Socket_is_open(selected_socket)) {
+            selected_socket = null;
             Show_items();
           }
           for (let model of models_with_available_joints) {
@@ -5808,15 +5886,29 @@
             // to be measured rather than taken from the model's origin, which
             // sits at the attachment end on parts like swing beams.
             if (!model.mesh) continue;
-            for (let joint of model.joints) {
-              if (!joint.available) {
-                joint.x = -9999;
-                joint.y = -9999;
+            for (const socket of model.sockets()) {
+              // Any joint here still free means the opening is still open. A
+              // post offering a scope or a wheel is one dot; taking either one
+              // closes it, which is what stops the twin advertising a spot
+              // that is already filled.
+              const open = socket.joints.filter((j) => j.available);
+              if (!open.length) {
+                socket.x = -9999;
+                socket.y = -9999;
                 continue;
               }
-              if (Locate_joint_ring(joint, joint.layer, null)) {
-                Draw_add_marker(joint, joint === selected_host_joint);
-                browse_joints.push(joint);
+              // Positioned from the first free joint: they are the same point
+              // to within a few centimetres, which is what made them one
+              // socket in the first place.
+              const anchor = open[0];
+              if (Locate_joint_ring(anchor, anchor.layer, null, socket.offset)) {
+                socket.x = anchor.x;
+                socket.y = anchor.y;
+                Draw_add_marker(socket, socket === selected_socket);
+                browse_sockets.push(socket);
+              } else {
+                socket.x = -9999;
+                socket.y = -9999;
               }
             }
           }
@@ -6090,6 +6182,23 @@
             })
           )
             return joint;
+        }
+        return null;
+      };
+
+      /**
+       * Which joint of a chosen opening this part should mate with.
+       *
+       * A socket can offer more than one way in — a beam's last hanger takes a
+       * swing on its `s` joint or a glider on its `sh` joint, at the same
+       * point. The part decides which: whichever of the socket's free joints it
+       * actually fits.
+       */
+      const Find_mate_in_socket = (model, socket) => {
+        for (const host_joint of socket.joints) {
+          if (!host_joint.available) continue;
+          const plug_joint = Find_plug_joint_for(model, host_joint);
+          if (plug_joint) return { plug_joint, host_joint };
         }
         return null;
       };
@@ -6571,7 +6680,7 @@
                 }
           }
 
-        Sync_exclusion_groups();
+        Sync_sockets();
 
         Hide_options();
         Show_items();
@@ -7706,13 +7815,13 @@
         // Joint-first: an opening was chosen before the part, so place it there
         // now rather than dropping into plugging mode and asking the user to
         // aim at the same marker again.
-        if (selected_host_joint && selected_host_joint.available) {
-          const mate = Find_plug_joint_for(plug_model, selected_host_joint);
+        if (selected_socket && Socket_is_open(selected_socket)) {
+          const mate = Find_mate_in_socket(plug_model, selected_socket);
           if (mate) {
-            plug_joint = mate;
-            plug_joint_index = plug_model.joints.indexOf(mate);
-            Attach_plug_to(selected_host_joint);
-            selected_host_joint = null;
+            plug_joint = mate.plug_joint;
+            plug_joint_index = plug_model.joints.indexOf(mate.plug_joint);
+            Attach_plug_to(mate.host_joint);
+            selected_socket = null;
             selected_object_id = null;
             Show_items();
             return;
@@ -8372,27 +8481,26 @@
 
           // Clicking a ring while empty-handed picks the opening to fill, and
           // the catalog narrows to what fits it. Clicking away clears it.
-          if (Mode.normal == Mode.mode && !plug_model && browse_joints.length) {
-            // Rings overlap where joints cluster — a tower's scope and wheel
-            // mounts sit almost on top of each other. Take the one whose
-            // centre is nearest the click rather than whichever comes first,
-            // or the far joint becomes unselectable.
+          if (Mode.normal == Mode.mode && !plug_model && browse_sockets.length) {
+            // Markers can still overlap where two separate openings sit close
+            // together, so take the one whose centre is nearest the click
+            // rather than whichever comes first.
             const size = joint_image.height / 2;
             let hit = null;
             let nearest = Infinity;
-            for (const joint of browse_joints) {
-              if (!Joint_hit(joint, Pointers.position)) continue;
-              const dx = joint.x + size / 2 - Pointers.position.x;
-              const dy = joint.y + size / 2 - Pointers.position.y;
+            for (const socket of browse_sockets) {
+              if (!Joint_hit(socket, Pointers.position)) continue;
+              const dx = socket.x + size / 2 - Pointers.position.x;
+              const dy = socket.y + size / 2 - Pointers.position.y;
               const d = dx * dx + dy * dy;
               if (d < nearest) {
                 nearest = d;
-                hit = joint;
+                hit = socket;
               }
             }
             if (hit) {
-              if (hit !== selected_host_joint) {
-                selected_host_joint = hit;
+              if (hit !== selected_socket) {
+                selected_socket = hit;
                 Show_items();
               }
               // Return before Pointer_down(): the ring sits on top of its own
@@ -8400,8 +8508,8 @@
               // up its colour/delete toolbar over the choice just made.
               return;
             }
-            if (selected_host_joint) {
-              selected_host_joint = null;
+            if (selected_socket) {
+              selected_socket = null;
               Show_items();
             }
           }
@@ -8644,7 +8752,7 @@
           for (let child of Categories[category_index].children) {
             child.index = index;
             const isCapable = child.model.capable(
-              selected_host_joint ? { joint: selected_host_joint } : undefined
+              selected_socket ? { socket: selected_socket } : undefined
             );
             if (isCapable) {
               html +=
