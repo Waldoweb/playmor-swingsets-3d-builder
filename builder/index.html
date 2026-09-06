@@ -3075,6 +3075,16 @@
        *           kept so a model that has not been given a real layer still
        *           behaves as it did
        */
+      /**
+       * Is this a layer that only ever seeks a socket, never offers one?
+       *
+       * Nothing in the catalog offers a `deck` socket — `deck` exists to match
+       * the numeric deck heights — so a joint carrying it can only be an
+       * attachment. Same for the old `*`. A product made entirely of these has
+       * nothing to stand on and cannot be the first thing in an empty yard.
+       */
+      const Is_attachment_only_layer = (layer) => layer === "*" || layer === "deck";
+
       const Layers_connect = (plug_layer, host_layer) => {
         if (plug_layer === host_layer) return true;
         if (plug_layer === "*" || host_layer === "*") return true;
@@ -4868,13 +4878,19 @@
             return this.hasTireSwingJoints(args);
           }
 
-          // check for an empty tarmac
+          // Nothing placed yet, so this can only be something that stands on
+          // its own ground. A bridge or tunnel is filed under towers but has
+          // nothing but attachment joints — it spans between two decks and has
+          // no legs of its own — so it is not a first placement.
+          //
+          // This used to count `*` joints, which did the same job by accident:
+          // those two were the only wildcards in the towers category. They now
+          // carry `deck`, so the test asks the question directly.
           if (picked_meshes.length == 0) {
-            // bail if wildcard model
-            let jokers = 0;
-            for (let joint of this.template_joints()) if (joint.layer == "*") jokers++;
-            const result = jokers == 0 && this.category == 0;
-            return result;
+            const own = this.template_joints();
+            const attaches_only =
+              own.length > 0 && own.every((joint) => Is_attachment_only_layer(joint.layer));
+            return !attaches_only && this.category == 0;
           }
 
           // check for available joints
