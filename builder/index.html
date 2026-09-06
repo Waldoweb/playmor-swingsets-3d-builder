@@ -5412,53 +5412,60 @@
        * height while the part meets the ground, so the ring is nudged down to
        * where the part will actually land.
        */
-      const Locate_joint_ring = (joint, attach_layer, ignore_mesh, facing_centre) => {
+      /**
+       * Is this model long and thin in plan — a swing beam rather than a tower?
+       *
+       * Such a model must not be allowed to occlude its own joints. Its
+       * hangers sit flush along its length, so any view down the beam sends
+       * every ray grazing the full run of timber before it arrives, and all
+       * four hangers disappear at once. A tower is compact enough that a ray
+       * only crosses it when the joint really is round the back.
+       *
+       * Cached: geometry never changes after load.
+       */
+      const Model_is_elongated = (model) => {
+        if (model._elongated === undefined) {
+          const box = new THREE.Box3().setFromObject(model.mesh);
+          const x = box.max.x - box.min.x;
+          const z = box.max.z - box.min.z;
+          const long = Math.max(x, z);
+          const short = Math.min(x, z);
+          model._elongated = short > 0.001 ? long / short > 2.5 : true;
+        }
+        return model._elongated;
+      };
+
+      const Locate_joint_ring = (joint, attach_layer, ignore_mesh) => {
         joint.updateMatrixWorld();
         const world = new THREE.Vector3().setFromMatrixPosition(joint.matrixWorld);
 
-        // Hide joints on the far side of their own model.
-        //
-        // The joint nodes all inherit the model's orientation rather than
-        // facing outward individually, so there is no per-joint normal to test
-        // — which is why an orientation-based attempt at this would not work.
-        // Instead compare where the joint sits relative to the model's centre:
-        // one on the back has an outward vector pointing away from the camera.
-        // Height is ignored so joints on top are judged by plan position only.
-        //
-        // This also covers what the occlusion raycast below cannot: slatted
-        // panels and open frames let rays slip between the timbers, so a joint
-        // squarely behind a fence still reads as visible to a raycast.
-        if (facing_centre) {
-          const outward = new THREE.Vector3(
-            world.x - facing_centre.x,
-            0,
-            world.z - facing_centre.z
-          );
-          // Joints near the model's axis have no meaningful side; keep those.
-          if (outward.length() > 0.15) {
-            const to_camera = new THREE.Vector3(
-              camera.position.x - world.x,
-              0,
-              camera.position.z - world.z
-            ).normalize();
-            // Just short of straight-on: a marker drops out a little before
-            // its joint reaches the silhouette, rather than clinging to the
-            // edge as the model turns away.
-            if (outward.normalize().dot(to_camera) < 0.15) {
-              joint.x = -9999;
-              joint.y = -9999;
-              return false;
-            }
-          }
-        }
         const dir = new THREE.Vector3().subVectors(world, camera.position).normalize();
         const distance = camera.position.distanceTo(world);
         raycaster.set(camera.position, dir);
+        // The joint's own model is included among the occluders. Being round
+        // the back of the thing you are attached to is the main way a joint is
+        // hidden, and excluding it was why back-of-tower markers showed
+        // through the structure.
+        //
+        // Self-hits are not a problem: a joint sits on its model's surface, so
+        // the ray reaches that surface at roughly the joint's own distance,
+        // which the margin below discounts. Only geometry genuinely in front
+        // of the joint counts as occluding it.
+        //
+        // This replaces a test comparing each joint against its model's
+        // centre. That assumed joints sit *around* a compact model — true of a
+        // tower, wrong for a swing beam, whose hangers run along its length,
+        // so half of them were culled while plainly visible.
+        const self_occludes = joint.model.mesh && !Model_is_elongated(joint.model);
         const occluders = picked_meshes.filter(
-          (m) => m !== ignore_mesh && m !== joint.model.mesh
+          (m) => m !== ignore_mesh && (self_occludes || m !== joint.model.mesh)
         );
         const hits = raycaster.intersectObjects(occluders, true);
-        if (hits.length > 0 && hits[0].distance < distance - 0.1) {
+        // The margin has to clear the joint's own mounting surface. A joint
+        // sits flush on its model, so a ray arriving at a shallow angle grazes
+        // that surface just before reaching the joint — at 0.1 that counted as
+        // occlusion and wiped out every hanger when sighting along a beam.
+        if (hits.length > 0 && hits[0].distance < distance - 0.3) {
           joint.x = -9999;
           joint.y = -9999;
           return false;
@@ -5741,22 +5748,18 @@
             selected_host_joint = null;
             Show_items();
           }
-          const model_centre = new THREE.Vector3();
-          const model_box = new THREE.Box3();
           for (let model of models_with_available_joints) {
             // Once per model per frame rather than once per joint: the box has
             // to be measured rather than taken from the model's origin, which
             // sits at the attachment end on parts like swing beams.
             if (!model.mesh) continue;
-            model_box.setFromObject(model.mesh);
-            model_box.getCenter(model_centre);
             for (let joint of model.joints) {
               if (!joint.available) {
                 joint.x = -9999;
                 joint.y = -9999;
                 continue;
               }
-              if (Locate_joint_ring(joint, joint.layer, null, model_centre)) {
+              if (Locate_joint_ring(joint, joint.layer, null)) {
                 Draw_add_marker(joint, joint === selected_host_joint);
                 browse_joints.push(joint);
               }
