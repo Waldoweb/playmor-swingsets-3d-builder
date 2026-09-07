@@ -3680,10 +3680,7 @@
             }
 
             if (!hasIncomingConnections) {
-              console.log('Identified root model:', model_data.object_id);
               root_models.push(model);
-            } else {
-              console.log('Model has incoming connections:', model_data.object_id);
             }
           }
 
@@ -3726,16 +3723,13 @@
           for (let model of created_models) {
             if (!positioned_models.has(model)) {
               console.warn('Model not positioned through connections, using saved position:', model.saved_data.object_id);
-              console.log('Model connections:', model.saved_data.connections || model.saved_data.joints);
 
               // Debug: Check if this model has outgoing connections that failed
               let connections = model.saved_data.connections || model.saved_data.joints || [];
               for (let conn of connections) {
                 let target_object_id = conn.connected_to?.model_object_id || conn.link?.model_object_id;
                 let target_model = created_models.find(m => m.saved_data.object_id === target_object_id);
-                console.log(`  -> Connection to ${target_object_id}: ${target_model ? 'found' : 'NOT FOUND'}`);
                 if (target_model) {
-                  console.log(`     Target positioned: ${positioned_models.has(target_model)}`);
                 }
               }
 
@@ -3993,7 +3987,6 @@
                       // Special case: if target joint is tire_only, morph to "tire" layer
                       let target_layer = joint2.tire_only ? "tire" : joint2.model.joints[0].layer;
                       if (target_layer && target_layer !== joint.layer) {
-                        console.log(`Morphing swing from layer ${joint.layer} to ${target_layer} to match swing beam`);
                         let position = model.mesh.position.clone();
                         let rotation = model.mesh.rotation.clone();
                         // By name, not index: morph rebuilds the joint list from
@@ -5928,7 +5921,6 @@
                   show_joint = (joint.layer === "handle" || joint.layer === "8") ||
                                (jointCategory === 'entries_climbers');
                 } else {
-                  console.log(`Non-handle joint logic: plug_joint.layer=${plug_joint.layer}, joint.layer=${joint.layer}, show_joint=${show_joint}`);
                 }
 
                 const canConnect = Can_connect({ plug_joint: plug_joint, host_joint: joint, exclude_preview: plug_model });
@@ -6195,15 +6187,6 @@
                   picked_mesh.model.selected = true;
                 }
 
-                console.log("=== SELECTED OBJECT DETAILS ===");
-                console.log("Mesh Name:", picked_mesh.name);
-                console.log("Mesh UUID:", picked_mesh.uuid);
-                console.log("Mesh Type:", picked_mesh.type);
-                console.log("Mesh Position:", picked_mesh.position);
-                console.log("Mesh Parent:", picked_mesh.parent ? picked_mesh.parent.name : "No parent");
-                console.log("Model Category:", picked_mesh.model ? picked_mesh.model.category : "No model");
-                console.log("Model Name:", picked_mesh.model ? picked_mesh.model.name : "No model");
-                console.log("Full picked_mesh object:", picked_mesh);
 
                 let splits = picked_mesh.name.toLowerCase().split(",");
 
@@ -6456,7 +6439,6 @@
       };
 
       const Show_info = (args) => {
-        console.log('Show_info called, picked_meshes:', picked_meshes.length);
 
         // Close all other modals first
         closeAllModals();
@@ -6569,7 +6551,6 @@
         info_content.innerHTML = html;
 
         // Show the dialog with animation
-        console.log('Showing dialog...');
         const dialog = document.getElementById('info_dialog');
         dialog.style.display = 'block';
 
@@ -6578,7 +6559,6 @@
 
         // Trigger animation by adding class
         dialog.classList.add('show-animated');
-        console.log('Dialog shown with animation');
 
         Resize_info_dialog();
       };
@@ -6704,7 +6684,6 @@
         }
       };
       const Help = (args) => {
-        console.log('Help called - showing instructions dialog');
 
         // Close all other modals first
         closeAllModals();
@@ -6718,11 +6697,9 @@
           dialog.classList.add('show-animated');
         });
 
-        console.log('Instructions dialog shown with animation');
       };
 
       const Hide_instructions = (args) => {
-        console.log('Hide_instructions called');
         const dialog = document.getElementById('instructions_dialog');
 
         // Remove animation class to trigger hide animation
@@ -6733,7 +6710,6 @@
           dialog.style.display = 'none';
         }, 300);
 
-        console.log('Instructions dialog hidden with animation');
       };
       const Resize_instructions_dialog = (args) => {
         // No longer needed for dialog sizing - CSS handles all positioning and sizing
@@ -6769,7 +6745,6 @@
         download_img.style.height = h / d + "px";
         upload_img.style.height = h / d + "px";
 
-        console.log('Resize_instructions_dialog called - using CSS responsive design for dialog');
       };
       const Resize_info_dialog = (args) => {
         // No longer needed - CSS handles all positioning and sizing
@@ -6811,7 +6786,6 @@
         show_info = false;
       };
       const Hide_info = (args) => {
-        console.log('Hide_info called');
         const dialog = document.getElementById('info_dialog');
 
         // Remove animation class to trigger hide animation
@@ -6820,7 +6794,6 @@
         // Hide dialog after animation completes
         setTimeout(() => {
           dialog.style.display = 'none';
-          console.log('Dialog hidden');
         }, 300); // Match the transition duration
 
       };
@@ -7284,8 +7257,6 @@
         // Use object_id to find object name and config
         const { objectName, objectConfig } = getObjectInfoById(model.object_id);
         
-        console.log("Resolved object name:", objectName);
-        console.log("Object config found:", !!objectConfig);
         
         // Get frame color configuration from JSON
         const frameColorConfig = colorConfig.constants.frame_colors[color];
@@ -7397,7 +7368,6 @@
             mesh.material.color = c;
           }
         });
-        console.log(`ColorizeTrim: Set trim color to ${s} for ${picked_mesh.model.object_id}`);
       };
       const Colorize = (color) => {
         picked_mesh.model.colorized = color;
@@ -7460,13 +7430,11 @@
                   // If it's a textured material, try to set color
                   mesh.material.color = toyColor;
                 } else {
-                  console.log("Mesh has material but no color property:", mesh.name);
                 }
 
                 // Force material to update
                 mesh.material.needsUpdate = true;
               } else {
-                console.log("Mesh has no material:", mesh.name);
               }
             }
           });
@@ -7475,22 +7443,17 @@
             model.colorized = toyColorHex; // Set the model as colorized
             model.toy_color = toyColorHex; // Also save it in the toy_color field
           } else {
-            console.log("DEBUG: No colorizable meshes found in swing");
           }
         } else {
-          console.log("DEBUG: Toy color not applied - conditions not met");
         }
 
         // Apply trim color to all objects that have trim support (saved or default blue)
         if (objectConfig && objectConfig.sections && objectConfig.sections.includes('trim')) {
-          console.log(`Checking trim color for ${model.object_id}: current trim_color =`, model.trim_color);
 
           // Use saved trim color if available, otherwise default to blue
           if (!model.trim_color) {
             model.trim_color = 0x1e4a30; // Default green color from trim_colors config
-            console.log(`No saved trim color, defaulting to green for ${model.object_id}`);
           } else {
-            console.log(`Using saved trim color ${model.trim_color.toString(16)} for ${model.object_id}`);
           }
 
           // Use the same approach as the Colorize function for consistency
@@ -7504,7 +7467,6 @@
               mesh.material.color = trimColor;
             }
           });
-          console.log(`Applied trim color (${s}) to ${model.object_id}`);
         }
 
         picked_mesh = tempPickedMesh;
@@ -8101,7 +8063,6 @@
           result = colorMap[hex_color];
         } else {
           // Debug: Log unrecognized colors to help identify issues
-          console.log(`Color2Name: Unrecognized color hex: ${hex_color}`);
         }
 
         return result;
@@ -8457,7 +8418,6 @@
           orbitControls.update();
           syncWorldRotationWithCamera();
           
-          console.log('Camera rotation set to:', degrees, 'degrees');
         };
 
 
@@ -8942,9 +8902,7 @@
       };
 
       $("#controls-buttons-info").on("click", (event) => {
-        console.log('Show Parts button clicked, current show_info:', show_info);
         show_info = !show_info;
-        console.log('New show_info value:', show_info);
         if (show_info) Show_info();
         else Hide_info();
       });
@@ -9014,13 +8972,10 @@
       let display_categories = true;
 
       $("#show-left-btn").on("click", (event) => {
-        console.log("Left button clicked! Current state:", display_categories);
         if (display_categories) {
-          console.log("Closing left sidebar");
           $(".left-bar").removeClass("open");
           $("#show-left-btn").addClass("hidden");
         } else {
-          console.log("Opening left sidebar");
           $(".left-bar").addClass("open");
           $("#show-left-btn").removeClass("hidden");
         }
@@ -9028,13 +8983,10 @@
       });
 
       $("#show-right-btn").on("click", (event) => {
-        console.log("Right button clicked! Current state:", display_items);
         if (display_items) {
-          console.log("Closing right sidebar");
           $(".right-bar").removeClass("open");
           $("#show-right-btn").addClass("hidden");
         } else {
-          console.log("Opening right sidebar");
           $(".right-bar").addClass("open");
           $("#show-right-btn").removeClass("hidden");
         }
@@ -9409,7 +9361,6 @@
         
         const visibleSections = [];
 
-        console.log(objectConfig)
         
         // Process each section based on object configuration
         objectConfig.sections.forEach(section => {
@@ -9518,14 +9469,11 @@
               const trimColors = objectConfig.colors.trim;
               let trimHtml = "";
               
-              console.log(`Trim colors:`, trimColors);
               
               Object.entries(trimColors).forEach(([key, colorData]) => {
-                console.log(`Adding trim color: ${key}`, colorData);
                 trimHtml += `<div onclick="ColorizeTrim(${colorData.hex})" class="custom-controls-color" style="background-color: ${colorData.color}" title="${key}"></div>`;
               });
               
-              console.log(`Trim HTML:`, trimHtml);
               $(".custom-controls-color-trim").html(trimHtml);
             }
           } else if (section === "toy") {
