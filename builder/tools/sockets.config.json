@@ -21,6 +21,26 @@
     "at 0.296. Anything from 0.09 to 0.29 gives the same answer."
   ],
 
+  "layer_renames": {
+    "scope": "toy",
+    "wheel": "toy",
+    "mailbox_or_phone": "toy"
+  },
+  "_layer_renames_note": [
+    "Layers that turned out to be one thing under several names, renamed",
+    "everywhere by tools/set_joint_layers.js.",
+    "",
+    "A tower post took a Super Scope, the mount below it took a Steering Wheel",
+    "or Ship's Wheel, and a separate mount took a Mailbox or Telephone -- three",
+    "layer names for what Weldon confirms is one kind of fitting. Any of the",
+    "five toys now goes on any of them.",
+    "",
+    "Applied to every model that carries these, so it holds for the towers and",
+    "for the toys themselves: 63 joints across 12 products become one layer.",
+    "Nothing special-cases a particular tower, which is the point -- a new toy",
+    "needs the 'toy' layer and nothing else."
+  ],
+
   "remove_joints": {
     "P-ST": ["joint_l,1,mailbox_or_phone", "joint_r,3,mailbox_or_phone"]
   },

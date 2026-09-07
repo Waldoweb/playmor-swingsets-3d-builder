@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-07T12:12:55.343Z",
+  "generated_at": "2026-09-07T12:18:36.198Z",
   "product_count": 64,
   "products": {
     "P-PT": {
@@ -12,8 +12,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-PT.7d028968.glb",
-          "bytes": 653120,
+          "file": "P-PT.0f3318f9.glb",
+          "bytes": 653152,
           "joints": [
             "joint,1,6",
             "joint,3,6",
@@ -22,19 +22,19 @@
             "joint_beam_front,0,b8,6,2",
             "joint_front,0,end_rail",
             "joint_l,0,6,1,2",
-            "joint_l,0,scope",
-            "joint_l,0,wheel",
+            "joint_l_scope,0,toy",
+            "joint_l_wheel,0,toy",
             "joint_l,2,6,3,4",
-            "joint_l,2,scope",
-            "joint_l,2,wheel",
+            "joint_l_scope,2,toy",
+            "joint_l_wheel,2,toy",
             "joint_pole_female,0,6,2,1",
             "joint_pole_female,2,6,4,3",
             "joint_r,0,6,1,2",
-            "joint_r,0,scope",
-            "joint_r,0,wheel",
+            "joint_r_scope,0,toy",
+            "joint_r_wheel,0,toy",
             "joint_r,2,6,3,4",
-            "joint_r,2,scope",
-            "joint_r,2,wheel"
+            "joint_r_scope,2,toy",
+            "joint_r_wheel,2,toy"
           ],
           "sockets": [
             {
@@ -156,16 +156,15 @@
                 0.585
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 0,
                 2
               ],
               "joints": [
-                "joint_l,0,scope",
-                "joint_l,2,wheel"
+                "joint_l_scope,0,toy",
+                "joint_l_wheel,2,toy"
               ]
             },
             {
@@ -175,16 +174,15 @@
                 -0.557
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 0,
                 2
               ],
               "joints": [
-                "joint_l,0,wheel",
-                "joint_l,2,scope"
+                "joint_l_wheel,0,toy",
+                "joint_l_scope,2,toy"
               ]
             },
             {
@@ -258,16 +256,15 @@
                 0.593
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 0,
                 2
               ],
               "joints": [
-                "joint_r,0,scope",
-                "joint_r,2,wheel"
+                "joint_r_scope,0,toy",
+                "joint_r_wheel,2,toy"
               ]
             },
             {
@@ -277,16 +274,15 @@
                 -0.557
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 0,
                 2
               ],
               "joints": [
-                "joint_r,0,wheel",
-                "joint_r,2,scope"
+                "joint_r_wheel,0,toy",
+                "joint_r_scope,2,toy"
               ]
             },
             {
@@ -366,17 +362,17 @@
           "excluder_layer": "2"
         },
         {
-          "name": "joint_l,0,scope",
+          "name": "joint_l_scope,0,toy",
           "direction": 0,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_l,0,wheel",
+          "name": "joint_l_wheel,0,toy",
           "direction": 0,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -390,17 +386,17 @@
           "excluder_layer": "4"
         },
         {
-          "name": "joint_l,2,scope",
+          "name": "joint_l_scope,2,toy",
           "direction": 2,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_l,2,wheel",
+          "name": "joint_l_wheel,2,toy",
           "direction": 2,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -430,17 +426,17 @@
           "excluder_layer": "2"
         },
         {
-          "name": "joint_r,0,scope",
+          "name": "joint_r_scope,0,toy",
           "direction": 0,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_r,0,wheel",
+          "name": "joint_r_wheel,0,toy",
           "direction": 0,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -454,17 +450,17 @@
           "excluder_layer": "4"
         },
         {
-          "name": "joint_r,2,scope",
+          "name": "joint_r_scope,2,toy",
           "direction": 2,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_r,2,wheel",
+          "name": "joint_r_wheel,2,toy",
           "direction": 2,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -480,20 +476,20 @@
       "files": [
         {
           "layer": null,
-          "file": "P-DPT.58886a2e.glb",
-          "bytes": 1030180,
+          "file": "P-DPT.27174031.glb",
+          "bytes": 1030200,
           "joints": [
             "joint,0,5",
-            "joint,0,scope",
+            "joint_scope,0,toy",
             "joint,1,5",
             "joint,1,6",
-            "joint,1,scope",
-            "joint,1,wheel",
-            "joint,2,wheel",
+            "joint_scope,1,toy",
+            "joint_wheel,1,toy",
+            "joint_wheel,2,toy",
             "joint,3,5",
             "joint,3,6",
-            "joint,3,scope",
-            "joint,3,wheel",
+            "joint_scope,3,toy",
+            "joint_wheel,3,toy",
             "joint_back,2,end_rail",
             "joint_beam,2,b8,3,2",
             "joint_front,0,end_rail",
@@ -535,16 +531,15 @@
                 1.193
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 0,
                 2
               ],
               "joints": [
-                "joint,0,scope",
-                "joint,2,wheel"
+                "joint_scope,0,toy",
+                "joint_wheel,2,toy"
               ]
             },
             {
@@ -586,16 +581,15 @@
                 0.553
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 1,
                 3
               ],
               "joints": [
-                "joint,1,scope",
-                "joint,3,wheel"
+                "joint_scope,1,toy",
+                "joint_wheel,3,toy"
               ]
             },
             {
@@ -605,16 +599,15 @@
                 0.568
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 1,
                 3
               ],
               "joints": [
-                "joint,1,wheel",
-                "joint,3,scope"
+                "joint_wheel,1,toy",
+                "joint_scope,3,toy"
               ]
             },
             {
@@ -918,9 +911,9 @@
           "excluder_layer": null
         },
         {
-          "name": "joint,0,scope",
+          "name": "joint_scope,0,toy",
           "direction": 0,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -942,25 +935,25 @@
           "excluder_layer": null
         },
         {
-          "name": "joint,1,scope",
+          "name": "joint_scope,1,toy",
           "direction": 1,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint,1,wheel",
+          "name": "joint_wheel,1,toy",
           "direction": 1,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint,2,wheel",
+          "name": "joint_wheel,2,toy",
           "direction": 2,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -982,17 +975,17 @@
           "excluder_layer": null
         },
         {
-          "name": "joint,3,scope",
+          "name": "joint_scope,3,toy",
           "direction": 3,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint,3,wheel",
+          "name": "joint_wheel,3,toy",
           "direction": 3,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -1136,31 +1129,31 @@
       "files": [
         {
           "layer": null,
-          "file": "P-WT.1ce18266.glb",
-          "bytes": 801164,
+          "file": "P-WT.18c518df.glb",
+          "bytes": 801196,
           "joints": [
             "joint,0,floor_center_watch",
             "joint,1,6,4,5",
             "joint,3,6,9,10",
             "joint_back,2,end_rail",
-            "joint_back_l,0,wheel",
+            "joint_back_l_wheel,0,toy",
             "joint_back_l,2,6,7,6",
-            "joint_back_l,2,mailbox_or_phone",
-            "joint_back_l,2,scope",
-            "joint_back_r,0,wheel",
+            "joint_back_l_mailbox_or_phone,2,toy",
+            "joint_back_l_scope,2,toy",
+            "joint_back_r_wheel,0,toy",
             "joint_back_r,2,6,7,6",
-            "joint_back_r,2,scope",
+            "joint_back_r_scope,2,toy",
             "joint_beam_back,2,b8,8,6",
             "joint_beam_front,0,b8,3,1",
             "joint_floor_center,0,picnic",
             "joint_front,0,end_rail",
             "joint_front_l,0,6,2,1",
-            "joint_front_l,0,mailbox_or_phone",
-            "joint_front_l,0,scope",
-            "joint_front_l,2,wheel",
+            "joint_front_l_mailbox_or_phone,0,toy",
+            "joint_front_l_scope,0,toy",
+            "joint_front_l_wheel,2,toy",
             "joint_front_r,0,6,2,1",
-            "joint_front_r,0,scope",
-            "joint_front_r,2,wheel",
+            "joint_front_r_scope,0,toy",
+            "joint_front_r_wheel,2,toy",
             "joint_left,3,end_rail",
             "joint_left_l,3,6,10,9",
             "joint_left_r,3,6,10,9",
@@ -1242,13 +1235,13 @@
                 -0.711
               ],
               "accepts": [
-                "wheel"
+                "toy"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint_back_l,0,wheel"
+                "joint_back_l_wheel,0,toy"
               ]
             },
             {
@@ -1274,13 +1267,13 @@
                 -0.611
               ],
               "accepts": [
-                "mailbox_or_phone"
+                "toy"
               ],
               "facings": [
                 2
               ],
               "joints": [
-                "joint_back_l,2,mailbox_or_phone"
+                "joint_back_l_mailbox_or_phone,2,toy"
               ]
             },
             {
@@ -1290,13 +1283,13 @@
                 -0.735
               ],
               "accepts": [
-                "scope"
+                "toy"
               ],
               "facings": [
                 2
               ],
               "joints": [
-                "joint_back_l,2,scope"
+                "joint_back_l_scope,2,toy"
               ]
             },
             {
@@ -1306,13 +1299,13 @@
                 -0.711
               ],
               "accepts": [
-                "wheel"
+                "toy"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint_back_r,0,wheel"
+                "joint_back_r_wheel,0,toy"
               ]
             },
             {
@@ -1338,13 +1331,13 @@
                 -0.735
               ],
               "accepts": [
-                "scope"
+                "toy"
               ],
               "facings": [
                 2
               ],
               "joints": [
-                "joint_back_r,2,scope"
+                "joint_back_r_scope,2,toy"
               ]
             },
             {
@@ -1439,13 +1432,13 @@
                 0.611
               ],
               "accepts": [
-                "mailbox_or_phone"
+                "toy"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint_front_l,0,mailbox_or_phone"
+                "joint_front_l_mailbox_or_phone,0,toy"
               ]
             },
             {
@@ -1455,13 +1448,13 @@
                 0.738
               ],
               "accepts": [
-                "scope"
+                "toy"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint_front_l,0,scope"
+                "joint_front_l_scope,0,toy"
               ]
             },
             {
@@ -1471,13 +1464,13 @@
                 0.706
               ],
               "accepts": [
-                "wheel"
+                "toy"
               ],
               "facings": [
                 2
               ],
               "joints": [
-                "joint_front_l,2,wheel"
+                "joint_front_l_wheel,2,toy"
               ]
             },
             {
@@ -1503,13 +1496,13 @@
                 0.738
               ],
               "accepts": [
-                "scope"
+                "toy"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint_front_r,0,scope"
+                "joint_front_r_scope,0,toy"
               ]
             },
             {
@@ -1519,13 +1512,13 @@
                 0.706
               ],
               "accepts": [
-                "wheel"
+                "toy"
               ],
               "facings": [
                 2
               ],
               "joints": [
-                "joint_front_r,2,wheel"
+                "joint_front_r_wheel,2,toy"
               ]
             },
             {
@@ -1693,9 +1686,9 @@
           "excluder_layer": null
         },
         {
-          "name": "joint_back_l,0,wheel",
+          "name": "joint_back_l_wheel,0,toy",
           "direction": 0,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -1709,25 +1702,25 @@
           "excluder_layer": "6"
         },
         {
-          "name": "joint_back_l,2,mailbox_or_phone",
+          "name": "joint_back_l_mailbox_or_phone,2,toy",
           "direction": 2,
-          "layer": "mailbox_or_phone",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_back_l,2,scope",
+          "name": "joint_back_l_scope,2,toy",
           "direction": 2,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_back_r,0,wheel",
+          "name": "joint_back_r_wheel,0,toy",
           "direction": 0,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -1741,9 +1734,9 @@
           "excluder_layer": "6"
         },
         {
-          "name": "joint_back_r,2,scope",
+          "name": "joint_back_r_scope,2,toy",
           "direction": 2,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -1789,25 +1782,25 @@
           "excluder_layer": "1"
         },
         {
-          "name": "joint_front_l,0,mailbox_or_phone",
+          "name": "joint_front_l_mailbox_or_phone,0,toy",
           "direction": 0,
-          "layer": "mailbox_or_phone",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_front_l,0,scope",
+          "name": "joint_front_l_scope,0,toy",
           "direction": 0,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_front_l,2,wheel",
+          "name": "joint_front_l_wheel,2,toy",
           "direction": 2,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -1821,17 +1814,17 @@
           "excluder_layer": "1"
         },
         {
-          "name": "joint_front_r,0,scope",
+          "name": "joint_front_r_scope,0,toy",
           "direction": 0,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_front_r,2,wheel",
+          "name": "joint_front_r_wheel,2,toy",
           "direction": 2,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -1911,18 +1904,18 @@
       "files": [
         {
           "layer": null,
-          "file": "P-ST.c734d23a.glb",
-          "bytes": 720580,
+          "file": "P-ST.c6609ed3.glb",
+          "bytes": 720612,
           "joints": [
             "joint,0,s,tire",
             "Joint_beam_left,3,b8,5,6",
             "Joint_beam_right,1,b8,3,1",
             "joint_l,0,6",
-            "joint_l,1,scope",
-            "joint_l,1,wheel",
+            "joint_l_scope,1,toy",
+            "joint_l_wheel,1,toy",
             "joint_l,2,6",
-            "joint_l,3,scope",
-            "joint_l,3,wheel",
+            "joint_l_scope,3,toy",
+            "joint_l_wheel,3,toy",
             "joint_left_l,3,6,5,4",
             "joint_left_r,3,6,5,4",
             "joint_pole_female,0,6",
@@ -1930,11 +1923,11 @@
             "joint_pole_female,2,6",
             "joint_pole_female,3,6,4,5",
             "joint_r,0,6",
-            "joint_r,1,scope",
-            "joint_r,1,wheel",
+            "joint_r_scope,1,toy",
+            "joint_r_wheel,1,toy",
             "joint_r,2,6",
-            "joint_r,3,scope",
-            "joint_r,3,wheel",
+            "joint_r_scope,3,toy",
+            "joint_r_wheel,3,toy",
             "joint_right_l,1,6,2,1",
             "joint_right_r,1,6,2,1"
           ],
@@ -2010,13 +2003,13 @@
                 0.283
               ],
               "accepts": [
-                "scope"
+                "toy"
               ],
               "facings": [
                 1
               ],
               "joints": [
-                "joint_l,1,scope"
+                "joint_l_scope,1,toy"
               ]
             },
             {
@@ -2026,13 +2019,13 @@
                 0.283
               ],
               "accepts": [
-                "wheel"
+                "toy"
               ],
               "facings": [
                 1
               ],
               "joints": [
-                "joint_l,1,wheel"
+                "joint_l_wheel,1,toy"
               ]
             },
             {
@@ -2058,13 +2051,13 @@
                 0.283
               ],
               "accepts": [
-                "scope"
+                "toy"
               ],
               "facings": [
                 3
               ],
               "joints": [
-                "joint_l,3,scope"
+                "joint_l_scope,3,toy"
               ]
             },
             {
@@ -2074,13 +2067,13 @@
                 0.283
               ],
               "accepts": [
-                "wheel"
+                "toy"
               ],
               "facings": [
                 3
               ],
               "joints": [
-                "joint_l,3,wheel"
+                "joint_l_wheel,3,toy"
               ]
             },
             {
@@ -2202,13 +2195,13 @@
                 -0.284
               ],
               "accepts": [
-                "scope"
+                "toy"
               ],
               "facings": [
                 1
               ],
               "joints": [
-                "joint_r,1,scope"
+                "joint_r_scope,1,toy"
               ]
             },
             {
@@ -2218,13 +2211,13 @@
                 -0.284
               ],
               "accepts": [
-                "wheel"
+                "toy"
               ],
               "facings": [
                 1
               ],
               "joints": [
-                "joint_r,1,wheel"
+                "joint_r_wheel,1,toy"
               ]
             },
             {
@@ -2250,13 +2243,13 @@
                 -0.284
               ],
               "accepts": [
-                "scope"
+                "toy"
               ],
               "facings": [
                 3
               ],
               "joints": [
-                "joint_r,3,scope"
+                "joint_r_scope,3,toy"
               ]
             },
             {
@@ -2266,13 +2259,13 @@
                 -0.284
               ],
               "accepts": [
-                "wheel"
+                "toy"
               ],
               "facings": [
                 3
               ],
               "joints": [
-                "joint_r,3,wheel"
+                "joint_r_wheel,3,toy"
               ]
             },
             {
@@ -2344,17 +2337,17 @@
           "excluder_layer": null
         },
         {
-          "name": "joint_l,1,scope",
+          "name": "joint_l_scope,1,toy",
           "direction": 1,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_l,1,wheel",
+          "name": "joint_l_wheel,1,toy",
           "direction": 1,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -2368,17 +2361,17 @@
           "excluder_layer": null
         },
         {
-          "name": "joint_l,3,scope",
+          "name": "joint_l_scope,3,toy",
           "direction": 3,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_l,3,wheel",
+          "name": "joint_l_wheel,3,toy",
           "direction": 3,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -2440,17 +2433,17 @@
           "excluder_layer": null
         },
         {
-          "name": "joint_r,1,scope",
+          "name": "joint_r_scope,1,toy",
           "direction": 1,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_r,1,wheel",
+          "name": "joint_r_wheel,1,toy",
           "direction": 1,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -2464,17 +2457,17 @@
           "excluder_layer": null
         },
         {
-          "name": "joint_r,3,scope",
+          "name": "joint_r_scope,3,toy",
           "direction": 3,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_r,3,wheel",
+          "name": "joint_r_wheel,3,toy",
           "direction": 3,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -2507,8 +2500,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-DST.dce94d16.glb",
-          "bytes": 932144,
+          "file": "P-DST.1161349e.glb",
+          "bytes": 932148,
           "joints": [
             "joint,1,6,4,5",
             "joint,1,8,6,7",
@@ -2527,18 +2520,18 @@
             "joint_front_l,0,6,2,1",
             "joint_front_r,0,6,2,1",
             "joint_l,0,6,1,2",
-            "joint_l,0,wheel",
+            "joint_l_wheel,0,toy",
             "joint_l,2,8,8,9",
-            "joint_l,2,scope",
+            "joint_l_scope,2,toy",
             "joint_left_l,3,6,14,13",
             "joint_left_l,3,8,12,11",
             "joint_left_r,3,6,14,13",
             "joint_left_r,3,8,12,11",
             "joint_pole_female_f,0,6,1,2",
             "joint_r,0,6,1,2",
-            "joint_r,0,wheel",
+            "joint_r_wheel,0,toy",
             "joint_r,2,8,8,9",
-            "joint_r,2,scope",
+            "joint_r_scope,2,toy",
             "joint_right_l,1,6,5,4",
             "joint_right_l,1,8,7,6",
             "joint_right_r,1,6,5,4",
@@ -2809,16 +2802,15 @@
                 -1.471
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 0,
                 2
               ],
               "joints": [
-                "joint_l,0,wheel",
-                "joint_l,2,scope"
+                "joint_l_wheel,0,toy",
+                "joint_l_scope,2,toy"
               ]
             },
             {
@@ -2908,16 +2900,15 @@
                 -1.471
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 0,
                 2
               ],
               "joints": [
-                "joint_r,0,wheel",
-                "joint_r,2,scope"
+                "joint_r_wheel,0,toy",
+                "joint_r_scope,2,toy"
               ]
             },
             {
@@ -3141,9 +3132,9 @@
           "excluder_layer": "2"
         },
         {
-          "name": "joint_l,0,wheel",
+          "name": "joint_l_wheel,0,toy",
           "direction": 0,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -3157,9 +3148,9 @@
           "excluder_layer": "9"
         },
         {
-          "name": "joint_l,2,scope",
+          "name": "joint_l_scope,2,toy",
           "direction": 2,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -3213,9 +3204,9 @@
           "excluder_layer": "2"
         },
         {
-          "name": "joint_r,0,wheel",
+          "name": "joint_r_wheel,0,toy",
           "direction": 0,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -3229,9 +3220,9 @@
           "excluder_layer": "9"
         },
         {
-          "name": "joint_r,2,scope",
+          "name": "joint_r_scope,2,toy",
           "direction": 2,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -3287,8 +3278,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-DSMT.8a3a6545.glb",
-          "bytes": 954480,
+          "file": "P-DSMT.43f3e939.glb",
+          "bytes": 954528,
           "joints": [
             "joint,0,8,6,7",
             "joint,0,floor_center_watch",
@@ -3311,24 +3302,24 @@
             "joint_front_l,3,8,8,9",
             "joint_front_r,2,6",
             "joint_front_r,3,8,8,9",
-            "joint_l,1,scope",
-            "joint_l,1,wheel",
-            "joint_l,3,scope",
-            "joint_l,3,wheel",
-            "joint_l_8,1,scope",
-            "joint_l_8,1,wheel",
-            "joint_l_8,3,scope",
-            "joint_l_8,3,wheel",
+            "joint_l_scope,1,toy",
+            "joint_l_wheel,1,toy",
+            "joint_l_scope,3,toy",
+            "joint_l_wheel,3,toy",
+            "joint_l_8_scope,1,toy",
+            "joint_l_8_wheel,1,toy",
+            "joint_l_8_scope,3,toy",
+            "joint_l_8_wheel,3,toy",
             "joint_left_l,1,6,5,4",
             "joint_left_r,1,6,5,4",
-            "joint_r,1,scope",
-            "joint_r,1,wheel",
-            "joint_r,3,scope",
-            "joint_r,3,wheel",
-            "joint_r_8,1,scope",
-            "joint_r_8,1,wheel",
-            "joint_r_8,3,scope",
-            "joint_r_8,3,wheel",
+            "joint_r_scope,1,toy",
+            "joint_r_wheel,1,toy",
+            "joint_r_scope,3,toy",
+            "joint_r_wheel,3,toy",
+            "joint_r_8_scope,1,toy",
+            "joint_r_8_wheel,1,toy",
+            "joint_r_8_scope,3,toy",
+            "joint_r_8_wheel,3,toy",
             "joint_right_l,0,8,7,6",
             "joint_right_l,3,6,2,1",
             "joint_right_r,0,8,7,6",
@@ -3655,16 +3646,15 @@
                 -0.68
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 1,
                 3
               ],
               "joints": [
-                "joint_l,1,scope",
-                "joint_l,3,wheel"
+                "joint_l_scope,1,toy",
+                "joint_l_wheel,3,toy"
               ]
             },
             {
@@ -3674,16 +3664,15 @@
                 -0.68
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 1,
                 3
               ],
               "joints": [
-                "joint_l,1,wheel",
-                "joint_l,3,scope"
+                "joint_l_wheel,1,toy",
+                "joint_l_scope,3,toy"
               ]
             },
             {
@@ -3693,16 +3682,15 @@
                 0.57
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 1,
                 3
               ],
               "joints": [
-                "joint_l_8,1,scope",
-                "joint_l_8,3,wheel"
+                "joint_l_8_scope,1,toy",
+                "joint_l_8_wheel,3,toy"
               ]
             },
             {
@@ -3712,16 +3700,15 @@
                 0.552
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 1,
                 3
               ],
               "joints": [
-                "joint_l_8,1,wheel",
-                "joint_l_8,3,scope"
+                "joint_l_8_wheel,1,toy",
+                "joint_l_8_scope,3,toy"
               ]
             },
             {
@@ -3763,16 +3750,15 @@
                 -0.16
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 1,
                 3
               ],
               "joints": [
-                "joint_r,1,scope",
-                "joint_r,3,wheel"
+                "joint_r_scope,1,toy",
+                "joint_r_wheel,3,toy"
               ]
             },
             {
@@ -3782,16 +3768,15 @@
                 -0.16
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 1,
                 3
               ],
               "joints": [
-                "joint_r,1,wheel",
-                "joint_r,3,scope"
+                "joint_r_wheel,1,toy",
+                "joint_r_scope,3,toy"
               ]
             },
             {
@@ -3801,16 +3786,15 @@
                 1.12
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 1,
                 3
               ],
               "joints": [
-                "joint_r_8,1,scope",
-                "joint_r_8,3,wheel"
+                "joint_r_8_scope,1,toy",
+                "joint_r_8_wheel,3,toy"
               ]
             },
             {
@@ -3820,16 +3804,15 @@
                 1.115
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 1,
                 3
               ],
               "joints": [
-                "joint_r_8,1,wheel",
-                "joint_r_8,3,scope"
+                "joint_r_8_wheel,1,toy",
+                "joint_r_8_scope,3,toy"
               ]
             },
             {
@@ -4069,65 +4052,65 @@
           "excluder_layer": "9"
         },
         {
-          "name": "joint_l,1,scope",
+          "name": "joint_l_scope,1,toy",
           "direction": 1,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_l,1,wheel",
+          "name": "joint_l_wheel,1,toy",
           "direction": 1,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_l,3,scope",
+          "name": "joint_l_scope,3,toy",
           "direction": 3,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_l,3,wheel",
+          "name": "joint_l_wheel,3,toy",
           "direction": 3,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_l_8,1,scope",
+          "name": "joint_l_8_scope,1,toy",
           "direction": 1,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_l_8,1,wheel",
+          "name": "joint_l_8_wheel,1,toy",
           "direction": 1,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_l_8,3,scope",
+          "name": "joint_l_8_scope,3,toy",
           "direction": 3,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_l_8,3,wheel",
+          "name": "joint_l_8_wheel,3,toy",
           "direction": 3,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -4149,65 +4132,65 @@
           "excluder_layer": "4"
         },
         {
-          "name": "joint_r,1,scope",
+          "name": "joint_r_scope,1,toy",
           "direction": 1,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_r,1,wheel",
+          "name": "joint_r_wheel,1,toy",
           "direction": 1,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_r,3,scope",
+          "name": "joint_r_scope,3,toy",
           "direction": 3,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_r,3,wheel",
+          "name": "joint_r_wheel,3,toy",
           "direction": 3,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_r_8,1,scope",
+          "name": "joint_r_8_scope,1,toy",
           "direction": 1,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_r_8,1,wheel",
+          "name": "joint_r_8_wheel,1,toy",
           "direction": 1,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_r_8,3,scope",
+          "name": "joint_r_8_scope,3,toy",
           "direction": 3,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint_r_8,3,wheel",
+          "name": "joint_r_8_wheel,3,toy",
           "direction": 3,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -4255,8 +4238,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-KT.b410dcfb.glb",
-          "bytes": 785584,
+          "file": "P-KT.74cb1cc2.glb",
+          "bytes": 785608,
           "joints": [
             "joint,1,0",
             "joint,2,end_rail",
@@ -4266,20 +4249,20 @@
             "joint,0,8,1,2004",
             "joint,0,8,1,2005",
             "joint,0,8,1,2006",
-            "joint,0,scope",
-            "joint,0,wheel",
+            "joint_scope,0,toy",
+            "joint_wheel,0,toy",
             "joint,1,8,3,4",
-            "joint,1,mailbox_or_phone",
+            "joint_mailbox_or_phone,1,toy",
             "joint,2,8,6,7001",
             "joint,2,8,6,7002",
             "joint,2,8,6,7003",
             "joint,2,8,6,7004",
             "joint,2,8,6,7005",
             "joint,2,8,6,7006",
-            "joint,2,scope",
-            "joint,2,wheel",
+            "joint_scope,2,toy",
+            "joint_wheel,2,toy",
             "joint,3,8,8,9",
-            "joint,3,mailbox_or_phone",
+            "joint_mailbox_or_phone,3,toy",
             "joint_beam_left,3,b10,10,8",
             "joint_beam_right,1,b10,5,3",
             "joint_floor_center,0,floor_center_king",
@@ -4433,16 +4416,15 @@
                 0.733
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 0,
                 2
               ],
               "joints": [
-                "joint,0,scope",
-                "joint,2,wheel"
+                "joint_scope,0,toy",
+                "joint_wheel,2,toy"
               ]
             },
             {
@@ -4452,16 +4434,15 @@
                 -0.715
               ],
               "accepts": [
-                "scope",
-                "wheel"
+                "toy"
               ],
               "facings": [
                 0,
                 2
               ],
               "joints": [
-                "joint,0,wheel",
-                "joint,2,scope"
+                "joint_wheel,0,toy",
+                "joint_scope,2,toy"
               ]
             },
             {
@@ -4487,13 +4468,13 @@
                 0.663
               ],
               "accepts": [
-                "mailbox_or_phone"
+                "toy"
               ],
               "facings": [
                 1
               ],
               "joints": [
-                "joint,1,mailbox_or_phone"
+                "joint_mailbox_or_phone,1,toy"
               ]
             },
             {
@@ -4615,13 +4596,13 @@
                 -0.65
               ],
               "accepts": [
-                "mailbox_or_phone"
+                "toy"
               ],
               "facings": [
                 3
               ],
               "joints": [
-                "joint,3,mailbox_or_phone"
+                "joint_mailbox_or_phone,3,toy"
               ]
             },
             {
@@ -4844,17 +4825,17 @@
           "excluder_layer": "2006"
         },
         {
-          "name": "joint,0,scope",
+          "name": "joint_scope,0,toy",
           "direction": 0,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint,0,wheel",
+          "name": "joint_wheel,0,toy",
           "direction": 0,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -4868,9 +4849,9 @@
           "excluder_layer": "4"
         },
         {
-          "name": "joint,1,mailbox_or_phone",
+          "name": "joint_mailbox_or_phone,1,toy",
           "direction": 1,
-          "layer": "mailbox_or_phone",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -4924,17 +4905,17 @@
           "excluder_layer": "7006"
         },
         {
-          "name": "joint,2,scope",
+          "name": "joint_scope,2,toy",
           "direction": 2,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint,2,wheel",
+          "name": "joint_wheel,2,toy",
           "direction": 2,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -4948,9 +4929,9 @@
           "excluder_layer": "9"
         },
         {
-          "name": "joint,3,mailbox_or_phone",
+          "name": "joint_mailbox_or_phone,3,toy",
           "direction": 3,
-          "layer": "mailbox_or_phone",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -8597,10 +8578,10 @@
       "files": [
         {
           "layer": null,
-          "file": "SW.74ca6b81.glb",
-          "bytes": 86068,
+          "file": "SW.52506256.glb",
+          "bytes": 86072,
           "joints": [
-            "joint,0,wheel"
+            "joint_wheel,0,toy"
           ],
           "sockets": [
             {
@@ -8610,13 +8591,13 @@
                 0
               ],
               "accepts": [
-                "wheel"
+                "toy"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint,0,wheel"
+                "joint_wheel,0,toy"
               ]
             }
           ]
@@ -8624,9 +8605,9 @@
       ],
       "joints": [
         {
-          "name": "joint,0,wheel",
+          "name": "joint_wheel,0,toy",
           "direction": 0,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -8642,10 +8623,10 @@
       "files": [
         {
           "layer": null,
-          "file": "SHW.a7a0ceca.glb",
-          "bytes": 95408,
+          "file": "SHW.f168925b.glb",
+          "bytes": 95412,
           "joints": [
-            "joint,0,wheel"
+            "joint_wheel,0,toy"
           ],
           "sockets": [
             {
@@ -8655,13 +8636,13 @@
                 0
               ],
               "accepts": [
-                "wheel"
+                "toy"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint,0,wheel"
+                "joint_wheel,0,toy"
               ]
             }
           ]
@@ -8669,9 +8650,9 @@
       ],
       "joints": [
         {
-          "name": "joint,0,wheel",
+          "name": "joint_wheel,0,toy",
           "direction": 0,
-          "layer": "wheel",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -8687,10 +8668,10 @@
       "files": [
         {
           "layer": null,
-          "file": "SSC.0abd4d7a.glb",
-          "bytes": 86488,
+          "file": "SSC.e27269ba.glb",
+          "bytes": 86492,
           "joints": [
-            "joint,0,scope"
+            "joint_scope,0,toy"
           ],
           "sockets": [
             {
@@ -8700,13 +8681,13 @@
                 0
               ],
               "accepts": [
-                "scope"
+                "toy"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint,0,scope"
+                "joint_scope,0,toy"
               ]
             }
           ]
@@ -8714,9 +8695,9 @@
       ],
       "joints": [
         {
-          "name": "joint,0,scope",
+          "name": "joint_scope,0,toy",
           "direction": 0,
-          "layer": "scope",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -8732,10 +8713,10 @@
       "files": [
         {
           "layer": null,
-          "file": "MAIL.34cc258d.glb",
-          "bytes": 31680,
+          "file": "MAIL.47e58b23.glb",
+          "bytes": 31684,
           "joints": [
-            "joint,0,mailbox_or_phone"
+            "joint_mailbox_or_phone,0,toy"
           ],
           "sockets": [
             {
@@ -8745,13 +8726,13 @@
                 0
               ],
               "accepts": [
-                "mailbox_or_phone"
+                "toy"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint,0,mailbox_or_phone"
+                "joint_mailbox_or_phone,0,toy"
               ]
             }
           ]
@@ -8759,9 +8740,9 @@
       ],
       "joints": [
         {
-          "name": "joint,0,mailbox_or_phone",
+          "name": "joint_mailbox_or_phone,0,toy",
           "direction": 0,
-          "layer": "mailbox_or_phone",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -8777,10 +8758,10 @@
       "files": [
         {
           "layer": null,
-          "file": "TEL.d18fd1e8.glb",
-          "bytes": 44740,
+          "file": "TEL.1845eb6f.glb",
+          "bytes": 44744,
           "joints": [
-            "joint,0,mailbox_or_phone"
+            "joint_mailbox_or_phone,0,toy"
           ],
           "sockets": [
             {
@@ -8790,13 +8771,13 @@
                 0
               ],
               "accepts": [
-                "mailbox_or_phone"
+                "toy"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint,0,mailbox_or_phone"
+                "joint_mailbox_or_phone,0,toy"
               ]
             }
           ]
@@ -8804,9 +8785,9 @@
       ],
       "joints": [
         {
-          "name": "joint,0,mailbox_or_phone",
+          "name": "joint_mailbox_or_phone,0,toy",
           "direction": 0,
-          "layer": "mailbox_or_phone",
+          "layer": "toy",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null

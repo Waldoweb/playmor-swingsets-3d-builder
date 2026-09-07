@@ -168,6 +168,41 @@ function main() {
     }
   };
 
+  // Layers that were several names for one kind of fitting. Applied to every
+  // model rather than to a named list, because the point of the rename is that
+  // no product is a special case.
+  const renames = config.layer_renames || {};
+  if (Object.keys(renames).length) {
+    for (const stem of [...files.keys()]) {
+      const objectId = stem.split("__")[0];
+      editProduct(objectId, (gltf) => {
+        const done = [];
+        for (const node of gltf.nodes || []) {
+          if (typeof node.name !== "string") continue;
+          if (!node.name.toLowerCase().startsWith("joint")) continue;
+          const fields = node.name.split(",");
+          if (fields.length < 3) continue;
+          const from = fields[2];
+          const to = renames[from];
+          if (!to || from === to) continue;
+
+          // The layer is part of the name, so merging two layers would merge
+          // two names: `joint_l,1,scope` and `joint_l,1,wheel` both become
+          // `joint_l,1,toy`. Names have to stay unique within a file — sockets
+          // and saved designs both resolve joints by name and would take the
+          // first match — so the distinction moves into the prefix, which is
+          // free-form and now says which mount this is.
+          fields[0] = `${fields[0]}_${from}`;
+          fields[2] = to;
+          const next = fields.join(",");
+          done.push(`${node.name} -> ${next}`);
+          node.name = next;
+        }
+        return done;
+      });
+    }
+  }
+
   // Joints the product does not actually offer.
   for (const [objectId, names] of Object.entries(removals)) {
     editProduct(objectId, (gltf) => {

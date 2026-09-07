@@ -157,8 +157,11 @@
     check("Play Tower joints", tower.joints.length, 20);
     check("Play Tower sockets", tower.sockets().length, 16);
 
-    const post = tower.sockets().find((s) => s.joints.some((j) => j.layer === "scope"));
-    check("a post is one socket offering both toys", post.joints.map((j) => j.layer).sort(), ["scope", "wheel"]);
+    // A Play Tower's post carries its two toy mounts close enough together to
+    // be one opening. Both are layer `toy` now — scope, wheel and mailbox were
+    // three names for one kind of fitting.
+    const post = tower.sockets().find((s) => s.joints.length > 1 && s.joints.every((j) => j.layer === "toy"));
+    check("a post is one socket, not two", !!post, true);
 
     // Filling either side of a shared opening closes the whole thing. This is
     // the bug the socket work was written for: the twin used to keep its dot.
@@ -431,22 +434,68 @@
     // no longer sees them as joints at all.
     await reset();
     const summit = await placeFirst("P-ST");
-    check("Summit Tower offers no mailbox mount",
-      summit.joints.filter((j) => j.layer === "mailbox_or_phone").length, 0);
-    check("and the catalogue greys out a mailbox there",
-      templates().find((m) => m.object_id === "MAIL").capable(), false);
+    const disabled = [];
+    summit.mesh.traverse((o) => {
+      if (o.name && o.name.startsWith("disabled_")) disabled.push(o.name);
+    });
+    check("both Summit mailbox mounts are disabled in the model", disabled.length, 2);
+    check("...and none of them is a joint any more",
+      summit.joints.some((j) => j.name.startsWith("disabled_")), false);
 
-    // The other two towers keep theirs.
-    for (const id of ["P-WT", "P-KT"]) {
+    // Summit keeps its eight post mounts, which now take any toy.
+    check("Summit still offers its eight toy points",
+      summit.sockets().filter((s) => s.joints.some((j) => j.layer === "toy")).length, 8);
+
+    // The other two towers kept their extra mounts, so they have more.
+    for (const [id, points] of [["P-WT", 10], ["P-KT", 4]]) {
       await reset();
       const tower = await placeFirst(id);
-      check(`${id} still offers two mailbox mounts`,
-        tower.joints.filter((j) => j.layer === "mailbox_or_phone").length, 2);
+      check(`${id} offers ${points} toy points`,
+        tower.sockets().filter((s) => s.joints.some((j) => j.layer === "toy")).length, points);
       check(`${id} still takes a mailbox`,
         templates().find((m) => m.object_id === "MAIL").capable(), true);
     }
     await reset();
   } catch (e) { fail("disabled joints suite", e); }
+
+  // ————————————————————————————————————————————————— toy mounts
+
+  try {
+    suite("toy mounts");
+    const TOYS = ["SW", "SHW", "SSC", "MAIL", "TEL"];
+    const refused = [];
+    const counts = {};
+    for (const id of ["P-PT", "P-DPT", "P-WT", "P-ST", "P-DST", "P-DSMT", "P-KT"]) {
+      await reset();
+      const tower = await placeFirst(id);
+      const points = tower.sockets().filter((s) => s.joints.some((j) => j.layer === "toy"));
+      counts[id] = points.length;
+      // Scope, wheel and mailbox were three names for one fitting. Every toy
+      // must now go on every toy point, on every tower.
+      for (const socket of points)
+        for (const toy of TOYS)
+          if (!templates().find((m) => m.object_id === toy).capable({ socket }))
+            refused.push(`${id}/${toy}`);
+    }
+    check("every toy fits every toy point", [...new Set(refused)], []);
+    check("and the towers offer the expected number of them", counts, {
+      "P-PT": 4, "P-DPT": 3, "P-WT": 10, "P-ST": 8, "P-DST": 2, "P-DSMT": 8, "P-KT": 4,
+    });
+
+    // All five actually place on one tower.
+    await reset();
+    const summit = await placeFirst("P-ST");
+    let fitted = 0;
+    for (const toy of TOYS) {
+      const socket = summit.sockets().find(
+        (s) => Socket_is_open(s) && s.joints.some((j) => j.layer === "toy" && j.available)
+      );
+      if (!socket) break;
+      if (await place(socket, toy)) fitted++;
+    }
+    check("all five toys fit on one tower", fitted, 5);
+    await reset();
+  } catch (e) { fail("toy mounts suite", e); }
 
   // ————————————————————————————————————————————————— facing
 
