@@ -3040,6 +3040,12 @@
       // Joint-first flow: the opening the user has clicked, and the joints
       // currently drawn as targets. Null selection means the catalog behaves
       // exactly as it always has.
+      // The part whose opening is being re-offered, once one is selected —
+      // { model, socket, host_joint }. Selecting a placed part fills the
+      // catalogue with everything that would fit where it sits, and choosing
+      // one swaps it. Null whenever nothing is selected.
+      let replacing = null;
+
       // The opening the user has picked, and every opening currently on screen.
       // Sockets rather than joints: one dot per place a part can go, however
       // many joints describe it.
@@ -6185,6 +6191,8 @@
                   for (let model of Model.instances) model.selected = false;
 
                   picked_mesh.model.selected = true;
+                  // Fill the catalogue with what else fits where this sits.
+                  Offer_replacements(picked_mesh.model);
                 }
 
 
@@ -6234,6 +6242,7 @@
                 for (let model of Model.instances) model.selected = false;
                 picked_mesh = null;
                 Hide_options();
+                Offer_replacements(null);
               }
             }
             break;
@@ -6315,6 +6324,135 @@
           .add(host_world);
         if (position.y < 0) position.y = 0;
         model.mesh.position.copy(position);
+      };
+
+      /**
+       * Run something with the selected part's opening treated as empty.
+       *
+       * The question the catalogue answers while a part is selected is what
+       * could go there *instead* of it, so the joint it sits on has to read as
+       * free. capable() asks about availability in half a dozen places, and
+       * lending it the joint for the length of one call is a better trade than
+       * threading a flag through all of them.
+       *
+       * Scoped rather than inlined so that every caller gets the same answer —
+       * a test asking the same question outside Show_items would otherwise be
+       * told the opening is taken. The restore is in a finally, so a throw
+       * cannot leave a joint wrongly free.
+       */
+      const With_opening_free = (body) => {
+        const freed = [];
+        if (replacing) {
+          for (const joint of replacing.socket.joints) {
+            if (joint.connected && joint.connected.model === replacing.model) {
+              freed.push([joint, joint.available]);
+              joint.available = true;
+            }
+          }
+        }
+        try {
+          return body();
+        } finally {
+          for (const [joint, was] of freed) joint.available = was;
+        }
+      };
+
+      /**
+       * Re-offer the opening a placed part occupies.
+       *
+       * Selecting a part fills the catalogue with everything that would fit
+       * where it sits — the same list clicking that empty socket would have
+       * given — so a wave slide can be traded for a DX wave slide without
+       * deleting it first and finding the spot again.
+       *
+       * A free-standing model is skipped: a tower is the ground the design
+       * stands on, not a part in an opening, and the joint it happens to have
+       * connected belongs to whatever is hanging off it.
+       */
+      const Offer_replacements = (model) => {
+        replacing = null;
+
+        if (model && !Is_free_standing(model)) {
+          const own = model.joints.find((joint) => joint.connected);
+          if (own) {
+            const host_joint = own.connected;
+            const socket = host_joint.model
+              .sockets()
+              .find((s) => s.joints.includes(host_joint));
+            if (socket) replacing = { model, socket, host_joint };
+          }
+        }
+
+        Show_items();
+      };
+
+      /**
+       * Put a different part in the opening the selected one occupies.
+       *
+       * Anything resting on the old part goes with it, as Weldon asked — a
+       * swapped-out beam takes its swings. The replacement then goes into the
+       * same opening by the ordinary route, so it lands exactly where the
+       * catalogue said it would fit.
+       */
+      const Replace_selected = async (objectId) => {
+        const target = replacing;
+        replacing = null;
+        if (!target) return false;
+
+        const template = Model.instances.find((m) => m.object_id === objectId);
+        if (!template) return false;
+
+        // Load before removing anything. Geometry arrives on demand, so this
+        // can fail or simply take a moment, and a failure after the old part is
+        // gone would leave an opening with nothing to put in it.
+        try {
+          await template.ensure_loaded();
+        } catch (error) {
+          console.warn(`Could not load ${objectId} to replace ${target.model.object_id}`, error);
+          return false;
+        }
+        if (!template.mesh) return false;
+
+        const host_joint = target.host_joint;
+        const host_model = host_joint.model;
+
+        picked_mesh = target.model.mesh;
+        Trash_picked_mesh({});
+        Mode.mode = Mode.normal;
+
+        const socket = host_model
+          .sockets()
+          .find((s) => s.joints.includes(host_joint));
+        if (!socket) return false;
+
+        const fresh = template.clone();
+        scene.add(fresh.mesh);
+        applyDefaultColors(fresh);
+
+        const mate = Find_mate_in_socket(fresh, socket);
+        if (!mate) {
+          scene.remove(fresh.mesh);
+          console.warn(`${objectId} would not fit the opening after all`);
+          Show_items();
+          return false;
+        }
+
+        plug_model = fresh;
+        plug_joint = mate.plug_joint;
+        plug_joint_index = fresh.joints.indexOf(mate.plug_joint);
+        const host_of_new = mate.host_joint.model;
+        Attach_plug_to(mate.host_joint);
+        Pair_handle_accessory(fresh, host_of_new);
+
+        plug_model = null;
+        plug_joint = null;
+        plug_joint_index = -1;
+        Mode.mode = Mode.normal;
+        picked_mesh = null;
+        Hide_options();
+        Show_items();
+        Update_measurements();
+        return true;
       };
 
       /**
@@ -7795,6 +7933,23 @@
       };
 
       const Item_clicked = async (args) => {
+        // A part is selected, so this click means "put that there instead".
+        if (replacing) {
+          const objectId =
+            selected_object_id ||
+            (typeof Categories !== "undefined" &&
+            Categories[category_index] &&
+            Categories[category_index].children[item_index] &&
+            Categories[category_index].children[item_index].model
+              ? Categories[category_index].children[item_index].model.object_id
+              : null);
+          if (objectId) {
+            selected_object_id = null;
+            await Replace_selected(objectId);
+            return;
+          }
+        }
+
         picked_mesh = null;
         host_joint = null;
         plug_joint = null;
@@ -8556,6 +8711,7 @@
             if (hit) {
               if (hit !== selected_socket) {
                 selected_socket = hit;
+                replacing = null;
                 Show_items();
               }
               // Return before Pointer_down(): the ring sits on top of its own
@@ -8804,10 +8960,16 @@
             switchboard = [];
           }
           switchboard[category_index] = [];
+
+          With_opening_free(() => {
           for (let child of Categories[category_index].children) {
             child.index = index;
             const isCapable = child.model.capable(
-              selected_socket ? { socket: selected_socket } : undefined
+              replacing
+                ? { socket: replacing.socket }
+                : selected_socket
+                ? { socket: selected_socket }
+                : undefined
             );
             if (isCapable) {
               html +=
@@ -8828,6 +8990,8 @@
 
             index++;
           }
+          });
+
           for (let child of cabuse) {
             html +=
               '<h6 class="sub-items disabled" id="sub-items-' +

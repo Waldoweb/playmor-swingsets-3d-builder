@@ -396,6 +396,60 @@
     check("a bridge does not", Is_free_standing(template("Bridge")), false);
   } catch (e) { fail("deletion suite", e); }
 
+  // ————————————————————————————————————————————————— replacing in place
+
+  try {
+    suite("replace");
+    await reset();
+    const tower = await placeFirst("P-PT");
+    const slide = await place(socketFor(tower, "6"), "WS-10");
+
+    // Selecting a placed part offers its opening as if it were empty, so the
+    // catalogue lists what else would fit there.
+    Offer_replacements(slide);
+    check("selecting a part offers its opening", replacing && replacing.model.object_id, "WS-10");
+
+    // Asked the way the catalogue asks it — the opening reads as free only
+    // inside this scope, which is what makes the answer the same everywhere.
+    const fits = With_opening_free(() =>
+      templates().filter((m) => m.capable({ socket: replacing.socket })).map((m) => m.object_id)
+    );
+    check("the DX wave slide is offered", fits.includes("SWS-10"), true);
+    check("so is a climber — everything that fits, as when building fresh", fits.includes("P-RC-5"), true);
+    check("a swing is not", fits.includes("SS"), false);
+
+    // The opening is only borrowed for that pass; the part is still attached.
+    check("the part is still connected afterwards", !!slide.joints.find((j) => j.connected), true);
+
+    selected_object_id = "SWS-10";
+    await Item_clicked();
+    const swapped = models_with_available_joints.find((m) => m.object_id === "SWS-10");
+    const mate = swapped && swapped.joints.find((j) => j.connected);
+    check("the swap happened", placed(), ["P-PT", "SWS-10"]);
+    check("into the same socket", mate && mate.connected.name, "joint,1,6");
+    check("sitting exactly on it", mate ? +new THREE.Vector3().subVectors(
+      (() => { const v = new THREE.Vector3(); mate.getWorldPosition(v); return v; })(),
+      (() => { const v = new THREE.Vector3(); mate.connected.getWorldPosition(v); return v; })()
+    ).length().toFixed(4) : null, 0);
+    check("and the selection is cleared", replacing, null);
+
+    // Anything resting on the old part goes with it.
+    await reset();
+    const t2 = await placeFirst("P-PT");
+    const beam = await place(socketFor(t2, "b8"), "P-AB-3-8");
+    for (const id of ["SS", "BS"]) await place(socketFor(beam, "s"), id);
+    Offer_replacements(beam);
+    selected_object_id = "P-AB-4-8";
+    await Item_clicked();
+    check("swapping a beam takes its swings", placed(), ["P-AB-4-8", "P-PT"]);
+
+    // A tower is the ground the design stands on, not a part in an opening.
+    await reset();
+    const lone = await placeFirst("P-PT");
+    Offer_replacements(lone);
+    check("a free-standing tower offers no replacement", replacing, null);
+  } catch (e) { fail("replace suite", e); }
+
   // ————————————————————————————————————————————————— save and restore
 
   try {
