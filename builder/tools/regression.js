@@ -422,6 +422,32 @@
     ]);
   } catch (e) { fail("spanning suite", e); }
 
+  // ————————————————————————————————————————————————— disabled joints
+
+  try {
+    suite("disabled joints");
+    // The Summit Tower offered a mailbox mount on each side that the product
+    // does not sell. Both were taken out by prefixing the node name, so the app
+    // no longer sees them as joints at all.
+    await reset();
+    const summit = await placeFirst("P-ST");
+    check("Summit Tower offers no mailbox mount",
+      summit.joints.filter((j) => j.layer === "mailbox_or_phone").length, 0);
+    check("and the catalogue greys out a mailbox there",
+      templates().find((m) => m.object_id === "MAIL").capable(), false);
+
+    // The other two towers keep theirs.
+    for (const id of ["P-WT", "P-KT"]) {
+      await reset();
+      const tower = await placeFirst(id);
+      check(`${id} still offers two mailbox mounts`,
+        tower.joints.filter((j) => j.layer === "mailbox_or_phone").length, 2);
+      check(`${id} still takes a mailbox`,
+        templates().find((m) => m.object_id === "MAIL").capable(), true);
+    }
+    await reset();
+  } catch (e) { fail("disabled joints suite", e); }
+
   // ————————————————————————————————————————————————— facing
 
   try {

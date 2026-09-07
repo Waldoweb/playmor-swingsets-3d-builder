@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-07T10:54:25.451Z",
+  "generated_at": "2026-09-07T12:12:55.343Z",
   "product_count": 64,
   "products": {
     "P-PT": {
@@ -1911,14 +1911,13 @@
       "files": [
         {
           "layer": null,
-          "file": "P-ST.9185dd94.glb",
-          "bytes": 720568,
+          "file": "P-ST.c734d23a.glb",
+          "bytes": 720580,
           "joints": [
             "joint,0,s,tire",
             "Joint_beam_left,3,b8,5,6",
             "Joint_beam_right,1,b8,3,1",
             "joint_l,0,6",
-            "joint_l,1,mailbox_or_phone",
             "joint_l,1,scope",
             "joint_l,1,wheel",
             "joint_l,2,6",
@@ -1934,7 +1933,6 @@
             "joint_r,1,scope",
             "joint_r,1,wheel",
             "joint_r,2,6",
-            "joint_r,3,mailbox_or_phone",
             "joint_r,3,scope",
             "joint_r,3,wheel",
             "joint_right_l,1,6,2,1",
@@ -2003,22 +2001,6 @@
               ],
               "joints": [
                 "joint_l,0,6"
-              ]
-            },
-            {
-              "marker": [
-                0.612,
-                2.557,
-                0.642
-              ],
-              "accepts": [
-                "mailbox_or_phone"
-              ],
-              "facings": [
-                1
-              ],
-              "joints": [
-                "joint_l,1,mailbox_or_phone"
               ]
             },
             {
@@ -2263,22 +2245,6 @@
             },
             {
               "marker": [
-                -0.612,
-                2.557,
-                -0.655
-              ],
-              "accepts": [
-                "mailbox_or_phone"
-              ],
-              "facings": [
-                3
-              ],
-              "joints": [
-                "joint_r,3,mailbox_or_phone"
-              ]
-            },
-            {
-              "marker": [
                 -0.741,
                 2.648,
                 -0.284
@@ -2373,14 +2339,6 @@
           "name": "joint_l,0,6",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
-        },
-        {
-          "name": "joint_l,1,mailbox_or_phone",
-          "direction": 1,
-          "layer": "mailbox_or_phone",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
@@ -2501,14 +2459,6 @@
           "name": "joint_r,2,6",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
-        },
-        {
-          "name": "joint_r,3,mailbox_or_phone",
-          "direction": 3,
-          "layer": "mailbox_or_phone",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null

@@ -26,8 +26,15 @@
  * empties, and the binary chunk carrying all the mesh data is copied through
  * untouched. The tool verifies that.
  *
- * Idempotent — a joint already on the target layer is left alone, so this can
- * be re-run after new models are added.
+ * It also takes joints out. A model may offer a connection the product does not
+ * sell -- the Summit Tower had a mailbox mount on each side -- and those are
+ * disabled by prefixing the name rather than deleting the node: the app treats
+ * a node as a joint only if its name begins with "joint", so a prefix removes
+ * it from the system while leaving the original name legible and the change
+ * reversible. Deleting would mean renumbering the whole node graph for nothing.
+ *
+ * Idempotent — a joint already on the target layer, or already disabled, is
+ * left alone, so this can be re-run after new models are added.
  */
 
 const fs = require("fs");
@@ -103,8 +110,77 @@ function main() {
     if (match) files.set(match[1], name);
   }
 
+  const removals = config.remove_joints || {};
+
   let changedFiles = 0;
   let changedJoints = 0;
+
+  /** Apply one product's edits to every file it has, and re-hash. */
+  const editProduct = (objectId, edit) => {
+    const stems = [...files.keys()].filter(
+      (stem) => stem === objectId || stem.startsWith(`${objectId}__`)
+    );
+    if (!stems.length) {
+      console.error(`  ${objectId}: no model file found`);
+      process.exit(1);
+    }
+
+    for (const stem of stems) {
+      const filename = files.get(stem);
+      const full = path.join(OUT_DIR, filename);
+      const original = fs.readFileSync(full);
+      const chunks = readChunks(original);
+      const jsonChunk = chunks.find((c) => c.type === JSON_CHUNK);
+      const gltf = JSON.parse(jsonChunk.data.toString("utf8"));
+
+      const done = edit(gltf);
+      if (!done.length) {
+        console.log(`  ${stem.padEnd(14)} nothing to do`);
+        continue;
+      }
+
+      jsonChunk.data = Buffer.from(JSON.stringify(gltf), "utf8");
+      const rebuilt = writeChunks(chunks);
+
+      const before = readChunks(original).filter((c) => c.type !== JSON_CHUNK);
+      const after = readChunks(rebuilt).filter((c) => c.type !== JSON_CHUNK);
+      if (
+        before.length !== after.length ||
+        !before.every((chunk, i) => chunk.data.equals(after[i].data))
+      ) {
+        console.error(`  ${stem}: binary chunk changed — refusing to write`);
+        process.exit(1);
+      }
+
+      const hash = crypto.createHash("sha256").update(rebuilt).digest("hex").slice(0, 8);
+      const renamedFile = `${stem}.${hash}.glb`;
+      if (!dryRun) {
+        fs.writeFileSync(path.join(OUT_DIR, renamedFile), rebuilt);
+        if (renamedFile !== filename) fs.unlinkSync(full);
+        files.set(stem, renamedFile);
+      }
+      changedFiles++;
+      changedJoints += done.length;
+      console.log(
+        `  ${stem.padEnd(14)} ${done.join(", ")}\n  ${"".padEnd(14)} ${filename} -> ${renamedFile}` +
+          (dryRun ? "  (dry run)" : "")
+      );
+    }
+  };
+
+  // Joints the product does not actually offer.
+  for (const [objectId, names] of Object.entries(removals)) {
+    editProduct(objectId, (gltf) => {
+      const gone = [];
+      for (const node of gltf.nodes || []) {
+        if (typeof node.name !== "string") continue;
+        if (!names.includes(node.name)) continue;
+        gone.push(`${node.name} -> disabled`);
+        node.name = `disabled_${node.name}`;
+      }
+      return gone;
+    });
+  }
 
   for (const [objectId, rule] of Object.entries(overrides)) {
     const from = rule.from;

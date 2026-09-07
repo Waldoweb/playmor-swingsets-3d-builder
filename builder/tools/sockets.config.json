@@ -21,6 +21,23 @@
     "at 0.296. Anything from 0.09 to 0.29 gives the same answer."
   ],
 
+  "remove_joints": {
+    "P-ST": ["joint_l,1,mailbox_or_phone", "joint_r,3,mailbox_or_phone"]
+  },
+  "_remove_joints_note": [
+    "Connection points the models offer but the product does not.",
+    "",
+    "Applied by tools/set_joint_layers.js, which renames the node rather than",
+    "deleting it: the app treats a node as a joint only if its name begins with",
+    "'joint', so a prefix takes it out of the system entirely. Deleting the node",
+    "would mean renumbering every index in the file's node graph for no gain,",
+    "and this way the original name is still legible and the change reversible.",
+    "",
+    "P-ST: the Summit Tower offered a mailbox or telephone mount on each side.",
+    "Weldon asked for both to come out. Sky Tower and King's Tower keep theirs,",
+    "and no shipped catalog set used the Summit ones."
+  ],
+
   "layer_overrides": {
     "Bridge": { "from": "*", "to": "deck" },
     "Tunnel": { "from": "*", "to": "deck" },
