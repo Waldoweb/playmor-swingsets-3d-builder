@@ -8332,8 +8332,11 @@
           Mode.mode = Mode.plugging;
           
           setTimeout(()=>{
-            // Show rotation hint when placing an object (only for multi-joint objects)
-            if (plug_model.joints.length > 1) {
+            // Show rotation hint when placing an object (only for multi-joint objects).
+            // A hundred milliseconds is long enough for the placement to have
+            // been finished or cancelled, which leaves plug_model null -- read
+            // it again here and the hint throws instead of not appearing.
+            if (Mode.mode === Mode.plugging && plug_model && plug_model.joints.length > 1) {
               const rotationHint = document.getElementById('rotation-hint');
               
               rotationHint.style.display = 'block';

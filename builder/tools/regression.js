@@ -39,7 +39,9 @@
     return ok;
   }
 
-  const suite = (name) => { group = name; };
+  // Published so a run that hangs can be asked how far it got — the results
+  // array is closure-local and a stuck run reports nothing at all otherwise.
+  const suite = (name) => { group = name; window.__suite = name; };
 
   const fail = (name, error) =>
     results.push({ group, name, ok: false, actual: String(error), expected: "no error" });
@@ -459,12 +461,19 @@
     check("Summit still offers its eight toy points",
       summit.sockets().filter((s) => s.joints.some((j) => j.layer === "toy")).length, 8);
 
-    // The other two towers kept their extra mounts, so they have more.
-    for (const [id, points] of [["P-WT", 10], ["P-KT", 4]]) {
+    // The Watchtower kept every mount it was drawn with. King's Tower lost the
+    // pair at its top corners and is down to the two on its end faces.
+    for (const [id, points] of [["P-WT", 10], ["P-KT", 2]]) {
       await reset();
       const tower = await placeFirst(id);
       check(`${id} offers ${points} toy points`,
         tower.sockets().filter((s) => s.joints.some((j) => j.layer === "toy")).length, points);
+
+      // A tower arrives with two toys on it, and King's has exactly two points
+      // left -- so both are taken and nothing else fits until one is freed.
+      // Clear them before asking, or this measures the fittings rather than
+      // what the mounts accept.
+      for (const m of models_with_available_joints.filter((x) => x.object_id !== id)) remove(m);
       check(`${id} still takes a mailbox`,
         templates().find((m) => m.object_id === "MAIL").capable(), true);
     }
@@ -481,9 +490,12 @@
     for (const id of ["P-PT", "P-DPT", "P-WT", "P-ST", "P-DST", "P-DSMT", "P-KT"]) {
       await reset();
       const tower = await placeFirst(id);
+      // Take off the toys it arrives with first. On a tower with only two toy
+      // points both are filled on arrival, and testing just the open ones
+      // would pass this suite by having nothing left to test.
+      for (const m of models_with_available_joints.filter((x) => x.object_id !== id)) remove(m);
       const points = tower.sockets().filter((s) => s.joints.some((j) => j.layer === "toy"));
       counts[id] = points.length;
-      // Two arrive filled, so only the open ones can be asked about.
       const free = points.filter((s) => Socket_is_open(s));
       // Scope, wheel and mailbox were three names for one fitting. Every toy
       // must now go on every toy point, on every tower.
@@ -494,7 +506,7 @@
     }
     check("every toy fits every toy point", [...new Set(refused)], []);
     check("and the towers offer the expected number of them", counts, {
-      "P-PT": 4, "P-DPT": 3, "P-WT": 10, "P-ST": 8, "P-DST": 2, "P-DSMT": 8, "P-KT": 4,
+      "P-PT": 4, "P-DPT": 3, "P-WT": 10, "P-ST": 8, "P-DST": 2, "P-DSMT": 8, "P-KT": 2,
     });
 
     // All five actually place on one tower.

@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-07T13:23:34.190Z",
+  "generated_at": "2026-09-07T13:34:57.357Z",
   "product_count": 64,
   "default_fittings": [
     {
@@ -4250,7 +4250,7 @@
       "files": [
         {
           "layer": null,
-          "file": "P-KT.4a8f35b6.glb",
+          "file": "P-KT.e0425422.glb",
           "bytes": 785628,
           "joints": [
             "joint,1,0",
@@ -4261,18 +4261,18 @@
             "joint,0,8,1,2004",
             "joint,0,8,1,2005",
             "joint,0,8,1,2006",
+            "joint_scope,0,toy",
             "joint_wheel,0,toy",
             "joint,1,8,3,4",
-            "joint_mailbox_or_phone,1,toy",
             "joint,2,8,6,7001",
             "joint,2,8,6,7002",
             "joint,2,8,6,7003",
             "joint,2,8,6,7004",
             "joint,2,8,6,7005",
             "joint,2,8,6,7006",
+            "joint_scope,2,toy",
             "joint_wheel,2,toy",
             "joint,3,8,8,9",
-            "joint_mailbox_or_phone,3,toy",
             "joint_beam_left,3,b10,10,8",
             "joint_beam_right,1,b10,5,3",
             "joint_floor_center,0,floor_center_king",
@@ -4421,6 +4421,24 @@
             },
             {
               "marker": [
+                -0.006,
+                2.953,
+                0.733
+              ],
+              "accepts": [
+                "toy"
+              ],
+              "facings": [
+                0,
+                2
+              ],
+              "joints": [
+                "joint_scope,0,toy",
+                "joint_wheel,2,toy"
+              ]
+            },
+            {
+              "marker": [
                 -0.007,
                 2.881,
                 -0.715
@@ -4429,10 +4447,12 @@
                 "toy"
               ],
               "facings": [
-                0
+                0,
+                2
               ],
               "joints": [
-                "joint_wheel,0,toy"
+                "joint_wheel,0,toy",
+                "joint_scope,2,toy"
               ]
             },
             {
@@ -4449,22 +4469,6 @@
               ],
               "joints": [
                 "joint,1,8,3,4"
-              ]
-            },
-            {
-              "marker": [
-                1.061,
-                3.151,
-                0.663
-              ],
-              "accepts": [
-                "toy"
-              ],
-              "facings": [
-                1
-              ],
-              "joints": [
-                "joint_mailbox_or_phone,1,toy"
               ]
             },
             {
@@ -4565,22 +4569,6 @@
             },
             {
               "marker": [
-                0.007,
-                2.89,
-                0.715
-              ],
-              "accepts": [
-                "toy"
-              ],
-              "facings": [
-                2
-              ],
-              "joints": [
-                "joint_wheel,2,toy"
-              ]
-            },
-            {
-              "marker": [
                 -1.244,
                 2.485,
                 0
@@ -4593,22 +4581,6 @@
               ],
               "joints": [
                 "joint,3,8,8,9"
-              ]
-            },
-            {
-              "marker": [
-                -1.061,
-                3.125,
-                -0.65
-              ],
-              "accepts": [
-                "toy"
-              ],
-              "facings": [
-                3
-              ],
-              "joints": [
-                "joint_mailbox_or_phone,3,toy"
               ]
             },
             {
@@ -4831,6 +4803,14 @@
           "excluder_layer": "2006"
         },
         {
+          "name": "joint_scope,0,toy",
+          "direction": 0,
+          "layer": "toy",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
           "name": "joint_wheel,0,toy",
           "direction": 0,
           "layer": "toy",
@@ -4845,14 +4825,6 @@
           "tire_only": false,
           "exclusion_layer": "3",
           "excluder_layer": "4"
-        },
-        {
-          "name": "joint_mailbox_or_phone,1,toy",
-          "direction": 1,
-          "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
         },
         {
           "name": "joint,2,8,6,7001",
@@ -4903,6 +4875,14 @@
           "excluder_layer": "7006"
         },
         {
+          "name": "joint_scope,2,toy",
+          "direction": 2,
+          "layer": "toy",
+          "tire_only": false,
+          "exclusion_layer": null,
+          "excluder_layer": null
+        },
+        {
           "name": "joint_wheel,2,toy",
           "direction": 2,
           "layer": "toy",
@@ -4917,14 +4897,6 @@
           "tire_only": false,
           "exclusion_layer": "8",
           "excluder_layer": "9"
-        },
-        {
-          "name": "joint_mailbox_or_phone,3,toy",
-          "direction": 3,
-          "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
         },
         {
           "name": "joint_beam_left,3,b10,10,8",

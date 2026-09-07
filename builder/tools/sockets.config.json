@@ -67,7 +67,7 @@
 
   "remove_joints": {
     "P-ST": ["joint_l,1,mailbox_or_phone", "joint_r,3,mailbox_or_phone"],
-    "P-KT": ["joint_scope,0,toy", "joint_scope,2,toy"]
+    "P-KT": ["joint_mailbox_or_phone,1,toy", "joint_mailbox_or_phone,3,toy"]
   },
   "_remove_joints_note": [
     "Connection points the models offer but the product does not.",
@@ -82,9 +82,18 @@
     "Weldon asked for both to come out. Sky Tower keeps its pair, and no shipped",
     "catalog set used the Summit ones.",
     "",
-    "P-KT: both King's Tower scope mounts, one each side. The tower keeps its",
-    "two wheel mounts and two mailbox mounts, so a scope can still be put on it",
-    "by hand -- it is only no longer one of the points it comes fitted with."
+    "P-KT: the King's Tower mailbox mounts, the pair up at the top corners.",
+    "Weldon asked for that point to go and it is the highest toy point on the",
+    "tower, which is why the Super Scope kept landing on it. The tower keeps a",
+    "scope mount and a wheel mount on each end face, and those still take any",
+    "of the five toys.",
+    "",
+    "Identify a joint by where it is, not by what it is called. This entry read",
+    "'joint_scope,0/2,toy' first, on the assumption that the point the scope",
+    "occupied was a scope mount. It was not: on this tower the scope joints sit",
+    "7cm from the wheel joints down on the end faces -- one socket, so removing",
+    "them deleted no dot at all -- while the point in question is a mailbox",
+    "mount 20cm higher at a corner."
   ],
 
   "layer_overrides": {

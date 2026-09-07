@@ -168,6 +168,33 @@ function main() {
     }
   };
 
+  // Joints taken out by an earlier run that the config no longer asks to
+  // remove. Without this the disabling is one-way: the only record of what has
+  // been taken out lives in the model files, and correcting a mistake means
+  // digging the original out of git. Restoring first makes remove_joints a
+  // description of how the models should end up rather than a log of edits
+  // already made -- delete a line and the joint comes back.
+  //
+  // This runs before the renames so a restored joint still gets its layer
+  // brought up to date; a disabled node is skipped by every other pass,
+  // because none of them look at a name that does not start with "joint".
+  for (const stem of [...files.keys()]) {
+    const objectId = stem.split("__")[0];
+    const stillRemoved = removals[objectId] || [];
+    editProduct(objectId, (gltf) => {
+      const back = [];
+      for (const node of gltf.nodes || []) {
+        if (typeof node.name !== "string") continue;
+        if (!node.name.startsWith("disabled_joint")) continue;
+        const original = node.name.slice("disabled_".length);
+        if (stillRemoved.includes(original)) continue;
+        back.push(`${node.name} -> ${original}`);
+        node.name = original;
+      }
+      return back;
+    });
+  }
+
   // Layers that were several names for one kind of fitting. Applied to every
   // model rather than to a named list, because the point of the rename is that
   // no product is a special case.
