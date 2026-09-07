@@ -39,6 +39,25 @@
     "8 = 7ft) and nothing else, which is a narrow rule in place of a wildcard."
   ],
 
+  "default_yaw": {
+    "P-ST": 90,
+    "P-KT": 90
+  },
+  "_default_yaw_note": [
+    "Which way a free-standing model faces when first placed, in degrees, for",
+    "the few modelled facing a different way from the rest.",
+    "",
+    "The Summit Tower and King's Tower were exported a quarter turn from the",
+    "other five, and were recognised by reading the name of the mesh inside the",
+    "GLB -- a match on 'King' or 'summitglb'. That works until one of them is",
+    "re-exported and the object comes out named something else, at which point",
+    "the tower silently places facing the wrong way. Keyed on the product id",
+    "instead, which does not change when a model is rebuilt.",
+    "",
+    "The comment on the old test named the Watchtower, which was never one of",
+    "the two: its mesh is 'Watch_tower' and it matched neither string."
+  ],
+
   "cutouts": {
     "TIC": [0.57, 0.25, 1.0]
   },

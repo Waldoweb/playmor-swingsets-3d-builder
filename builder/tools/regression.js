@@ -311,6 +311,26 @@
     ]);
   } catch (e) { fail("spanning suite", e); }
 
+  // ————————————————————————————————————————————————— facing
+
+  try {
+    suite("facing");
+    // Two towers are modelled a quarter turn from the other five. This used to
+    // be worked out by reading the name of the mesh inside the GLB, which stops
+    // being true the moment a model is re-exported under a different object
+    // name — and fails silently, with the tower simply facing the wrong way.
+    for (const [id, degrees] of [
+      ["P-PT", 0], ["P-DPT", 0], ["P-WT", 0], ["P-DST", 0], ["P-DSMT", 0],
+      ["P-ST", 90], ["P-KT", 90],
+    ]) {
+      await reset();
+      const tower = await placeFirst(id);
+      check(`${id} faces ${degrees} degrees`, tower.yaw, degrees);
+      check(`${id} mesh matches its yaw`, Math.round(tower.mesh.rotation.y * 180 / Math.PI), degrees);
+    }
+    await reset();
+  } catch (e) { fail("facing suite", e); }
+
   // ————————————————————————————————————————————————— handle accessories
 
   try {

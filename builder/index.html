@@ -3092,6 +3092,27 @@
       const Is_attachment_only_layer = (layer) => layer === "*" || layer === "deck";
 
       /**
+       * Which way a model faces when first placed, in degrees.
+       *
+       * Nearly everything is modelled facing the same way and wants 0. The
+       * Summit Tower and King's Tower were exported a quarter turn from the
+       * rest, and used to be picked out by reading the name of the mesh inside
+       * their GLB — a substring match on "King" or "summitglb". That holds only
+       * until one of them is re-exported and the object comes out named
+       * something else, at which point the tower silently faces the wrong way
+       * with nothing to show for it.
+       *
+       * The manifest keys this on the product id, which survives a rebuild.
+       */
+      const Default_yaw = (model) => {
+        const entry =
+          modelManifest && model && model.object_id
+            ? modelManifest.products[model.object_id]
+            : null;
+        return entry && typeof entry.default_yaw === "number" ? entry.default_yaw : 0;
+      };
+
+      /**
        * A part that mounts onto a handle socket — the hand grip and hand rail.
        *
        * Named by what it is made of rather than by product id: every one of its
@@ -8010,16 +8031,10 @@
           return;
         }
 
-        // Check tower type and apply correct rotation for front-facing direction
-        if(plug_model.mesh.children[0].name.includes("King") || plug_model.mesh.children[0].name.includes("summitglb")){
-          // King's Tower and Watchtower need 90-degree rotation due to different front direction
-          plug_model.mesh.rotation.y = Math.PI / 2; // 90 degrees in radians
-          plug_model.yaw = 90; // Set yaw for consistency with attachment system
-        } else {
-          // Other towers use standard orientation
-          plug_model.mesh.rotation.y = 0; // 0 degrees
-          plug_model.yaw = 0; // Set yaw for consistency with attachment system
-        }
+        // Face the way this model was built to face. Declared per product in
+        // tools/sockets.config.json rather than guessed from the mesh's name.
+        plug_model.yaw = Default_yaw(plug_model);
+        plug_model.mesh.rotation.y = plug_model.yaw * Deg2Rad;
 
         scene.add(plug_model.mesh);
 

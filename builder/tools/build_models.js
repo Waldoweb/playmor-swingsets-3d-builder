@@ -252,6 +252,11 @@ function main() {
       const cutout = (socketConfig.cutouts || {})[objectId];
       if (cutout) products[objectId].cutout = cutout;
 
+      // Which way it faces when first placed, for the few modelled a quarter
+      // turn from the rest.
+      const yaw = (socketConfig.default_yaw || {})[objectId];
+      if (yaw !== undefined) products[objectId].default_yaw = yaw;
+
       if ("tubular" in child) products[objectId].tubular = child.tubular;
       if ("slope" in child) products[objectId].slope = child.slope;
     });

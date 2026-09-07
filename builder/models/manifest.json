@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-06T19:18:55.740Z",
+  "generated_at": "2026-09-07T10:54:25.451Z",
   "product_count": 64,
   "products": {
     "P-PT": {
@@ -2545,7 +2545,8 @@
           "exclusion_layer": "2",
           "excluder_layer": "1"
         }
-      ]
+      ],
+      "default_yaw": 90
     },
     "P-DST": {
       "name": "DX Sky Tower",
@@ -5100,7 +5101,8 @@
           "exclusion_layer": "4",
           "excluder_layer": "3"
         }
-      ]
+      ],
+      "default_yaw": 90
     },
     "Bridge": {
       "name": "Bridge",
