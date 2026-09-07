@@ -365,6 +365,27 @@
               square.push(`${firstId}/${spanId}/${secondId}`);
           }
       check("every joined pair has parallel roofs", square, []);
+
+      // ...and the answer must not depend on which way the yard happens to be
+      // turned. It used to: at one quarter turn the collision test rejected
+      // every roof-aligned joint, because it measured the part in the pose it
+      // had rather than the one it would be turned into, and the fallback was
+      // a crooked join.
+      const crooked = [];
+      for (const turn of [0, 90, 180, 270])
+        for (const secondId of ["P-PT", "P-DPT", "P-WT", "P-ST", "P-DST", "P-DSMT"]) {
+          await reset();
+          const one = await placeFirst("P-PT");
+          one.yaw = turn;
+          one.mesh.rotation.y = turn * Deg2Rad;
+          one.mesh.updateMatrixWorld(true);
+          const link = await place(socketFor(one, "6"), "Bridge");
+          if (!link) { crooked.push(`${turn}deg/${secondId}: no bridge`); continue; }
+          const two = await place(link.sockets().find((s) => Socket_is_open(s)), secondId);
+          if (!two) { crooked.push(`${turn}deg/${secondId}: refused`); continue; }
+          if (Roof_axis(one) !== Roof_axis(two)) crooked.push(`${turn}deg/${secondId}`);
+        }
+      check("roofs stay parallel whichever way the yard is turned", crooked, []);
       // A count rather than a threshold, so a rule that quietly starts refusing
       // everything shows up here instead of passing on an empty set. Play Tower
       // reaches the six towers with a 5ft deck, King's the three with a 7ft

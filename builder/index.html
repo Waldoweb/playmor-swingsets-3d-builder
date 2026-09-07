@@ -5459,6 +5459,24 @@
         const hjp = new THREE.Vector3();
         host_joint.getWorldPosition(hjp);
 
+        // Connecting turns the part to face its host, so test the space it will
+        // actually occupy rather than the space it occupies now. Measuring the
+        // unturned pose refuses placements that would fit: a tower meeting a
+        // bridge has to swing round to present its end, and with the yard at
+        // certain angles every joint that gave a square, roof-aligned join was
+        // rejected here, leaving only a crooked one.
+        const turn =
+          (Lookup_yaw({
+            host_model_yaw: host_joint.model.yaw,
+            host_joint_direction: host_joint.direction,
+            plug_joint_direction: plug_joint.direction,
+          }) -
+            (plug_joint.model.yaw || 0)) *
+          Deg2Rad;
+        const up = new THREE.Vector3(0, 1, 0);
+        joint_offset.applyAxisAngle(up, turn);
+        plug_mesh.rotation.y += turn;
+
         // Place plug mesh so its joint aligns with the host joint
         const desired_pos = new THREE.Vector3().subVectors(hjp, joint_offset);
         if (desired_pos.y < 0) desired_pos.y = 0;
