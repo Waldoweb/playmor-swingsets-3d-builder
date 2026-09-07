@@ -6343,7 +6343,53 @@
        * A preference, not a rule. If nothing on an end fits, a side joint is
        * still used, and a part with one joint is unaffected.
        */
-      const Joints_ends_first = (model) => {
+      /**
+       * Which way a model's roof runs, as the world sees it: "x" or "z".
+       *
+       * Measured rather than inferred from the model's yaw, because a roof does
+       * not reliably run along its tower's length. Most do; the DX Play Tower's
+       * runs across its short way, so two towers can share a yaw and still have
+       * their roofs at right angles.
+       */
+      const Roof_axis = (model) => {
+        if (!model || !model.mesh) return null;
+        const box = new THREE.Box3();
+        let found = false;
+        model.mesh.traverse((mesh) => {
+          if (mesh.name && /roof|canopy/i.test(mesh.name)) {
+            box.expandByObject(mesh);
+            found = true;
+          }
+        });
+        if (!found || box.isEmpty()) return null;
+        const size = new THREE.Vector3();
+        box.getSize(size);
+        return size.x > size.z ? "x" : "z";
+      };
+
+      /**
+       * The roof direction a part should end up matching, if anything sets one.
+       *
+       * A tower joining a bridge takes its cue from the tower at the other end:
+       * two towers either side of a span should have their roofs running the
+       * same way rather than square to each other. A spanning part has no roof
+       * of its own, so it passes the question along to whatever it is already
+       * attached to.
+       */
+      const Facing_precedent = (host_joint) => {
+        const host = host_joint.model;
+        if (!host) return null;
+        if (!Is_free_standing(host)) {
+          for (const joint of host.joints) {
+            const other = joint.connected && joint.connected.model;
+            if (other && other !== host) return Roof_axis(other);
+          }
+          return null;
+        }
+        return Roof_axis(host);
+      };
+
+      const Joints_ends_first = (model, host_joint) => {
         const joints = model.joints;
         if (joints.length < 2 || !model.mesh) return joints;
 
@@ -6357,6 +6403,8 @@
 
         const long_axis = size.x > size.z ? "x" : "z";
         const world = new THREE.Vector3();
+        const wanted = host_joint ? Facing_precedent(host_joint) : null;
+        const roof_now = Roof_axis(model);
 
         return joints
           .map((joint) => {
@@ -6365,8 +6413,33 @@
             const nz = (world.z - middle.z) / (size.z / 2);
             // Whichever normalised offset dominates names the face it is on.
             const face = Math.abs(nx) > Math.abs(nz) ? "x" : "z";
+
+            // Which way this joint would leave the model pointing.
+            const yaw = host_joint
+              ? Lookup_yaw({
+                  host_model_yaw: host_joint.model.yaw,
+                  host_joint_direction: host_joint.direction,
+                  plug_joint_direction: joint.direction,
+                })
+              : null;
+
+            // A quarter turn swaps which way the roof runs; a half turn does
+            // not. Measured from where the model already stands, not from zero:
+            // Summit and King's carry a 90 degree default, so their roof has
+            // been read in that pose and only the change from it matters.
+            const turned =
+              yaw !== null &&
+              Math.round((yaw - (model.yaw || 0)) / 90) % 2 !== 0;
+            const roof_after =
+              roof_now === null ? null : turned ? (roof_now === "x" ? "z" : "x") : roof_now;
+
             return {
               joint,
+              // Roofs running the same way as the tower across the span, rather
+              // than square to it. First because it is the more visible of the
+              // two: the DX Play Tower is nearly square, so which face the span
+              // meets barely shows, while a roof turned across it plainly does.
+              faces_right: wanted === null || roof_after === null || roof_after === wanted,
               // The ends are the faces across the narrow way — the ones whose
               // normal runs along the long axis.
               on_end: face === long_axis,
@@ -6374,14 +6447,16 @@
               off_centre: face === "x" ? Math.abs(nz) : Math.abs(nx),
             };
           })
-          .sort((a, b) =>
-            a.on_end !== b.on_end ? (a.on_end ? -1 : 1) : a.off_centre - b.off_centre
-          )
+          .sort((a, b) => {
+            if (a.faces_right !== b.faces_right) return a.faces_right ? -1 : 1;
+            if (a.on_end !== b.on_end) return a.on_end ? -1 : 1;
+            return a.off_centre - b.off_centre;
+          })
           .map((entry) => entry.joint);
       };
 
       const Find_plug_joint_for = (model, host_joint) => {
-        for (const joint of Joints_ends_first(model)) {
+        for (const joint of Joints_ends_first(model, host_joint)) {
           if (!Joints_connect(joint, host_joint)) continue;
           if (
             Can_connect({

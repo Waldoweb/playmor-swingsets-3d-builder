@@ -343,9 +343,43 @@
     const span2 = await place(socketFor(near2, "6"), "Bridge");
     await place(span2.sockets().find((s) => Socket_is_open(s)), "P-WT");
 
+    // Two towers either side of a span should have their roofs running the same
+    // way, not square to each other. Measured on the roof itself rather than on
+    // yaw: a roof does not reliably run along its tower's length, and the DX
+    // Play Tower's runs across its short way, so equal yaws can still leave two
+    // roofs at right angles.
+    {
+      let joined = 0;
+      const square = [];
+      for (const firstId of ["P-PT", "P-KT"])
+        for (const spanId of ["Bridge", "Tunnel"])
+          for (const secondId of ["P-PT", "P-DPT", "P-WT", "P-ST", "P-DST", "P-DSMT", "P-KT"]) {
+            await reset();
+            const one = await placeFirst(firstId);
+            const link = await place(socketFor(one, firstId === "P-KT" ? "8" : "6"), spanId);
+            if (!link) continue;
+            const two = await place(link.sockets().find((s) => Socket_is_open(s)), secondId);
+            if (!two) continue;                       // refused on height, as it should be
+            joined++;
+            if (Roof_axis(one) !== Roof_axis(two))
+              square.push(`${firstId}/${spanId}/${secondId}`);
+          }
+      check("every joined pair has parallel roofs", square, []);
+      // A count rather than a threshold, so a rule that quietly starts refusing
+      // everything shows up here instead of passing on an empty set. Play Tower
+      // reaches the six towers with a 5ft deck, King's the three with a 7ft
+      // one, across two kinds of span.
+      check("pairs actually joined", joined, 18);
+    }
+
+    await reset();
+    const near3 = await placeFirst("P-PT");
+    const span3 = await place(socketFor(near3, "6"), "Bridge");
+    await place(span3.sockets().find((s) => Socket_is_open(s)), "P-WT");
+
     // Two towers still may not be joined directly — that is what a bridge is for.
-    const deck = near2.joints.find((j) => j.layer === "6" && j.available);
-    const deckSocket = near2.sockets().find((s) => s.joints.includes(deck));
+    const deck = near3.joints.find((j) => j.layer === "6" && j.available);
+    const deckSocket = near3.sockets().find((s) => s.joints.includes(deck));
     check("a tower cannot attach straight to another tower",
       templates().find((m) => m.object_id === "P-DPT").capable({ socket: deckSocket }), false);
 
