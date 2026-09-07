@@ -1344,7 +1344,7 @@
             {
               "marker": [
                 0,
-                2.56,
+                2.93,
                 -0.661
               ],
               "accepts": [
@@ -1355,12 +1355,17 @@
               ],
               "joints": [
                 "joint_beam_back,2,b8,8,6"
+              ],
+              "marker_offset": [
+                0,
+                0.37,
+                0
               ]
             },
             {
               "marker": [
                 0,
-                2.56,
+                2.93,
                 0.661
               ],
               "accepts": [
@@ -1371,6 +1376,11 @@
               ],
               "joints": [
                 "joint_beam_front,0,b8,3,1"
+              ],
+              "marker_offset": [
+                0,
+                0.37,
+                0
               ]
             },
             {
@@ -2664,7 +2674,7 @@
             {
               "marker": [
                 0,
-                2.56,
+                2.93,
                 1.427
               ],
               "accepts": [
@@ -2675,6 +2685,11 @@
               ],
               "joints": [
                 "joint_beam_front,0,b8,3,1"
+              ],
+              "marker_offset": [
+                0,
+                0.37,
+                0
               ]
             },
             {
@@ -4513,7 +4528,7 @@
             {
               "marker": [
                 -1.183,
-                3.2,
+                3.55,
                 0
               ],
               "accepts": [
@@ -4524,12 +4539,17 @@
               ],
               "joints": [
                 "joint_beam_left,3,b10,10,8"
+              ],
+              "marker_offset": [
+                0,
+                0.35,
+                0
               ]
             },
             {
               "marker": [
                 1.183,
-                3.2,
+                3.55,
                 0
               ],
               "accepts": [
@@ -4540,6 +4560,11 @@
               ],
               "joints": [
                 "joint_beam_right,1,b10,5,3"
+              ],
+              "marker_offset": [
+                0,
+                0.35,
+                0
               ]
             },
             {
@@ -6424,8 +6449,8 @@
       "files": [
         {
           "layer": "b8",
-          "file": "DS-KR__b8.e02881fe.glb",
-          "bytes": 45752,
+          "file": "DS-KR__b8.3cff755d.glb",
+          "bytes": 45816,
           "joints": [
             "joint,0,ds"
           ],
@@ -6450,8 +6475,8 @@
         },
         {
           "layer": "b10",
-          "file": "DS-KR__b10.96f94bcb.glb",
-          "bytes": 45764,
+          "file": "DS-KR__b10.f64d8f8e.glb",
+          "bytes": 45828,
           "joints": [
             "joint,0,ds"
           ],

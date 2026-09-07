@@ -1238,6 +1238,56 @@
     await reset();
   } catch (e) { fail("marker visibility suite", e); }
 
+  // ————————————————————————————————————————————————— authored heights
+
+  try {
+    suite("heights");
+
+    // The disc swing's rope length is geometry inside its own GLB, not
+    // anything the app works out, so a rebuild that lost the change would put
+    // the seat back at shoulder height with nothing else complaining. It hung
+    // at 45 inches while every other seat on a beam sat between 14 and 31;
+    // Weldon put it level with the tire and ball swings.
+    await reset();
+    await beamRig("P-WT", "P-AB-DS-8");
+    await idle(250);
+    const disc = models_with_available_joints.find((m) => m.object_id === "DS-KR");
+    check("the disc swing is fitted", !!disc, true);
+    const seat = new THREE.Box3().setFromObject(disc.mesh).min.y * 39.3701;
+    check("its seat hangs about 20 inches up", seat > 17 && seat < 24, true);
+
+    // Where a swing beam's dot is drawn, and where the beam actually bolts on,
+    // are two different heights on three of the towers. Both are asserted
+    // together on purpose: raising the attachment instead of the marker would
+    // leave the beam's own A-frame leg hanging in the air, since the leg is
+    // baked a fixed distance below the joint.
+    for (const [id, name, attach, dot] of [
+      ["P-WT", "joint_beam_front,0,b8,3,1", 2.56, 2.93],
+      ["P-WT", "joint_beam_back,2,b8,8,6", 2.56, 2.93],
+      ["P-KT", "joint_beam_left,3,b10,10,8", 3.2, 3.55],
+      ["P-KT", "joint_beam_right,1,b10,5,3", 3.2, 3.55],
+      ["P-DST", "joint_beam_front,0,b8,3,1", 2.56, 2.93],
+      // ...and the ones that already sat right are untouched. P-DST carries
+      // one of each, which is the whole point of keying this by joint name:
+      // its 7ft side must not move with its 5ft one.
+      ["P-DST", "joint_beam_back,2,b10,10,8", 3.2, 3.2],
+      ["P-PT", "joint_beam_front,0,b8,6,2", 2.56, 2.56],
+      ["P-DPT", "joint_beam,2,b8,3,2", 2.56, 2.56],
+    ]) {
+      await reset();
+      const tower = await placeFirst(id);
+      const joint = tower.joints.find((j) => j.name === name);
+      const socket = tower.sockets().find((s) => s.joints.includes(joint));
+      const at = new THREE.Vector3();
+      joint.getWorldPosition(at);
+      const short = `${id} ${name.split(",")[0]}`;
+      check(`${short} bolts on at ${attach}`, +at.y.toFixed(2), attach);
+      check(`${short} draws its dot at ${dot}`,
+        +(at.y + (socket.offset ? socket.offset.y : 0)).toFixed(2), dot);
+    }
+    await reset();
+  } catch (e) { fail("heights suite", e); }
+
   // ————————————————————————————————————————————————— report
 
   await reset();

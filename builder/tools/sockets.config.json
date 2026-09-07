@@ -226,7 +226,11 @@
 
   "marker_offsets": {
     "picnic": [0, 0.393, 0],
-    "joint,0,s,tire": [0, -1.0, 0]
+    "joint,0,s,tire": [0, -1.0, 0],
+    "joint_beam_back,2,b8,8,6": [0, 0.37, 0],
+    "joint_beam_front,0,b8,3,1": [0, 0.37, 0],
+    "joint_beam_left,3,b10,10,8": [0, 0.35, 0],
+    "joint_beam_right,1,b10,5,3": [0, 0.35, 0]
   },
   "_marker_offsets_note": [
     "Where to DRAW a socket's dot, when that differs from where the part",
