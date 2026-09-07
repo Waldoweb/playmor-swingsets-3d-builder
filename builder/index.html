@@ -3154,9 +3154,24 @@
         return own.length > 0 && own.every((joint) => joint.layer === "handle");
       };
 
+      /**
+       * Whether a part's layer fits an opening's layer — the whole of it.
+       *
+       * Five copies of this rule used to sit in five places and had drifted
+       * apart. There is one now, and every question about whether two things
+       * mate comes through here.
+       *
+       * There used to be a wildcard: a joint on layer `*` matched every socket
+       * in the catalog, which let a Bridge hang off a swing hanger. Weldon said
+       * where each of those four parts actually belongs, they were relayered
+       * onto `deck`, and no joint carries `*` any more — 0 of 313. The branch
+       * that honoured it is gone with them, so a stray `*` now matches nothing
+       * rather than everything. That is the safer way round, and
+       * tools/build_models.js refuses to build a model carrying one at all, so
+       * it cannot come back by accident.
+       */
       const Layers_connect = (plug_layer, host_layer) => {
         if (plug_layer === host_layer) return true;
-        if (plug_layer === "*" || host_layer === "*") return true;
         if (plug_layer === "deck") return Is_deck_layer(host_layer);
         if (host_layer === "deck") return Is_deck_layer(plug_layer);
         if (host_layer === "ds")

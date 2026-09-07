@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-07T14:55:25.104Z",
+  "generated_at": "2026-09-07T15:52:23.249Z",
   "product_count": 64,
   "default_fittings": [
     {
@@ -7069,11 +7069,10 @@
       "files": [
         {
           "layer": null,
-          "file": "SR-KT.c5ea7279.glb",
-          "bytes": 15392,
+          "file": "SR-KT.7784567a.glb",
+          "bytes": 15404,
           "joints": [
-            "joint,2,end_rail",
-            "joint,0,0"
+            "joint,2,end_rail"
           ],
           "sockets": [
             {
@@ -7091,22 +7090,6 @@
               "joints": [
                 "joint,2,end_rail"
               ]
-            },
-            {
-              "marker": [
-                0,
-                0.463,
-                0
-              ],
-              "accepts": [
-                "0"
-              ],
-              "facings": [
-                0
-              ],
-              "joints": [
-                "joint,0,0"
-              ]
             }
           ]
         }
@@ -7116,14 +7099,6 @@
           "name": "joint,2,end_rail",
           "direction": 2,
           "layer": "end_rail",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
-        },
-        {
-          "name": "joint,0,0",
-          "direction": 0,
-          "layer": "0",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null

@@ -217,6 +217,23 @@ function main() {
 
         const names = readJoints(buffer);
 
+        // The wildcard layer is gone from the catalog and from the app: a joint
+        // on `*` used to match every socket there is, so a Bridge could hang
+        // off a swing hanger, and Layers_connect no longer has the branch that
+        // allowed it. A re-exported model bringing one back would therefore
+        // match nothing rather than everything, and would simply refuse to
+        // attach with no clue why. Refusing to build says so instead, at the
+        // one moment someone can still fix the model.
+        for (const name of names) {
+          if (name.split(",")[2] === "*") {
+            problems.push(
+              `${filename}: joint '${name}' is on the wildcard layer '*'. ` +
+                `Give it the layer it belongs to, or add a layer_overrides ` +
+                `entry for ${objectId} in tools/sockets.config.json.`
+            );
+          }
+        }
+
         // Sockets are per file, not per product: a multi-layer swing repeats
         // its joints once per beam length, and only the active layer's are in
         // the scene. Deriving per file keeps each set with the geometry it

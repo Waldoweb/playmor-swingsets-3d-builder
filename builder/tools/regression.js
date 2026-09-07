@@ -310,6 +310,14 @@
     const loose = await probe("Bridge");
     check("an unattached bridge accepts 5ft", Joints_connect(loose.joint, six), true);
     check("an unattached bridge accepts 7ft", Joints_connect(loose.joint, eight), true);
+
+    // Weldon: a span reaches any deck, so long as both ends are the same
+    // height. 4ft is the third and lives on a different tower, so it takes a
+    // second host to ask about.
+    const play = await probe("P-DPT");
+    const four = play.model.joints.find((j) => j.layer === "5");
+    check("an unattached bridge accepts 4ft", Joints_connect(loose.joint, four), true);
+    play.done();
     loose.done();
 
     const bridge = await place(dx.sockets().find((s) => s.joints.includes(six)), "Bridge");
@@ -501,6 +509,17 @@
       check(`a ${id} can still go on the King's Tower`,
         templates().find((m) => m.object_id === id).capable(), true);
     }
+
+    // Weldon: the end rail and the picnic table are different places, and a
+    // tower carries both at once. No socket in the catalog accepts both
+    // layers, so this checks that placing one does not consume the other --
+    // and that the Safety Rail still goes on now that its second plug, which
+    // had no host left anywhere, has been taken off it.
+    const rail = await place(socketFor(kings, "end_rail"), "SR-KT");
+    const table = await place(socketFor(kings, "picnic"), "PT-K");
+    check("a tower takes an end rail and a picnic table at once",
+      [!!rail, !!table], [true, true]);
+    check("...and both are still standing", built(), ["P-KT", "PT-K", "SR-KT"]);
     await reset();
   } catch (e) { fail("disabled joints suite", e); }
 
@@ -894,6 +913,35 @@
     await place(socketFor(tower, "6"), "TIC");
     check("tic-tac-toe cuts as much as the slide", slats() - bySlide, bySlide);
   } catch (e) { fail("cut-outs suite", e); }
+
+  // ————————————————————————————————————————————————— layer vocabulary
+
+  try {
+    suite("layer vocabulary");
+    const products = {};
+    for (const [id, product] of Object.entries(modelManifest.products))
+      for (const file of product.files || [])
+        for (const name of file.joints || []) {
+          const layer = name.split(",")[2];
+          (products[layer] = products[layer] || new Set()).add(id);
+        }
+
+    // The wildcard matched every socket there is, which let a Bridge hang off
+    // a swing hanger. It is gone from the models and from Layers_connect, and
+    // build_models.js now refuses to build one — this is the same invariant
+    // asked from the other end, where a person would actually see it.
+    check("no joint is on the wildcard layer", "*" in products, false);
+
+    // A layer only one product knows cannot connect to anything: a model's
+    // own joints are never offered to each other, so it takes two. Layer '0'
+    // became exactly that the moment the King's Tower railed end came out —
+    // the Safety Rail was left holding a plug with nowhere to go. Asking it of
+    // the whole catalog finds the next one without anyone having to notice.
+    const lonely = Object.entries(products)
+      .filter(([, ids]) => ids.size < 2)
+      .map(([layer, ids]) => `${layer} (only ${[...ids]})`);
+    check("every layer is known to at least two products", lonely, []);
+  } catch (e) { fail("layer vocabulary suite", e); }
 
   // ————————————————————————————————————————————————— marker visibility
 
