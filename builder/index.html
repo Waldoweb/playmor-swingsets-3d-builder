@@ -5880,11 +5880,17 @@
 
       // PlayMor red, the same value the buttons use.
       const ADD_MARKER_RED = "#ce030c";
-      // The chosen opening switches to blue. Red says "you could add here";
-      // once one is picked, every other marker still says that, so the picked
-      // one needs to stop looking like the rest rather than just grow a little.
-      const ADD_MARKER_BLUE = "#0b6fc4";
-      const ADD_MARKER_BLUE_RGB = "11, 111, 196";
+      // The chosen opening switches to green, and so does every target while a
+      // part is being carried. Red says "you could add here"; once one is
+      // picked, every other marker still says that, so the picked one needs to
+      // stop looking like the rest rather than just grow a little.
+      //
+      // A cool emerald rather than a leafy green, because the lawn behind these
+      // markers is #6f9b46 -- a warm olive. Roughly seventy degrees of hue and
+      // a lot of saturation separate the two, which is what keeps a marker
+      // legible when it sits over grass rather than over the playset.
+      const ADD_MARKER_GREEN = "#04aa6d";
+      const ADD_MARKER_GREEN_RGB = "4, 170, 109";
       const ADD_MARKER_RED_RGB = "206, 3, 12";
       const reduced_motion =
         window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -5907,7 +5913,7 @@
         const cx = joint.x + size / 2;
         const cy = joint.y + size / 2;
         const r = highlighted ? 11 : 8;
-        const rgb = highlighted ? ADD_MARKER_BLUE_RGB : ADD_MARKER_RED_RGB;
+        const rgb = highlighted ? ADD_MARKER_GREEN_RGB : ADD_MARKER_RED_RGB;
 
         context.save();
 
@@ -5924,7 +5930,7 @@
 
         context.beginPath();
         context.arc(cx, cy, r, 0, Math.PI * 2);
-        context.fillStyle = highlighted ? ADD_MARKER_BLUE : ADD_MARKER_RED;
+        context.fillStyle = highlighted ? ADD_MARKER_GREEN : ADD_MARKER_RED;
         context.fill();
         context.lineWidth = 1.5;
         context.strokeStyle = "rgba(255, 255, 255, 0.92)";
@@ -6086,7 +6092,7 @@
                     // and the sprite was the odd one out, since every other
                     // "you can add here" cue in the app is this dot.
                     //
-                    // Blue rather than red: red means "one of many places you
+                    // Green rather than red: red means "one of many places you
                     // could go", and while a part is being carried every dot
                     // shown is a live target for the thing in hand.
                     Draw_add_marker(joint, true);
