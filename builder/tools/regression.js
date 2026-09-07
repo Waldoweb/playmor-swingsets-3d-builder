@@ -180,7 +180,7 @@
     await place(shared, "TZR");
     check("a swing there closes the glider option too", Socket_is_open(shared), false);
 
-    // A part's own spare facing used to draw a dot on top of its own hanger.
+    // A part's own spare facing must not draw a dot on top of its own hanger.
     await reset();
     const bs = await probe("BS");
     check("the baby swing's two facings are one socket", bs.model.sockets().length, 1);
@@ -190,6 +190,18 @@
       [0, 2]
     );
     bs.done();
+
+    // ...and the same asked of a PLACED one, which is a different question.
+    // The check above passed while the bug was live: the sockets were right,
+    // but the pass that closes them ran before the part joined the list it
+    // iterates, so nothing ever looked at them.
+    const rig = await beamRig("P-PT", "P-AB-3-8");
+    const placedSwing = await place(socketFor(rig.beam, "s"), "BS");
+    Tik({});
+    check("a placed baby swing closes its unused facing",
+      placedSwing.joints.filter((j) => j.available).length, 0);
+    check("...and draws no marker of its own",
+      browse_sockets.filter((s) => s.model === placedSwing).length, 0);
   } catch (e) { fail("sockets suite", e); }
 
   // ————————————————————————————————————————————————— swing fit

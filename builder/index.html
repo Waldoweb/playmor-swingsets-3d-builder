@@ -6593,6 +6593,14 @@
 
         models_with_available_joints.push(plug_model);
         picked_meshes.push(plug_model.mesh);
+
+        // Again, now that this part is on the list. Connect_joints already ran
+        // a pass, but the part was not there to be seen yet — which left a baby
+        // swing, whose hanger is one opening described by two facings, still
+        // advertising the facing it had not used. The host's side was closed
+        // because the host was already listed; the newcomer's was not.
+        Sync_sockets();
+
         plug_model = null;
         plug_joint = null;
         Mode.mode = Mode.normal;
