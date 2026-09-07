@@ -2823,9 +2823,11 @@
       const Deg2Rad = Math.PI / 180;
       const Meters2Feet = 3.28084;
 
+      // Two modes: nothing in hand, or a part being carried to an opening.
+      // There was a third, `placing`, for dropping a part anywhere on the
+      // ground; nothing has set it in years, and its two branches are gone.
       const Mode = {
         normal: 0,
-        placing: 1,
         plugging: 2,
         mode: 0,
       };
@@ -2935,9 +2937,23 @@
       const Category_allows = (plug_model, host_model) => {
         if (!plug_model || !host_model) return true;
         if (Is_handle_accessory(plug_model)) return true;
-        if (host_model.category != plug_model.category) return true;
+        if (Category_of(host_model) !== Category_of(plug_model)) return true;
         return Is_free_standing(plug_model) !== Is_free_standing(host_model);
       };
+
+      /**
+       * Which catalogue category a model belongs to, by key: "towers",
+       * "swings", and so on, as object-mapping.json names them.
+       *
+       * The rules used to compare category *numbers* — 0 for towers, 2 for
+       * swings — which are positions in the Categories array and change the
+       * moment a category is added or reordered, with nothing to say so. The
+       * key is what the mapping file already calls the category, and it is
+       * the same name the manifest and colour config use. Null until the
+       * mapping has loaded, which only happens under the loading screen.
+       */
+      const Category_of = (model) =>
+        model && model.object_id ? getCategoryFromObjectId(model.object_id) : null;
 
       /**
        * Which way a model faces when first placed, in degrees.
@@ -3097,12 +3113,89 @@
 
       /**
        * The whole question, at the level of two actual joints: right kind of
-       * opening, and no constraint either side has already taken on.
+       * opening, no constraint either side has already taken on, and the two
+       * parts are of kinds that meet at all.
+       *
+       * The category rule used to be applied by two of the five callers and
+       * skipped by the other three — the joint-first fitting, the plugging
+       * hover and the default fittings — which is how a tower came to attach
+       * itself to another tower's deck. Every joint knows its model, so the
+       * rule belongs here with the rest.
        */
       const Joints_connect = (plug_joint, host_joint) =>
         Layers_connect(plug_joint.layer, host_joint.layer) &&
         Tire_rule_holds(plug_joint, host_joint) &&
-        Deck_heights_agree(plug_joint, host_joint);
+        Deck_heights_agree(plug_joint, host_joint) &&
+        Category_allows(plug_joint.model, host_joint.model);
+
+      /**
+       * The mesh variant a part has to switch to before it can hang here.
+       *
+       * Swings carry one mesh per beam length, and a tire swing carries a tire
+       * variant besides. The hanger says which: a tire-only hanger wants
+       * `tire`; any other swing hanger wants the length its beam is built in,
+       * which the beam records as the layer of its own first joint. Anything
+       * else has nothing to switch to.
+       *
+       * Three copies of this test — the hover, the commit and the restore —
+       * each also asked about a joint layer `tire`, which no model file has
+       * ever had. This is the one rule, without the branch that could not run.
+       */
+      const Morph_target_for = (host_joint) => {
+        if (host_joint.tire_only) return "tire";
+        if (["s", "sh", "ds"].includes(host_joint.layer)) {
+          const first = host_joint.model && host_joint.model.joints[0];
+          return first ? first.layer : null;
+        }
+        return null;
+      };
+
+      /**
+       * Switch a part to the variant its host calls for, in place.
+       *
+       * Returns whether anything changed. The caller's joint references are
+       * stale afterwards: morph rebuilds the joint list from the new mesh, so
+       * whoever held a joint has to find it again — by name, which is unique
+       * within a layer, not by an index into the list that just went away.
+       */
+      const Morph_to_fit = (model, host_joint) => {
+        const target = Morph_target_for(host_joint);
+        if (!target || target === model.layer || !model.layers.includes(target)) return false;
+
+        const in_scene = model.mesh.parent === scene;
+        const position = model.mesh.position.clone();
+        const rotation = model.mesh.rotation.clone();
+        if (in_scene) scene.remove(model.mesh);
+        model.morph({ layer: target });
+        model.mesh.position.copy(position);
+        model.mesh.rotation.copy(rotation);
+        if (in_scene) scene.add(model.mesh);
+        applyDefaultColors(model);
+        return true;
+      };
+
+      /**
+       * Put down whatever is being carried, and take it out of the scene.
+       *
+       * Esc, and clicking a second tile while a part is in hand, used to set
+       * plug_model to null and nothing else, which left the carried mesh in
+       * the scene for the rest of the session — invisible, because the render
+       * loop had switched it off, but there.
+       */
+      const Drop_carried = () => {
+        if (plug_model && plug_model.mesh && !picked_meshes.includes(plug_model.mesh)) {
+          scene.remove(plug_model.mesh);
+        }
+        plug_model = null;
+        plug_joint = null;
+        plug_joint_index = -1;
+        host_joint = null;
+      };
+
+      /** Nothing in the yard is selected. */
+      const Deselect_all = () => {
+        for (const model of models_with_available_joints) model.selected = false;
+      };
       let file_button;
       let link = document.createElement("a");
       let intersection_object;
@@ -3583,92 +3676,21 @@
             created_models.push(model);
           }
 
-          // Phase 2: Position models using connection-based reconstruction
-          let positioned_models = new Set();
-          let root_models = [];
-
-          // Find root models (those with no incoming connections or should be positioned first)
+          // Phase 2: every model goes exactly where the file says it was.
+          //
+          // Three phases used to sit here that walked the connection graph
+          // from the free-standing models outward and worked out each part's
+          // position from the joint it hung on — and then overwrote that
+          // position with the saved one on the very next line. The saved
+          // position is the one that has been keeping every design right, so
+          // it is the only one applied now. Connections are then re-made in
+          // phase 3 from what the file recorded, not re-derived.
           for (let model of created_models) {
-            let model_data = model.saved_data;
-            let hasIncomingConnections = false;
-
-            // Check if this model is connected TO by other models
-            for (let other_model of created_models) {
-              if (other_model === model) continue;
-              let other_data = other_model.saved_data;
-
-              // Check both new connections format and legacy joints format
-              let connections = other_data.connections || other_data.joints || [];
-              for (let conn of connections) {
-                let target_object_id = conn.connected_to?.model_object_id || conn.link?.model_object_id;
-                if (target_object_id === model_data.object_id) {
-                  hasIncomingConnections = true;
-                  break;
-                }
-              }
-              if (hasIncomingConnections) break;
-            }
-
-            if (!hasIncomingConnections) {
-              root_models.push(model);
-            }
-          }
-
-          // Position root models first (use saved positions)
-          for (let model of root_models) {
-            let model_data = model.saved_data;
-            this.applyModelProperties(model, model_data);
-            positioned_models.add(model);
+            this.applyModelProperties(model, model.saved_data);
             models_with_available_joints.push(model);
           }
 
-          // Phase 3: Position connected models using joint relationships
-          let queue = [...root_models];
-          let max_iterations = created_models.length * 2; // Prevent infinite loops
-          let iterations = 0;
-
-          while (queue.length > 0 && iterations < max_iterations) {
-            iterations++;
-            let current_model = queue.shift();
-            let current_data = current_model.saved_data;
-
-            // Process connections for this model
-            let connections = current_data.connections || current_data.joints || [];
-            for (let conn of connections) {
-              let target_object_id = conn.connected_to?.model_object_id || conn.link?.model_object_id;
-              let target_model = created_models.find(m => m.saved_data.object_id === target_object_id);
-
-              if (target_model && !positioned_models.has(target_model)) {
-                // Position the target model based on connection
-                this.positionModelByConnection(current_model, target_model, conn);
-                this.applyModelProperties(target_model, target_model.saved_data);
-                positioned_models.add(target_model);
-                models_with_available_joints.push(target_model);
-                queue.push(target_model);
-              }
-            }
-          }
-
-          // Phase 4: Handle any remaining unpositioned models (fallback to saved positions)
-          for (let model of created_models) {
-            if (!positioned_models.has(model)) {
-              console.warn('Model not positioned through connections, using saved position:', model.saved_data.object_id);
-
-              // Debug: Check if this model has outgoing connections that failed
-              let connections = model.saved_data.connections || model.saved_data.joints || [];
-              for (let conn of connections) {
-                let target_object_id = conn.connected_to?.model_object_id || conn.link?.model_object_id;
-                let target_model = created_models.find(m => m.saved_data.object_id === target_object_id);
-                if (target_model) {
-                }
-              }
-
-              this.applyModelProperties(model, model.saved_data);
-              models_with_available_joints.push(model);
-            }
-          }
-
-          // Phase 5: Restore connections using existing logic (but with improved model lookup)
+          // Phase 3: reconnect the joints.
           this.restoreConnections(created_models);
         }
 
@@ -3691,51 +3713,6 @@
 
             // Apply visual properties
             this.applyVisualProperties(model, model_data);
-        }
-
-        // Helper function to position a model based on connection to another model
-        positionModelByConnection(sourceModel, targetModel, connectionData) {
-            try {
-              let sourceJoint = Find_saved_joint(
-                sourceModel,
-                connectionData.my_joint_name,
-                connectionData.my_joint_index
-              );
-              let targetJoint = Find_saved_joint(
-                targetModel,
-                connectionData.connected_to?.joint_name || connectionData.link?.joint_name,
-                connectionData.connected_to?.joint_index || connectionData.link?.joint_index
-              );
-
-              if (!sourceJoint || !targetJoint) {
-                console.warn('Could not find joints for connection, using saved position');
-                return false;
-              }
-
-              // Calculate target position based on joint relationship
-              // This uses the existing joint positioning logic
-              if (sourceJoint.position && targetJoint.position) {
-                // Get the world position of the source joint
-                let sourceWorldPos = new THREE.Vector3();
-                sourceWorldPos.copy(sourceJoint.position);
-                sourceWorldPos.applyMatrix4(sourceModel.mesh.matrix);
-
-                // Calculate the offset for the target joint
-                let targetLocalPos = new THREE.Vector3();
-                targetLocalPos.copy(targetJoint.position);
-
-                // Position the target model so its joint aligns with the source joint
-                let targetPosition = new THREE.Vector3();
-                targetPosition.copy(sourceWorldPos);
-                targetPosition.sub(targetLocalPos);
-
-                targetModel.mesh.position.copy(targetPosition);
-                return true;
-              }
-            } catch (error) {
-              console.warn('Error positioning model by connection:', error);
-            }
-            return false;
         }
 
         // Helper function to apply visual properties (colors, flags, etc.)
@@ -3858,41 +3835,66 @@
             }
         }
 
-        // Helper function to restore connections between models
+        /**
+         * Re-make the connections a saved design recorded.
+         *
+         * Which model a connection points at is settled by `save_index`, the
+         * model's position in the saved list, which is unique. It used to be
+         * settled by `object_id` first, with the index as a fallback — but an
+         * object_id is a *product*, and a design with two sling swings or a
+         * pair of handrails has two models answering to it. The lookup took
+         * whichever was listed last, so a swing beam's hangers were all wired
+         * to the same swing, and a bridge between two Play Towers came back
+         * with both its ends on one tower and the other tower pointing at a
+         * joint that no longer pointed back. Deleting the wrong one then left
+         * its neighbours hanging, or freed an opening that was still in use.
+         *
+         * The object_id is kept as the fallback for saves that predate the
+         * index, and only trusted when exactly one model carries it.
+         */
         restoreConnections(created_models) {
-          // Create connection map for quick lookup
-          let modelMap = new Map();
-          for (let model of created_models) {
-            modelMap.set(model.saved_data.save_index, model);
-            if (model.saved_data.object_id) {
-              modelMap.set(model.saved_data.object_id, model);
+          const by_save_index = new Map();
+          const by_object_id = new Map();
+          for (const model of created_models) {
+            const data = model.saved_data;
+            if (data.save_index !== undefined && data.save_index !== null) {
+              by_save_index.set(data.save_index, model);
+            }
+            if (data.object_id) {
+              if (!by_object_id.has(data.object_id)) by_object_id.set(data.object_id, []);
+              by_object_id.get(data.object_id).push(model);
             }
           }
 
-          // Restore connections using enhanced lookup
           for (let model of created_models) {
             let model_data = model.saved_data;
             let connections = model_data.connections || model_data.joints || [];
 
             for (let joint_data of connections) {
               try {
+                const target = joint_data.connected_to || joint_data.link || {};
                 let model2 = null;
 
-                // Try to find connected model using object_id first (new system)
-                let target_object_id = joint_data.connected_to?.model_object_id || joint_data.link?.model_object_id;
-                if (target_object_id) {
-                  model2 = modelMap.get(target_object_id);
-                  if (!model2) {
-                    console.warn('Could not find connected model for object_id:', target_object_id);
-                  }
+                // `??` rather than `||`: the first model in a design has
+                // save_index 0, which `||` reads as missing.
+                const target_save_index = target.model_save_index ?? null;
+                if (target_save_index !== null) {
+                  model2 = by_save_index.get(target_save_index) || null;
                 }
 
-                // Fallback to save_index lookup
-                if (!model2) {
-                  let target_save_index = joint_data.connected_to?.model_save_index || joint_data.link?.model_save_index;
-                  if (target_save_index !== undefined) {
-                    model2 = modelMap.get(target_save_index);
+                if (!model2 && target.model_object_id) {
+                  const candidates = by_object_id.get(target.model_object_id) || [];
+                  if (candidates.length === 1) {
+                    model2 = candidates[0];
+                  } else if (candidates.length > 1) {
+                    console.warn(
+                      'Connection names a product this design has several of, and no save_index to tell them apart:',
+                      target.model_object_id
+                    );
                   }
+                }
+                if (!model2) {
+                  console.warn('Could not find connected model for', target);
                 }
 
                 if (model2) {
@@ -3910,47 +3912,34 @@
                   );
 
                   if (joint && joint2) {
-
-                    // Handle layer morphing for swings connecting to swing beams
-                    if (joint.layer == "s" || joint.layer == "sh" || joint.layer == "ds" || joint.layer == "tire" ||
-                        // Tire swing connecting to b8/b10 swing beam
-                        (joint.layer == "tire" && (joint2.layer == "b8" || joint2.layer == "b10" || joint2.model.joints[0].layer == "b8" || joint2.model.joints[0].layer == "b10"))) {
-                      // This model is connecting to a swing beam, need to morph to match beam's layer
-                      // Special case: if target joint is tire_only, morph to "tire" layer
-                      let target_layer = joint2.tire_only ? "tire" : joint2.model.joints[0].layer;
-                      if (target_layer && target_layer !== joint.layer) {
-                        let position = model.mesh.position.clone();
-                        let rotation = model.mesh.rotation.clone();
-                        // By name, not index: morph rebuilds the joint list from
-                        // the new layer's mesh, and the index counter restarts
-                        // per layer, so indices are not unique across a
-                        // multi-layer swing. Names are.
-                        const joint_name = joint.name;
-                        const joint_index = joint.index;
-
-                        model.morph({ layer: target_layer });
-
-                        joint =
-                          Find_saved_joint(model, joint_name, joint_index) ||
-                          model.joints[joint_index];
-
-                        // Restore position and rotation
-                        model.mesh.position.copy(position);
-                        model.mesh.rotation.copy(rotation);
-
-                        // Ensure mesh.model references are maintained after morphing
-                        model.mesh.traverse((mesh) => {
-                          mesh.model = model;
-                        });
-
-                        // Apply default colors after morphing
-                        if (typeof applyDefaultColors === 'function') {
-                          applyDefaultColors(model);
-                        }
-                      }
+                    // Each connection is written from both ends, so the second
+                    // record of a pair finds it already made and there is
+                    // nothing to do. A record that disagrees with one already
+                    // made — a file saying a scope is on a deck rail from one
+                    // side and on a toy mount from the other, which the older
+                    // catalogue sets do say — is refused rather than wired in,
+                    // because Connect_joints would overwrite one end and leave
+                    // the other pointing at a joint that no longer points back.
+                    if (joint.connected === joint2 && joint2.connected === joint) continue;
+                    if (joint.connected || joint2.connected) {
+                      console.warn(
+                        'Saved connection contradicts one already restored; keeping the first:',
+                        `${model.object_id}.${joint.name} -> ${model2.object_id}.${joint2.name}`
+                      );
+                      continue;
                     }
 
-                    // Connect the joints - Hide_touched_fences will automatically preserve step railings
+                    // A swing switches to the mesh built for this beam's
+                    // length before it is hung. By name afterwards: morph
+                    // rebuilds the joint list, and names are unique within a
+                    // layer where indices are not.
+                    const joint_name = joint.name;
+                    const joint_index = joint.index;
+                    if (Morph_to_fit(model, joint2)) {
+                      joint =
+                        Find_saved_joint(model, joint_name, joint_index) || model.joints[0];
+                    }
+
                     Connect_joints({ joint_1: joint, joint_2: joint2 });
                   }
                 }
@@ -3986,15 +3975,29 @@
           Update_measurements();
         }
         refresh(args) {
-          for (let model of Model.instances) model.selected = false;
+          Deselect_all();
+
+          // Out of the scene, not just off the lists. This used to clear the
+          // lists and leave every mesh where it was; the render loop hid them
+          // by walking Model.instances each frame, so nothing showed, but
+          // every Reset, Undo and load added a yard's worth of geometry to the
+          // scene for the life of the page.
+          for (const mesh of picked_meshes) scene.remove(mesh);
+          Drop_carried();
 
           models_with_available_joints = [];
           picked_meshes = [];
           picked_mesh = null;
-          host_joint = null;
-          plug_joint = null;
-          plug_joint_index = -1;
-          plug_model = null;
+
+          // The joint-first state points at models that no longer exist. Left
+          // alone, a socket chosen before an Undo still read as open — its
+          // joints were never marked otherwise — so the parts bar stayed
+          // filtered against a ghost, and a tower placed after a Reset
+          // attached itself to the deck of the tower that had just been
+          // removed.
+          selected_socket = null;
+          replacing = null;
+          browse_sockets = [];
 
           Hide_options();
           Blueprint.states = [this.get_snapshot()];
@@ -4401,7 +4404,12 @@
             this.object_id = getObjectIdFromCategoryIndex(this.category, this.children_index);
           }
 
-          Model.instances.push(this);
+          // Model.instances is the list of *templates* — one per product,
+          // what the catalogue is drawn from. A placed copy is not one of
+          // those, and registering every clone here kept each one alive for
+          // the life of the page: eighty entries after a few resets, growing
+          // with every undo, every restore and every part swapped out.
+          if (!(args && args.detached)) Model.instances.push(this);
         }
         morph(args) {
           if (args.layer == this.layer) return;
@@ -4412,7 +4420,9 @@
             found = this.layers[i++] == args.layer;
           if (found) {
             this.mesh = this.meshes[--i];
+            this.layer = args.layer;
             this.joints = [];
+            let joint_index = 0;
             this.mesh.traverse((mesh) => {
               mesh.model = this;
               mesh.castShadow = shadows;
@@ -4430,7 +4440,9 @@
                 mesh.exclusion_layer = (splits.length > 3 && splits[3].toLowerCase() !== "tire") ? splits[3] : null;
                 mesh.excluder_layer = splits.length > 4 ? splits[4] : null;
                 mesh.available = true;
+                mesh.connected = null;
                 mesh.visible = false;
+                mesh.index = joint_index++;
                 this.joints.push(mesh);
               }
             });
@@ -4608,14 +4620,50 @@
             });
           });
         }
+        /**
+         * A placeable copy of this template.
+         *
+         * A multi-layer product — a swing with one mesh per beam length — gets
+         * every layer cloned into `meshes`, and `mesh` is one of those, the
+         * same layer the template was showing. It used to be a *separate*
+         * clone, so the copy carried one more mesh than it had layers and its
+         * joint list was every layer's joints together: a sling swing offered
+         * three joints all called `joint,0,s`, two of them on meshes that were
+         * not in the scene and reported positions from the origin. Which one
+         * the fitting picked came down to sort stability, and the index it
+         * remembered pointed into a list that morph() then rebuilt. Now the
+         * copy's joints are the active mesh's joints and nothing else, exactly
+         * as morph() leaves them.
+         */
         clone(args) {
-          let clone = new Model();
-          clone.mesh = this.mesh.clone();
+          let clone = new Model({ detached: true });
           clone.roof_canopy_mesh = null;
           clone.roof_poly_mesh = null;
+
+          for (let mesh of this.meshes) {
+            let mesh_clone = mesh.clone();
+            mesh_clone.traverse((node) => {
+              if (node.material) node.material = node.material.clone();
+              node.model = clone;
+              node.castShadow = shadows;
+              node.receiveShadow = shadows;
+            });
+            clone.meshes.push(mesh_clone);
+          }
+
+          const active = this.meshes.indexOf(this.mesh);
+          if (active >= 0) {
+            clone.mesh = clone.meshes[active];
+            clone.layer = this.layers[active];
+          } else {
+            clone.mesh = this.mesh.clone();
+            clone.mesh.traverse((node) => {
+              if (node.material) node.material = node.material.clone();
+            });
+          }
+
           let mesh_index = 0;
           clone.mesh.traverse((mesh) => {
-            if (mesh.material) mesh.material = mesh.material.clone();
             mesh.model = clone;
             mesh.castShadow = shadows;
             mesh.receiveShadow = shadows;
@@ -4636,7 +4684,7 @@
             if (mesh.name.toLowerCase().startsWith("joint")) {
               let splits = mesh.name.split(",");
               mesh.direction = parseInt(splits[1]);
-              mesh.layer = splits[2];
+              mesh.layer = splits[2].toLowerCase();
               // Check if this is a tire-only joint (joint,0,s,tire)
               mesh.tire_only = (splits.length > 3 && splits[3].toLowerCase() === "tire");
               mesh.exclusion_layer = (splits.length > 3 && splits[3].toLowerCase() !== "tire") ? splits[3] : null;
@@ -4660,40 +4708,6 @@
           clone.mirrorx = this.mirrorx;
           clone.slope = this.slope;
           clone.tubular = this.tubular;
-
-          for (let mesh of this.meshes) {
-            let mesh_clone = mesh.clone();
-            let mesh_index = 0;
-            mesh_clone.traverse((mesh) => {
-              if (mesh.material) mesh.material = mesh.material.clone();
-              mesh.model = clone;
-              mesh.castShadow = shadows;
-              mesh.receiveShadow = shadows;
-              if (
-                clone.roof_canopy_mesh == null &&
-                mesh.name.toLowerCase().startsWith("roof_canopy")
-              )
-                clone.roof_canopy_mesh = mesh;
-              if (
-                clone.roof_poly_mesh == null &&
-                mesh.name.toLowerCase().startsWith("roof_poly")
-              )
-                clone.roof_poly_mesh = mesh;
-              if (mesh.name.toLowerCase().startsWith("joint")) {
-                let splits = mesh.name.split(",");
-                mesh.direction = parseInt(splits[1]);
-                mesh.layer = splits[2];
-                mesh.exclusion_layer = splits.length > 3 ? splits[3] : null;
-                mesh.excluder_layer = splits.length > 4 ? splits[4] : null;
-                mesh.available = true;
-                mesh.connected = null;
-                mesh.visible = mesh.children.length != 0;
-                mesh.index = mesh_index++;
-                clone.joints.push(mesh);
-              }
-            });
-            clone.meshes.push(mesh_clone);
-          }
 
           // Compute ground offset so models sit on the ground plane
           let bbox = new THREE.Box3().setFromObject(clone.mesh);
@@ -4815,12 +4829,6 @@
             for (const joint of model.joints) joints.push(joint);
           return joints;
         }
-        /** As above, but for the wildcard pass, which inspects a model's joint pair. */
-        candidate_host_models(args) {
-          if (args && args.socket) return args.socket.model ? [args.socket.model] : [];
-          if (args && args.joint) return args.joint.model ? [args.joint.model] : [];
-          return models_with_available_joints;
-        }
         capable(args) {
           let found = false;
           const hosts = this.candidate_host_joints(args);
@@ -4829,16 +4837,7 @@
           // its own ground. A bridge or tunnel is filed under towers but has
           // nothing but attachment joints — it spans between two decks and has
           // no legs of its own — so it is not a first placement.
-          //
-          // This used to count `*` joints, which did the same job by accident:
-          // those two were the only wildcards in the towers category. They now
-          // carry `deck`, so the test asks the question directly.
-          if (picked_meshes.length == 0) {
-            const own = this.template_joints();
-            const attaches_only =
-              own.length > 0 && own.every((joint) => Is_attachment_only_layer(joint.layer));
-            return !attaches_only && this.category == 0;
-          }
+          if (picked_meshes.length == 0) return Is_free_standing(this);
 
           // check for available joints
           let availableJointCount = 0;
@@ -4860,8 +4859,7 @@
           let i = 0;
           found = false;
           while (!found && i < own_joints.length) {
-            const layer = own_joints[i++].layer;
-            found = layer === "*" || layer === "deck";
+            found = own_joints[i++].layer === "deck";
           }
           if (found) {
             let valid = 0;
@@ -4871,76 +4869,19 @@
             return valid != 0;
           }
 
-          // not a wildcard seek an available exact match
-          if (!found) {
-            let i = 0;
-            while (!found && i < own_joints.length) {
-              const seeking = own_joints[i];
-              const seekingLayer = seeking.layer;
-              let h = 0;
-              while (!found && h < hosts.length) {
-                let joint = hosts[h++];
-                if (joint.available && joint.model.category != 2) {
-                    // The same predicate every other path asks. This was a
-                    // fifth copy — raw equality with a hand-rolled disc-swing
-                    // clause — and it did not know about `deck`, so a tower
-                    // could not see a bridge's socket even though placing one
-                    // there worked perfectly well.
-                    //
-                    // The height agreement comes with it, or the catalogue
-                    // offers what the placement rules will then refuse: a
-                    // bridge already meeting a 5ft deck listing King's Tower
-                    // and every 7ft slide. So does the tire rule, which used to
-                    // be a branch here that answered only half of it — whether
-                    // a tire hanger takes this part, never whether this part
-                    // takes anything but a tire hanger.
-                    found = Joints_connect(seeking, joint);
-
-
-                    if (found) {
-                      found = Category_allows(this, joint.model);
-                      /*
-                                        if ( joint        . name . indexOf ( 'female' ) >= 0 &&
-                                             joints [ i ] . name . indexOf ( 'female' ) >= 0 )
-                                            return true
-                                        */
-                  }
-                }
-              }
-              i++;
+          // Otherwise, some free host joint this part's joints would mate with.
+          // Joints_connect is the same predicate every placement path asks —
+          // layer, tire rule, deck height and category together — so what the
+          // catalogue offers is exactly what placing will accept.
+          //
+          // A swing never hosts anything: its joints are the ones it hangs by.
+          for (const seeking of own_joints) {
+            for (const joint of hosts) {
+              if (!joint.available || Category_of(joint.model) === "swings") continue;
+              if (Joints_connect(seeking, joint)) return true;
             }
           }
-
-          // if no exact match is available look for available wildcards
-          const host_models = this.candidate_host_models(args);
-          i = 0;
-          while (!found && i < host_models.length) {
-            let model = host_models[i++];
-
-            // wildcards only can have 2 joints
-            if (model.joints.length > 1) {
-              let joint = model.joints[0];
-              if (joint.layer == "*") {
-                let other_joint = model.joints[1];
-                if (joint.available || other_joint.available) {
-                  if (!joint.available) {
-                    joint = model.joints[1];
-                    other_joint = model.joints[0];
-                  }
-                  if (!other_joint.available) {
-                    let layer = other_joint.connected.layer;
-                    // do i have a joint of this exact layer
-                    let j = 0;
-                    while (!found && j < this.joints.length) {
-                      let plug_joint = this.joints[j++];
-                      found = plug_joint.available && plug_joint.layer == layer;
-                    }
-                  }
-                }
-              }
-            }
-          }
-          return found;
+          return false;
         }
 
         // Function to check if any loaded models have tire swing compatible joints
@@ -5539,46 +5480,22 @@
           }
 
           if (handle_joint && host_step_joint) {
+            // Turned to its host, then tilted to the step's slope. A branch
+            // here used to prefer a saved rotation while "restoring from a
+            // blueprint", but nothing ever raised that flag and nothing ever
+            // saved a rotation for it to read, so this was always the path.
+            handle_joint.model.mesh.rotation.y =
+              Lookup_yaw({
+                host_model_yaw: host_step_joint.model.yaw,
+                host_joint_direction: host_step_joint.direction,
+                plug_joint_direction: handle_joint.direction,
+              }) * Deg2Rad;
 
-            // Calculate the proper rotation for the handle
-            const calculatedRotation = Lookup_yaw({
-              host_model_yaw: host_step_joint.model.yaw,
-              host_joint_direction: host_step_joint.direction,
-              plug_joint_direction: handle_joint.direction,
-            }) * Deg2Rad;
-
-            // For blueprint restoration, use saved rotation if available, otherwise use calculated
-            if (window.isRestoringFromBlueprint) {
-              const savedRotation = handle_joint.model.saved_data?.rotation?.y || handle_joint.model.saved_data?.y_rotation;
-
-              if (savedRotation !== undefined) {
-                handle_joint.model.mesh.rotation.y = savedRotation;
-              } else {
-                handle_joint.model.mesh.rotation.y = calculatedRotation;
+            handle_joint.model.mesh.traverse((mesh) => {
+              if (mesh.name && mesh.name.indexOf("_colorize_") != -1) {
+                mesh.rotation.x = host_step_joint.model.slope * Deg2Rad;
               }
-
-            } else {
-              // Interactive placement
-              handle_joint.model.mesh.rotation.y = calculatedRotation;
-            }
-
-            // Apply slope rotation for handles
-            const savedXRotation = window.isRestoringFromBlueprint ? handle_joint.model.saved_data?.rotation?.x : undefined;
-
-            if (savedXRotation !== undefined) {
-              handle_joint.model.mesh.traverse((mesh) => {
-                if (mesh.name && mesh.name.indexOf("_colorize_") != -1) {
-                  mesh.rotation.x = savedXRotation;
-                }
-              });
-            } else {
-              // Calculate slope rotation
-              handle_joint.model.mesh.traverse((mesh) => {
-                if (mesh.name && mesh.name.indexOf("_colorize_") != -1) {
-                  mesh.rotation.x = host_step_joint.model.slope * Deg2Rad;
-                }
-              });
-            }
+            });
           }
         }
 
@@ -5991,52 +5908,23 @@
           let size = joint_image.height / 2;
           for (let model of models_with_available_joints)
             for (let joint of model.joints) {
-              let we_gud = false;
-              if (joint.available && !joint.connected) {
-                if (
-                  joint.name && joint.name.indexOf("_no_tube_slides") > -1 &&
+              // The same predicate every other path asks — layer, tire rule,
+              // deck height and category — which is what stops the copies
+              // drifting apart. The wildcard branches that used to follow are
+              // gone with the wildcard layer itself.
+              const we_gud =
+                joint.available &&
+                !joint.connected &&
+                !(
+                  joint.name &&
+                  joint.name.indexOf("_no_tube_slides") > -1 &&
                   plug_joint.model.tubular
-                ) {
-                } else {
-                  // This was a fourth copy of the layer rule. It now asks the
-                  // same predicate every other path asks, which is what stops
-                  // the four drifting apart.
-                  const layersMatch = Joints_connect(plug_joint, joint);
-
-                  if (layersMatch) {
-                    if (joint.layer != "*") {
-                      we_gud = Category_allows(plug_joint.model, joint.model);
-                    }
-                  } else {
-                    if (joint.layer == "*") {
-                      if (model.joints.length > 1) {
-                        let connected_layer;
-                        if (joint == model.joints[0])
-                          connected_layer = model.joints[1].connected.layer;
-                        else connected_layer = model.joints[0].connected.layer;
-                        we_gud = connected_layer == plug_joint.layer;
-                      }
-                    } else {
-                      if (plug_joint.layer == "*") {
-                        if (plug_joint.model.joints.length == 1)
-                          we_gud =
-                            joint.layer[0] >= "0" && joint.layer[0] <= "9";
-                        else
-                          we_gud =
-                            joint.layer[0] > "0" && joint.layer[0] <= "9";
-                      }
-                    }
-                  }
-                }
-              }
+                ) &&
+                Joints_connect(plug_joint, joint);
               if (we_gud) {
                 let show_joint = true;
 
-                // Special case: wildcard joints (bridges/tunnels) should always be shown
-                // when we_gud is true, as they can connect to any compatible tower joint
-                if (joint.layer === "*") {
-                  show_joint = true;
-                } else if (plug_joint.name.startsWith("joint_pole,")) {
+                if (plug_joint.name.startsWith("joint_pole,")) {
                   show_joint = joint.name.startsWith("joint_pole_female");
                 } else if (plug_joint.name.startsWith("joint_c"))
                   show_joint =
@@ -6182,10 +6070,7 @@
         }
 
         // rotate the plug
-        if (
-          /*false ) { //*/ Mode.placing == Mode.mode ||
-          (Mode.plugging == Mode.mode && plug_model)
-        ) {
+        if (Mode.plugging == Mode.mode && plug_model) {
           mouse.x = (Pointers.position.x / canvas.width) * 2 - 1;
           mouse.y = (-Pointers.position.y / canvas.height) * 2 + 1;
           raycaster.setFromCamera(mouse, camera);
@@ -6205,78 +6090,31 @@
               position: Pointers.position,
             });
             if (host_joint != null) {
-              if (
-                host_joint.layer == "s" ||
-                host_joint.layer == "sh" ||
-                host_joint.layer == "ds" ||
-                host_joint.layer == "tire" ||
-                // Tire swing connecting to b8/b10 swing beam
-                (plug_joint.layer == "tire" && (host_joint.layer == "b8" || host_joint.layer == "b10"))
-              ) {
-                // Determine target layer based on beam type
-                let target_layer = host_joint.tire_only ? "tire" : host_joint.model.joints[0].layer;
-
-                // Only morph if layer actually needs to change
-                if (target_layer && target_layer !== plug_joint.layer) {
-                  scene.remove(plug_model.mesh);
-                  // plug_model is a swing
-                  // assuming only beams have available layer 's' joints
-                  plug_model.morph({ layer: target_layer });
-                  plug_joint = plug_model.joints[plug_joint_index];
-                  scene.add(plug_model.mesh);
-
-                  // Apply default colors after morphing
-                  applyDefaultColors(plug_model);
-                }
+              // A swing switches to the mesh built for this beam's length as
+              // it is carried over the hanger. Its joint is found again by
+              // name, since morph rebuilds the joint list.
+              const carried_name = plug_joint.name;
+              const carried_index = plug_joint.index;
+              if (Morph_to_fit(plug_model, host_joint)) {
+                plug_joint =
+                  Find_saved_joint(plug_model, carried_name, carried_index) ||
+                  plug_model.joints[0];
+                plug_joint_index = plug_model.joints.indexOf(plug_joint);
               }
 
-              // Calculate the proper rotation for connection
-              const calculatedRotation = Lookup_yaw({
-                host_model_yaw: host_joint.model.yaw,
-                host_joint_direction: host_joint.direction,
-                plug_joint_direction: plug_joint.direction,
-              }) * Deg2Rad;
+              plug_model.mesh.rotation.y =
+                Lookup_yaw({
+                  host_model_yaw: host_joint.model.yaw,
+                  host_joint_direction: host_joint.direction,
+                  plug_joint_direction: plug_joint.direction,
+                }) * Deg2Rad;
 
-              // A handle accessory sits at an angle set by its host's slope,
-              // which the yaw calculation alone does not reproduce, so a
-              // restore trusts what was saved.
-              if (window.isRestoringFromBlueprint && Is_handle_accessory(plug_model)) {
-                // Check if model has saved rotation data
-                const savedRotation = plug_model.saved_data?.rotation?.y || plug_model.saved_data?.y_rotation;
-
-                if (savedRotation !== undefined) {
-                  plug_model.mesh.rotation.y = savedRotation;
-                } else {
-                  plug_model.mesh.rotation.y = calculatedRotation;
-                }
-              } else {
-                // Normal placement or non-handle objects
-                plug_model.mesh.rotation.y = calculatedRotation;
-              }
-
+              // A handle accessory follows its host step's slope.
               if (host_joint.layer == "handle") {
-                // For blueprint restoration, use saved X rotation if available
-                if (window.isRestoringFromBlueprint && Is_handle_accessory(plug_model)) {
-                  const savedXRotation = plug_model.saved_data?.rotation?.x;
-                  if (savedXRotation !== undefined) {
-                    plug_model.mesh.traverse((mesh) => {
-                      if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
-                        mesh.rotation.x = savedXRotation;
-                    });
-                  } else {
-                    // Fallback to calculated slope rotation
-                    plug_model.mesh.traverse((mesh) => {
-                      if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
-                        mesh.rotation.x = host_joint.model.slope * Deg2Rad;
-                    });
-                  }
-                } else {
-                  // Normal placement
-                  plug_model.mesh.traverse((mesh) => {
-                    if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
-                      mesh.rotation.x = host_joint.model.slope * Deg2Rad;
-                  });
-                }
+                plug_model.mesh.traverse((mesh) => {
+                  if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
+                    mesh.rotation.x = host_joint.model.slope * Deg2Rad;
+                });
               }
 
               let pjp = new THREE.Vector3();
@@ -6329,7 +6167,7 @@
 
                 picked_mesh = intersection_objects[0].object;
                 if ("model" in picked_mesh) {
-                  for (let model of Model.instances) model.selected = false;
+                  Deselect_all();
 
                   picked_mesh.model.selected = true;
                   // Fill the catalogue with what else fits where this sits.
@@ -6380,28 +6218,11 @@
                   Show_unified_popup();
                 }
               } else {
-                for (let model of Model.instances) model.selected = false;
+                Deselect_all();
                 picked_mesh = null;
                 Hide_options();
                 Offer_replacements(null);
               }
-            }
-            break;
-          case Mode.placing:
-            {
-              models_with_available_joints.push(plug_model);
-              picked_meshes.push(plug_model.mesh);
-              Fit_default_parts(plug_model);
-              plug_model = null;
-              plug_joint_index = -1;
-              Mode.mode = Mode.normal;
-
-              // Hide rotation hint when object is successfully placed
-              document.getElementById('rotation-hint').style.display = 'none';
-
-              Show_items();
-              // Set_up_email ()
-              Update_measurements();
             }
             break;
           case Mode.plugging:
@@ -6651,8 +6472,15 @@
       const With_opening_free = (body) => {
         const freed = [];
         if (replacing) {
+          // The whole opening, not just the joint the part hangs by. A socket
+          // is one spot described by several joints, and filling one closes
+          // the rest (Sync_sockets), so the twin has to be lent out too — or
+          // a swing on the end hanger could only ever be swapped for another
+          // swing, never for the glider or the nest that hang from the `sh`
+          // joint beside it.
           for (const joint of replacing.socket.joints) {
-            if (joint.connected && joint.connected.model === replacing.model) {
+            const holds_it = joint.connected && joint.connected.model === replacing.model;
+            if (holds_it || joint.closed_by_socket) {
               freed.push([joint, joint.available]);
               joint.available = true;
             }
@@ -6951,24 +6779,18 @@
         // joint-first flow has no hover step, so it has to happen here — and
         // here is the right place for both, since this is the one function
         // that commits a part.
-        if (
-          host_joint.layer == "s" ||
-          host_joint.layer == "sh" ||
-          host_joint.layer == "ds" ||
-          host_joint.layer == "tire" ||
-          (plug_joint.layer == "tire" &&
-            (host_joint.layer == "b8" || host_joint.layer == "b10"))
-        ) {
-          const target_layer = host_joint.tire_only
-            ? "tire"
-            : host_joint.model.joints[0].layer;
-          if (target_layer && target_layer !== plug_joint.layer) {
-            scene.remove(plug_model.mesh);
-            plug_model.morph({ layer: target_layer });
-            plug_joint = plug_model.joints[plug_joint_index];
-            scene.add(plug_model.mesh);
-            applyDefaultColors(plug_model);
-          }
+        //
+        // The joint is found again by name afterwards. It used to be re-read
+        // by index into the rebuilt list, and the index came from a list that
+        // included every layer's joints — right only while the sort happened
+        // to leave the active layer's first.
+        const committed_name = plug_joint.name;
+        const committed_index = plug_joint.index;
+        if (Morph_to_fit(plug_model, host_joint)) {
+          plug_joint =
+            Find_saved_joint(plug_model, committed_name, committed_index) ||
+            plug_model.joints[0];
+          plug_joint_index = plug_model.joints.indexOf(plug_joint);
         }
 
         // undo
@@ -7221,7 +7043,7 @@
         const own = model.template_joints ? model.template_joints() : model.joints || [];
         const attaches_only =
           own.length > 0 && own.every((joint) => Is_attachment_only_layer(joint.layer));
-        return !attaches_only && model.category == 0;
+        return !attaches_only && Category_of(model) === "towers";
       };
 
       /**
@@ -7326,6 +7148,10 @@
         for (const model of doomed) Remove_model(model);
 
         picked_mesh = null;
+        // The part whose opening was being re-offered may be among the
+        // removed; either way nothing is selected now.
+        replacing = null;
+        if (selected_socket && doomed.has(selected_socket.model)) selected_socket = null;
         Sync_sockets();
 
         Hide_options();
@@ -7599,8 +7425,12 @@
         link.dispatchEvent(new MouseEvent("click"));
       };
       const Lookup_yaw = (args) => {
+        // Brought into 0..270 first: the table has one row per quarter turn,
+        // and a yaw of 360 or -90 would otherwise read past its end and come
+        // back undefined, which the caller multiplies into NaN.
+        const yaw = (((args.host_model_yaw || 0) % 360) + 360) % 360;
         return Yaws[
-          (args.host_model_yaw / 45) * 8 +
+          (yaw / 90) * 16 +
             args.host_joint_direction * 4 +
             args.plug_joint_direction
         ];
@@ -7780,8 +7610,11 @@
             }
           }
         } else {
-          for (let model of Model.instances)
-            if (model.mesh) model.mesh.visible = model.selected;
+          // The outline pass: only the selected part is drawn. Over the
+          // placed models, not Model.instances — that list is the templates
+          // now, none of which is in the scene.
+          for (const model of models_with_available_joints)
+            model.mesh.visible = model.selected;
         }
         if (plug_model) plug_model.mesh.visible = true;
         scene.background = null;
@@ -7795,8 +7628,7 @@
           });
           picked_mesh.model.mesh.visible = false;
         } else {
-          for (let model of Model.instances)
-            if (model.mesh) model.mesh.visible = false;
+          for (const mesh of picked_meshes) mesh.visible = false;
         }
 
         renderer.setRenderTarget(null);
@@ -8130,20 +7962,24 @@
         switch (Keys.code) {
           case Keys.esc:
             {
-              for (let model of Model.instances) model.selected = false;
-
+              Deselect_all();
               picked_mesh = null;
-              host_joint = null;
-              plug_joint = null;
-              plug_joint_index = -1;
-              plug_model = null;
-
+              Drop_carried();
               Mode.mode = Mode.normal;
-              
+
               // Hide rotation hint when canceling object placement
               document.getElementById('rotation-hint').style.display = 'none';
 
               Hide_options();
+
+              // Esc means "never mind", for the chosen spot and the selected
+              // part alike. `replacing` used to survive it, so the part looked
+              // deselected while the next tile click still swapped it out.
+              if (replacing || selected_socket) {
+                replacing = null;
+                selected_socket = null;
+                Show_items();
+              }
             }
             break;
           case Keys.space:
@@ -8241,6 +8077,13 @@
        * loading them, so those fall back to loading everything.
        */
       const Ensure_models_for_state = async (stateJson) => {
+        // Templates are found by object_id, and templates only get their
+        // object_id once object-mapping.json has landed. The ?catalog-id path
+        // reaches here straight from page load, racing that fetch; if it won,
+        // nothing was found to load and restore() went on to clone templates
+        // with no geometry.
+        await configsReady.catch(() => {});
+
         let state;
         try {
           state = typeof stateJson === "string" ? JSON.parse(stateJson) : stateJson;
@@ -8359,7 +8202,27 @@
         }
       };
 
+      /**
+       * One click at a time. Geometry arrives on demand, so a click can be
+       * waiting on a download when the next one lands — a double-click on a
+       * tile does exactly this — and two placements then run against the same
+       * state: the first puts the tower down, the second finds a tower can no
+       * longer go anywhere and bails, leaving a copy in hand that switches
+       * every marker off. The spinner is already showing for the first click,
+       * so the second is simply ignored.
+       */
+      let item_click_in_flight = false;
       const Item_clicked = async (args) => {
+        if (item_click_in_flight) return;
+        item_click_in_flight = true;
+        try {
+          return await Place_clicked_item(args);
+        } finally {
+          item_click_in_flight = false;
+        }
+      };
+
+      const Place_clicked_item = async (args) => {
         // A part is selected, so this click means "put that there instead".
         if (replacing) {
           const objectId =
@@ -8378,10 +8241,7 @@
         }
 
         picked_mesh = null;
-        host_joint = null;
-        plug_joint = null;
-        plug_joint_index = -1;
-        plug_model = null;
+        Drop_carried();
 
         // Determine object_id from either the new system or fallback to Categories
         let objectId = null;
@@ -8425,7 +8285,9 @@
         // Check if this model can be placed (has available connections)
         if (!plug_model.capable()) {
           console.warn(`Cannot place object ${objectId}: no available connection points`);
-          // Show user feedback that placement is not possible
+          // Not in the scene yet, but still in hand — and the browse markers
+          // only draw while nothing is in hand.
+          Drop_carried();
           return;
         }
 
@@ -8439,8 +8301,7 @@
         // Apply default colors to the new model
         applyDefaultColors(plug_model);
 
-        for (let model of Model.instances) model.selected = false;
-        //plug_model . selected = true
+        Deselect_all();
 
         // Joint-first: an opening was chosen before the part, so place it there
         // now rather than dropping into plugging mode and asking the user to
@@ -10128,7 +9989,7 @@
         $(".custom-controls-roof").css("display", "none");
         $(".custom-controls-unified").css("display", "none");
 
-        for (let model of Model.instances) model.selected = false;
+        Deselect_all();
       };
 
       // Show loading bar immediately when page starts

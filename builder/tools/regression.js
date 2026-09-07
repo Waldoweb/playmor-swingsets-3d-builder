@@ -53,10 +53,39 @@
 
   const normal = () => {
     Mode.mode = Mode.normal;
-    plug_model = null;
-    plug_joint = null;
+    // Through the app's own hand-emptying, so a part left in hand by a probe
+    // comes out of the scene rather than being dropped on the floor of it.
+    if (typeof Drop_carried === "function") Drop_carried();
+    else { plug_model = null; plug_joint = null; }
     selected_socket = null;
   };
+
+  /**
+   * Every connection points both ways, at a model that is in the yard.
+   *
+   * The invariant the connection bookkeeping rests on, and the one the rest of
+   * this suite never asked directly: it counted connections, so a design that
+   * came back with the right number of links wired to the wrong parts passed.
+   * Restoring two Play Towers on a bridge did exactly that.
+   */
+  const brokenLinks = () => {
+    const out = [];
+    for (const m of models_with_available_joints)
+      for (const j of m.joints) {
+        if (!j.connected) continue;
+        const other = j.connected;
+        if (!models_with_available_joints.includes(other.model))
+          out.push(`${m.object_id}.${j.name} -> ${other.model.object_id} (not in the yard)`);
+        else if (other.connected !== j)
+          out.push(`${m.object_id}.${j.name} -> ${other.model.object_id}.${other.name}, which points back at ${
+            other.connected ? other.connected.model.object_id + "." + other.connected.name : "nothing"}`);
+      }
+    return out;
+  };
+
+  /** Model meshes in the scene that the yard does not know about. */
+  const strayMeshes = () =>
+    scene.children.filter((c) => c.model && !picked_meshes.includes(c)).length;
 
   const placed = () => models_with_available_joints.map((m) => m.object_id).sort();
 
@@ -968,6 +997,7 @@
     };
 
     check("round trip", await reload(snapshot), original);
+    check("round trip links all point both ways", brokenLinks(), []);
 
     // Names must be what restore actually reads, not merely present. Corrupt
     // every index and the result should be unchanged.
@@ -1011,9 +1041,30 @@
       blueprint.restore({ state });
       await idle(500);
 
-      const wanted = JSON.parse(state).models_data.reduce((n, m) => n + (m.connections || []).length, 0);
+      // Every connection the file records, less any that contradict each
+      // other. Three of the old sets say, from one side, that a scope sits on
+      // a deck rail and, from the other, that the same scope sits on a toy
+      // mount; restore keeps the first and refuses the second, so those two
+      // records yield one joint fewer than their count. A joint named with two
+      // different partners is a conflict, and neither of its records is owed.
+      const records = [];
+      for (const m of JSON.parse(state).models_data)
+        for (const c of m.connections || [])
+          records.push({
+            a: `${m.save_index}.${c.my_joint_name}`,
+            b: `${c.connected_to.model_save_index}.${c.connected_to.joint_name}`,
+          });
+      const partner = new Map();
+      const conflicted = new Set();
+      for (const r of records)
+        for (const [x, y] of [[r.a, r.b], [r.b, r.a]]) {
+          if (partner.has(x) && partner.get(x) !== y) conflicted.add(x);
+          else partner.set(x, y);
+        }
+      const consistent = records.filter((r) => !conflicted.has(r.a) && !conflicted.has(r.b)).length;
       const made = models_with_available_joints.reduce((n, m) => n + m.joints.filter((j) => j.connected).length, 0);
-      check(`${file.slice(0, 22)} restores every connection`, made, wanted);
+      check(`${file.slice(0, 22)} restores every consistent connection (${consistent} of ${records.length})`,
+        made >= consistent && made <= records.length, true);
 
       // A joint may legitimately be closed without a connection: the socket
       // rule retires the twin of a filled opening, and a tower's exclusion
@@ -1025,6 +1076,7 @@
           if (!j.available && !j.connected && !j.closed_by_socket && !j.exclusion_layer)
             dangling.push(`${m.object_id}.${j.name}`);
       check(`${file.slice(0, 22)} leaves no joint closed for no reason`, dangling, []);
+      check(`${file.slice(0, 22)} links all point both ways`, brokenLinks(), []);
 
       // Where every part ended up, against where the file says it was. Pair
       // each saved model with its NEAREST live twin of the same product, never
@@ -1287,6 +1339,112 @@
     }
     await reset();
   } catch (e) { fail("heights suite", e); }
+
+  // ————————————————————————————————————————————————— state hygiene
+
+  try {
+    suite("integrity");
+    const templateCount = Model.instances.length;
+
+    // Two of one product across a bridge. Restore used to find the far model
+    // by product id, so both bridge ends came back on the same tower and the
+    // other tower pointed at a joint that no longer pointed back.
+    await reset();
+    const near = await placeFirst("P-PT");
+    const span = await place(socketFor(near, "6"), "Bridge");
+    await place(span.sockets().find((s) => Socket_is_open(s)), "P-PT");
+    check("two Play Towers on a bridge, before saving", brokenLinks(), []);
+    const twins = blueprint.get_snapshot({});
+    await Ensure_models_for_state(twins);
+    blueprint.restore({ state: twins });
+    await idle(300);
+    check("...and after restoring", brokenLinks(), []);
+    check("both ends of the bridge are on different towers",
+      new Set(models_with_available_joints.find((m) => m.object_id === "Bridge").joints
+        .map((j) => j.connected && j.connected.model)).size, 2);
+
+    // Nothing lingers from before a reset: not the meshes, not the selection.
+    const tower = models_with_available_joints.find((m) => m.object_id === "P-PT");
+    selected_socket = socketFor(tower, "6");
+    Refresh();
+    check("reset clears the chosen spot", selected_socket, null);
+    check("reset takes the old meshes out of the scene", strayMeshes(), 0);
+    const fresh = await placeFirst("P-PT");
+    check("a tower placed after a reset is attached to nothing",
+      fresh.joints.filter((j) => j.connected && j.connected.model.object_id === "P-PT").length, 0);
+    check("...and every link in the yard is sound", brokenLinks(), []);
+
+    // Same for undo, which rebuilds every model from the snapshot.
+    selected_socket = socketFor(fresh, "6");
+    Offer_replacements(models_with_available_joints.find((m) => m.object_id === "SW") || null);
+    blueprint.undo();
+    await idle(100);
+    check("undo clears the chosen spot", selected_socket, null);
+    check("undo clears the part being swapped", replacing, null);
+    check("undo leaves no stray meshes", strayMeshes(), 0);
+
+    // Placing does not register copies as templates.
+    check("placed parts are not added to the template list", Model.instances.length, templateCount);
+
+    // Esc is "never mind" for a selected part too.
+    await reset();
+    const t = await placeFirst("P-WT");
+    await idle(250);
+    const wheel = models_with_available_joints.find((m) => m.object_id === "SW");
+    picked_mesh = wheel.mesh;
+    Offer_replacements(wheel);
+    check("selecting the wheel offers its opening", replacing && replacing.model.object_id, "SW");
+    Keys.code = Keys.esc; Key_up();
+    check("Esc drops the swap", replacing, null);
+    await place(null, "MAIL");
+    check("...so the next tile does not replace the wheel",
+      models_with_available_joints.some((m) => m.object_id === "SW"), true);
+    normal();
+    // And deleting the selected part drops it as well.
+    picked_mesh = wheel.mesh; Offer_replacements(wheel);
+    remove(wheel);
+    check("deleting the selected part drops the swap", replacing, null);
+
+    // Esc while carrying takes the carried mesh out of the scene.
+    await reset();
+    await placeFirst("P-PT");
+    selected_socket = null; selected_object_id = "WS-10";
+    await Item_clicked();                              // no spot chosen: goes into the hand
+    check("a part with no spot chosen is carried", Mode.mode === Mode.plugging && !!plug_model, true);
+    Keys.code = Keys.esc; Key_up();
+    check("Esc puts it down and out of the scene", [plug_model, strayMeshes()], [null, 0]);
+
+    // Swapping a swing at the end hanger offers what hangs from the other
+    // joint of that opening too.
+    const rig = await beamRig("P-WT", "P-AB-3-8");
+    const endHanger = rig.beam.sockets().find((s) => s.joints.some((j) => j.layer === "sh"));
+    const sling = await place(endHanger, "SS");
+    Offer_replacements(sling);
+    const swaps = With_opening_free(() =>
+      templates().filter((m) => m.capable({ socket: replacing.socket })).map((m) => m.object_id));
+    check("a swing on the end hanger can be swapped for the glider and the nest",
+      ["HG", "BNS"].every((id) => swaps.includes(id)), true);
+    replacing = null;
+
+    // A double-click on a tile is one placement, not one and a copy in hand.
+    await reset();
+    await template("P-KT").ensure_loaded();
+    selected_socket = null; selected_object_id = "P-KT";
+    await Promise.all([Item_clicked(), Item_clicked()]);
+    check("a double-click places once", placed().filter((id) => id === "P-KT").length, 1);
+    check("...with nothing left in hand", plug_model, null);
+    normal();
+
+    // A copy of a multi-layer part has one mesh's joints, on a mesh it owns.
+    const ss = await probe("SS");
+    check("a fresh sling swing has one joint, not one per layer", ss.model.joints.length, 1);
+    check("...on a mesh that is one of its layers", ss.model.meshes.includes(ss.model.mesh), true);
+    check("...and knows which layer that is", ss.model.layers.includes(ss.model.layer), true);
+    ss.done();
+
+    await reset();
+    check("an empty yard has an empty scene", strayMeshes(), 0);
+  } catch (e) { fail("integrity suite", e); }
 
   // ————————————————————————————————————————————————— report
 
