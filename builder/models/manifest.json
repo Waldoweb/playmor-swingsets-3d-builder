@@ -5,13 +5,20 @@
   "default_fittings": [
     {
       "part": "SSC",
+      "layer": "toy",
       "mount": "scope",
       "prefer": "high"
     },
     {
       "part": "SW",
+      "layer": "toy",
       "mount": "wheel",
       "prefer": "low"
+    },
+    {
+      "part": "DS-KR",
+      "layer": "ds",
+      "mount": "disc_swing"
     }
   ],
   "products": {

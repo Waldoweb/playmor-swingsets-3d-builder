@@ -22,14 +22,20 @@
   ],
 
   "default_fittings": [
-    { "part": "SSC", "mount": "scope", "prefer": "high" },
-    { "part": "SW", "mount": "wheel", "prefer": "low" }
+    { "part": "SSC", "layer": "toy", "mount": "scope", "prefer": "high" },
+    { "part": "SW", "layer": "toy", "mount": "wheel", "prefer": "low" },
+    { "part": "DS-KR", "layer": "ds", "mount": "disc_swing" }
   ],
   "_default_fittings_note": [
-    "Toys a tower arrives with. Fitted when one is placed, and removable like",
-    "anything else -- deleting one takes only that one.",
+    "Parts a product arrives with. Fitted when one is placed, and removable",
+    "like anything else -- deleting one takes only that one.",
     "",
-    "`mount` is the joint each toy was modelled for. Scope and wheel mounts are",
+    "A tower brings its two toys. A disc swing beam brings the disc swing:",
+    "the hanger on its end takes that part and nothing else, so shipping the",
+    "beam bare only ever meant a second click to reach a foregone conclusion.",
+    "",
+    "`layer` is which openings on the host to consider, and `mount` narrows",
+    "those by joint name. Scope and wheel mounts are",
     "one layer now, but they are not interchangeable in the model: on the DX",
     "Play Tower the scope mount on a side faces one way and the wheel mount on",
     "the same side faces the other, so a wheel fitted to a scope mount comes out",

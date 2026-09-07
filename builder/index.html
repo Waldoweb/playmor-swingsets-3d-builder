@@ -6391,7 +6391,7 @@
             {
               models_with_available_joints.push(plug_model);
               picked_meshes.push(plug_model.mesh);
-              Fit_default_toys(plug_model);
+              Fit_default_parts(plug_model);
               plug_model = null;
               plug_joint_index = -1;
               Mode.mode = Mode.normal;
@@ -6764,11 +6764,17 @@
       };
 
       /**
-       * Fit the toys a tower comes with.
+       * Fit the parts a product comes with.
        *
        * A tower arrives with a super scope and a steering wheel already on it,
-       * which is how they are sold. Either can be deleted like anything else:
-       * a toy rests on its tower, so removing one takes only that one.
+       * which is how they are sold, and a disc swing beam arrives with the
+       * disc swing. Any of them can be deleted like anything else: a fitting
+       * rests on its host, so removing one takes only that one.
+       *
+       * The disc swing is the clearest case for this. The hanger on the end of
+       * that beam takes exactly one part in the whole catalog, so shipping the
+       * beam bare only ever meant a second click to reach a foregone
+       * conclusion.
        *
        * Each goes on the mount it was modelled for. Scope and wheel mounts
        * share a layer now, but they are not interchangeable: on the DX Play
@@ -6786,10 +6792,19 @@
        * Only runs on placement. Restoring a saved design connects joints
        * directly without coming through here, so a catalogue set gets what it
        * says and nothing added.
+       *
+       * Not re-entrant, and it has to say so itself. Fitting a part goes
+       * through Attach_plug_to, which calls back here for the thing just
+       * placed — so a part that carries the layer it is fitted to would fit
+       * one to itself for ever. The disc swing is exactly that shape: two `ds`
+       * joints, one of which is still free once it is hanging. This used to be
+       * covered by only ever fitting free-standing hosts, which is no longer
+       * true now a beam brings its swing.
        */
-      const Fit_default_toys = (model) => {
+      let fitting_defaults = false;
+      const Fit_default_parts = (model) => {
         const fittings = modelManifest && modelManifest.default_fittings;
-        if (!Array.isArray(fittings) || !model || !Is_free_standing(model)) return;
+        if (!Array.isArray(fittings) || !model || fitting_defaults) return;
 
         const world = new THREE.Vector3();
         const heightOf = (joint) => {
@@ -6797,49 +6812,56 @@
           return world.y;
         };
 
-        for (const fitting of fittings) {
-          const template = Model.instances.find((m) => m.object_id === fitting.part);
-          // Geometry only, no waiting. It is fetched when the manifest loads,
-          // so by the time anything can be placed it is here. If it somehow is
-          // not, the toy is left off rather than held for.
-          if (!template || !template.mesh) continue;
+        fitting_defaults = true;
+        try {
+          for (const fitting of fittings) {
+            const template = Model.instances.find((m) => m.object_id === fitting.part);
+            // Geometry only, no waiting. It is fetched when the manifest loads,
+            // so by the time anything can be placed it is here. If it somehow is
+            // not, the toy is left off rather than held for.
+            if (!template || !template.mesh) continue;
 
-          const free = model.joints.filter((j) => j.layer === "toy" && j.available);
-          if (!free.length) continue;
+            const free = model.joints.filter(
+              (j) => j.layer === fitting.layer && j.available
+            );
+            if (!free.length) continue;
 
-          // Only the mount this toy was drawn for. A mount faces the way its
-          // own toy is meant to be used, so putting a scope on a wheel or
-          // mailbox mount stands it the wrong way round — which is how the
-          // steering wheel came out backwards on the DX Play Tower. A tower
-          // with no mount for a toy simply does not come with that toy; one
-          // can still be added by hand.
-          const choices = fitting.mount
-            ? free.filter((j) => j.name.includes(fitting.mount))
-            : free;
-          if (!choices.length) continue;
-          choices.sort((a, b) =>
-            fitting.prefer === "low" ? heightOf(a) - heightOf(b) : heightOf(b) - heightOf(a)
-          );
-          const host_joint = choices[0];
+            // Only the mount this toy was drawn for. A mount faces the way its
+            // own toy is meant to be used, so putting a scope on a wheel or
+            // mailbox mount stands it the wrong way round — which is how the
+            // steering wheel came out backwards on the DX Play Tower. A tower
+            // with no mount for a toy simply does not come with that toy; one
+            // can still be added by hand.
+            const choices = fitting.mount
+              ? free.filter((j) => j.name.includes(fitting.mount))
+              : free;
+            if (!choices.length) continue;
+            choices.sort((a, b) =>
+              fitting.prefer === "low" ? heightOf(a) - heightOf(b) : heightOf(b) - heightOf(a)
+            );
+            const host_joint = choices[0];
 
-          const socket = model
-            .sockets()
-            .find((s) => s.joints.includes(host_joint));
-          if (!socket) continue;
+            const socket = model
+              .sockets()
+              .find((s) => s.joints.includes(host_joint));
+            if (!socket) continue;
 
-          const toy = template.clone();
-          scene.add(toy.mesh);
-          applyDefaultColors(toy);
+            const toy = template.clone();
+            scene.add(toy.mesh);
+            applyDefaultColors(toy);
 
-          const plug = Find_plug_joint_for(toy, host_joint);
-          if (!plug) {
-            scene.remove(toy.mesh);
-            continue;
+            const plug = Find_plug_joint_for(toy, host_joint);
+            if (!plug) {
+              scene.remove(toy.mesh);
+              continue;
+            }
+            plug_model = toy;
+            plug_joint = plug;
+            plug_joint_index = toy.joints.indexOf(plug);
+            Attach_plug_to(host_joint);
           }
-          plug_model = toy;
-          plug_joint = plug;
-          plug_joint_index = toy.joints.indexOf(plug);
-          Attach_plug_to(host_joint);
+        } finally {
+          fitting_defaults = false;
         }
 
         plug_model = null;
@@ -7002,7 +7024,7 @@
         Mode.mode = Mode.normal;
       
         // A tower joined to a bridge arrives fitted like any other.
-        Fit_default_toys(just_placed);
+        Fit_default_parts(just_placed);
 
         // Hide rotation hint when object is successfully placed
         document.getElementById('rotation-hint').style.display = 'none';
@@ -8475,7 +8497,7 @@
           plug_model = null;
           Mode.mode = Mode.normal;
 
-          Fit_default_toys(first);
+          Fit_default_parts(first);
           Show_items();
           Update_measurements();
         }
@@ -9629,8 +9651,8 @@
             }
             modelManifest = await response.json();
 
-            // A tower is fitted with these the moment it is placed, and the fit
-            // has to be synchronous — it drives placement through the same
+            // A product is fitted with these the moment it is placed, and the
+            // fit has to be synchronous — it drives placement through the same
             // globals every other placement uses, so anything awaited in the
             // middle can be clobbered by whatever the person does next. Two
             // small files, fetched now so they are in hand by the time the

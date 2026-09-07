@@ -291,6 +291,15 @@
     // on the end of a disc swing beam and see what the bar offers.
     await reset();
     const discRig = await beamRig("P-WT", "P-AB-DS-8");
+    await idle(250);
+    // The beam ships with its swing, which fills the very hanger this is
+    // about, so take it off to ask the question of a free one. Conditional
+    // rather than assumed: the fitting is skipped when the disc swing's
+    // geometry has not arrived yet, and this suite runs early enough that it
+    // sometimes has not -- which would otherwise make the test pass or fail on
+    // download timing rather than on the rule.
+    const preFitted = models_with_available_joints.find((m) => m.object_id === "DS-KR");
+    if (preFitted) remove(preFitted);
     const dsSocket = discRig.beam.sockets().find((s) =>
       s.joints.some((j) => j.available && j.layer === "ds")
     );
@@ -698,6 +707,45 @@
         check(`${id} puts the scope above the wheel`, at("SSC") > at("SW"), true);
       }
     }
+
+    // A disc swing beam brings its swing. The hanger on its end takes exactly
+    // one part in the catalog, so the beam is sold with it on.
+    await reset();
+    const discRig2 = await beamRig("P-WT", "P-AB-DS-8");
+    await settle();
+    check("a disc swing beam arrives with the disc swing",
+      placed().includes("DS-KR"), true);
+
+    // Exactly one. The disc swing carries `ds` on both its joints, so the one
+    // left free after it is hung is a hanger of the same layer -- fit it a
+    // second time and the beam grows a chain of them. Attach_plug_to calls the
+    // fitting back for whatever it just placed, so this is guarded rather than
+    // merely unlikely.
+    check("and exactly one of them",
+      placed().filter((id) => id === "DS-KR").length, 1);
+
+    const hung = models_with_available_joints.find((m) => m.object_id === "DS-KR");
+    check("hung from the beam's disc-swing hanger",
+      !!hung.joints.find((j) => j.connected && j.connected.name.includes("disc_swing")), true);
+
+    // Removable, and it does not come back when something else is placed.
+    remove(hung);
+    check("deleting it takes only the swing",
+      placed().sort(), ["P-AB-DS-8", "P-WT", "SSC", "SW"]);
+    const spare = discRig2.beam.sockets().find((s) =>
+      s.joints.some((j) => j.available && j.layer === "s")
+    );
+    await place(spare, "SS");
+    await settle();
+    check("and placing a swing does not refit it",
+      placed().filter((id) => id === "DS-KR").length, 0);
+
+    // A plain swing beam has no disc-swing hanger and so brings nothing.
+    await reset();
+    await beamRig("P-WT", "P-AB-3-8");
+    await settle();
+    check("a plain swing beam brings nothing of its own",
+      placed().sort(), ["P-AB-3-8", "P-WT", "SSC", "SW"]);
 
     // Removable one at a time, and they go with their tower.
     await reset();
