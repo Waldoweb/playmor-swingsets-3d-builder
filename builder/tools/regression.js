@@ -478,6 +478,29 @@
       check(`${id} still takes a mailbox`,
         templates().find((m) => m.object_id === "MAIL").capable(), true);
     }
+
+    // The King's Tower carries a picket panel on one end already, and offered
+    // a Side Rail and a Kitchen Kit on top of it. Both points on that end are
+    // gone; the open end keeps its one, so neither part is lost.
+    await reset();
+    const kings = await placeFirst("P-KT");
+    const ground = [];
+    for (const socket of kings.sockets()) {
+      const joint = socket.joints.find((j) => j.available);
+      if (!joint) continue;
+      const at = new THREE.Vector3();
+      joint.getWorldPosition(at);
+      if (at.y < 1.6) ground.push(Math.round(at.z * 100) / 100);
+    }
+    // The railed end is the negative one; the two at its middle are the floor
+    // kit and the picnic table, which mount inside rather than on either end.
+    check("the King's railed end offers nothing at ground level",
+      ground.filter((z) => z < -0.5).length, 0);
+    check("...while its open end still does", ground.filter((z) => z > 0.5).length, 1);
+    for (const id of ["SR-KT", "KK"]) {
+      check(`a ${id} can still go on the King's Tower`,
+        templates().find((m) => m.object_id === id).capable(), true);
+    }
     await reset();
   } catch (e) { fail("disabled joints suite", e); }
 
@@ -882,68 +905,84 @@
     // back of a tower came to show through the front fence. The test is a
     // bundle of five parallel rays now, offset by more than half that gap.
     await reset();
-    await placeFirst("P-KT");
+    const tower = await placeFirst("P-KT");
 
-    const eye = new THREE.Vector3();
-    const look = async (height, z) => {
-      orbitControls.object.position.set(0.2, height, z);
-      orbitControls.target.set(0, 2.2, 0);
-      orbitControls.update();
-      await idle(300);   // clear the occlusion tick, which runs at 10Hz
+    // Asked of the visibility test directly rather than counted off the drawn
+    // markers. browse_sockets is filled by the render loop, and a browser that
+    // has put the tab in the background stops calling it — which failed this
+    // suite three times over while the thing it tests was working perfectly.
+    // Driving the test itself also removes the wait for the 10Hz tick.
+    const world = new THREE.Vector3();
+    const look = (height, z) => {
+      camera.position.set(0.2, height, z);
+      camera.lookAt(0, 2.2, 0);
+      camera.updateMatrixWorld();
+      Refresh_occluder_boxes();
     };
-    // Markers on the fence itself, near and far, from where the camera is.
+    /** Markers a person would see, on the model's own open sockets. */
+    const visible = (model, low, high) => {
+      const out = [];
+      for (const socket of model.sockets()) {
+        const joint = socket.joints.find((j) => j.available);
+        if (!joint) continue;
+        joint.updateMatrixWorld();
+        world.setFromMatrixPosition(joint.matrixWorld);
+        if (socket.offset) world.add(socket.offset);
+        if (low !== undefined && (world.y <= low || world.y >= high)) continue;
+        if (Marker_is_hidden(joint, world, null)) continue;
+        out.push(world.z);
+      }
+      return out;
+    };
     // Bounded above as well as below: the swing-beam seat rides at 3.2, clear
-    // of the fence, and is genuinely visible from the far side — hiding that
-    // one would be wrong, so it is not what this measures.
+    // of the fence with nothing in front of it, and is genuinely visible from
+    // either side — hiding that one would be wrong, so it is not what this
+    // measures.
     const rails = () => {
-      const near = Math.sign(orbitControls.object.position.z);
+      const near = Math.sign(camera.position.z);
       let onNear = 0, onFar = 0;
-      for (const socket of browse_sockets) {
-        socket.joints[0].getWorldPosition(eye);
-        if (eye.y <= 2.0 || eye.y >= 3.0) continue;
-        if (Math.sign(eye.z) === near) onNear++; else onFar++;
+      for (const z of visible(tower, 2.0, 3.0)) {
+        if (Math.sign(z) === near) onNear++; else onFar++;
       }
       return { onNear, onFar };
     };
 
-    await look(3.2, 5.2);
+    look(3.2, 5.2);
     const front = rails();
     check("no far-rail marker draws through the fence", front.onFar, 0);
     check("the near rail still shows its markers", front.onNear > 0, true);
 
     // Orbiting to the other side has to swap which rail is hidden, or this is
     // a fixed rule about the model rather than an answer about the view.
-    await look(3.2, -5.2);
+    look(3.2, -5.2);
     const behind = rails();
     check("the same holds from the other side", behind.onFar, 0);
     check("and the rail now in front shows its markers", behind.onNear > 0, true);
 
     // Looking down over the fence is the angle that beat the first attempt:
-    // the sight line clears the near rail, so a bundle of rays finds nothing
-    // in the way and every dot on the back rail draws.
-    await look(4.4, 4.6);
+    // the sight line clears the near rail, so a bundle sized to the slat gaps
+    // finds nothing in the way and every dot on the back rail draws.
+    look(4.4, 4.6);
     check("nor from above, looking down over the rail", rails().onFar, 0);
 
     // A swing beam is open air. Its hangers sit on the far half of it from
     // half the angles anyone looks from, and a rule that hid the far half on
-    // position alone would cull them -- which is what happened the last time
-    // one was tried.
+    // position alone would cull them — which is what happened the last time
+    // one was tried. They block no rays, so they survive.
     await reset();
-    const tower = await placeFirst("P-WT");
-    const seat = tower.sockets().find((socket) =>
+    const host = await placeFirst("P-WT");
+    const seat = host.sockets().find((socket) =>
       socket.joints.some((j) => j.available && (j.layer === "b8" || j.layer === "b10"))
     );
     const beam = await place(seat, "P-AB-3-8");
     check("the beam went on", !!beam, true);
     // Stand off the beam's flank, where its hangers are plainly in view.
-    orbitControls.object.position.set(7, 3.4, -2.8);
-    orbitControls.target.set(0, 2.5, -2.8);
-    orbitControls.update();
-    await idle(300);
-    const hangers = browse_sockets.filter((socket) =>
-      beam.joints.includes(socket.joints[0])
-    ).length;
-    check("a beam's hangers all stay visible from its flank", hangers, 3);
+    camera.position.set(7, 3.4, -2.8);
+    camera.lookAt(0, 2.5, -2.8);
+    camera.updateMatrixWorld();
+    Refresh_occluder_boxes();
+    check("a beam's hangers all stay visible from its flank",
+      visible(beam).length, 3);
 
     await reset();
   } catch (e) { fail("marker visibility suite", e); }

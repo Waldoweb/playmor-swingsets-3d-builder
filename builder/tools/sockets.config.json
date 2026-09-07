@@ -67,7 +67,14 @@
 
   "remove_joints": {
     "P-ST": ["joint_l,1,mailbox_or_phone", "joint_r,3,mailbox_or_phone"],
-    "P-KT": ["joint_mailbox_or_phone,1,toy", "joint_mailbox_or_phone,3,toy"]
+    "P-KT": [
+      "joint_mailbox_or_phone,1,toy",
+      "joint_mailbox_or_phone,3,toy",
+      "joint,2,end_rail",
+      "joint_left,1,end_rail",
+      "joint_left,1,kitchen",
+      "joint,1,0"
+    ]
   },
   "_remove_joints_note": [
     "Connection points the models offer but the product does not.",
@@ -87,6 +94,14 @@
     "tower, which is why the Super Scope kept landing on it. The tower keeps a",
     "scope mount and a wheel mount on each end face, and those still take any",
     "of the five toys.",
+    "",
+    "P-KT also loses both ground-level points on its railed end. That end comes",
+    "with a picket panel built into the model -- the boards sit at z -1.24,",
+    "centred 0.471 up -- and the two points there offered a Side Rail and a",
+    "Kitchen Kit on top of the rail that is already standing. The open end keeps",
+    "its point, so both parts can still be fitted, on the end that has room for",
+    "them. The two are one opening each, so the Kitchen shares the lower point",
+    "with the Side Rail and goes with it.",
     "",
     "Identify a joint by where it is, not by what it is called. This entry read",
     "'joint_scope,0/2,toy' first, on the assumption that the point the scope",
