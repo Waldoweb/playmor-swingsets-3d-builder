@@ -726,7 +726,7 @@
          --------------------------------------------------------------- */
 
       :root {
-        --bottom-bar-h: 176px;
+        --bottom-bar-h: 196px;
         --bottom-bar-gap: 16px;
       }
 
@@ -816,7 +816,7 @@
         flex: 1 1 auto;
         overflow-x: auto;
         overflow-y: hidden;
-        padding: 10px 16px 14px 16px;
+        padding: 10px 16px 8px 16px;
         box-sizing: border-box;
       }
 
@@ -851,8 +851,11 @@
       .part-tile {
         position: relative;
         flex: 0 0 auto;
-        width: 116px;
-        padding: 8px;
+        width: 128px;
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
         background: rgba(255, 255, 255, 0.08);
         border-radius: 8px;
         border: 2px solid rgba(255, 255, 255, 0.1);
@@ -879,11 +882,21 @@
           inset 0 1px 0 rgba(255, 255, 255, 0.2);
       }
 
+      /* The thumbnails run from a mean luminance of 7 (the bird's nest swing,
+         effectively a black silhouette) to 179 (tic-tac-toe), so no one flat
+         panel colour serves both -- a light one loses the steps and monkey
+         bars, a dark one loses the tire swing, which is what it was doing.
+         The gradient gives every part somewhere to read against: dark ones
+         against the light top, light ones against the dark foot. */
       .part-tile-image {
+        flex: 1 1 auto;
+        min-height: 0;
         width: 100%;
-        height: calc(100% - 20px);
         object-fit: contain;
-        border-radius: 5px;
+        border-radius: 6px;
+        background: linear-gradient(180deg, #767d85 0%, #4b5057 100%);
+        padding: 3px;
+        box-sizing: border-box;
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
@@ -892,28 +905,17 @@
       }
 
       .part-tile-text {
+        flex: 0 0 auto;
         color: white;
-        position: absolute;
-        width: calc(100% - 12px);
+        width: 100%;
         text-align: center;
-        bottom: 4px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 600;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-        background: rgba(0, 0, 0, 0.3);
-        padding: 2px 4px;
-        border-radius: 3px;
-        backdrop-filter: blur(5px);
+        line-height: 1.25;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         box-sizing: border-box;
-      }
-
-      .part-tile.selected .part-tile-text {
-        background: rgba(206, 3, 12, 0.9);
       }
 
       /* Shown only when a model's geometry is still being fetched, and only
@@ -953,11 +955,11 @@
 
       @media (max-width: 768px) {
         :root {
-          --bottom-bar-h: 152px;
+          --bottom-bar-h: 172px;
         }
 
         .part-tile {
-          width: 96px;
+          width: 108px;
         }
       }
 
