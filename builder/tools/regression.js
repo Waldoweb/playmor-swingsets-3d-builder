@@ -272,11 +272,34 @@
       ["deck", "s", false],
       ["deck", "picnic", false],
       ["deck", "0", false],
-      ["b8", "ds", true],
+      // A beam mount does NOT fit the disc-swing hanger. This table used to
+      // say it did, which was a transcription of the implementation rather
+      // than anything the catalog wants: a tower's beam mount carries `b8`,
+      // so the hanger at the end of a disc swing beam offered all seven
+      // towers alongside the disc swing. The disc swing itself carries `ds`
+      // on both joints and connects by plain equality, so nothing was relying
+      // on the wider rule.
+      ["b8", "ds", false],
+      ["b10", "ds", false],
+      ["ds", "ds", true],
       ["s", "s", true],
     ]) {
       check(`${plug} -> ${host}`, Layers_connect(plug, host), want);
     }
+
+    // ...and the same thing asked the way a person meets it: click the hanger
+    // on the end of a disc swing beam and see what the bar offers.
+    await reset();
+    const discRig = await beamRig("P-WT", "P-AB-DS-8");
+    const dsSocket = discRig.beam.sockets().find((s) =>
+      s.joints.some((j) => j.available && j.layer === "ds")
+    );
+    check("the disc swing beam has a disc-swing hanger", !!dsSocket, true);
+    const atDisc = templates()
+      .filter((m) => m.capable({ socket: dsSocket }))
+      .map((m) => m.object_id)
+      .sort();
+    check("only the disc swing fits the disc-swing hanger", atDisc, ["DS-KR"]);
 
     // Only a part with a tire mesh variant may take a tire-only hanger. This
     // was enforced in the catalog listing but in none of the placement rules,

@@ -2894,11 +2894,13 @@
        * The rule was written out separately in three places, which is how a
        * fourth clause ends up in two of them. Stated once:
        *
-       *   equal   the ordinary case
+       *   equal   the ordinary case, which is every named socket -- `s`, `sh`,
+       *           `toy`, `end_rail`, and `ds`, the disc-swing hanger. A disc
+       *           swing carries `ds` on both its joints, so equality is all it
+       *           has ever needed.
        *   deck    parts that fit any deck height — bridges, tunnels, the bubble
        *           panel and the tic-tac-toe board, which span or fill a deck
        *           opening whatever height it is at
-       *   ds      a disc-swing beam's hanger also takes the beam layers
        *   *       matches anything; nothing in the catalog uses it any more,
        *           kept so a model that has not been given a real layer still
        *           behaves as it did
@@ -2996,8 +2998,6 @@
         if (plug_layer === host_layer) return true;
         if (plug_layer === "deck") return Is_deck_layer(host_layer);
         if (host_layer === "deck") return Is_deck_layer(plug_layer);
-        if (host_layer === "ds")
-          return plug_layer === "b8" || plug_layer === "b10" || plug_layer === "ds";
         return false;
       };
 
