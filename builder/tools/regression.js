@@ -36,6 +36,7 @@
   function check(name, actual, expected) {
     const ok = typeof expected === "function" ? !!expected(actual) : eq(actual, expected);
     results.push({ group, name, ok, actual, expected: typeof expected === "function" ? "(predicate)" : expected });
+    window.__last_check = `${group} / ${name}`;
     return ok;
   }
 
@@ -870,6 +871,52 @@
     await place(socketFor(tower, "6"), "TIC");
     check("tic-tac-toe cuts as much as the slide", slats() - bySlide, bySlide);
   } catch (e) { fail("cut-outs suite", e); }
+
+  // ————————————————————————————————————————————————— marker visibility
+
+  try {
+    suite("marker visibility");
+    // A tower fence is separate boards, 0.089 wide on a 0.156 pitch, so the
+    // gaps run to 0.095. A single ray aimed at a marker on the far rail threads
+    // one cleanly and calls the marker visible, which is how the dots from the
+    // back of a tower came to show through the front fence. The test is a
+    // bundle of five parallel rays now, offset by more than half that gap.
+    await reset();
+    await placeFirst("P-KT");
+
+    const eye = new THREE.Vector3();
+    const look = async (z) => {
+      orbitControls.object.position.set(0.2, 3.2, z);
+      orbitControls.target.set(0, 2.2, 0);
+      orbitControls.update();
+      await idle(300);   // clear the occlusion tick, which runs at 10Hz
+    };
+    // Deck-height markers on the near and far rails, from where the camera is.
+    const rails = () => {
+      const near = Math.sign(orbitControls.object.position.z);
+      let onNear = 0, onFar = 0;
+      for (const socket of browse_sockets) {
+        socket.joints[0].getWorldPosition(eye);
+        if (eye.y <= 2.0) continue;          // the open frame below the deck
+        if (Math.sign(eye.z) === near) onNear++; else onFar++;
+      }
+      return { onNear, onFar };
+    };
+
+    await look(5.2);
+    const front = rails();
+    check("no far-rail marker draws through the fence", front.onFar, 0);
+    check("the near rail still shows its markers", front.onNear > 0, true);
+
+    // Orbiting to the other side has to swap which rail is hidden, or this is
+    // a fixed rule about the model rather than an answer about the view.
+    await look(-5.2);
+    const behind = rails();
+    check("the same holds from the other side", behind.onFar, 0);
+    check("and the rail now in front shows its markers", behind.onNear > 0, true);
+
+    await reset();
+  } catch (e) { fail("marker visibility suite", e); }
 
   // ————————————————————————————————————————————————— report
 
