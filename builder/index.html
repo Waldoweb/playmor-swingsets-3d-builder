@@ -6294,6 +6294,74 @@
       };
 
       /**
+       * Move a model so its joint sits exactly on the one it is joining.
+       *
+       * Its rotation has to be final before this runs: the position is derived
+       * from where the joint currently is, so anything that turns the model, or
+       * a mesh the joint hangs from, invalidates it.
+       */
+      const Settle_on_joint = (model, plug_joint, host_joint) => {
+        model.mesh.updateMatrixWorld(true);
+
+        const joint_world = new THREE.Vector3();
+        plug_joint.getWorldPosition(joint_world);
+        const model_world = new THREE.Vector3();
+        model.mesh.getWorldPosition(model_world);
+        const host_world = new THREE.Vector3();
+        host_joint.getWorldPosition(host_world);
+
+        const position = new THREE.Vector3()
+          .subVectors(model_world, joint_world)
+          .add(host_world);
+        if (position.y < 0) position.y = 0;
+        model.mesh.position.copy(position);
+      };
+
+      /**
+       * Fit a handle accessory's twin on the other side of the same step.
+       *
+       * Handrails and grips are sold and fitted as a pair, one each side, so
+       * placing one fills the step's other handle socket with the same part.
+       * The rule follows from being a handle accessory rather than from a list
+       * of product ids, so a new grip or rail behaves the same way without
+       * anyone remembering to add it.
+       *
+       * Silent if there is no second socket free — a step already carrying one
+       * rail, or a host that only offers a single handle.
+       */
+      const Pair_handle_accessory = (placed, host_model) => {
+        if (!placed || !host_model || !Is_handle_accessory(placed)) return null;
+
+        const sibling = host_model
+          .sockets()
+          .find(
+            (socket) =>
+              Socket_is_open(socket) &&
+              socket.joints.some((joint) => joint.layer === "handle" && joint.available)
+          );
+        if (!sibling) return null;
+
+        const template = Model.instances.find((m) => m.object_id === placed.object_id);
+        if (!template || !template.mesh) return null;
+
+        const twin = template.clone();
+        scene.add(twin.mesh);
+        applyDefaultColors(twin);
+
+        const mate = Find_mate_in_socket(twin, sibling);
+        if (!mate) {
+          scene.remove(twin.mesh);
+          return null;
+        }
+
+        plug_model = twin;
+        plug_joint = mate.plug_joint;
+        plug_joint_index = twin.joints.indexOf(mate.plug_joint);
+        Attach_plug_to(mate.host_joint);
+        return twin;
+      };
+
+      /**
        * Which joint of a chosen opening this part should mate with.
        *
        * A socket can offer more than one way in — a beam's last hanger takes a
@@ -6374,6 +6442,16 @@
 
         // actually connect the joints
         Connect_joints({ joint_1: host_joint, joint_2: plug_joint });
+
+        // Settle the position again, because connecting can change the shape
+        // the position was worked out for. A handle accessory takes its host
+        // step's slope, and its joint hangs off the very mesh that rotates —
+        // so aligning the joint first and rotating after left a hand grip
+        // 0.218 adrift of the step it was supposedly bolted to.
+        //
+        // A no-op for everything else: nothing moved, so the same numbers come
+        // out. Cheaper than working out in advance which parts reshape.
+        Settle_on_joint(plug_model, plug_joint, host_joint);
 
         models_with_available_joints.push(plug_model);
         picked_meshes.push(plug_model.mesh);
@@ -6633,6 +6711,22 @@
         blueprint.add_snapshot();
 
         const doomed = new Set([picked_mesh.model]);
+
+        // A pair goes together. A handrail's twin is not orphaned by its
+        // removal — the step still holds it up — so it has to be named here,
+        // for the same reason the pair is fitted together in the first place.
+        for (const model of [...doomed]) {
+          if (!Is_handle_accessory(model)) continue;
+          for (const joint of model.joints) {
+            const host = joint.connected && joint.connected.model;
+            if (!host) continue;
+            for (const sibling of host.joints) {
+              const other = sibling.connected && sibling.connected.model;
+              if (other && other !== model && Is_handle_accessory(other)) doomed.add(other);
+            }
+          }
+        }
+
         for (const orphan of Orphaned_by(doomed)) doomed.add(orphan);
 
         for (const model of doomed) {
@@ -7780,7 +7874,10 @@
           if (mate) {
             plug_joint = mate.plug_joint;
             plug_joint_index = plug_model.joints.indexOf(mate.plug_joint);
+            const host_model = mate.host_joint.model;
+            const just_placed = plug_model;
             Attach_plug_to(mate.host_joint);
+            Pair_handle_accessory(just_placed, host_model);
             selected_socket = null;
             selected_object_id = null;
             Show_items();

@@ -313,9 +313,25 @@
     await reset();
     const tower = await placeFirst("P-PT");
     const step = await place(socketFor(tower, "6"), "P-STEP-5");
-    const a = await place(socketFor(step, "handle"), "HGR");
-    const b = await place(socketFor(step, "handle"), "HR");
-    check("both rails mount on a step", [!!a, !!b], [true, true]);
+
+    // One click fits both sides: a single rail is not something PlayMor sells.
+    await place(socketFor(step, "handle"), "HGR");
+    const rails = models_with_available_joints.filter((m) => Is_handle_accessory(m));
+    check("one click fits a pair", rails.length, 2);
+    check("both of the step's handles are filled",
+      step.joints.filter((j) => j.layer === "handle").every((j) => !!j.connected), true);
+
+    // A handrail's joint hangs off the mesh that takes the step's slope, so
+    // aligning it before that rotation left it adrift of the step it was
+    // supposedly bolted to. Both ends must sit exactly on their socket.
+    for (const rail of rails) {
+      const mate = rail.joints.find((j) => j.connected);
+      const gap = new THREE.Vector3().subVectors(
+        (() => { const v = new THREE.Vector3(); mate.getWorldPosition(v); return v; })(),
+        (() => { const v = new THREE.Vector3(); mate.connected.getWorldPosition(v); return v; })()
+      ).length();
+      check(`rail on ${mate.connected.name} sits on its socket`, +gap.toFixed(4), 0);
+    }
 
     // A step and its handrails share a category, which every other pair is
     // forbidden. The exception has to be scoped to the accessory, or a step
@@ -340,12 +356,13 @@
       await reset();
       const tower = await placeFirst("P-PT");
       const step = await place(socketFor(tower, "6"), "P-STEP-5");
-      const a = await place(socketFor(step, "handle"), "HGR");
-      const b = await place(socketFor(step, "handle"), "HR");
-      return { tower, step, a, b };
+      await place(socketFor(step, "handle"), "HGR");   // fits both sides
+      return { tower, step };
     };
 
     let rig = await stepRig();
+    check("a step carries a pair of rails",
+      models_with_available_joints.filter((m) => Is_handle_accessory(m)).length, 2);
     remove(rig.step);
     check("deleting a step takes both its rails", placed(), ["P-PT"]);
 
@@ -354,9 +371,12 @@
     // The reported bug: rails used to survive their tower, hanging in mid-air.
     check("deleting a tower takes step and rails", placed(), []);
 
+    // Fitted as a pair, removed as a pair. The twin is not orphaned by the
+    // removal — the step still holds it up — so it is named explicitly.
     rig = await stepRig();
-    remove(rig.a);
-    check("deleting one rail leaves the rest", placed(), ["HR", "P-PT", "P-STEP-5"]);
+    const anyRail = models_with_available_joints.find((m) => Is_handle_accessory(m));
+    remove(anyRail);
+    check("deleting one rail takes its twin", placed(), ["P-PT", "P-STEP-5"]);
 
     const swingRig = async () => {
       const { tower, beam } = await beamRig("P-PT", "P-AB-3-8");
