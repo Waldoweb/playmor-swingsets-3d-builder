@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-07T16:03:46.953Z",
+  "generated_at": "2026-09-07T16:37:15.187Z",
   "product_count": 64,
   "default_fittings": [
     {
@@ -1947,7 +1947,7 @@
             {
               "marker": [
                 0,
-                1.5,
+                0.5,
                 0
               ],
               "accepts": [
@@ -1958,6 +1958,11 @@
               ],
               "joints": [
                 "joint,0,s,tire"
+              ],
+              "marker_offset": [
+                0,
+                -1,
+                0
               ]
             },
             {
@@ -3373,7 +3378,7 @@
             {
               "marker": [
                 0,
-                1.5,
+                0.5,
                 -0.421
               ],
               "accepts": [
@@ -3384,6 +3389,11 @@
               ],
               "joints": [
                 "joint,0,s,tire"
+              ],
+              "marker_offset": [
+                0,
+                -1,
+                0
               ]
             },
             {

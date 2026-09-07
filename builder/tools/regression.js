@@ -1075,6 +1075,44 @@
     check("a beam's hangers all stay visible from its flank",
       visible(beam).length, 3);
 
+    // The Summit Tower's tire hanger is authored flush under the deck, and the
+    // deck is a solid square at exactly that height, so its dot could not be
+    // seen from anywhere: 0 of 25 camera positions. Its marker drops a metre to
+    // where the tire hangs. Only the dot moves — the swing still attaches to
+    // the bracket, which is what marker_offsets is for.
+    await reset();
+    const summitTower = await placeFirst("P-ST");
+    const tireSocket = summitTower.sockets().find((socket) =>
+      socket.joints.some((j) => j.tire_only)
+    );
+    check("the tire hanger's dot is drawn a metre below the bracket",
+      tireSocket.offset ? Math.round(tireSocket.offset.y * 100) / 100 : 0, -1);
+
+    const bracket = new THREE.Vector3();
+    tireSocket.joints[0].getWorldPosition(bracket);
+    check("the bracket itself has not moved", Math.round(bracket.y * 100) / 100, 1.5);
+
+    // Seen from eye level and from above, both of which used to show nothing.
+    let seen = 0;
+    for (const height of [1.6, 2.2, 3.0]) {
+      camera.position.set(0.1, height, 6);
+      camera.lookAt(0, 1.6, 0);
+      camera.updateMatrixWorld();
+      Refresh_occluder_boxes();
+      const at = bracket.clone().add(tireSocket.offset);
+      if (!Marker_is_hidden(tireSocket.joints[0], at, null)) seen++;
+    }
+    check("and it can be seen from eye level and above", seen, 3);
+
+    // The swing still lands on the bracket, not on the dot.
+    const swing = await place(tireSocket, "MTS");
+    check("a tire swing still goes on", !!swing, true);
+    const hung = swing && swing.joints.find((j) => j.connected);
+    const where = new THREE.Vector3();
+    if (hung) hung.getWorldPosition(where);
+    check("...at the bracket's own height", Math.round(where.y * 100) / 100, 1.5);
+    await reset();
+
     await reset();
   } catch (e) { fail("marker visibility suite", e); }
 

@@ -153,7 +153,13 @@ function deriveSockets(joints, parseJoint, config) {
   const sockets = [];
   for (const joint of joints) {
     const parsed = parseJoint(joint.name);
-    const offset = offsets[parsed.layer] || [0, 0, 0];
+    // Keyed by joint name first, then by layer. A layer key moves every dot of
+    // that kind, which is right for the picnic mount and wrong for the tire
+    // hanger: that one is layer `s`, so keying it by layer would drag every
+    // swing hanger on every beam down with it. Its name is `joint,0,s,tire`,
+    // which is unique in a file and the same on both Summit towers -- the two
+    // that have the hanger -- so the name says exactly what is meant.
+    const offset = offsets[joint.name] || offsets[parsed.layer] || [0, 0, 0];
     const marker = [
       joint.position[0] + offset[0],
       joint.position[1] + offset[1],
