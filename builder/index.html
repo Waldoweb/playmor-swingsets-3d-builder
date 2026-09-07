@@ -5885,12 +5885,18 @@
       // picked, every other marker still says that, so the picked one needs to
       // stop looking like the rest rather than just grow a little.
       //
-      // A cool emerald rather than a leafy green, because the lawn behind these
-      // markers is #6f9b46 -- a warm olive. Roughly seventy degrees of hue and
-      // a lot of saturation separate the two, which is what keeps a marker
-      // legible when it sits over grass rather than over the playset.
-      const ADD_MARKER_GREEN = "#04aa6d";
-      const ADD_MARKER_GREEN_RGB = "4, 170, 109";
+      // A lime, and it is the hue doing the work rather than the saturation:
+      // this and the emerald it replaces are both 95% saturated, and what read
+      // as flat about the emerald was its 158-degree, teal-leaning hue. At 100
+      // degrees the same saturation looks far more vivid.
+      //
+      // What stops it disappearing into the lawn is not hue -- #6f9b46 is only
+      // nine degrees away -- but that the grass is a muted 38% saturation at
+      // 44% lightness, against this at 95% and 36%. Held at 36% rather than
+      // taken brighter so the white plus keeps its contrast; lime gets light
+      // quickly, and much above this the glyph starts to wash out.
+      const ADD_MARKER_GREEN = "#3fb305";
+      const ADD_MARKER_GREEN_RGB = "63, 179, 5";
       const ADD_MARKER_RED_RGB = "206, 3, 12";
       const reduced_motion =
         window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
