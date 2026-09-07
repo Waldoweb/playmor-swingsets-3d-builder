@@ -75,7 +75,11 @@
       "joint_left,1,kitchen",
       "joint,1,0"
     ],
-    "SR-KT": ["joint,0,0"]
+    "SR-KT": ["joint,0,0"],
+    "P-WT": [
+      "joint_back_l_mailbox_or_phone,2,toy",
+      "joint_front_l_mailbox_or_phone,0,toy"
+    ]
   },
   "_remove_joints_note": [
     "Connection points the models offer but the product does not.",
@@ -87,8 +91,13 @@
     "and this way the original name is still legible and the change reversible.",
     "",
     "P-ST: the Summit Tower offered a mailbox or telephone mount on each side.",
-    "Weldon asked for both to come out. Sky Tower keeps its pair, and no shipped",
-    "catalog set used the Summit ones.",
+    "Weldon asked for both to come out.",
+    "",
+    "P-WT: the Sky Tower's pair of the same thing, the corner mounts at 2.57 --",
+    "(0.66, -0.61) and its mirror (-0.66, 0.61). Weldon circled one and said it",
+    "is the top-corner toy point, the same one taken off the King's Tower, so",
+    "both go. The tower keeps its three scope mounts and three wheel mounts,",
+    "which still take any of the five toys.",
     "",
     "P-KT: the King's Tower mailbox mounts, the pair up at the top corners.",
     "Weldon asked for that point to go and it is the highest toy point on the",
@@ -167,6 +176,29 @@
     "",
     "The comment on the old test named the Watchtower, which was never one of",
     "the two: its mesh is 'Watch_tower' and it matched neither string."
+  ],
+
+  "default_facing": {
+    "BS": 2
+  },
+  "_default_facing_note": [
+    "Which way a part turns when it has a choice, as the direction field of the",
+    "joint to prefer.",
+    "",
+    "A part that can face two ways at one opening is drawn with two joints at",
+    "the same point, one per facing -- the baby swing has `joint,0,s` and",
+    "`joint,2,s`. Whichever fits first was taken, which put the seat facing in",
+    "along the beam. Weldon asked for it facing out.",
+    "",
+    "This cannot be worked out from the model. The two directions are mirror",
+    "images about the beam, so no measurement distinguishes them; only someone",
+    "who knows which way a child sits in it does. Hence a recorded choice, and",
+    "hence keyed on the product id like default_yaw rather than on anything the",
+    "geometry could be asked.",
+    "",
+    "Only a preference. If the wanted facing does not fit -- the opening is up",
+    "against something, or the twin is already taken -- the other is still used",
+    "rather than the part refusing to go on."
   ],
 
   "cutouts": {

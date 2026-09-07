@@ -221,6 +221,15 @@
       placedSwing.joints.filter((j) => j.available).length, 0);
     check("...and draws no marker of its own",
       browse_sockets.filter((s) => s.model === placedSwing).length, 0);
+
+    // Which of the two it took. Both fit, so the model cannot say which way
+    // round the seat belongs -- the directions are mirror images about the
+    // beam -- and it used to take whichever came first, seat facing in.
+    // Weldon asked for it facing out, so the manifest records the choice.
+    const facing = modelManifest.products.BS.default_facing;
+    check("the manifest says which way a baby swing faces", typeof facing, "number");
+    check("and the placed one took that facing",
+      (placedSwing.joints.find((j) => j.connected) || {}).direction, facing);
   } catch (e) { fail("sockets suite", e); }
 
   // ————————————————————————————————————————————————— swing fit
@@ -513,9 +522,11 @@
     check("Summit still offers its eight toy points",
       summit.sockets().filter((s) => s.joints.some((j) => j.layer === "toy")).length, 8);
 
-    // The Watchtower kept every mount it was drawn with. King's Tower lost the
-    // pair at its top corners and is down to the two on its end faces.
-    for (const [id, points] of [["P-WT", 10], ["P-KT", 2]]) {
+    // Both towers lost the mailbox mounts at their top corners -- the Sky
+    // Tower's pair took it from 10 to 8, and King's Tower is down to the two
+    // on its end faces. Each keeps its scope and wheel mounts, which take any
+    // of the five toys.
+    for (const [id, points] of [["P-WT", 8], ["P-KT", 2]]) {
       await reset();
       const tower = await placeFirst(id);
       check(`${id} offers ${points} toy points`,
@@ -592,7 +603,7 @@
     }
     check("every toy fits every toy point", [...new Set(refused)], []);
     check("and the towers offer the expected number of them", counts, {
-      "P-PT": 4, "P-DPT": 3, "P-WT": 10, "P-ST": 8, "P-DST": 2, "P-DSMT": 8, "P-KT": 2,
+      "P-PT": 4, "P-DPT": 3, "P-WT": 8, "P-ST": 8, "P-DST": 2, "P-DSMT": 8, "P-KT": 2,
     });
 
     // All five actually place on one tower.

@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-07T16:37:15.187Z",
+  "generated_at": "2026-09-07T17:21:04.196Z",
   "product_count": 64,
   "default_fittings": [
     {
@@ -1141,8 +1141,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-WT.18c518df.glb",
-          "bytes": 801196,
+          "file": "P-WT.1f5660b4.glb",
+          "bytes": 801212,
           "joints": [
             "joint,0,floor_center_watch",
             "joint,1,6,4,5",
@@ -1150,7 +1150,6 @@
             "joint_back,2,end_rail",
             "joint_back_l_wheel,0,toy",
             "joint_back_l,2,6,7,6",
-            "joint_back_l_mailbox_or_phone,2,toy",
             "joint_back_l_scope,2,toy",
             "joint_back_r_wheel,0,toy",
             "joint_back_r,2,6,7,6",
@@ -1160,7 +1159,6 @@
             "joint_floor_center,0,picnic",
             "joint_front,0,end_rail",
             "joint_front_l,0,6,2,1",
-            "joint_front_l_mailbox_or_phone,0,toy",
             "joint_front_l_scope,0,toy",
             "joint_front_l_wheel,2,toy",
             "joint_front_r,0,6,2,1",
@@ -1270,22 +1268,6 @@
               ],
               "joints": [
                 "joint_back_l,2,6,7,6"
-              ]
-            },
-            {
-              "marker": [
-                0.661,
-                2.565,
-                -0.611
-              ],
-              "accepts": [
-                "toy"
-              ],
-              "facings": [
-                2
-              ],
-              "joints": [
-                "joint_back_l_mailbox_or_phone,2,toy"
               ]
             },
             {
@@ -1435,22 +1417,6 @@
               ],
               "joints": [
                 "joint_front_l,0,6,2,1"
-              ]
-            },
-            {
-              "marker": [
-                -0.661,
-                2.565,
-                0.611
-              ],
-              "accepts": [
-                "toy"
-              ],
-              "facings": [
-                0
-              ],
-              "joints": [
-                "joint_front_l_mailbox_or_phone,0,toy"
               ]
             },
             {
@@ -1714,14 +1680,6 @@
           "excluder_layer": "6"
         },
         {
-          "name": "joint_back_l_mailbox_or_phone,2,toy",
-          "direction": 2,
-          "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
-        },
-        {
           "name": "joint_back_l_scope,2,toy",
           "direction": 2,
           "layer": "toy",
@@ -1792,14 +1750,6 @@
           "tire_only": false,
           "exclusion_layer": "2",
           "excluder_layer": "1"
-        },
-        {
-          "name": "joint_front_l_mailbox_or_phone,0,toy",
-          "direction": 0,
-          "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
         },
         {
           "name": "joint_front_l_scope,0,toy",
@@ -6218,7 +6168,8 @@
           "exclusion_layer": null,
           "excluder_layer": null
         }
-      ]
+      ],
+      "default_facing": 2
     },
     "HG": {
       "name": "Horse Glider",

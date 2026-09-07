@@ -6744,8 +6744,43 @@
           .map((entry) => entry.joint);
       };
 
+      /**
+       * Which way a part turns when it has a choice, or null when it has none.
+       *
+       * A part that faces two ways at one opening carries two joints at the
+       * same point, one per facing -- the baby swing's `joint,0,s` and
+       * `joint,2,s`. Both fit, so whichever came first was taken, and that put
+       * the seat facing in along the beam.
+       *
+       * No measurement can settle it: the two directions are mirror images
+       * about the beam, so the model cannot be asked which one is "out". Only
+       * someone who knows which way a child sits in it can say, so it is
+       * recorded per product in the manifest, like default_yaw.
+       */
+      const Preferred_facing = (model) => {
+        const entry =
+          modelManifest && model && model.object_id
+            ? modelManifest.products[model.object_id]
+            : null;
+        return entry && typeof entry.default_facing === "number"
+          ? entry.default_facing
+          : null;
+      };
+
       const Find_plug_joint_for = (model, host_joint) => {
-        for (const joint of Joints_ends_first(model, host_joint)) {
+        const wanted = Preferred_facing(model);
+        let order = Joints_ends_first(model, host_joint);
+        if (wanted !== null) {
+          // A preference, not a requirement: a stable sort moves the wanted
+          // facing to the front and leaves every other joint in the order it
+          // was already in, so if that facing will not fit -- the twin taken,
+          // or something in the way -- the part still goes on the other way
+          // round rather than refusing.
+          order = order
+            .slice()
+            .sort((a, b) => (b.direction === wanted) - (a.direction === wanted));
+        }
+        for (const joint of order) {
           if (!Joints_connect(joint, host_joint)) continue;
           if (
             Can_connect({
