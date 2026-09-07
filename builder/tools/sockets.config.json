@@ -21,18 +21,25 @@
     "at 0.296. Anything from 0.09 to 0.29 gives the same answer."
   ],
 
-  "default_fittings": {
-    "high": "SSC",
-    "low": "SW"
-  },
+  "default_fittings": [
+    { "part": "SSC", "mount": "scope", "prefer": "high" },
+    { "part": "SW", "mount": "wheel", "prefer": "low" }
+  ],
   "_default_fittings_note": [
     "Toys a tower arrives with. Fitted when one is placed, and removable like",
     "anything else -- deleting one takes only that one.",
     "",
-    "Where a tower has toy mounts at two heights the scope goes on the higher",
-    "and the wheel on the lower, which is where they were modelled to sit. On",
-    "the Play, DX Play and DX Sky towers the two mounts are close enough to be",
-    "one opening, so there is no upper and lower and any two points are used.",
+    "`mount` is the joint each toy was modelled for. Scope and wheel mounts are",
+    "one layer now, but they are not interchangeable in the model: on the DX",
+    "Play Tower the scope mount on a side faces one way and the wheel mount on",
+    "the same side faces the other, so a wheel fitted to a scope mount comes out",
+    "backwards. The joint names still say which is which -- merging the layers",
+    "moved the old name into the prefix rather than dropping it -- so each toy",
+    "goes on the mount built for it.",
+    "",
+    "`prefer` breaks ties where a tower has several of the right mount: the",
+    "scope takes the highest, the wheel the lowest, which is how the towers with",
+    "two rows were drawn. Where neither mount matches, any free point is used.",
     "",
     "Only on placement. Restoring a saved design does not go through this path,",
     "so opening a catalogue set gets what the set says and nothing more."
@@ -59,7 +66,8 @@
   ],
 
   "remove_joints": {
-    "P-ST": ["joint_l,1,mailbox_or_phone", "joint_r,3,mailbox_or_phone"]
+    "P-ST": ["joint_l,1,mailbox_or_phone", "joint_r,3,mailbox_or_phone"],
+    "P-KT": ["joint_scope,0,toy"]
   },
   "_remove_joints_note": [
     "Connection points the models offer but the product does not.",
@@ -71,8 +79,11 @@
     "and this way the original name is still legible and the change reversible.",
     "",
     "P-ST: the Summit Tower offered a mailbox or telephone mount on each side.",
-    "Weldon asked for both to come out. Sky Tower and King's Tower keep theirs,",
-    "and no shipped catalog set used the Summit ones."
+    "Weldon asked for both to come out. Sky Tower keeps its pair, and no shipped",
+    "catalog set used the Summit ones.",
+    "",
+    "P-KT: the King's Tower scope mount on the near side. It has a mirror at",
+    "joint_scope,2,toy on the far side which is still there."
   ],
 
   "layer_overrides": {

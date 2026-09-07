@@ -1,11 +1,19 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-07T12:59:23.387Z",
+  "generated_at": "2026-09-07T13:20:21.268Z",
   "product_count": 64,
-  "default_fittings": {
-    "high": "SSC",
-    "low": "SW"
-  },
+  "default_fittings": [
+    {
+      "part": "SSC",
+      "mount": "scope",
+      "prefer": "high"
+    },
+    {
+      "part": "SW",
+      "mount": "wheel",
+      "prefer": "low"
+    }
+  ],
   "products": {
     "P-PT": {
       "name": "Play Tower",
@@ -4242,8 +4250,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-KT.74cb1cc2.glb",
-          "bytes": 785608,
+          "file": "P-KT.aa21665c.glb",
+          "bytes": 785616,
           "joints": [
             "joint,1,0",
             "joint,2,end_rail",
@@ -4253,7 +4261,6 @@
             "joint,0,8,1,2004",
             "joint,0,8,1,2005",
             "joint,0,8,1,2006",
-            "joint_scope,0,toy",
             "joint_wheel,0,toy",
             "joint,1,8,3,4",
             "joint_mailbox_or_phone,1,toy",
@@ -4415,24 +4422,6 @@
             },
             {
               "marker": [
-                -0.006,
-                2.953,
-                0.733
-              ],
-              "accepts": [
-                "toy"
-              ],
-              "facings": [
-                0,
-                2
-              ],
-              "joints": [
-                "joint_scope,0,toy",
-                "joint_wheel,2,toy"
-              ]
-            },
-            {
-              "marker": [
                 -0.007,
                 2.881,
                 -0.715
@@ -4575,6 +4564,22 @@
               ],
               "joints": [
                 "joint,2,8,6,7006"
+              ]
+            },
+            {
+              "marker": [
+                0.007,
+                2.89,
+                0.715
+              ],
+              "accepts": [
+                "toy"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_wheel,2,toy"
               ]
             },
             {
@@ -4827,14 +4832,6 @@
           "tire_only": false,
           "exclusion_layer": "1",
           "excluder_layer": "2006"
-        },
-        {
-          "name": "joint_scope,0,toy",
-          "direction": 0,
-          "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
         },
         {
           "name": "joint_wheel,0,toy",

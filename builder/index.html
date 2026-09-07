@@ -6642,12 +6642,6 @@
         return true;
       };
 
-      // Two toy mounts within this of each other are the same height — on the
-      // Play, DX Play and DX Sky towers the scope and wheel positions are a few
-      // centimetres apart and read as one level, while the towers that really
-      // do have an upper and a lower row separate them by 0.27 or more.
-      const TOY_LEVEL_GAP = 0.12;
-
       /**
        * Fit the toys a tower comes with.
        *
@@ -6655,65 +6649,71 @@
        * which is how they are sold. Either can be deleted like anything else:
        * a toy rests on its tower, so removing one takes only that one.
        *
-       * Where a tower has mounts at two heights the scope goes high and the
-       * wheel low, which is where they were modelled to sit. Where its mounts
-       * are all at one height — the scope and wheel positions close enough to
-       * have merged into a single opening — any two are used.
+       * Each goes on the mount it was modelled for. Scope and wheel mounts
+       * share a layer now, but they are not interchangeable: on the DX Play
+       * Tower the scope mount on a side faces one way and the wheel mount on
+       * the same side faces the other, so a wheel fitted to a scope mount comes
+       * out backwards. The joint names still record which is which — merging
+       * the layers moved the old name into the prefix rather than dropping it —
+       * so that is what picks the joint, with height only breaking ties.
+       *
+       * Synchronous on purpose. It places through the same globals as every
+       * other placement, so anything awaited here can be clobbered by whatever
+       * the person does next; the geometry is fetched when the manifest loads
+       * instead.
        *
        * Only runs on placement. Restoring a saved design connects joints
-       * directly without coming through here, so opening a catalogue set gets
-       * what the set says and nothing added.
+       * directly without coming through here, so a catalogue set gets what it
+       * says and nothing added.
        */
       const Fit_default_toys = (model) => {
-        const wanted = modelManifest && modelManifest.default_fittings;
-        if (!wanted || !model || !Is_free_standing(model)) return;
+        const fittings = modelManifest && modelManifest.default_fittings;
+        if (!Array.isArray(fittings) || !model || !Is_free_standing(model)) return;
 
-        const toy_points = model
-          .sockets()
-          .filter(
-            (socket) =>
-              Socket_is_open(socket) &&
-              socket.joints.some((joint) => joint.layer === "toy" && joint.available)
-          );
-        if (toy_points.length < 2) return;
-
-        const height = (socket) => {
-          const world = new THREE.Vector3();
-          socket.joints[0].getWorldPosition(world);
-          return world.y + (socket.offset ? socket.offset.y : 0);
+        const world = new THREE.Vector3();
+        const heightOf = (joint) => {
+          joint.getWorldPosition(world);
+          return world.y;
         };
-        const byHeight = toy_points.slice().sort((a, b) => height(a) - height(b));
-        const low = byHeight[0];
-        const high = byHeight[byHeight.length - 1];
 
-        // Two rows, or one? If the extremes are within a level of each other
-        // the tower has a single row and the pair just takes two of them.
-        const two_rows = height(high) - height(low) > TOY_LEVEL_GAP;
-        const plan = two_rows
-          ? [[high, wanted.high], [low, wanted.low]]
-          : [[byHeight[0], wanted.high], [byHeight[1], wanted.low]];
-
-        for (const [socket, objectId] of plan) {
-          if (!objectId || !Socket_is_open(socket)) continue;
-          const template = Model.instances.find((m) => m.object_id === objectId);
+        for (const fitting of fittings) {
+          const template = Model.instances.find((m) => m.object_id === fitting.part);
           // Geometry only, no waiting. It is fetched when the manifest loads,
           // so by the time anything can be placed it is here. If it somehow is
-          // not, the toy is simply left off rather than held for.
+          // not, the toy is left off rather than held for.
           if (!template || !template.mesh) continue;
+
+          const free = model.joints.filter((j) => j.layer === "toy" && j.available);
+          if (!free.length) continue;
+
+          // The mount this toy was drawn for, if the tower has one left.
+          const matching = fitting.mount
+            ? free.filter((j) => j.name.includes(fitting.mount))
+            : [];
+          const choices = matching.length ? matching : free;
+          choices.sort((a, b) =>
+            fitting.prefer === "low" ? heightOf(a) - heightOf(b) : heightOf(b) - heightOf(a)
+          );
+          const host_joint = choices[0];
+
+          const socket = model
+            .sockets()
+            .find((s) => s.joints.includes(host_joint));
+          if (!socket) continue;
 
           const toy = template.clone();
           scene.add(toy.mesh);
           applyDefaultColors(toy);
 
-          const mate = Find_mate_in_socket(toy, socket);
-          if (!mate) {
+          const plug = Find_plug_joint_for(toy, host_joint);
+          if (!plug) {
             scene.remove(toy.mesh);
             continue;
           }
           plug_model = toy;
-          plug_joint = mate.plug_joint;
-          plug_joint_index = toy.joints.indexOf(mate.plug_joint);
-          Attach_plug_to(mate.host_joint);
+          plug_joint = plug;
+          plug_joint_index = toy.joints.indexOf(plug);
+          Attach_plug_to(host_joint);
         }
 
         plug_model = null;
@@ -9613,10 +9613,10 @@
             // small files, fetched now so they are in hand by the time the
             // welcome screen is out of the way.
             const fittings = modelManifest.default_fittings;
-            if (fittings) {
+            if (Array.isArray(fittings)) {
               configsReady.then(() => {
-                for (const objectId of Object.values(fittings)) {
-                  const template = Model.instances.find((m) => m.object_id === objectId);
+                for (const fitting of fittings) {
+                  const template = Model.instances.find((m) => m.object_id === fitting.part);
                   if (template) template.ensure_loaded().catch(() => {});
                 }
               });

@@ -529,6 +529,18 @@
       const fitted = placed().filter((x) => x !== id);
       check(`${id} arrives with a scope and a wheel`, fitted, ["SSC", "SW"]);
 
+      // Each toy goes on the mount it was drawn for. They share a layer now,
+      // but not a facing: on the DX Play Tower the scope mount on a side points
+      // one way and the wheel mount on the same side points the other, so a
+      // wheel on a scope mount comes out backwards. Weldon spotted exactly
+      // that. The joint names still say which mount is which.
+      for (const [toy, mount] of [["SSC", "scope"], ["SW", "wheel"]]) {
+        const m = models_with_available_joints.find((x) => x.object_id === toy);
+        const j = m && m.joints.find((x) => x.connected);
+        check(`${id} puts the ${toy} on a ${mount} mount`,
+          !!j && j.connected.name.includes(mount), true);
+      }
+
       // Where the tower has two rows the scope goes on the upper one. Where its
       // mounts are all at one height there is no upper, so no claim is made.
       if (twoRows) {
