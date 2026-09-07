@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-07T13:20:21.268Z",
+  "generated_at": "2026-09-07T13:23:34.190Z",
   "product_count": 64,
   "default_fittings": [
     {
@@ -4250,8 +4250,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-KT.aa21665c.glb",
-          "bytes": 785616,
+          "file": "P-KT.4a8f35b6.glb",
+          "bytes": 785628,
           "joints": [
             "joint,1,0",
             "joint,2,end_rail",
@@ -4270,7 +4270,6 @@
             "joint,2,8,6,7004",
             "joint,2,8,6,7005",
             "joint,2,8,6,7006",
-            "joint_scope,2,toy",
             "joint_wheel,2,toy",
             "joint,3,8,8,9",
             "joint_mailbox_or_phone,3,toy",
@@ -4430,12 +4429,10 @@
                 "toy"
               ],
               "facings": [
-                0,
-                2
+                0
               ],
               "joints": [
-                "joint_wheel,0,toy",
-                "joint_scope,2,toy"
+                "joint_wheel,0,toy"
               ]
             },
             {
@@ -4904,14 +4901,6 @@
           "tire_only": false,
           "exclusion_layer": "6",
           "excluder_layer": "7006"
-        },
-        {
-          "name": "joint_scope,2,toy",
-          "direction": 2,
-          "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
         },
         {
           "name": "joint_wheel,2,toy",

@@ -6686,11 +6686,16 @@
           const free = model.joints.filter((j) => j.layer === "toy" && j.available);
           if (!free.length) continue;
 
-          // The mount this toy was drawn for, if the tower has one left.
-          const matching = fitting.mount
+          // Only the mount this toy was drawn for. A mount faces the way its
+          // own toy is meant to be used, so putting a scope on a wheel or
+          // mailbox mount stands it the wrong way round — which is how the
+          // steering wheel came out backwards on the DX Play Tower. A tower
+          // with no mount for a toy simply does not come with that toy; one
+          // can still be added by hand.
+          const choices = fitting.mount
             ? free.filter((j) => j.name.includes(fitting.mount))
-            : [];
-          const choices = matching.length ? matching : free;
+            : free;
+          if (!choices.length) continue;
           choices.sort((a, b) =>
             fitting.prefer === "low" ? heightOf(a) - heightOf(b) : heightOf(b) - heightOf(a)
           );

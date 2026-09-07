@@ -527,14 +527,25 @@
       await placeFirst(id);
       await settle();
       const fitted = placed().filter((x) => x !== id);
-      check(`${id} arrives with a scope and a wheel`, fitted, ["SSC", "SW"]);
+
+      // A tower comes with the toy for each mount it was drawn with, and no
+      // more. King's Tower has had both its scope mounts taken out, so it
+      // arrives with the wheel alone. Read off the tower rather than kept as a
+      // list here: a mount added or removed in the model changes what this
+      // expects, without anyone remembering to edit the test.
+      const tower = models_with_available_joints.find((x) => x.object_id === id);
+      const wants = modelManifest.default_fittings.filter((f) =>
+        tower.joints.some((j) => j.name.includes(f.mount))
+      );
+      check(`${id} arrives with ${wants.map((f) => f.part).join(" + ") || "no toys"}`,
+        fitted, wants.map((f) => f.part).sort());
 
       // Each toy goes on the mount it was drawn for. They share a layer now,
       // but not a facing: on the DX Play Tower the scope mount on a side points
       // one way and the wheel mount on the same side points the other, so a
       // wheel on a scope mount comes out backwards. Weldon spotted exactly
       // that. The joint names still say which mount is which.
-      for (const [toy, mount] of [["SSC", "scope"], ["SW", "wheel"]]) {
+      for (const { part: toy, mount } of wants) {
         const m = models_with_available_joints.find((x) => x.object_id === toy);
         const j = m && m.joints.find((x) => x.connected);
         check(`${id} puts the ${toy} on a ${mount} mount`,
@@ -542,8 +553,9 @@
       }
 
       // Where the tower has two rows the scope goes on the upper one. Where its
-      // mounts are all at one height there is no upper, so no claim is made.
-      if (twoRows) {
+      // mounts are all at one height there is no upper, so no claim is made —
+      // nor where the tower did not come with both toys to compare.
+      if (twoRows && wants.length === 2) {
         const at = (objectId) => {
           const m = models_with_available_joints.find((x) => x.object_id === objectId);
           const j = m && m.joints.find((x) => x.connected);
