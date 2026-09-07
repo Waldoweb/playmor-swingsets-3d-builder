@@ -21,6 +21,23 @@
     "at 0.296. Anything from 0.09 to 0.29 gives the same answer."
   ],
 
+  "default_fittings": {
+    "high": "SSC",
+    "low": "SW"
+  },
+  "_default_fittings_note": [
+    "Toys a tower arrives with. Fitted when one is placed, and removable like",
+    "anything else -- deleting one takes only that one.",
+    "",
+    "Where a tower has toy mounts at two heights the scope goes on the higher",
+    "and the wheel on the lower, which is where they were modelled to sit. On",
+    "the Play, DX Play and DX Sky towers the two mounts are close enough to be",
+    "one opening, so there is no upper and lower and any two points are used.",
+    "",
+    "Only on placement. Restoring a saved design does not go through this path,",
+    "so opening a catalogue set gets what the set says and nothing more."
+  ],
+
   "layer_renames": {
     "scope": "toy",
     "wheel": "toy",

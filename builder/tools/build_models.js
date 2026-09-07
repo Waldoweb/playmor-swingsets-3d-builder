@@ -266,6 +266,9 @@ function main() {
     generated_by: "tools/build_models.js",
     generated_at: new Date().toISOString(),
     product_count: Object.keys(products).length,
+    // Toys a tower is fitted with on placement. Carried here so the app reads
+    // it alongside everything else rather than holding its own copy.
+    default_fittings: socketConfig.default_fittings || null,
     products,
   };
   fs.writeFileSync(path.join(OUT_DIR, "manifest.json"), JSON.stringify(manifest, null, 2));

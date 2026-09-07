@@ -6305,6 +6305,7 @@
             {
               models_with_available_joints.push(plug_model);
               picked_meshes.push(plug_model.mesh);
+              Fit_default_toys(plug_model);
               plug_model = null;
               plug_joint_index = -1;
               Mode.mode = Mode.normal;
@@ -6641,6 +6642,88 @@
         return true;
       };
 
+      // Two toy mounts within this of each other are the same height — on the
+      // Play, DX Play and DX Sky towers the scope and wheel positions are a few
+      // centimetres apart and read as one level, while the towers that really
+      // do have an upper and a lower row separate them by 0.27 or more.
+      const TOY_LEVEL_GAP = 0.12;
+
+      /**
+       * Fit the toys a tower comes with.
+       *
+       * A tower arrives with a super scope and a steering wheel already on it,
+       * which is how they are sold. Either can be deleted like anything else:
+       * a toy rests on its tower, so removing one takes only that one.
+       *
+       * Where a tower has mounts at two heights the scope goes high and the
+       * wheel low, which is where they were modelled to sit. Where its mounts
+       * are all at one height — the scope and wheel positions close enough to
+       * have merged into a single opening — any two are used.
+       *
+       * Only runs on placement. Restoring a saved design connects joints
+       * directly without coming through here, so opening a catalogue set gets
+       * what the set says and nothing added.
+       */
+      const Fit_default_toys = (model) => {
+        const wanted = modelManifest && modelManifest.default_fittings;
+        if (!wanted || !model || !Is_free_standing(model)) return;
+
+        const toy_points = model
+          .sockets()
+          .filter(
+            (socket) =>
+              Socket_is_open(socket) &&
+              socket.joints.some((joint) => joint.layer === "toy" && joint.available)
+          );
+        if (toy_points.length < 2) return;
+
+        const height = (socket) => {
+          const world = new THREE.Vector3();
+          socket.joints[0].getWorldPosition(world);
+          return world.y + (socket.offset ? socket.offset.y : 0);
+        };
+        const byHeight = toy_points.slice().sort((a, b) => height(a) - height(b));
+        const low = byHeight[0];
+        const high = byHeight[byHeight.length - 1];
+
+        // Two rows, or one? If the extremes are within a level of each other
+        // the tower has a single row and the pair just takes two of them.
+        const two_rows = height(high) - height(low) > TOY_LEVEL_GAP;
+        const plan = two_rows
+          ? [[high, wanted.high], [low, wanted.low]]
+          : [[byHeight[0], wanted.high], [byHeight[1], wanted.low]];
+
+        for (const [socket, objectId] of plan) {
+          if (!objectId || !Socket_is_open(socket)) continue;
+          const template = Model.instances.find((m) => m.object_id === objectId);
+          // Geometry only, no waiting. It is fetched when the manifest loads,
+          // so by the time anything can be placed it is here. If it somehow is
+          // not, the toy is simply left off rather than held for.
+          if (!template || !template.mesh) continue;
+
+          const toy = template.clone();
+          scene.add(toy.mesh);
+          applyDefaultColors(toy);
+
+          const mate = Find_mate_in_socket(toy, socket);
+          if (!mate) {
+            scene.remove(toy.mesh);
+            continue;
+          }
+          plug_model = toy;
+          plug_joint = mate.plug_joint;
+          plug_joint_index = toy.joints.indexOf(mate.plug_joint);
+          Attach_plug_to(mate.host_joint);
+        }
+
+        plug_model = null;
+        plug_joint = null;
+        plug_joint_index = -1;
+        Mode.mode = Mode.normal;
+        Show_items();
+        Update_measurements();
+      };
+
       /**
        * Fit a handle accessory's twin on the other side of the same step.
        *
@@ -6779,6 +6862,7 @@
 
         models_with_available_joints.push(plug_model);
         picked_meshes.push(plug_model.mesh);
+        const just_placed = plug_model;
 
         // Again, now that this part is on the list. Connect_joints already ran
         // a pass, but the part was not there to be seen yet — which left a baby
@@ -6791,6 +6875,9 @@
         plug_joint = null;
         Mode.mode = Mode.normal;
       
+        // A tower joined to a bridge arrives fitted like any other.
+        Fit_default_toys(just_placed);
+
         // Hide rotation hint when object is successfully placed
         document.getElementById('rotation-hint').style.display = 'none';
         /*
@@ -8257,9 +8344,11 @@
         } else {
           models_with_available_joints.push(plug_model);
           picked_meshes.push(plug_model.mesh);
+          const first = plug_model;
           plug_model = null;
           Mode.mode = Mode.normal;
 
+          Fit_default_toys(first);
           Show_items();
           Update_measurements();
         }
@@ -9516,6 +9605,22 @@
               throw new Error(`HTTP error! status: ${response.status}`);
             }
             modelManifest = await response.json();
+
+            // A tower is fitted with these the moment it is placed, and the fit
+            // has to be synchronous — it drives placement through the same
+            // globals every other placement uses, so anything awaited in the
+            // middle can be clobbered by whatever the person does next. Two
+            // small files, fetched now so they are in hand by the time the
+            // welcome screen is out of the way.
+            const fittings = modelManifest.default_fittings;
+            if (fittings) {
+              configsReady.then(() => {
+                for (const objectId of Object.values(fittings)) {
+                  const template = Model.instances.find((m) => m.object_id === objectId);
+                  if (template) template.ensure_loaded().catch(() => {});
+                }
+              });
+            }
             return;
           } catch (error) {
             console.error(

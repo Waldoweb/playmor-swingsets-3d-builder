@@ -57,6 +57,13 @@
 
   const placed = () => models_with_available_joints.map((m) => m.object_id).sort();
 
+  /** What is in the yard, ignoring the toys a tower arrives fitted with. */
+  const built = () =>
+    models_with_available_joints
+      .filter((m) => !["SSC", "SW"].includes(m.object_id))
+      .map((m) => m.object_id)
+      .sort();
+
   /** Every product template, whether or not its geometry has loaded. */
   const templates = () => {
     const out = [];
@@ -87,16 +94,22 @@
         socket.joints.some((joint) => joint.layer === layer && joint.available)
     );
 
-  /** Place `id` into `socket`; returns the model, or null if it was refused. */
+  /**
+   * Place `id` into `socket`; returns the model, or null if it was refused.
+   *
+   * Found by id rather than by taking the last thing added: a tower arrives
+   * with a scope and a wheel fitted straight after it, so "the last model" is
+   * one of the toys. That caught me out and had the spanning checks measuring
+   * a steering wheel's position instead of the tower's.
+   */
   const place = async (socket, id) => {
-    const before = models_with_available_joints.length;
+    const before = models_with_available_joints.filter((m) => m.object_id === id).length;
     selected_socket = socket;
     selected_object_id = id;
     await Item_clicked();
     normal();
-    return models_with_available_joints.length > before
-      ? models_with_available_joints[models_with_available_joints.length - 1]
-      : null;
+    const mine = models_with_available_joints.filter((m) => m.object_id === id);
+    return mine.length > before ? mine[mine.length - 1] : null;
   };
 
   /** The first model, which has no socket to go into. */
@@ -470,9 +483,11 @@
       const tower = await placeFirst(id);
       const points = tower.sockets().filter((s) => s.joints.some((j) => j.layer === "toy"));
       counts[id] = points.length;
+      // Two arrive filled, so only the open ones can be asked about.
+      const free = points.filter((s) => Socket_is_open(s));
       // Scope, wheel and mailbox were three names for one fitting. Every toy
       // must now go on every toy point, on every tower.
-      for (const socket of points)
+      for (const socket of free)
         for (const toy of TOYS)
           if (!templates().find((m) => m.object_id === toy).capable({ socket }))
             refused.push(`${id}/${toy}`);
@@ -485,17 +500,67 @@
     // All five actually place on one tower.
     await reset();
     const summit = await placeFirst("P-ST");
-    let fitted = 0;
-    for (const toy of TOYS) {
+    // Two are already on, so three more go on.
+    let fitted = 2;
+    for (const toy of TOYS.filter((t) => !["SSC", "SW"].includes(t))) {
       const socket = summit.sockets().find(
         (s) => Socket_is_open(s) && s.joints.some((j) => j.layer === "toy" && j.available)
       );
       if (!socket) break;
       if (await place(socket, toy)) fitted++;
     }
-    check("all five toys fit on one tower", fitted, 5);
+    check("all five toys are on one tower", fitted, 5);
     await reset();
   } catch (e) { fail("toy mounts suite", e); }
+
+  // ————————————————————————————————————————————————— default fittings
+
+  try {
+    suite("fittings");
+    const settle = () => idle(250);   // the toys load on demand and arrive just behind
+
+    for (const [id, twoRows] of [
+      ["P-WT", true], ["P-ST", true], ["P-DSMT", true], ["P-KT", true],
+      ["P-PT", false], ["P-DPT", false], ["P-DST", false],
+    ]) {
+      await reset();
+      await placeFirst(id);
+      await settle();
+      const fitted = placed().filter((x) => x !== id);
+      check(`${id} arrives with a scope and a wheel`, fitted, ["SSC", "SW"]);
+
+      // Where the tower has two rows the scope goes on the upper one. Where its
+      // mounts are all at one height there is no upper, so no claim is made.
+      if (twoRows) {
+        const at = (objectId) => {
+          const m = models_with_available_joints.find((x) => x.object_id === objectId);
+          const j = m && m.joints.find((x) => x.connected);
+          const v = new THREE.Vector3();
+          if (j) j.getWorldPosition(v);
+          return v.y;
+        };
+        check(`${id} puts the scope above the wheel`, at("SSC") > at("SW"), true);
+      }
+    }
+
+    // Removable one at a time, and they go with their tower.
+    await reset();
+    await placeFirst("P-ST");
+    await settle();
+    remove(models_with_available_joints.find((m) => m.object_id === "SSC"));
+    check("deleting the scope leaves the tower and the wheel", placed(), ["P-ST", "SW"]);
+    remove(models_with_available_joints.find((m) => m.object_id === "P-ST"));
+    check("deleting the tower takes the rest", placed(), []);
+
+    // A saved design says what it contains; nothing is added on top.
+    const state = await (await fetch("assets/catalog/_175 Jolly Retreat.json")).text();
+    await Ensure_models_for_state(state);
+    blueprint.restore({ state });
+    await idle(600);
+    check("restoring a catalogue set adds no fittings",
+      models_with_available_joints.length, JSON.parse(state).models_data.length);
+    await reset();
+  } catch (e) { fail("fittings suite", e); }
 
   // ————————————————————————————————————————————————— facing
 
@@ -582,7 +647,7 @@
     check("a step carries a pair of rails",
       models_with_available_joints.filter((m) => Is_handle_accessory(m)).length, 2);
     remove(rig.step);
-    check("deleting a step takes both its rails", placed(), ["P-PT"]);
+    check("deleting a step takes both its rails", built(), ["P-PT"]);
 
     rig = await stepRig();
     remove(rig.tower);
@@ -594,7 +659,7 @@
     rig = await stepRig();
     const anyRail = models_with_available_joints.find((m) => Is_handle_accessory(m));
     remove(anyRail);
-    check("deleting one rail takes its twin", placed(), ["P-PT", "P-STEP-5"]);
+    check("deleting one rail takes its twin", built(), ["P-PT", "P-STEP-5"]);
 
     const swingRig = async () => {
       const { tower, beam } = await beamRig("P-PT", "P-AB-3-8");
@@ -608,7 +673,7 @@
 
     sw = await swingRig();
     remove(sw.beam);
-    check("deleting a beam takes its swings, keeps the tower", placed(), ["P-PT"]);
+    check("deleting a beam takes its swings, keeps the tower", built(), ["P-PT"]);
 
     check("a tower stands on its own", Is_free_standing(template("P-PT")), true);
     check("a bridge does not", Is_free_standing(template("Bridge")), false);
@@ -643,7 +708,7 @@
     await Item_clicked();
     const swapped = models_with_available_joints.find((m) => m.object_id === "SWS-10");
     const mate = swapped && swapped.joints.find((j) => j.connected);
-    check("the swap happened", placed(), ["P-PT", "SWS-10"]);
+    check("the swap happened", built(), ["P-PT", "SWS-10"]);
     check("into the same socket", mate && mate.connected.name, "joint,1,6");
     check("sitting exactly on it", mate ? +new THREE.Vector3().subVectors(
       (() => { const v = new THREE.Vector3(); mate.getWorldPosition(v); return v; })(),
@@ -659,7 +724,7 @@
     Offer_replacements(beam);
     selected_object_id = "P-AB-4-8";
     await Item_clicked();
-    check("swapping a beam takes its swings", placed(), ["P-AB-4-8", "P-PT"]);
+    check("swapping a beam takes its swings", built(), ["P-AB-4-8", "P-PT"]);
 
     // A tower is the ground the design stands on, not a part in an opening.
     await reset();

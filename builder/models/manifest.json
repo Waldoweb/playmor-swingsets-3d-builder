@@ -1,7 +1,11 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-07T12:18:36.198Z",
+  "generated_at": "2026-09-07T12:59:23.387Z",
   "product_count": 64,
+  "default_fittings": {
+    "high": "SSC",
+    "low": "SW"
+  },
   "products": {
     "P-PT": {
       "name": "Play Tower",
