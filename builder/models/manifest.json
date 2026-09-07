@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-07T15:52:23.249Z",
+  "generated_at": "2026-09-07T16:03:46.953Z",
   "product_count": 64,
   "default_fittings": [
     {
@@ -6535,10 +6535,10 @@
       "files": [
         {
           "layer": "b8",
-          "file": "BNS__b8.09f8702d.glb",
+          "file": "BNS__b8.c4c2b0bd.glb",
           "bytes": 124152,
           "joints": [
-            "joint,0,s"
+            "joint,0,sh"
           ],
           "sockets": [
             {
@@ -6548,23 +6548,23 @@
                 0
               ],
               "accepts": [
-                "s"
+                "sh"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint,0,s"
+                "joint,0,sh"
               ]
             }
           ]
         },
         {
           "layer": "b10",
-          "file": "BNS__b10.b2943511.glb",
-          "bytes": 102920,
+          "file": "BNS__b10.0d5f36b3.glb",
+          "bytes": 102924,
           "joints": [
-            "joint,0,s"
+            "joint,0,sh"
           ],
           "sockets": [
             {
@@ -6574,13 +6574,13 @@
                 0
               ],
               "accepts": [
-                "s"
+                "sh"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint,0,s"
+                "joint,0,sh"
               ]
             }
           ]
@@ -6588,17 +6588,17 @@
       ],
       "joints": [
         {
-          "name": "joint,0,s",
+          "name": "joint,0,sh",
           "direction": 0,
-          "layer": "s",
+          "layer": "sh",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null
         },
         {
-          "name": "joint,0,s",
+          "name": "joint,0,sh",
           "direction": 0,
-          "layer": "s",
+          "layer": "sh",
           "tire_only": false,
           "exclusion_layer": null,
           "excluder_layer": null

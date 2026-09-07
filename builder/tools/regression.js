@@ -283,6 +283,49 @@
       p.done();
     }
 
+    // And the other direction, which used not to be stated at all: the tire
+    // swing plugs with `s` like every other swing, so it fitted any hanger on
+    // any beam. Weldon says it hangs from the frame under a Summit Tower and
+    // nowhere else. The catalog agrees, because the listing asks the same
+    // predicate now rather than its own half of the rule.
+    check("a tire swing is offered while a Summit Tower stands",
+      templates().find((m) => m.object_id === "MTS").capable(), true);
+
+    await reset();
+    const rig = await beamRig("P-WT", "P-AB-4-8");
+    const swings = ["SS", "TZR", "BS", "VTS", "BB"];
+    const hangers = rig.beam.sockets().filter((socket) =>
+      socket.joints.some((j) => j.available && ["s", "sh"].includes(j.layer))
+    );
+    check("the beam has four hangers", hangers.length, 4);
+
+    // The end hanger is the one furthest from the tower it is bolted to, and
+    // the only one carrying `sh` — on all six beams the tower mount sits at
+    // the far end and that hanger at 0.96.
+    const reach = (socket) => {
+      const at = new THREE.Vector3();
+      socket.joints[0].getWorldPosition(at);
+      return at.distanceTo(new THREE.Vector3(0, at.y, 0));
+    };
+    hangers.sort((a, b) => reach(b) - reach(a));
+    const offers = (socket, id) =>
+      templates().find((m) => m.object_id === id).capable({ socket });
+
+    check("no hanger on a beam takes a tire swing",
+      hangers.filter((h) => offers(h, "MTS")).length, 0);
+    check("a tire swing is not offered at all once only a beam is free",
+      templates().find((m) => m.object_id === "MTS").capable(), false);
+
+    // The horse glider and the bird's nest are sold for the end position only.
+    for (const id of ["HG", "BNS"]) {
+      check(`the ${id} goes on the hanger nearest the legs`, offers(hangers[0], id), true);
+      check(`...and the ${id} on none of the others`,
+        hangers.slice(1).filter((h) => offers(h, id)).length, 0);
+    }
+    // The ordinary swings are unaffected, on all four.
+    check("every plain swing still fits every hanger",
+      hangers.filter((h) => swings.every((id) => offers(h, id))).length, 4);
+
     // A deck part fits any deck height and nothing else.
     const { beam } = await beamRig("P-PT", "P-AB-3-8");
     const tower = models_with_available_joints.find((m) => m.object_id === "P-PT");

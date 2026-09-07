@@ -3247,16 +3247,29 @@
       };
 
       /**
-       * A tire-only hanger takes nothing but a tire swing.
+       * A tire-only hanger takes nothing but a tire swing, and a tire swing
+       * hangs from nothing but such a hanger.
        *
-       * This was enforced in capable(), which decides what the catalog offers,
-       * but nowhere in the rules that decide what may actually connect — so the
-       * older plugging flow, which matches on layer alone, would snap any swing
-       * onto it. Enforced here it holds for every path.
+       * The first half was enforced in capable(), which decides what the
+       * catalog offers, but nowhere in the rules that decide what may actually
+       * connect — so the older plugging flow, which matches on layer alone,
+       * would snap any swing onto it. Enforced here it holds for every path.
+       *
+       * The second half was missing entirely. The tire swing's joint is layer
+       * `s` like every other swing's, so it fitted any hanger on any beam, and
+       * Weldon says it only ever hangs from the frame under a Summit Tower.
+       * Stating both directions is also what makes the rule readable: this is
+       * one fitting that pairs with one opening, rather than an opening with a
+       * guest list.
+       *
+       * Worth knowing when this is next touched: those two towers carry
+       * exactly one hanger each and it is the tire-only one, so no ordinary
+       * swing was ever going under a Summit Tower to begin with.
        */
       const Tire_rule_holds = (plug_joint, host_joint) => {
         if (host_joint.tire_only) return Has_tire_variant(plug_joint.model);
         if (plug_joint.tire_only) return Has_tire_variant(host_joint.model);
+        if (Has_tire_variant(plug_joint.model)) return false;
         return true;
       };
 
@@ -4853,7 +4866,17 @@
             modelManifest && this.object_id
               ? modelManifest.products[this.object_id]
               : null;
-          return entry ? entry.joints : this.joints;
+          if (!entry) return this.joints;
+          // Stamped with the model they describe, and cached. The shared
+          // predicates ask a joint which model it is on — the tire rule has to
+          // know whether the thing being offered is a tire swing — and a
+          // manifest joint is a bare record with no way back. Without this,
+          // asking those predicates about a part that has not loaded yet gives
+          // a different answer from asking about the same part once it has.
+          if (!this._template_joints) {
+            this._template_joints = entry.joints.map((joint) => ({ ...joint, model: this }));
+          }
+          return this._template_joints;
         }
         /**
          * This model's openings, as a person sees them.
@@ -4949,12 +4972,6 @@
           let found = false;
           const hosts = this.candidate_host_joints(args);
 
-          // A tire swing is only placeable where a tire-only hanger is free.
-          if (Has_tire_variant(this)) {
-            // Tire swings are only available if there are models with tire swing compatible joints
-            return this.hasTireSwingJoints(args);
-          }
-
           // Nothing placed yet, so this can only be something that stands on
           // its own ground. A bridge or tunnel is filed under towers but has
           // nothing but attachment joints — it spans between two decks and has
@@ -5011,23 +5028,20 @@
               while (!found && h < hosts.length) {
                 let joint = hosts[h++];
                 if (joint.available && joint.model.category != 2) {
-                    if (joint.tire_only) {
-                      found = Has_tire_variant(this);
-                    } else {
-                      // The same predicate every other path asks. This was a
-                      // fifth copy — raw equality with a hand-rolled disc-swing
-                      // clause — and it did not know about `deck`, so a tower
-                      // could not see a bridge's socket even though placing one
-                      // there worked perfectly well.
-                      //
-                      // The height agreement comes with it, or the catalogue
-                      // offers what the placement rules will then refuse: a
-                      // bridge already meeting a 5ft deck listing King's Tower
-                      // and every 7ft slide.
-                      found =
-                        Layers_connect(seekingLayer, joint.layer) &&
-                        Deck_heights_agree(seeking, joint);
-                    }
+                    // The same predicate every other path asks. This was a
+                    // fifth copy — raw equality with a hand-rolled disc-swing
+                    // clause — and it did not know about `deck`, so a tower
+                    // could not see a bridge's socket even though placing one
+                    // there worked perfectly well.
+                    //
+                    // The height agreement comes with it, or the catalogue
+                    // offers what the placement rules will then refuse: a
+                    // bridge already meeting a 5ft deck listing King's Tower
+                    // and every 7ft slide. So does the tire rule, which used to
+                    // be a branch here that answered only half of it — whether
+                    // a tire hanger takes this part, never whether this part
+                    // takes anything but a tire hanger.
+                    found = Joints_connect(seeking, joint);
 
 
                     if (found) {
@@ -5077,28 +5091,6 @@
         }
 
         // Function to check if any loaded models have tire swing compatible joints
-        hasTireSwingJoints(args) {
-
-          {
-            for (const joint of this.candidate_host_joints(args)) {
-              // Only check available joints
-              if (!joint.available) continue;
-
-              if (joint.name && joint.name.includes("tire")) {
-                return true;
-              }
-              if (joint.layer === "tire" || joint.tire_only) {
-                return true;
-              }
-              // Also check regular "s" layer joints that can accept tire swings
-              if (joint.layer === "s" && !joint.tire_only) {
-                return true;
-              }
-            }
-          }
-          return false;
-        }
-
         get_flag_mesh_list(args) {
           let flag_list = [];
           this.mesh.traverse((mesh) => {

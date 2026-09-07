@@ -123,7 +123,8 @@
     "Bridge": { "from": "*", "to": "deck" },
     "Tunnel": { "from": "*", "to": "deck" },
     "BUB":    { "from": "*", "to": "deck" },
-    "TIC":    { "from": "*", "to": "deck" }
+    "TIC":    { "from": "*", "to": "deck" },
+    "BNS":    { "from": "s", "to": "sh" }
   },
   "_layer_overrides_note": [
     "Applied to the model files themselves by tools/set_joint_layers.js, because",
@@ -134,7 +135,19 @@
     "could be hung off a swing hanger. Bridge and Tunnel span between decks, the",
     "Bubble Panel goes wherever a climb goes, and Tic-Tac-Toe wherever a slide",
     "goes -- all deck parts. 'deck' matches any deck height (5 = 4ft, 6 = 5ft,",
-    "8 = 7ft) and nothing else, which is a narrow rule in place of a wildcard."
+    "8 = 7ft) and nothing else, which is a narrow rule in place of a wildcard.",
+    "",
+    "BNS, the Bird's Nest Swing, is a different kind of correction. It plugged",
+    "with 's' like every other swing, so it hung from any hanger on any beam.",
+    "Weldon says it goes only at the opening closest to the beam's legs -- the",
+    "same one the Horse Glider takes. That opening is already the only one",
+    "carrying 'sh', on all six beams: the tower mount is at the far end and the",
+    "'sh' hanger sits at 0.96, furthest from it. So the layer already existed",
+    "and said the right thing; the Bird's Nest simply was not on it.",
+    "",
+    "This is also the answer to whether 's' and 'sh' should merge: they should",
+    "not. 'sh' is not a second name for a swing hanger, it is the end position,",
+    "and two products in the catalog are sold only for it."
   ],
 
   "default_yaw": {
