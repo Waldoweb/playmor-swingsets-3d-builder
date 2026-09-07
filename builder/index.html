@@ -3533,14 +3533,57 @@
        * first. Within one layer's joints, which is what morph leaves behind,
        * names are unambiguous.
        */
-      const Find_saved_joint = (model, name, index) => {
+      /**
+       * The joint a saved design meant, by name, then index, then layer.
+       *
+       * A design records the joint it hung from. Newer saves name it, which
+       * survives anything; older ones -- the shipped catalogue among them --
+       * record only an index on the host side, and an index is a position in a
+       * list that model edits renumber. Taking two joints out of the Summit
+       * Tower moved its beam mount from 24 to 22, and two catalogue sets asked
+       * for 24: the beam came back standing in the right place but attached to
+       * nothing, so deleting the tower would have left it hanging in the air.
+       *
+       * Hence the last resort: a free joint on the layer the save recorded, and
+       * where several qualify the one nearest the joint asking. A tower's two
+       * beam mounts are on opposite sides, so nearest is what tells them apart
+       * -- the parts are already positioned by the time this runs.
+       *
+       * Only ever a fallback. A name or a valid index still wins, so nothing
+       * that resolves today resolves differently tomorrow.
+       */
+      const Find_saved_joint = (model, name, index, layer, near) => {
         if (!model || !model.joints) return null;
         if (name) {
           const by_name = model.joints.find((joint) => joint.name === name);
           if (by_name) return by_name;
         }
-        if (index === undefined || index === null) return null;
-        return model.joints.find((joint) => joint.index === index) || null;
+        if (index !== undefined && index !== null) {
+          const by_index = model.joints.find((joint) => joint.index === index);
+          if (by_index) return by_index;
+        }
+        if (!layer) return null;
+
+        const candidates = model.joints.filter(
+          (joint) => joint.layer === layer && joint.available
+        );
+        if (!candidates.length) return null;
+        if (candidates.length === 1 || !near) return candidates[0];
+
+        const wanted = new THREE.Vector3();
+        const at = new THREE.Vector3();
+        near.getWorldPosition(wanted);
+        let best = candidates[0];
+        let closest = Infinity;
+        for (const joint of candidates) {
+          joint.getWorldPosition(at);
+          const gap = at.distanceToSquared(wanted);
+          if (gap < closest) {
+            closest = gap;
+            best = joint;
+          }
+        }
+        return best;
       };
 
       class Blueprint {
@@ -4053,7 +4096,9 @@
                   let joint2 = Find_saved_joint(
                     model2,
                     joint_data.connected_to?.joint_name ?? joint_data.link?.joint_name,
-                    joint_data.connected_to?.joint_index ?? joint_data.link?.joint_index
+                    joint_data.connected_to?.joint_index ?? joint_data.link?.joint_index,
+                    joint_data.connected_to?.joint_layer ?? joint_data.link?.joint_layer,
+                    joint
                   );
 
                   if (joint && joint2) {

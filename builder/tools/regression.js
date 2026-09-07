@@ -909,7 +909,21 @@
 
   try {
     suite("catalog");
-    for (const file of ["_175 Jolly Retreat.json", "_611 Summit Escape.json", "_111 Family Favorite.json"]) {
+    // Every shipped set, not a sample. These are the designs a customer opens
+    // and the client signs off on, and they are the one thing in the build that
+    // records what the catalog looked like before any of this work — a saved
+    // set binds its connections by joint index, so disabling a joint in a model
+    // is exactly the kind of edit that could quietly rearrange one.
+    const catalogue = [
+      "_111 Family Favorite.json", "_171 Lovely Retreat.json", "_173 Family Joy.json",
+      "_175 Jolly Retreat.json", "_211 Scenic Pointe.json", "_223 Friendly Retreat.json",
+      "_475 Golden Retreat.json", "_518 Dizzy Delight.json", "_549 Backyard Retreat.json",
+      "_611 Summit Escape.json",
+    ];
+    let drift = 0;
+    let worstSet = "";
+    const missing = [];
+    for (const file of catalogue) {
       const state = await (await fetch("assets/catalog/" + encodeURIComponent(file))).text();
       await Ensure_models_for_state(state);
       blueprint.restore({ state });
@@ -929,7 +943,33 @@
           if (!j.available && !j.connected && !j.closed_by_socket && !j.exclusion_layer)
             dangling.push(`${m.object_id}.${j.name}`);
       check(`${file.slice(0, 22)} leaves no joint closed for no reason`, dangling, []);
+
+      // Where every part ended up, against where the file says it was. Pair
+      // each saved model with its NEAREST live twin of the same product, never
+      // the first one found: a beam carries several identical sling swings, and
+      // matching them in list order reports a whole hanger's spacing of drift
+      // that is not there.
+      const pool = models_with_available_joints.slice();
+      for (const saved of JSON.parse(state).models_data) {
+        let pick = -1;
+        let nearest = Infinity;
+        pool.forEach((live, i) => {
+          if (live.object_id !== saved.object_id) return;
+          const gap = Math.hypot(
+            live.mesh.position.x - saved.position.x,
+            live.mesh.position.y - saved.position.y,
+            live.mesh.position.z - saved.position.z
+          );
+          if (gap < nearest) { nearest = gap; pick = i; }
+        });
+        if (pick < 0) { missing.push(`${file}: ${saved.object_id}`); continue; }
+        pool.splice(pick, 1);
+        if (nearest > drift) { drift = nearest; worstSet = `${file} ${saved.object_id}`; }
+      }
     }
+    check("every catalogue set restores every part", missing, []);
+    // Exact, not approximate: these are the same numbers written back out.
+    check(`no part drifts on restore (worst: ${worstSet || "none"})`, drift < 1e-6, true);
   } catch (e) { fail("catalog suite", e); }
 
   // ————————————————————————————————————————————————— railing cut-outs
