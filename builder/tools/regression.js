@@ -303,6 +303,41 @@
       fail("bridge placed on a deck", "refused");
     }
 
+    // The whole point of a bridge is to join two towers, so the second tower
+    // has to be offered at its free end — and only towers whose deck is at the
+    // height the bridge has already committed to.
+    await reset();
+    const near = await placeFirst("P-PT");                 // 5 ft decks only
+    const span = await place(socketFor(near, "6"), "Bridge");
+    const farEnd = span.sockets().find((s) => Socket_is_open(s));
+    const at_far_end = templates().filter((m) => m.capable({ socket: farEnd })).map((m) => m.object_id);
+
+    check("a second tower is offered at the bridge's free end", at_far_end.includes("P-WT"), true);
+    check("King's Tower is not — it has no 5 ft deck", at_far_end.includes("P-KT"), false);
+    check("nor is a 7 ft slide", at_far_end.includes("SWS-14"), false);
+
+    const far = await place(farEnd, "P-WT");
+    check("and it attaches", !!far, true);
+    check("so the bridge spans two towers",
+      span.joints.map((j) => (j.connected ? j.connected.model.object_id : "free")),
+      ["P-PT", "P-WT"]);
+
+    // Two towers still may not be joined directly — that is what a bridge is for.
+    const deck = near.joints.find((j) => j.layer === "6" && j.available);
+    const deckSocket = near.sockets().find((s) => s.joints.includes(deck));
+    check("a tower cannot attach straight to another tower",
+      templates().find((m) => m.object_id === "P-DPT").capable({ socket: deckSocket }), false);
+
+    // The same at 7 ft, from the other side.
+    await reset();
+    const tall = await placeFirst("P-KT");                 // 7 ft decks only
+    const span7 = await place(socketFor(tall, "8"), "Bridge");
+    const end7 = span7.sockets().find((s) => Socket_is_open(s));
+    const offered7 = templates().filter((m) => m.capable({ socket: end7 })).map((m) => m.object_id);
+    check("a 7 ft bridge offers only 7 ft towers",
+      offered7.filter((id) => templates().find((m) => m.object_id === id).category === 0).sort(),
+      ["P-DSMT", "P-DST", "P-KT"]);
+
     // A bridge has no legs, so it cannot be the first thing in an empty yard.
     await reset();
     const offered = templates().filter((m) => m.capable()).map((m) => m.object_id);

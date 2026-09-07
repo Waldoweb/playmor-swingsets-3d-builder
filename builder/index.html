@@ -3092,6 +3092,30 @@
       const Is_attachment_only_layer = (layer) => layer === "*" || layer === "deck";
 
       /**
+       * May these two connect, given what categories they are in?
+       *
+       * Parts of one category do not normally meet each other. The rule stops a
+       * slide attaching to another slide's joint, which the layers alone would
+       * allow, since every 5ft slide carries the same layer 6.
+       *
+       * Two exceptions, both real:
+       *
+       *   A step and its handrails are both entries and climbers.
+       *
+       *   A tower and a bridge are both filed under towers, and a bridge exists
+       *   precisely to join two towers. That one is told apart by one side
+       *   standing on its own ground and the other not — a structure meeting a
+       *   spanning part. Two towers joined directly is still refused, which is
+       *   what the bridge is for.
+       */
+      const Category_allows = (plug_model, host_model) => {
+        if (!plug_model || !host_model) return true;
+        if (Is_handle_accessory(plug_model)) return true;
+        if (host_model.category != plug_model.category) return true;
+        return Is_free_standing(plug_model) !== Is_free_standing(host_model);
+      };
+
+      /**
        * Which way a model faces when first placed, in degrees.
        *
        * Nearly everything is modelled facing the same way and wants 0. The
@@ -4966,7 +4990,8 @@
           if (!found) {
             let i = 0;
             while (!found && i < own_joints.length) {
-              const seekingLayer = own_joints[i].layer;
+              const seeking = own_joints[i];
+              const seekingLayer = seeking.layer;
               let h = 0;
               while (!found && h < hosts.length) {
                 let joint = hosts[h++];
@@ -4974,29 +4999,24 @@
                     if (joint.tire_only) {
                       found = Has_tire_variant(this);
                     } else {
-                      // Normal layer matching
-                      found = joint.layer == seekingLayer;
-
-
-
-                      // Special case: allow b8/b10/ds disc swings to connect to "ds" layer joints
-                      if (!found && joint.layer === "ds" && (seekingLayer === "b8" || seekingLayer === "b10" || seekingLayer === "ds")) {
-                        found = true;
-                      }
+                      // The same predicate every other path asks. This was a
+                      // fifth copy — raw equality with a hand-rolled disc-swing
+                      // clause — and it did not know about `deck`, so a tower
+                      // could not see a bridge's socket even though placing one
+                      // there worked perfectly well.
+                      //
+                      // The height agreement comes with it, or the catalogue
+                      // offers what the placement rules will then refuse: a
+                      // bridge already meeting a 5ft deck listing King's Tower
+                      // and every 7ft slide.
+                      found =
+                        Layers_connect(seekingLayer, joint.layer) &&
+                        Deck_heights_agree(seeking, joint);
                     }
 
 
                     if (found) {
-                      // Parts of one category do not normally connect to each
-                      // other — it stops a slide meeting another slide's joint,
-                      // which the layers alone would allow. A step and its
-                      // handrails are both entries/climbers, so that rule has
-                      // to stand aside for them.
-                      //
-                      // Scoped to the accessory rather than to the layer: a step
-                      // also carries handle joints, and keying on those would let
-                      // one step attach to another step's handle socket.
-                      found = Is_handle_accessory(this) || joint.model.category != this.category;
+                      found = Category_allows(this, joint.model);
                       /*
                                         if ( joint        . name . indexOf ( 'female' ) >= 0 &&
                                              joints [ i ] . name . indexOf ( 'female' ) >= 0 )
@@ -5901,11 +5921,7 @@
 
                   if (layersMatch) {
                     if (joint.layer != "*") {
-                      // Same exception as capable(): a step and its handrails
-                      // share a category and are still a legitimate pair.
-                      we_gud =
-                        Is_handle_accessory(plug_joint.model) ||
-                        joint.model.category != plug_joint.model.category;
+                      we_gud = Category_allows(plug_joint.model, joint.model);
                     }
                   } else {
                     if (joint.layer == "*") {
