@@ -3085,6 +3085,24 @@
        */
       const Is_attachment_only_layer = (layer) => layer === "*" || layer === "deck";
 
+      /**
+       * A part that mounts onto a handle socket — the hand grip and hand rail.
+       *
+       * Named by what it is made of rather than by product id: every one of its
+       * joints is a `handle`, and it is the only shape of part in the catalog
+       * that is. A step carries handle sockets too, but alongside the numeric
+       * joint it hangs from, so it is not one of these.
+       *
+       * These two behave unlike anything else in three ways — they mount flush
+       * against their host, they follow its slope, and they attach within their
+       * own category — which is why nine places used to name them.
+       */
+      const Is_handle_accessory = (model) => {
+        if (!model) return false;
+        const own = model.template_joints ? model.template_joints() : model.joints || [];
+        return own.length > 0 && own.every((joint) => joint.layer === "handle");
+      };
+
       const Layers_connect = (plug_layer, host_layer) => {
         if (plug_layer === host_layer) return true;
         if (plug_layer === "*" || host_layer === "*") return true;
@@ -4939,19 +4957,6 @@
                       // Normal layer matching
                       found = joint.layer == seekingLayer;
 
-                      // Special case: allow layer "8" to connect to layer "handle" for handrails only
-                      if (!found && ((seekingLayer === "8" && joint.layer === "handle") ||
-                                     (seekingLayer === "handle" && joint.layer === "8"))) {
-                        // Only allow this connection for handrails connecting to entries/climbers (steps, ladders, etc.)
-                        const isHandrail = this.object_id === 'HGR' || this.object_id === 'HR';
-                        const isConnectingToStep = joint.model.object_id && joint.model.object_id || null;
-                        const targetCategory = joint.model.object_id ? getCategoryFromObjectId(joint.model.object_id) : null;
-                        const isConnectingToClimber = targetCategory === 'entries_climbers';
-
-                        if (isHandrail && isConnectingToClimber) {
-                          found = true;
-                        }
-                      }
 
 
                       // Special case: allow b8/b10/ds disc swings to connect to "ds" layer joints
@@ -4962,18 +4967,16 @@
 
 
                     if (found) {
-                      const categoryMatch = joint.model.category != this.category;
-
-                      // Special case: handrails (HGR, HR) can connect to same category (steps)
-                      const isHandrail = this.object_id === 'HGR' || this.object_id === 'HR';
-                      const isHandleConnection = seekingLayer === 'handle' || seekingLayer === '8';
-
-                      if (isHandrail && isHandleConnection) {
-                        console.log("object Id: ", this.object_id, 'seekingLayer: ', seekingLayer, 'joint.layer: ', joint.layer, 'found: ', found);
-                        found = true; // Allow handrails to connect to steps in same category
-                      } else {
-                        found = categoryMatch; // Original logic for other items
-                      }
+                      // Parts of one category do not normally connect to each
+                      // other — it stops a slide meeting another slide's joint,
+                      // which the layers alone would allow. A step and its
+                      // handrails are both entries/climbers, so that rule has
+                      // to stand aside for them.
+                      //
+                      // Scoped to the accessory rather than to the layer: a step
+                      // also carries handle joints, and keying on those would let
+                      // one step attach to another step's handle socket.
+                      found = Is_handle_accessory(this) || joint.model.category != this.category;
                       /*
                                         if ( joint        . name . indexOf ( 'female' ) >= 0 &&
                                              joints [ i ] . name . indexOf ( 'female' ) >= 0 )
@@ -5379,11 +5382,9 @@
         const plug_joint = args.plug_joint;
         const host_joint = args.host_joint;
 
-        // Skip collision detection for handles - they are small accessories that attach close to host
-        const isHandle = plug_joint.model.object_id === 'HGR' || plug_joint.model.object_id === 'HR';
-        if (isHandle) {
-          return true;
-        }
+        // Handle accessories mount flush against their host, so the box test
+        // would always report them as colliding with the thing they attach to.
+        if (Is_handle_accessory(plug_joint.model)) return true;
 
         // Direct occupancy check: if the host joint's world position is already inside
         // the bounding box of any placed model, the space is physically occupied — hide the ring.
@@ -5607,16 +5608,16 @@
         // Apply handle attachment logic for both interactive placement and blueprint restoration
         if (host_joint.layer === "handle" || plug_joint.layer === "handle") {
 
-          // Determine which is the handle and which is the host
+          // Both joints are layer `handle`, so the layer cannot say which side
+          // is the accessory and which is the step offering the socket. What
+          // can: the accessory is made of nothing but handle joints.
           let handle_joint, host_step_joint;
-          if (plug_joint.model.object_id === 'HGR' || plug_joint.model.object_id === 'HR') {
+          if (Is_handle_accessory(plug_joint.model)) {
             handle_joint = plug_joint;
             host_step_joint = host_joint;
-          } else if (host_joint.model.object_id === 'HGR' || host_joint.model.object_id === 'HR') {
+          } else if (Is_handle_accessory(host_joint.model)) {
             handle_joint = host_joint;
             host_step_joint = plug_joint;
-          } else {
-            console.log(`Neither joint is a handle - skipping logic`);
           }
 
           if (handle_joint && host_step_joint) {
@@ -5873,37 +5874,18 @@
                   plug_joint.model.tubular
                 ) {
                 } else {
-                  // Check if layers match (including special cases)
-                  // Check if plug is a handle trying to connect to entries_climbers category
-                  const isHandrail = plug_joint.model.object_id === 'HGR' || plug_joint.model.object_id === 'HR';
-                  const targetCategory = joint.model.object_id ? getCategoryFromObjectId(joint.model.object_id) : null;
-                  const handleToClimber = isHandrail &&
-                                         (plug_joint.layer === "handle" || plug_joint.layer === "8") &&
-                                         targetCategory === 'entries_climbers';
-
-                  // A tire-only hanger takes only a part with a tire variant.
-                  // The clause that used to sit here for "s" meeting "tire"
-                  // could never fire — no joint carries the layer "tire".
-                  const layersMatch = joint.tire_only
-                    ? Has_tire_variant(plug_joint.model)
-                    : (Layers_connect(plug_joint.layer, joint.layer) ||
-                       // Handrails, still keyed on product id — see the HGR/HR
-                       // group, which is the next of these to fold into the
-                       // shared rule.
-                       ((joint.layer === "8" && plug_joint.layer === "handle") ||
-                        (joint.layer === "handle" && plug_joint.layer === "8")) ||
-                       handleToClimber);
+                  // This was a fourth copy of the layer rule. It now asks the
+                  // same predicate every other path asks, which is what stops
+                  // the four drifting apart.
+                  const layersMatch = Joints_connect(plug_joint, joint);
 
                   if (layersMatch) {
                     if (joint.layer != "*") {
-                      // Special case: handrails (HGR, HR) can connect to entries_climbers
-                      const isHandrailPlug = plug_joint.model.object_id === 'HGR' || plug_joint.model.object_id === 'HR';
-                      const isHandleConnection = joint.layer === 'handle' || joint.layer === '8';
-                      if (isHandrailPlug && (isHandleConnection || handleToClimber)) {
-                        we_gud = true;
-                      } else {
-                        we_gud = joint.model.category != plug_joint.model.category;
-                      }
+                      // Same exception as capable(): a step and its handrails
+                      // share a category and are still a legitimate pair.
+                      we_gud =
+                        Is_handle_accessory(plug_joint.model) ||
+                        joint.model.category != plug_joint.model.category;
                     }
                   } else {
                     if (joint.layer == "*") {
@@ -6116,8 +6098,10 @@
                 plug_joint_direction: plug_joint.direction,
               }) * Deg2Rad;
 
-              // For handles during blueprint restoration, use saved rotation if it's reasonable
-              if (window.isRestoringFromBlueprint && (plug_model.object_id === 'HGR' || plug_model.object_id === 'HR')) {
+              // A handle accessory sits at an angle set by its host's slope,
+              // which the yaw calculation alone does not reproduce, so a
+              // restore trusts what was saved.
+              if (window.isRestoringFromBlueprint && Is_handle_accessory(plug_model)) {
                 // Check if model has saved rotation data
                 const savedRotation = plug_model.saved_data?.rotation?.y || plug_model.saved_data?.y_rotation;
 
@@ -6133,7 +6117,7 @@
 
               if (host_joint.layer == "handle") {
                 // For blueprint restoration, use saved X rotation if available
-                if (window.isRestoringFromBlueprint && (plug_model.object_id === 'HGR' || plug_model.object_id === 'HR')) {
+                if (window.isRestoringFromBlueprint && Is_handle_accessory(plug_model)) {
                   const savedXRotation = plug_model.saved_data?.rotation?.x;
                   if (savedXRotation !== undefined) {
                     plug_model.mesh.traverse((mesh) => {
