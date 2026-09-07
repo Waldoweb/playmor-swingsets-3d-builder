@@ -3101,8 +3101,6 @@
         Layers_connect(plug_joint.layer, host_joint.layer) &&
         Tire_rule_holds(plug_joint, host_joint) &&
         Deck_heights_agree(plug_joint, host_joint);
-      let joint_image_frame = 0;
-      let joint_image_frames = 0;
       let file_button;
       let link = document.createElement("a");
       let intersection_object;
@@ -5973,9 +5971,6 @@
 
         context.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (joint_image_frame++ >= joint_image_frames - 1)
-          joint_image_frame = 0;
-
         // highlight available hosts joints
         //for ( let box3 of box3s ) scene . remove ( box3 )
         if (Mode.plugging == Mode.mode) {
@@ -6085,17 +6080,16 @@
                     joint.x = joint_position.x - size / 2;
                     joint.y = joint_position.y - size / 2;
 
-                    context.drawImage(
-                      joint_image,
-                      joint_image_frame * joint_image.height,
-                      0,
-                      joint_image.height,
-                      joint_image.height,
-                      joint.x,
-                      joint.y,
-                      size,
-                      size
-                    );
+                    // The same marker browsing draws. This used to be a
+                    // spinning sprite, which made picking the part first and
+                    // picking the spot first look like two different tools --
+                    // and the sprite was the odd one out, since every other
+                    // "you can add here" cue in the app is this dot.
+                    //
+                    // Blue rather than red: red means "one of many places you
+                    // could go", and while a part is being carried every dot
+                    // shown is a live target for the thing in hand.
+                    Draw_add_marker(joint, true);
                   }
                 }
               }
@@ -9018,9 +9012,10 @@
         configsReady.catch(() => {}).then(() =>
           Load_image_base_64({ base_64: Texture_source("joint_ring") })
         ).then((resolution) => {
+          // Kept for its dimensions: the marker's size and every hit test are
+          // still expressed in terms of the ring sprite's height, even though
+          // the sprite itself is no longer drawn.
           joint_image = resolution.resolution;
-          joint_image_frame = 0;
-          joint_image_frames = joint_image.width / joint_image.height;
         });
 
         intersection_point = new THREE.Vector3();
