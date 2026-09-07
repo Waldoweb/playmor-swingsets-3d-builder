@@ -6324,8 +6324,64 @@
        * Mirrors the layer rules Find_closest_available_joint uses, then checks
        * the part actually fits once positioned there.
        */
+      /**
+       * Order a model's joints so the ones on its ends come first, and the most
+       * central of those first of all.
+       *
+       * Only matters for something with joints all round, which in practice
+       * means a tower being joined to a bridge. A bridge should meet the middle
+       * of a tower's end, not run into its flank — but the first joint that
+       * happened to fit was taken, and for the DX towers, which are half again
+       * as deep as they are wide, that was a long side. They ended up set back
+       * and skewed against the span.
+       *
+       * "End" is the face across the narrow way: for a plan 2.62 wide and 3.67
+       * deep, the ends are the 2.62 faces. A joint's own offset from the centre
+       * says which face it sits on, once each axis is measured against its own
+       * half-extent — otherwise the deeper axis always looks dominant.
+       *
+       * A preference, not a rule. If nothing on an end fits, a side joint is
+       * still used, and a part with one joint is unaffected.
+       */
+      const Joints_ends_first = (model) => {
+        const joints = model.joints;
+        if (joints.length < 2 || !model.mesh) return joints;
+
+        model.mesh.updateMatrixWorld(true);
+        const box = new THREE.Box3().setFromObject(model.mesh);
+        const size = new THREE.Vector3();
+        const middle = new THREE.Vector3();
+        box.getSize(size);
+        box.getCenter(middle);
+        if (size.x <= 0 || size.z <= 0) return joints;
+
+        const long_axis = size.x > size.z ? "x" : "z";
+        const world = new THREE.Vector3();
+
+        return joints
+          .map((joint) => {
+            joint.getWorldPosition(world);
+            const nx = (world.x - middle.x) / (size.x / 2);
+            const nz = (world.z - middle.z) / (size.z / 2);
+            // Whichever normalised offset dominates names the face it is on.
+            const face = Math.abs(nx) > Math.abs(nz) ? "x" : "z";
+            return {
+              joint,
+              // The ends are the faces across the narrow way — the ones whose
+              // normal runs along the long axis.
+              on_end: face === long_axis,
+              // Nearer the middle of that face reads as squarer to the span.
+              off_centre: face === "x" ? Math.abs(nz) : Math.abs(nx),
+            };
+          })
+          .sort((a, b) =>
+            a.on_end !== b.on_end ? (a.on_end ? -1 : 1) : a.off_centre - b.off_centre
+          )
+          .map((entry) => entry.joint);
+      };
+
       const Find_plug_joint_for = (model, host_joint) => {
-        for (const joint of model.joints) {
+        for (const joint of Joints_ends_first(model)) {
           if (!Joints_connect(joint, host_joint)) continue;
           if (
             Can_connect({

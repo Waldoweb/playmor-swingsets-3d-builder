@@ -322,9 +322,30 @@
       span.joints.map((j) => (j.connected ? j.connected.model.object_id : "free")),
       ["P-PT", "P-WT"]);
 
+    // A bridge should meet the middle of a tower's end, not run into its
+    // flank. The DX towers are half again as deep as they are wide, so the
+    // first joint that happened to fit was a long side and they ended up set
+    // back from the span.
+    const plan = (m) => {
+      const b = new THREE.Box3().setFromObject(m.mesh);
+      return { x: (b.min.x + b.max.x) / 2, z: (b.min.z + b.max.z) / 2 };
+    };
+    for (const id of ["P-WT", "P-DST", "P-DSMT", "P-ST"]) {
+      await reset();
+      const first = await placeFirst("P-PT");
+      const span = await place(socketFor(first, "6"), "Bridge");
+      const second = await place(span.sockets().find((s) => Socket_is_open(s)), id);
+      check(`${id} squares up with the span`, second ? +(plan(second).z - plan(span).z).toFixed(2) : null, 0);
+    }
+
+    await reset();
+    const near2 = await placeFirst("P-PT");
+    const span2 = await place(socketFor(near2, "6"), "Bridge");
+    await place(span2.sockets().find((s) => Socket_is_open(s)), "P-WT");
+
     // Two towers still may not be joined directly — that is what a bridge is for.
-    const deck = near.joints.find((j) => j.layer === "6" && j.available);
-    const deckSocket = near.sockets().find((s) => s.joints.includes(deck));
+    const deck = near2.joints.find((j) => j.layer === "6" && j.available);
+    const deckSocket = near2.sockets().find((s) => s.joints.includes(deck));
     check("a tower cannot attach straight to another tower",
       templates().find((m) => m.object_id === "P-DPT").capable({ socket: deckSocket }), false);
 
