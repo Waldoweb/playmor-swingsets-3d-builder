@@ -885,35 +885,65 @@
     await placeFirst("P-KT");
 
     const eye = new THREE.Vector3();
-    const look = async (z) => {
-      orbitControls.object.position.set(0.2, 3.2, z);
+    const look = async (height, z) => {
+      orbitControls.object.position.set(0.2, height, z);
       orbitControls.target.set(0, 2.2, 0);
       orbitControls.update();
       await idle(300);   // clear the occlusion tick, which runs at 10Hz
     };
-    // Deck-height markers on the near and far rails, from where the camera is.
+    // Markers on the fence itself, near and far, from where the camera is.
+    // Bounded above as well as below: the swing-beam seat rides at 3.2, clear
+    // of the fence, and is genuinely visible from the far side — hiding that
+    // one would be wrong, so it is not what this measures.
     const rails = () => {
       const near = Math.sign(orbitControls.object.position.z);
       let onNear = 0, onFar = 0;
       for (const socket of browse_sockets) {
         socket.joints[0].getWorldPosition(eye);
-        if (eye.y <= 2.0) continue;          // the open frame below the deck
+        if (eye.y <= 2.0 || eye.y >= 3.0) continue;
         if (Math.sign(eye.z) === near) onNear++; else onFar++;
       }
       return { onNear, onFar };
     };
 
-    await look(5.2);
+    await look(3.2, 5.2);
     const front = rails();
     check("no far-rail marker draws through the fence", front.onFar, 0);
     check("the near rail still shows its markers", front.onNear > 0, true);
 
     // Orbiting to the other side has to swap which rail is hidden, or this is
     // a fixed rule about the model rather than an answer about the view.
-    await look(-5.2);
+    await look(3.2, -5.2);
     const behind = rails();
     check("the same holds from the other side", behind.onFar, 0);
     check("and the rail now in front shows its markers", behind.onNear > 0, true);
+
+    // Looking down over the fence is the angle that beat the first attempt:
+    // the sight line clears the near rail, so a bundle of rays finds nothing
+    // in the way and every dot on the back rail draws.
+    await look(4.4, 4.6);
+    check("nor from above, looking down over the rail", rails().onFar, 0);
+
+    // A swing beam is open air. Its hangers sit on the far half of it from
+    // half the angles anyone looks from, and a rule that hid the far half on
+    // position alone would cull them -- which is what happened the last time
+    // one was tried.
+    await reset();
+    const tower = await placeFirst("P-WT");
+    const seat = tower.sockets().find((socket) =>
+      socket.joints.some((j) => j.available && (j.layer === "b8" || j.layer === "b10"))
+    );
+    const beam = await place(seat, "P-AB-3-8");
+    check("the beam went on", !!beam, true);
+    // Stand off the beam's flank, where its hangers are plainly in view.
+    orbitControls.object.position.set(7, 3.4, -2.8);
+    orbitControls.target.set(0, 2.5, -2.8);
+    orbitControls.update();
+    await idle(300);
+    const hangers = browse_sockets.filter((socket) =>
+      beam.joints.includes(socket.joints[0])
+    ).length;
+    check("a beam's hangers all stay visible from its flank", hangers, 3);
 
     await reset();
   } catch (e) { fail("marker visibility suite", e); }

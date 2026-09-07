@@ -5783,13 +5783,60 @@
        * a different pitch needs no new rule.
        */
       const MARKER_RAY_RADIUS = 0.07;
+      const MARKER_RAYS = 4;
 
       /**
-       * Two blocked rays hide the dot. One is a dot beside a post — which is
-       * where the toy mounts are — and those have to stay visible; two means
-       * it sits in a slot narrower than 0.14 and is mostly covered.
+       * Round the back of a model the bundle is both wider and denser.
+       *
+       * A dot on the far rail can sit in genuine clear line of sight — the
+       * sight line passes just under the near rail's top, or straight down into
+       * the tower from above — so a bundle sized to the slat gaps finds nothing
+       * and draws it. Looking harder is only safe on the far side: widening the
+       * near-side bundle to 0.12 starts hiding dots the user is looking
+       * straight at, while widening the far side costs nothing, because a dot
+       * out there is one the user cannot work with anyway.
+       *
+       * 0.15 is where the gain stops. Over 36 views of the King's Tower the far
+       * rail leaked 46 dots at 0.07, 10 at 0.15, and 8 at both 0.22 and 0.30 —
+       * and the near side lost exactly the same 64 in every one of those runs,
+       * which is what says the wider ring is not reaching across.
+       *
+       * The 10 that remain are honest: 6 are the swing-beam seat, which sits
+       * above the fence with nothing in front of it, and the rest need the
+       * camera almost 50 degrees up, looking down over the rail into the deck.
+       */
+      const MARKER_RAY_RADIUS_FAR_SIDE = 0.15;
+      const MARKER_RAYS_FAR_SIDE = 8;
+
+      /**
+       * How many blocked rays hide the dot, and why it depends on which side of
+       * its own model the dot sits on.
+       *
+       * Facing the model, two. One blocked ray is a dot beside a post — which
+       * is where the toy mounts are — and a dot the user is looking straight at
+       * should not vanish because something clips its edge.
+       *
+       * Round the back, one. A fence is mostly gap by area, so a dot on the far
+       * rail can sit in clear line of sight and still read as clutter showing
+       * through the near rail. Measured over fifteen views of the King's Tower,
+       * the far rail leaked 31 dots at two and 9 at one, with the near side
+       * losing nothing either way.
+       *
+       * What makes this safe is that it lowers the evidence needed rather than
+       * deciding on its own. A position-only rule — hide anything on the far
+       * half — was tried before and culled half the hangers on a swing beam,
+       * which is open air with nothing to hide behind. Those hangers still
+       * block no rays, so they still show. The model does not have to be
+       * classified; only asked whether anything is actually in the way.
        */
       const MARKER_RAYS_TO_HIDE = 2;
+      const MARKER_RAYS_TO_HIDE_FAR_SIDE = 1;
+
+      /**
+       * How far past its model's middle a dot must be to count as round the
+       * back, so that dots on the centre line do not flip as the view turns.
+       */
+      const FAR_SIDE_MARGIN = 0.05;
 
       /**
        * How much closer than the dot something must be to count as in front of
@@ -5882,39 +5929,59 @@
         );
         if (!candidates.length) return false;
 
+        // Which side of its own model the dot is on, measured on the ground
+        // plane — this is about turning around a model, not about height.
+        // Taken from the box already measured for the pre-filter, so it costs
+        // nothing extra.
+        let radius = MARKER_RAY_RADIUS;
+        let rays = MARKER_RAYS;
+        let needed = MARKER_RAYS_TO_HIDE;
+        const own = occluder_boxes.find((o) => o.mesh === joint.model.mesh);
+        if (own) {
+          const centre = own.box.getCenter(new THREE.Vector3());
+          const to_camera = new THREE.Vector3()
+            .subVectors(camera.position, centre)
+            .setY(0)
+            .normalize();
+          const to_marker = new THREE.Vector3().subVectors(world, centre).setY(0);
+          if (to_marker.dot(to_camera) < -FAR_SIDE_MARGIN) {
+            radius = MARKER_RAY_RADIUS_FAR_SIDE;
+            rays = MARKER_RAYS_FAR_SIDE;
+            needed = MARKER_RAYS_TO_HIDE_FAR_SIDE;
+          }
+        }
+
         // Screen right and up, so the disc always faces the camera. Both the
         // origin and the aim point move together, which makes each ray a
         // parallel copy of the centre one — the offset is the same all the way
         // along it, rather than shrinking to nothing at the marker.
-        const right = new THREE.Vector3()
-          .setFromMatrixColumn(camera.matrixWorld, 0)
-          .multiplyScalar(MARKER_RAY_RADIUS);
-        const up = new THREE.Vector3()
-          .setFromMatrixColumn(camera.matrixWorld, 1)
-          .multiplyScalar(MARKER_RAY_RADIUS);
+        const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
+        const up = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1);
 
         const origin = new THREE.Vector3();
         const meshes = [];
-        let blocked = 0;
-        for (let i = 0; i < 5; i++) {
-          origin.copy(camera.position);
-          if (i === 1) origin.add(right);
-          else if (i === 2) origin.sub(right);
-          else if (i === 3) origin.add(up);
-          else if (i === 4) origin.sub(up);
-
+        const ray_is_blocked = () => {
           raycaster.set(origin, dir);
           meshes.length = 0;
           for (const o of candidates)
             if (raycaster.ray.intersectsBox(o.box)) meshes.push(o.mesh);
-          if (!meshes.length) continue;
-
+          if (!meshes.length) return false;
           const hits = raycaster.intersectObjects(meshes, true);
-          if (!(hits.length > 0 && hits[0].distance < distance - OCCLUSION_MARGIN)) continue;
+          return hits.length > 0 && hits[0].distance < distance - OCCLUSION_MARGIN;
+        };
 
-          // The middle of the dot being behind something settles it.
-          if (i === 0) return true;
-          if (++blocked >= MARKER_RAYS_TO_HIDE) return true;
+        // The middle of the dot being behind something settles it.
+        origin.copy(camera.position);
+        if (ray_is_blocked()) return true;
+
+        let blocked = 0;
+        for (let i = 0; i < rays; i++) {
+          const angle = (2 * Math.PI * i) / rays;
+          origin
+            .copy(camera.position)
+            .addScaledVector(right, radius * Math.cos(angle))
+            .addScaledVector(up, radius * Math.sin(angle));
+          if (ray_is_blocked() && ++blocked >= needed) return true;
         }
         return false;
       };
