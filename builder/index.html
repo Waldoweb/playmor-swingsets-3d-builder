@@ -711,157 +711,147 @@
         z-index: 10;
       }
 
-      .left-bar {
+      /* ---------------------------------------------------------------
+         Bottom parts bar.
+
+         Replaces the old left category rail and right parts rail. One
+         strip along the bottom holds every part that can be placed right
+         now; a row of chips above it narrows that list by category.
+
+         The chips are derived from whatever is in the strip rather than
+         being a fixed list of the seven categories, so they never offer a
+         category with nothing behind it -- and the row hides itself when
+         it would show only one, which is the common case once a spot on
+         the playset has been picked.
+         --------------------------------------------------------------- */
+
+      :root {
+        --bottom-bar-h: 176px;
+        --bottom-bar-gap: 16px;
+      }
+
+      .bottom-bar {
         position: fixed;
-        height: 100vh;
-        top: 0;
         left: 0;
-        width: 160px;
-        background: rgba(0, 0, 0, 0.8);
-        backdrop-filter: blur(10px);
-        border-right: 2px solid rgba(255, 255, 255, 0.2);
-        padding: 0;
-        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
-        z-index: 1000;
-        transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-        transform: translateX(-100%);
-      }
-
-      .left-bar.open {
-        transform: translateX(0);
-      }
-
-      #sub_step_container {
-        width: 100%;
-        height: 100%;
-        overflow-y: auto;
-        padding: 12px;
-        box-sizing: border-box;
-      }
-
-      #sub_step_container::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      #sub_step_container::-webkit-scrollbar-track {
-        background-color: rgba(0, 0, 0, 0.2);
-        border-radius: 4px;
-      }
-
-      #sub_step_container::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.6);
-        border-radius: 4px;
-        border: 2px solid transparent;
-        background-clip: content-box;
-      }
-
-      #sub_step_container::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.8);
-        background-clip: content-box;
-      }
-
-      .steps {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 16px;
-        margin: 12px 0px;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        backdrop-filter: blur(10px);
-      }
-
-      .steps:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-        border-color: rgba(255, 255, 255, 0.4);
-        background: rgba(255, 255, 255, 0.15);
-      }
-
-      .steps.active {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        border-color: rgba(255, 255, 255, 0.5);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-      }
-
-      .step-text {
-        color: #ffffff;
-        font-size: 13px;
-        font-weight: 600;
-        margin-top: 8px;
-        text-align: center;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-      }
-
-      .steps.active .step-text {
-        color: white;
-      }
-
-      .step-image {
-        width: 100%;
-        height: 60px;
-        object-fit: contain;
-        border-radius: 8px;
-      }
-
-      .right-bar {
-        position: fixed;
-        height: 100vh;
-        top: 0;
         right: 0;
-        width: 180px;
+        bottom: 0;
+        height: var(--bottom-bar-h);
         background: rgba(0, 0, 0, 0.8);
         backdrop-filter: blur(10px);
-        border-left: 2px solid rgba(255, 255, 255, 0.2);
-        padding: 0;
-        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+        border-top: 2px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
         z-index: 1000;
-        transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-        transform: translateX(100%);
-        cursor: pointer;
-      }
-
-      .right-bar.open {
-        transform: translateX(0);
-      }
-
-      .sub_item_container {
-        width: 100%;
-        height: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding: 12px;
+        display: flex;
+        flex-direction: column;
         box-sizing: border-box;
       }
 
-      .sub_item_container::-webkit-scrollbar {
-        width: 8px;
+      /* Context row: category chips on the left, the "fits this spot"
+         notice on the right. */
+      .bar-context {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px 0 16px;
+        min-height: 34px;
+        box-sizing: border-box;
       }
 
-      .sub_item_container::-webkit-scrollbar-track {
+      #part_filter_row {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        flex: 1 1 auto;
+        scrollbar-width: none;
+      }
+
+      #part_filter_row::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* One chip is no choice at all, so the row stands down rather than
+         showing a lone button that does nothing when pressed. */
+      #part_filter_row.single {
+        visibility: hidden;
+      }
+
+      .part-chip {
+        flex: 0 0 auto;
+        padding: 5px 14px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+      }
+
+      .part-chip:hover {
+        background: rgba(255, 255, 255, 0.18);
+        border-color: rgba(255, 255, 255, 0.4);
+      }
+
+      .part-chip.active {
+        background: linear-gradient(135deg, rgba(206, 3, 12, 0.85), rgba(165, 2, 9, 0.85));
+        border-color: rgba(206, 3, 12, 1);
+        box-shadow: 0 2px 10px rgba(206, 3, 12, 0.4);
+      }
+
+      .part-chip .chip-count {
+        opacity: 0.65;
+        margin-left: 5px;
+        font-weight: 500;
+      }
+
+      /* The strip itself. */
+      #part_strip {
+        display: flex;
+        gap: 10px;
+        align-items: stretch;
+        flex: 1 1 auto;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 10px 16px 14px 16px;
+        box-sizing: border-box;
+      }
+
+      #part_strip::-webkit-scrollbar {
+        height: 8px;
+      }
+
+      #part_strip::-webkit-scrollbar-track {
         background-color: rgba(0, 0, 0, 0.2);
         border-radius: 4px;
       }
 
-      .sub_item_container::-webkit-scrollbar-thumb {
+      #part_strip::-webkit-scrollbar-thumb {
         background: rgba(255, 255, 255, 0.6);
         border-radius: 4px;
         border: 2px solid transparent;
         background-clip: content-box;
       }
 
-      .sub_item_container::-webkit-scrollbar-thumb:hover {
+      #part_strip::-webkit-scrollbar-thumb:hover {
         background: rgba(255, 255, 255, 0.8);
         background-clip: content-box;
       }
 
-      .sub-items {
+      #part_strip_empty {
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 13px;
+        align-self: center;
+        padding-left: 4px;
+      }
+
+      .part-tile {
         position: relative;
-        width: 100%;
-        height: 120px;
-        margin: 12px 0px;
+        flex: 0 0 auto;
+        width: 116px;
         padding: 8px;
         background: rgba(255, 255, 255, 0.08);
         border-radius: 8px;
@@ -873,16 +863,62 @@
         box-sizing: border-box;
       }
 
-      .sub-items:hover {
+      .part-tile:hover {
         background: rgba(255, 255, 255, 0.12);
         border-color: rgba(255, 255, 255, 0.3);
         transform: translateY(-2px);
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
       }
 
+      .part-tile.selected {
+        background: linear-gradient(135deg, rgba(206, 3, 12, 0.3), rgba(165, 2, 9, 0.3));
+        border-color: rgba(206, 3, 12, 0.8);
+        box-shadow:
+          0 8px 32px rgba(206, 3, 12, 0.3),
+          0 4px 16px rgba(0, 0, 0, 0.2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      }
+
+      .part-tile-image {
+        width: 100%;
+        height: calc(100% - 20px);
+        object-fit: contain;
+        border-radius: 5px;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+
+      .part-tile.selected .part-tile-image {
+        filter: brightness(1.1) contrast(1.1);
+      }
+
+      .part-tile-text {
+        color: white;
+        position: absolute;
+        width: calc(100% - 12px);
+        text-align: center;
+        bottom: 4px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 11px;
+        font-weight: 600;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        background: rgba(0, 0, 0, 0.3);
+        padding: 2px 4px;
+        border-radius: 3px;
+        backdrop-filter: blur(5px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        box-sizing: border-box;
+      }
+
+      .part-tile.selected .part-tile-text {
+        background: rgba(206, 3, 12, 0.9);
+      }
+
       /* Shown only when a model's geometry is still being fetched, and only
          after a short delay, so a cached model never flashes a spinner. */
-      .sub-items.loading::before {
+      .part-tile.loading::before {
         content: "";
         position: absolute;
         inset: 0;
@@ -891,7 +927,7 @@
         z-index: 1;
       }
 
-      .sub-items.loading::after {
+      .part-tile.loading::after {
         content: "";
         position: absolute;
         top: calc(50% - 14px);
@@ -905,232 +941,29 @@
         z-index: 2;
       }
 
-      .sub-items.loading {
+      .part-tile.loading {
         cursor: progress;
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .sub-items.loading::after {
+        .part-tile.loading::after {
           animation: spin 2.4s linear infinite;
         }
       }
 
-      .sub-items.selected {
-        background: linear-gradient(135deg, rgba(206, 3, 12, 0.3), rgba(165, 2, 9, 0.3));
-        border: 2px solid rgba(206, 3, 12, 0.8);
-        box-shadow:
-          0 8px 32px rgba(206, 3, 12, 0.3),
-          0 4px 16px rgba(0, 0, 0, 0.2),
-          inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        transform: scale(1.02);
-      }
+      @media (max-width: 768px) {
+        :root {
+          --bottom-bar-h: 152px;
+        }
 
-      .sub-items.selected:hover {
-        background: linear-gradient(135deg, rgba(206, 3, 12, 0.4), rgba(165, 2, 9, 0.4));
-        box-shadow:
-          0 12px 40px rgba(206, 3, 12, 0.4),
-          0 6px 20px rgba(0, 0, 0, 0.3),
-          inset 0 1px 0 rgba(255, 255, 255, 0.3);
-      }
-
-      .sub-item-image {
-        width: 100%;
-        height: calc(100% - 16px);
-        object-fit: contain;
-        border-radius: 5px;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        transform-origin: center center;
-      }
-
-      .sub-items.selected .sub-item-image {
-        filter: brightness(1.1) contrast(1.1);
-      }
-
-      .sub-item-text {
-        color: white;
-        width: calc(100% - 6px);
-        position: absolute;
-        text-align: center;
-        bottom: 4px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 12px;
-        font-weight: 600;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-        background: rgba(0, 0, 0, 0.3);
-        padding: 2px 4px;
-        border-radius: 3px;
-        backdrop-filter: blur(5px);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .sub-items.selected .sub-item-text {
-        background: rgba(206, 3, 12, 0.9);
-        color: white;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-      }
-
-      /* Disabled/Unavailable Item Styles */
-      .sub-items.disabled,
-      .sub-items:has(.sub-item-image[style*="grayscale"]) {
-        background: rgba(255, 255, 255, 0.03);
-        border: 2px solid rgba(255, 255, 255, 0.05);
-        opacity: 0.6;
-        cursor: not-allowed;
-        filter: brightness(0.7);
-      }
-
-      .sub-items.disabled:hover,
-      .sub-items:has(.sub-item-image[style*="grayscale"]):hover {
-        background: rgba(255, 255, 255, 0.05);
-        border-color: rgba(255, 255, 255, 0.1);
-        transform: none;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      }
-
-      .sub-items.disabled .sub-item-image,
-      .sub-items:has(.sub-item-image[style*="grayscale"]) .sub-item-image {
-        filter: grayscale(100%) brightness(0.5) contrast(0.8);
-      }
-
-      .sub-items.disabled .sub-item-text,
-      .sub-items:has(.sub-item-image[style*="grayscale"]) .sub-item-text {
-        background: rgba(128, 128, 128, 0.4);
-        color: rgba(255, 255, 255, 0.6);
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-      }
-
-      /* Disabled overlay effect */
-      .sub-items.disabled::after,
-      .sub-items:has(.sub-item-image[style*="grayscale"])::after {
-        content: '🔒';
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        font-size: 16px;
-        opacity: 0.7;
-        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
-      }
-
-      /* Alternative lock icon using CSS */
-      .sub-items.disabled::before,
-      .sub-items:has(.sub-item-image[style*="grayscale"])::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 40px;
-        height: 40px;
-        background: rgba(0, 0, 0, 0.6);
-        border-radius: 50%;
-        backdrop-filter: blur(5px);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        z-index: 1;
-      }
-
-      .sub-items.disabled:hover::before,
-      .sub-items:has(.sub-item-image[style*="grayscale"]):hover::before {
-        opacity: 1;
-      }
-
-      #show-right-btn {
-        width: 35px;
-        height: 35px;
-        position: fixed;
-        top: 50%;
-        transform: translateY(-17.5px);
-        right: 165px;
-        background: rgba(0, 0, 0, 0.8);
-        cursor: pointer;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
-        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-        z-index: 1001;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        backdrop-filter: blur(10px);
-        box-sizing: border-box;
-      }
-
-      #show-right-btn:hover {
-        transform: translateY(-17.5px) scale(1.1);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-        background: rgba(0, 0, 0, 0.9);
-      }
-
-      #show-right-btn.hidden {
-        right: 20px;
-      }
-
-      #show-right-btn img {
-        width: 18px;
-        height: 18px;
-        filter: brightness(0) invert(1);
-        opacity: 0.9;
-        transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-        display: block;
-        margin: auto;
-      }
-
-      #show-right-btn.hidden img {
-        transform: rotate(180deg);
-      }
-
-      #show-left-btn {
-        width: 35px;
-        height: 35px;
-        position: fixed;
-        top: 50%;
-        transform: translateY(-17.5px);
-        left: 145px;
-        background: rgba(0, 0, 0, 0.8);
-        cursor: pointer;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
-        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-        z-index: 1001;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        backdrop-filter: blur(10px);
-        box-sizing: border-box;
-      }
-
-      #show-left-btn:hover {
-        transform: translateY(-17.5px) scale(1.1);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-        background: rgba(0, 0, 0, 0.9);
-      }
-
-      #show-left-btn.hidden {
-        left: 20px;
-      }
-
-      #show-left-btn img {
-        width: 18px;
-        height: 18px;
-        filter: brightness(0) invert(1);
-        opacity: 0.9;
-        transform: rotate(180deg);
-        transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-        display: block;
-        margin: auto;
-      }
-
-      #show-left-btn.hidden img {
-        transform: rotate(0deg);
+        .part-tile {
+          width: 96px;
+        }
       }
 
       .controls {
         position: absolute;
-        left: 200px;
+        left: 20px;
         cursor: pointer;
       }
 
@@ -1243,13 +1076,13 @@
 
       .bottom-controls {
         position: fixed;
-        bottom: 20px;
+        bottom: calc(var(--bottom-bar-h) + var(--bottom-bar-gap));
       }
 
       .bottom-controls-right {
         position: fixed;
-        bottom: 20px;
-        right: 200px;
+        bottom: calc(var(--bottom-bar-h) + var(--bottom-bar-gap));
+        right: 20px;
         z-index: 1000;
       }
 
@@ -1327,8 +1160,8 @@
         padding: 15px;
         border-radius: 20px;
         background: rgba(0, 0, 0, 0.5);
-        position: absolute;
-        top: calc(100vh - 280px);
+        position: fixed;
+        bottom: calc(var(--bottom-bar-h) + var(--bottom-bar-gap));
         left: calc(50vw - 200px);
         align-items: center;
         flex-direction: row;
@@ -2324,7 +2157,7 @@
 
       #rotation-hint {
         position: fixed;
-        bottom: 20px;
+        bottom: calc(var(--bottom-bar-h) + var(--bottom-bar-gap) + 60px);
         left: 50%;
         transform: translateX(-50%);
         background: rgba(0, 0, 0, 0.8);
@@ -2557,19 +2390,11 @@
         </div>
       </div>
 
-      <div class="left-bar">
-        <div class="sub_step_container" id="sub_step_container">
+      <div class="bottom-bar">
+        <div class="bar-context">
+          <div id="part_filter_row"></div>
         </div>
-      </div>
-      <div id="show-left-btn">
-        <img
-          src="images/image_ae5a2d14.png"
-        />
-      </div>
-      <div id="show-right-btn">
-        <img
-          src="images/image_ae5a2d14.png"
-        />
+        <div id="part_strip"></div>
       </div>
       <div class="bottom-controls-right">
         <div class="controls-buttons">
@@ -2585,11 +2410,6 @@
             <img src="images/image_66d66c82.png" />
             <span class="button-text">Get A Quote</span>
           </div>
-        </div>
-      </div>
-      <div class="right-bar open">
-        <div class="sub_item_container" id="sub_item_container">
-
         </div>
       </div>
       <div class="custom-controls-unified" style="display: none">
@@ -3291,19 +3111,7 @@
       let adopted = 0;
 
       // New object ID-based variables to replace category_index and item_index
-      let selected_category = null;
       let selected_object_id = null;
-
-      // Initialize with first category if objectMapping is available
-      function initializeObjectIdSystem() {
-        if (objectMapping && !selected_category) {
-          const sortedCategories = Object.entries(objectMapping.categories)
-            .sort((a, b) => a[1].display_order - b[1].display_order);
-          if (sortedCategories.length > 0) {
-            selected_category = sortedCategories[0][0];
-          }
-        }
-      }
       let show_mesurements = false;
       let measurements = "0.00' x 0.00' x 0.00'";
       let measurements_font_height = 32;
@@ -7883,13 +7691,6 @@
                 });
               }
               Show_items();
-
-              if (!display_items) {
-                // open
-                $(".right-bar").addClass("open");
-                $("#show-right-btn").removeClass("hidden");
-                display_items = true;
-              }
             });
         };
         fileReader.readAsDataURL(args.file);
@@ -8484,27 +8285,32 @@
        * the download we just removed.
        */
       let prefetch_token = 0;
-      // Only the first few of a category. Pulling a whole category is easy to
-      // write and gives back most of the download we just removed — the towers
-      // category alone is about 6 MB, and someone places exactly one tower.
+      // Only the first few in the strip. Pulling everything on offer is easy
+      // to write and gives back most of the download we just removed — the
+      // towers alone are about 6 MB, and someone places exactly one tower.
       // Hover prefetch covers the rest precisely, so this only needs to cover
-      // the "clicked something near the top without pausing" case.
+      // the "clicked something near the front without pausing" case.
       const PREFETCH_PER_CATEGORY = 3;
       const PREFETCH_CONCURRENCY = 2;
 
-      const Prefetch_current_category = () => {
+      /**
+       * Warm the front of the strip. Takes the models rather than reading a
+       * category, because the strip is a flat list now and its contents turn
+       * over whenever the chosen spot changes — which is exactly when the
+       * previous guess stops being worth finishing.
+       */
+      const Prefetch_parts = (models) => {
         const link = navigator.connection;
         if (link && (link.saveData || /2g/.test(link.effectiveType || ""))) return;
-        if (typeof Categories === "undefined" || !Categories[category_index]) return;
+        if (!models || !models.length) return;
 
         const token = ++prefetch_token;
 
         const start = () => {
-          if (token !== prefetch_token) return; // category changed; abandon
-          const queue = (Categories[category_index].children || [])
-            .filter((child) => child.model && !child.model.mesh && child.model.capable())
-            .slice(0, PREFETCH_PER_CATEGORY)
-            .map((child) => child.model);
+          if (token !== prefetch_token) return; // strip changed; abandon
+          const queue = models
+            .filter((model) => model && !model.mesh)
+            .slice(0, PREFETCH_PER_CATEGORY);
 
           const pump = () => {
             if (token !== prefetch_token) return;
@@ -9383,7 +9189,6 @@
         down: 40,
       };
       const poi = new THREE.Vector3();
-      let display_items = true;
       let display_mulch = false;
       let display_email = false;
       let mulch_enabled = true;
@@ -9391,111 +9196,136 @@
       let category_index = 0;
       let item_index = 0;
 
-      const Show_categories = function () {
-        let html = "";
+      /**
+       * The bottom bar holds one flat list of parts. What goes in it is
+       * always the same question -- what can be added right now -- asked
+       * against a narrower or wider constraint:
+       *
+       *   nothing selected  ->  anything that fits somewhere on the set
+       *   a spot selected   ->  anything that fits that spot
+       *   swapping a part   ->  anything that fits the spot it sits in
+       *
+       * capable() answers all three, including the empty-yard case, where it
+       * returns towers only. So there is no separate "what do I show first"
+       * rule: the list starts as the towers because those are the only things
+       * that can stand on their own ground.
+       */
+      let active_category_filter = null;
 
-        // Use existing Categories system if available, otherwise fall back to objectMapping
-        if (typeof Categories !== 'undefined' && Categories.length > 0) {
-          let index = 0;
-          for (let category of Categories) {
-            // Find corresponding category key in objectMapping
-            let categoryKey = null;
-            if (objectMapping && objectMapping.categories) {
-              for (const [key, info] of Object.entries(objectMapping.categories)) {
-                if (info.name === category.name) {
-                  categoryKey = key;
-                  break;
-                }
-              }
-            }
+      const Escape_html = (text) =>
+        String(text).replace(/[&<>"']/g, (c) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c]);
 
-            html +=
-              '<h6 class="steps" id="steps-' +
-              index +
-              '"' +
-              (categoryKey ? ' data-category="' + categoryKey + '"' : '') +
-              '>' +
-              '<img class="step-image" src="' +
-              category.thumbnail +
-              '"/>' +
-              '<div class="step-text">' +
-              (index + 1) +
-              ". " +
-              category.name +
-              "</div>" +
-              "</h6>";
-            index++;
-          }
-
-          sub_step_container.innerHTML = html;
-
-          $(".steps").on("click", (event) => {
-            if (event && event.currentTarget && event.currentTarget.id) {
-              var index = event.currentTarget.id.replace(/^\D+/g, "");
-              category_index = parseInt(index);
-              // Set selected_category from data attribute or fallback to helper function
-              selected_category = event.currentTarget.getAttribute('data-category');
-              if (!selected_category && Categories && Categories[category_index]) {
-                selected_category = getCategoryKeyFromIndex(category_index);
-              }
-              Highlight_category();
-              Show_items();
-              Highlight_item();
-
-              if (!display_items) {
-                // open
-                $(".right-bar").addClass("open");
-                $("#show-right-btn").removeClass("hidden");
-                display_items = true;
-              }
-            }
-          });
-        } else if (objectMapping) {
-          // Use objectMapping.categories as fallback
-          const sortedCategories = Object.entries(objectMapping.categories)
-            .sort((a, b) => a[1].display_order - b[1].display_order);
-
-          sortedCategories.forEach(([categoryKey, categoryInfo], index) => {
-            html +=
-              '<h6 class="steps" data-category="' + categoryKey + '" id="steps-' +
-              index +
-              '">' +
-              '<img class="step-image" src="' +
-              'images/' + categoryKey + '_thumbnail.png' +
-              '"/>' +
-              '<div class="step-text">' +
-              (index + 1) +
-              ". " +
-              categoryInfo.name +
-              "</div>" +
-              "</h6>";
-          });
-
-          sub_step_container.innerHTML = html;
-
-          $(".steps").on("click", (event) => {
-            if (event && event.currentTarget) {
-              let categoryKey = event.currentTarget.getAttribute('data-category');
-              if (selected_category !== categoryKey) {
-                selected_category = categoryKey;
-                Highlight_category();
-                Show_items();
-                Highlight_item();
-
-                if (!display_items) {
-                  // open
-                  $(".right-bar").addClass("open");
-                  $("#show-right-btn").removeClass("hidden");
-                  $(".bottom-controls-right").css("right", "220px");
-                  display_items = true;
-                }
-              }
-            }
-          });
-        } else {
-          console.warn('Neither Categories nor objectMapping available for showing categories');
-        }
+      // Categories carry a display name; objectMapping keys them. Everything
+      // downstream wants both, and the two are only joined by that name.
+      const Category_meta = (category_index) => {
+        const name =
+          (typeof Categories !== "undefined" &&
+            Categories[category_index] &&
+            Categories[category_index].name) ||
+          null;
+        const key = getCategoryKeyFromIndex(category_index);
+        return {
+          key: key || "category-" + category_index,
+          name: name || "Category " + (category_index + 1),
+        };
       };
+
+      /**
+       * Every part that can be placed under the current constraint, tagged
+       * with the category it came from. Flat across categories on purpose:
+       * once a spot is picked, what fits it usually spans two of them, and
+       * making the user find the right rail first is the step this layout
+       * exists to remove.
+       */
+      const Placeable_parts = () => {
+        const parts = [];
+        if (typeof Categories === "undefined" || !Categories.length) return parts;
+
+        // Only a socket that is still open narrows anything. Attach_plug_to
+        // renders while selected_socket still names the opening it has just
+        // filled, and asking what fits a full socket answers "nothing" --
+        // which blanked the strip for a frame and, worse, looked exactly like
+        // every category having emptied at once.
+        const constraint = replacing
+          ? { socket: replacing.socket }
+          : selected_socket && Socket_is_open(selected_socket)
+          ? { socket: selected_socket }
+          : undefined;
+
+        With_opening_free(() => {
+          let category_index_i = 0;
+          for (const category of Categories) {
+            const meta = Category_meta(category_index_i);
+            let child_index = 0;
+            for (const child of category.children) {
+              child.index = child_index++;
+              if (child.model && child.model.capable(constraint)) {
+                parts.push({
+                  child,
+                  category_index: category_index_i,
+                  key: meta.key,
+                  name: meta.name,
+                });
+              }
+            }
+            category_index_i++;
+          }
+        });
+        return parts;
+      };
+
+      /**
+       * Chips are derived from what is in the strip, not from the seven
+       * categories. A category with nothing to offer here never appears, and
+       * where only one is left the row stands down -- a filter offering a
+       * single choice is just something else to read.
+       */
+      const Show_filters = function (groups) {
+        const row = document.getElementById("part_filter_row");
+        if (!row) return;
+
+        if (groups.length < 2) {
+          row.innerHTML = "";
+          row.classList.add("single");
+          return;
+        }
+        row.classList.remove("single");
+
+        const total = groups.reduce((sum, group) => sum + group.count, 0);
+        let html =
+          '<div class="part-chip' +
+          (active_category_filter ? "" : " active") +
+          '" data-category="">All<span class="chip-count">' +
+          total +
+          "</span></div>";
+
+        for (const group of groups) {
+          html +=
+            '<div class="part-chip' +
+            (active_category_filter === group.key ? " active" : "") +
+            '" data-category="' +
+            Escape_html(group.key) +
+            '">' +
+            Escape_html(group.name) +
+            '<span class="chip-count">' +
+            group.count +
+            "</span></div>";
+        }
+        row.innerHTML = html;
+
+        $(".part-chip").on("click", (event) => {
+          const key = event.currentTarget.getAttribute("data-category") || null;
+          active_category_filter = key;
+          Show_items();
+        });
+      };
+
       const Load_models = (args) => {
         // Keep the original Categories-based system but ensure object_id is set
         if (typeof Categories !== 'undefined' && Categories.length > 0) {
@@ -9540,217 +9370,111 @@
         }
       };
       const Show_items = function () {
+        const strip = document.getElementById("part_strip");
+        if (!strip) return;
+
+        const parts = Placeable_parts();
+
+        // Group for the chips, preserving catalogue order.
+        const groups = [];
+        const by_key = new Map();
+        for (const part of parts) {
+          let group = by_key.get(part.key);
+          if (!group) {
+            group = { key: part.key, name: part.name, count: 0 };
+            by_key.set(part.key, group);
+            groups.push(group);
+          }
+          group.count++;
+        }
+
+        // A filter left pointing at a category that has since emptied -- the
+        // spot changed, or the last one of something was placed -- would show
+        // an empty strip with no obvious way back, so it lapses.
+        // A filter left pointing at a category that has since emptied would
+        // show an empty strip with no obvious way back, so it lapses. An
+        // empty list is not that: it says nothing about any one category, and
+        // Attach_plug_to renders once mid-placement with nothing placeable at
+        // all. Lapsing on that threw away the user's choice on every part
+        // they placed.
+        if (
+          parts.length &&
+          active_category_filter &&
+          !by_key.has(active_category_filter)
+        ) {
+          active_category_filter = null;
+        }
+
+        Show_filters(groups);
+
+        const shown = active_category_filter
+          ? parts.filter((part) => part.key === active_category_filter)
+          : parts;
+
+        if (!shown.length) {
+          strip.innerHTML =
+            '<div id="part_strip_empty">' +
+            (selected_socket || replacing
+              ? "Nothing in the catalog fits this spot."
+              : "Nothing can be added here yet.") +
+            "</div>";
+          return;
+        }
+
         let html = "";
-        let cabuse = [];
-
-        // Use existing Categories system if available
-        if (typeof Categories !== 'undefined' && Categories.length > 0 && typeof category_index !== 'undefined') {
-          let index = 0;
-          if (typeof switchboard === 'undefined') {
-            switchboard = [];
-          }
-          switchboard[category_index] = [];
-
-          With_opening_free(() => {
-          for (let child of Categories[category_index].children) {
-            child.index = index;
-            const isCapable = child.model.capable(
-              replacing
-                ? { socket: replacing.socket }
-                : selected_socket
-                ? { socket: selected_socket }
-                : undefined
-            );
-            if (isCapable) {
-              html +=
-                '<h6 class="sub-items" id="sub-items-' +
-                index +
-                '" data-object-id="' +
-                (child.model.object_id || '') +
-                '">' +
-                '<div class="sub-item-text">' +
-                child.name +
-                "</div>" +
-                '<img class="sub-item-image" src="' +
-                child.thumbnail +
-                '"/>' +
-                "</h6>";
-              switchboard[category_index].push(child.index);
-            } else cabuse.push(child);
-
-            index++;
-          }
-          });
-
-          for (let child of cabuse) {
-            html +=
-              '<h6 class="sub-items disabled" id="sub-items-' +
-              index +
-              '" data-object-id="' +
-              (child.model.object_id || '') +
-              '">' +
-              '<div class="sub-item-text">' +
-              child.name +
-              "</div>" +
-              '<img class="sub-item-image" style="filter: grayscale(100%);" src="' +
-              child.thumbnail +
-              '"/>' +
-              "</h6>";
-            switchboard[category_index].push(child.index);
-          }
-
-          sub_item_container.innerHTML = html;
-
-          $(".sub-items").on("click", (event) => {
-            if (event && event.currentTarget) {
-              // Prevent interaction with disabled items
-              if (event.currentTarget.classList.contains('disabled')) {
-                return;
-              }
-              let objectId = event.currentTarget.getAttribute('data-object-id');
-              if (objectId) {
-                selected_object_id = objectId;
-                Highlight_item();
-                Run_item_click(event.currentTarget, objectId);
-              } else {
-                // Fallback to index-based system
-                var index = event.currentTarget.id.replace(/^\D+/g, "");
-                item_index = parseInt(index);
-                Highlight_item(switchboard[category_index].indexOf(item_index));
-                Run_item_click(event.currentTarget, null);
-              }
-            }
-          });
-
-          // Hovering is a strong hint the item is about to be clicked, so
-          // start the fetch now rather than on mousedown.
-          $(".sub-items").on("mouseenter", (event) => {
-            if (!event.currentTarget.classList.contains("disabled"))
-              Prefetch_model(event.currentTarget.getAttribute("data-object-id"));
-          });
-
-          Prefetch_current_category();
-        } else if (objectMapping && selected_category) {
-          // Fallback to objectMapping system
-          let availableObjects = [];
-          let unavailableObjects = [];
-
-          // Get objects for the selected category
-          const categoryObjects = Object.entries(objectMapping.objects)
-            .filter(([objectId, objectInfo]) => objectInfo.category === selected_category)
-            .sort((a, b) => a[1].index - b[1].index);
-
-          categoryObjects.forEach(([objectId, objectInfo]) => {
-            // Find the model instance for this object
-            let model = Model.instances.find(m => m.object_id === objectId);
-
-            // Fallback: if no model found by object_id, try to find by category and index
-            if (!model && objectMapping.categories[objectInfo.category]) {
-              const categoryDisplayOrder = objectMapping.categories[objectInfo.category].display_order;
-              model = Model.instances.find(m =>
-                m.category === categoryDisplayOrder &&
-                m.children_index === objectInfo.index
-              );
-              // Set the object_id if found via fallback
-              if (model) {
-                model.object_id = objectId;
-              }
-            }
-
-            if (model) {
-              const isCapable = model.capable();
-              if (isCapable) {
-                availableObjects.push({ objectId, objectInfo, model });
-              } else {
-                unavailableObjects.push({ objectId, objectInfo, model });
-              }
-            } else {
-              console.warn(`Object mapping - No model found for ${objectInfo.name} (${objectId})`);
-            }
-          });
-
-          // Show available objects first
-          availableObjects.forEach(({ objectId, objectInfo, model }) => {
-            html +=
-              '<h6 class="sub-items" data-object-id="' + objectId + '">' +
-              '<div class="sub-item-text">' +
-              objectInfo.name +
-              "</div>" +
-              '<img class="sub-item-image" src="' +
-              `images/${objectId}_thumbnail.png` +
-              '"/>' +
-              "</h6>";
-          });
-
-          // Show unavailable objects (grayed out)
-          unavailableObjects.forEach(({ objectId, objectInfo, model }) => {
-            html +=
-              '<h6 class="sub-items disabled" data-object-id="' + objectId + '">' +
-              '<div class="sub-item-text">' +
-              objectInfo.name +
-              "</div>" +
-              '<img class="sub-item-image" style="filter: grayscale(100%);" src="' +
-              `images/${objectId}_thumbnail.png` +
-              '"/>' +
-              "</h6>";
-          });
-
-          sub_item_container.innerHTML = html;
-
-          $(".sub-items").on("click", (event) => {
-            if (event && event.currentTarget) {
-              // Prevent interaction with disabled items
-              if (event.currentTarget.classList.contains('disabled')) {
-                return;
-              }
-              let objectId = event.currentTarget.getAttribute('data-object-id');
-              if (selected_object_id !== objectId) {
-                selected_object_id = objectId;
-                Highlight_item();
-                Run_item_click(event.currentTarget, objectId);
-              }
-            }
-          });
-
-          // Hovering is a strong hint the item is about to be clicked, so
-          // start the fetch now rather than on mousedown.
-          $(".sub-items").on("mouseenter", (event) => {
-            if (!event.currentTarget.classList.contains("disabled"))
-              Prefetch_model(event.currentTarget.getAttribute("data-object-id"));
-          });
-        } else {
-          console.warn('Cannot show items: no Categories or objectMapping/selected_category available');
+        for (const part of shown) {
+          const object_id = (part.child.model && part.child.model.object_id) || "";
+          html +=
+            '<div class="part-tile" data-object-id="' +
+            Escape_html(object_id) +
+            '" data-category-index="' +
+            part.category_index +
+            '" data-item-index="' +
+            part.child.index +
+            '" title="' +
+            Escape_html(part.child.name) +
+            " — " +
+            Escape_html(part.name) +
+            '">' +
+            '<img class="part-tile-image" src="' +
+            part.child.thumbnail +
+            '"/>' +
+            '<div class="part-tile-text">' +
+            Escape_html(part.child.name) +
+            "</div>" +
+            "</div>";
         }
-      };
-      const Highlight_category = function () {
-        // Clear all category selections first
-        $(".steps").removeClass("active");
-        $(".steps img").css("opacity", 1);
+        strip.innerHTML = html;
 
-        // Use object ID-based highlighting if available
-        if (selected_category) {
-          $(`.steps[data-category="${selected_category}"]`).addClass("active");
-        } else if (typeof category_index !== 'undefined') {
-          // Fallback to index-based highlighting
-          $(`#steps-${category_index}`).addClass("active");
-        }
-      };
-      const Highlight_item = function (override_index) {
-        // Clear all selections first
-        $(".sub-items").removeClass("selected");
-        $(".sub-item-image").css("opacity", 1);
+        $(".part-tile").on("click", (event) => {
+          const tile = event.currentTarget;
+          // Both are set: object ids are the real key, but Item_clicked still
+          // falls back to the pair when object-mapping.json has not landed.
+          category_index = parseInt(tile.getAttribute("data-category-index"), 10);
+          item_index = parseInt(tile.getAttribute("data-item-index"), 10);
+          const object_id = tile.getAttribute("data-object-id");
+          selected_object_id = object_id || null;
+          Highlight_item();
+          Run_item_click(tile, object_id || null);
+        });
 
-        // Use object ID-based highlighting if available
+        // Hovering is a strong hint the item is about to be clicked, so
+        // start the fetch now rather than on mousedown.
+        $(".part-tile").on("mouseenter", (event) => {
+          Prefetch_model(event.currentTarget.getAttribute("data-object-id"));
+        });
+
+        Highlight_item();
+        Prefetch_parts(shown.map((part) => part.child.model));
+      };
+
+      const Highlight_item = function () {
+        $(".part-tile").removeClass("selected");
         if (selected_object_id) {
-          $(`.sub-items[data-object-id="${selected_object_id}"]`).addClass("selected");
-        } else if (typeof override_index !== 'undefined') {
-          // Use provided index
-          $(`#sub-items-${override_index}`).addClass("selected");
-        } else if (typeof item_index !== 'undefined') {
-          // Fallback to item_index
-          $(`#sub-items-${item_index}`).addClass("selected");
+          $('.part-tile[data-object-id="' + selected_object_id + '"]').addClass("selected");
         }
       };
+
 
       $("#controls-buttons-info").on("click", (event) => {
         show_info = !show_info;
@@ -9819,29 +9543,6 @@
       });
       $("#controls-buttons-download").on("click", (event) => {
         Save();
-      });
-      let display_categories = true;
-
-      $("#show-left-btn").on("click", (event) => {
-        if (display_categories) {
-          $(".left-bar").removeClass("open");
-          $("#show-left-btn").addClass("hidden");
-        } else {
-          $(".left-bar").addClass("open");
-          $("#show-left-btn").removeClass("hidden");
-        }
-        display_categories = !display_categories;
-      });
-
-      $("#show-right-btn").on("click", (event) => {
-        if (display_items) {
-          $(".right-bar").removeClass("open");
-          $("#show-right-btn").addClass("hidden");
-        } else {
-          $(".right-bar").addClass("open");
-          $("#show-right-btn").removeClass("hidden");
-        }
-        display_items = !display_items;
       });
       $("#custom-controls-delete").on("click", (event) => {
         // Hide color options popup immediately when delete is pressed
@@ -9988,7 +9689,7 @@
         // tile goes out with data-object-id="". Clicks still worked, falling
         // back to an index lookup, but anything keyed on the id — the hover
         // prefetch — silently did nothing. Re-render now that ids exist.
-        if (typeof sub_item_container !== "undefined" && sub_item_container) {
+        if (document.getElementById("part_strip")) {
           Show_items();
         }
       });
@@ -10415,19 +10116,7 @@
         });
 
       Load_models();
-      initializeObjectIdSystem();
-      Show_categories();
       Show_items();
-      Highlight_category();
-      Highlight_item();
-
-      // Initialize right sidebar as open
-      $(".right-bar").addClass("open");
-      $("#show-right-btn").removeClass("hidden");
-
-      // Initialize left sidebar as open
-      $(".left-bar").addClass("open");
-      $("#show-left-btn").removeClass("hidden");
 
       // Ensure mulch options start hidden
       $(".mulch").hide();
