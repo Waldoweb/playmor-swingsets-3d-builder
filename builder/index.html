@@ -1357,19 +1357,18 @@
          ================================================================ */
       #brand {
         position: fixed;
-        left: 24px;
-        top: 18px;
+        left: 20px;
+        top: 12px;
         z-index: 990;
-        display: flex;
-        align-items: baseline;
-        gap: 8px;
-        color: #fff;
-        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
         pointer-events: none;
         user-select: none;
       }
-      #brand_name { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; }
-      #brand_sub { font-size: 12px; font-weight: 500; opacity: 0.85; }
+      #brand_logo {
+        display: block;
+        height: 64px;
+        width: auto;
+        filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.35));
+      }
 
       #command_strip {
         position: fixed;
@@ -1532,17 +1531,16 @@
         border-radius: 22px;
         border: 0;
         background: linear-gradient(135deg, #ce030c, #a50209);
-        box-shadow: 0 4px 16px rgba(206, 3, 12, 0.45);
         color: #fff;
         font-family: inherit;
         font-size: 15px;
         font-weight: 700;
         white-space: nowrap;
         cursor: pointer;
-        transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+        transition: transform 0.15s ease, background 0.15s ease, opacity 0.15s ease;
       }
-      .cta:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(206, 3, 12, 0.5); }
-      .cta:disabled { opacity: 0.55; cursor: default; transform: none; box-shadow: none; }
+      .cta:hover { transform: translateY(-1px); background: linear-gradient(135deg, #d9101a, #b00410); }
+      .cta:disabled { opacity: 0.55; cursor: default; transform: none; }
       .cta[hidden] { display: none; }
 
       /* ---- the side panel: the parts list, and the quote form under it */
@@ -1647,7 +1645,7 @@
          the room between the wordmark and the panel, and the wordmark
          drops its subtitle to make that room. */
       body.panel-open #command_strip { left: calc(120px + (100% - var(--panel-w) - 120px) / 2); }
-      body.panel-open #brand_sub { display: none; }
+      body.panel-open #brand_logo { height: 52px; }
       #playground_snapshot img { max-height: 150px; object-fit: cover; }
       .custom-controls-unified,
       #rotation-hint {
@@ -1659,7 +1657,7 @@
       body.panel-open #rotation-hint { left: calc((100vw - var(--panel-w)) / 2); }
 
       @media (max-width: 1100px) {
-        #brand_sub { display: none; }
+        #brand_logo { height: 52px; }
         .pill { padding: 0 10px; }
       }
       @media (max-width: 900px) {
@@ -1676,7 +1674,8 @@
         #command_strip::-webkit-scrollbar { display: none; }
         .pill-menu { position: static; }
         .menu { left: 12px; top: 112px; position: fixed; }
-        #brand { top: 16px; }
+        #brand { top: 10px; }
+        #brand_logo { height: 44px; }
         #top_actions { top: 10px; }
         .cta { height: 40px; font-size: 14px; padding: 0 16px; }
         :root { --panel-w: 100vw; }
@@ -1704,9 +1703,8 @@
            form, and the parts bar along the bottom. The design these
            follow is the "Command strip" canvas; see the memory notes.
            ------------------------------------------------------------ -->
-      <div id="brand" aria-hidden="true">
-        <div id="brand_name">PlayMor</div>
-        <div id="brand_sub">Swing Set Builder</div>
+      <div id="brand">
+        <img id="brand_logo" src="images/playmor-logo-white.svg" alt="PlayMor Swing Sets" />
       </div>
 
       <div id="command_strip" role="toolbar" aria-label="Design tools">
