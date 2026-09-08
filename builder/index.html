@@ -399,6 +399,62 @@
         font-weight: 500;
       }
 
+      /* The strip, with a paging arrow over each end. The arrows stop short
+         of the scrollbar so it can still be dragged right to the edges. */
+      .strip-wrap {
+        position: relative;
+        flex: 1 1 auto;
+        display: flex;
+        min-height: 0;
+      }
+      .strip-arrow {
+        position: absolute;
+        top: 10px;
+        /* A height rather than a bottom offset: Chrome will not stretch a
+           button between top and bottom, it keeps its intrinsic height. */
+        height: calc(100% - 28px);
+        width: 56px;
+        border: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #fff;
+        z-index: 2;
+        transition: opacity 0.2s ease;
+      }
+      .strip-arrow-left {
+        left: 0;
+        background: linear-gradient(90deg, rgba(0, 0, 0, 0.85) 30%, rgba(0, 0, 0, 0));
+      }
+      .strip-arrow-right {
+        right: 0;
+        background: linear-gradient(270deg, rgba(0, 0, 0, 0.85) 30%, rgba(0, 0, 0, 0));
+      }
+      .strip-arrow span {
+        width: 34px;
+        height: 34px;
+        border-radius: 17px;
+        background: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s ease;
+      }
+      .strip-arrow:hover span { background: rgba(255, 255, 255, 0.32); }
+      .strip-arrow svg {
+        width: 20px;
+        height: 20px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .strip-arrow.off { opacity: 0; pointer-events: none; }
+
       /* The strip itself. */
       #part_strip {
         display: flex;
@@ -443,6 +499,10 @@
         position: relative;
         flex: 0 0 auto;
         width: 128px;
+        touch-action: pan-x;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-user-drag: none;
         padding: 6px;
         display: flex;
         flex-direction: column;
@@ -564,7 +624,7 @@
         z-index: 985;
         align-items: center;
         gap: 14px;
-        padding: 8px 8px 8px 16px;
+        padding: 8px 40px 8px 16px;
         border-radius: 22px;
         background: rgba(0, 0, 0, 0.8);
         backdrop-filter: blur(10px);
@@ -575,9 +635,12 @@
         box-sizing: border-box;
         transition: bottom 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
       }
-      .sel-head { display: flex; align-items: center; gap: 6px; padding-right: 14px; border-right: 1px solid rgba(255, 255, 255, 0.2); align-self: stretch; }
+      .sel-head { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 8px; padding-right: 14px; border-right: 1px solid rgba(255, 255, 255, 0.2); align-self: stretch; }
       .sel-name { font-size: 13px; font-weight: 700; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
       .sel-close {
+        position: absolute;
+        top: 6px;
+        right: 6px;
         width: 26px;
         height: 26px;
         border-radius: 13px;
@@ -627,7 +690,6 @@
       .roof-type-group { display: flex; align-items: center; gap: 8px; }
       .roof-type-group + .roof-type-group { padding-left: 12px; border-left: 1px solid rgba(255, 255, 255, 0.2); }
       .roof-type-label { font-size: 11px; font-weight: 600; color: rgba(255, 255, 255, 0.75); }
-      .sel-actions { display: flex; align-items: center; padding-left: 14px; border-left: 1px solid rgba(255, 255, 255, 0.2); align-self: stretch; }
       .sel-delete {
         display: flex;
         align-items: center;
@@ -647,8 +709,8 @@
       .sel-delete:hover { background: rgba(206, 3, 12, 0.85); border-color: #ce030c; color: #fff; }
       .sel-delete[hidden] { display: none; }
       @media (max-width: 900px) {
-        .custom-controls-unified { flex-wrap: wrap; justify-content: center; gap: 10px; padding: 10px 12px; }
-        .sel-head, .sel-actions { border: 0; padding: 0; }
+        .custom-controls-unified { flex-wrap: wrap; justify-content: center; gap: 10px; padding: 10px 36px 10px 12px; }
+        .sel-head { border: 0; padding: 0; flex-direction: row; align-items: center; gap: 10px; }
       }
 
       .cedar-tan-split {
@@ -1768,14 +1830,20 @@
         <div class="bar-context">
           <div id="part_filter_row"></div>
         </div>
-        <div id="part_strip"></div>
+        <div class="strip-wrap">
+          <button id="strip_prev" class="strip-arrow strip-arrow-left off" type="button" title="Earlier parts" aria-label="Scroll the parts list left"><span><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 6 9 12 15 18" /></svg></span></button>
+          <div id="part_strip"></div>
+          <button id="strip_next" class="strip-arrow strip-arrow-right off" type="button" title="More parts" aria-label="Scroll the parts list right"><span><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18" /></svg></span></button>
+        </div>
       </div>
-      <!-- The selection toolbar: what the clicked part is, the colours it
-           offers, and Delete. Sits above the parts bar, centred over the yard. -->
+      <!-- The selection toolbar: what the clicked part is with Delete beneath it,
+           the colours it offers, and a close X in the corner. Sits above the
+           parts bar, centred over the yard. -->
       <div class="custom-controls-unified" id="selection_bar" style="display: none" role="toolbar" aria-label="Selected part">
+        <button class="sel-close" id="selection_close" type="button" title="Close" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6 6 18"></path></svg></button>
         <div class="sel-head">
           <div class="sel-name" id="selection_name">Part</div>
-          <button class="sel-close" id="selection_close" type="button" title="Close" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6 6 18"></path></svg></button>
+          <button id="custom-controls-delete" class="sel-delete" type="button" title="Remove this part from the design"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M10 11v6M14 11v6"></path><path d="M6 7l1 13h10l1-13"></path><path d="M9 7V4h6v3"></path></svg><span>Delete</span></button>
         </div>
         <div id="custom-controls-padding" class="sel-rows">
           <div class="custom-controls-row" id="frame-section" style="display: none;">
@@ -1801,9 +1869,6 @@
               <div class="custom-controls-color-poly"></div>
             </div>
           </div>
-        </div>
-        <div class="sel-actions">
-          <button id="custom-controls-delete" class="sel-delete" type="button" title="Remove this part from the design"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M10 11v6M14 11v6"></path><path d="M6 7l1 13h10l1-13"></path><path d="M9 7V4h6v3"></path></svg><span>Delete</span></button>
         </div>
       </div>
 
@@ -1947,6 +2012,21 @@
       // catalogue with everything that would fit where it sits, and choosing
       // one swaps it. Null whenever nothing is selected.
       let replacing = null;
+
+      // The target the carried part has locked onto, if any. Update_carried
+      // sets it every frame while a part is in hand; Pointer_down attaches to
+      // it, and the marker loop draws it larger than the rest. The targets
+      // drawn this frame are kept so the snap search only considers dots the
+      // user can actually see -- an occluded joint is still the "closest" by
+      // distance, but nobody is aiming at it.
+      let snapped_joint = null;
+      let carry_targets = [];
+      // How close counts as "on it", in screen pixels: from the pointer to a
+      // dot, or from the carried part's outline to a dot. The second is what
+      // lets a swing snap when its seat is put where the seat should hang,
+      // with the pointer a couple of feet above the hanger.
+      const SNAP_RADIUS = 80;
+      const SNAP_BODY_RADIUS = 24;
 
       // The opening the user has picked, and every opening currently on screen.
       // Sockets rather than joints: one dot per place a part can go, however
@@ -2261,6 +2341,7 @@
        * loop had switched it off, but there.
        */
       const Drop_carried = () => {
+        snapped_joint = null;
         if (plug_model && plug_model.mesh && !picked_meshes.includes(plug_model.mesh)) {
           scene.remove(plug_model.mesh);
         }
@@ -4974,23 +5055,28 @@
        * reads as a hint. The hit target stays the sprite-sized box, so the
        * marker can shrink without becoming fiddly to click.
        */
-      const Draw_add_marker = (joint, highlighted) => {
+      const Draw_add_marker = (joint, highlighted, locked) => {
         const size = joint_image.height / 2;
         const cx = joint.x + size / 2;
         const cy = joint.y + size / 2;
-        const r = highlighted ? 11 : 8;
+        // Locked: the part in hand has snapped onto this one. It grows, pulses
+        // faster and gets a heavy white ring, and every other target steps
+        // back so there is no doubt which joint a click will fill.
+        const r = locked ? 17 : highlighted ? 11 : 8;
         const rgb = highlighted ? ADD_MARKER_GREEN_RGB : ADD_MARKER_RED_RGB;
 
         context.save();
+        if (highlighted && !locked && snapped_joint) context.globalAlpha = 0.4;
 
         if (!reduced_motion) {
           // An expanding stroked ring reads as a pulse far more clearly than a
           // disc fading outward, which at low opacity was barely perceptible.
-          const phase = (performance.now() % 1600) / 1600;
+          const period = locked ? 700 : 1600;
+          const phase = (performance.now() % period) / period;
           context.beginPath();
-          context.arc(cx, cy, r + 1 + phase * 5, 0, Math.PI * 2);
+          context.arc(cx, cy, r + 1 + phase * (locked ? 9 : 5), 0, Math.PI * 2);
           context.strokeStyle = "rgba(" + rgb + ", " + (0.7 * (1 - phase)).toFixed(3) + ")";
-          context.lineWidth = 2.5;
+          context.lineWidth = locked ? 3.5 : 2.5;
           context.stroke();
         }
 
@@ -4998,8 +5084,8 @@
         context.arc(cx, cy, r, 0, Math.PI * 2);
         context.fillStyle = highlighted ? ADD_MARKER_GREEN : ADD_MARKER_RED;
         context.fill();
-        context.lineWidth = 1.5;
-        context.strokeStyle = "rgba(255, 255, 255, 0.92)";
+        context.lineWidth = locked ? 3 : 1.5;
+        context.strokeStyle = locked ? "#ffffff" : "rgba(255, 255, 255, 0.92)";
         context.stroke();
 
         const arm = r * 0.48;
@@ -5040,6 +5126,8 @@
 
         // highlight available hosts joints
         //for ( let box3 of box3s ) scene . remove ( box3 )
+        carry_targets = [];
+        if (Mode.plugging != Mode.mode || !plug_model) snapped_joint = null;
         if (Mode.plugging == Mode.mode) {
           let size = joint_image.height / 2;
           for (let model of models_with_available_joints)
@@ -5127,7 +5215,8 @@
                     // Green rather than red: red means "one of many places you
                     // could go", and while a part is being carried every dot
                     // shown is a live target for the thing in hand.
-                    Draw_add_marker(joint, true);
+                    Draw_add_marker(joint, true, joint === snapped_joint);
+                    carry_targets.push(joint);
                   }
                 }
               }
@@ -5205,84 +5294,168 @@
           }
         }
 
-        // rotate the plug
-        if (Mode.plugging == Mode.mode && plug_model) {
-          mouse.x = (Pointers.position.x / canvas.width) * 2 - 1;
-          mouse.y = (-Pointers.position.y / canvas.height) * 2 + 1;
-          raycaster.setFromCamera(mouse, camera);
-          let intersectables = picked_meshes.slice();
-          intersectables.push(skybox.mesh);
-          let intersection_objects = raycaster.intersectObjects(
-            intersectables,
-            true
-          );
-          if (intersection_objects.length > 0) {
-            let i = intersection_objects[0];
-            let io = i.object;
-            let ip = i.point;
-
-            //						if ( Mode . plugging == Mode . mode ) {
-            host_joint = Find_closest_available_joint({
-              position: Pointers.position,
-            });
-            if (host_joint != null) {
-              // A swing switches to the mesh built for this beam's length as
-              // it is carried over the hanger. Its joint is found again by
-              // name, since morph rebuilds the joint list.
-              const carried_name = plug_joint.name;
-              const carried_index = plug_joint.index;
-              if (Morph_to_fit(plug_model, host_joint)) {
-                plug_joint =
-                  Find_saved_joint(plug_model, carried_name, carried_index) ||
-                  plug_model.joints[0];
-                plug_joint_index = plug_model.joints.indexOf(plug_joint);
-              }
-
-              plug_model.mesh.rotation.y =
-                Lookup_yaw({
-                  host_model_yaw: host_joint.model.yaw,
-                  host_joint_direction: host_joint.direction,
-                  plug_joint_direction: plug_joint.direction,
-                }) * Deg2Rad;
-
-              // A handle accessory follows its host step's slope.
-              if (host_joint.layer == "handle") {
-                plug_model.mesh.traverse((mesh) => {
-                  if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
-                    mesh.rotation.x = host_joint.model.slope * Deg2Rad;
-                });
-              }
-
-              let pjp = new THREE.Vector3();
-              plug_joint.getWorldPosition(pjp);
-              let mjp = new THREE.Vector3();
-              plug_model.mesh.getWorldPosition(mjp);
-              let p = new THREE.Vector3();
-              p.subVectors(mjp, pjp);
-
-              if (
-                Pointers.position.x > host_joint.x &&
-                Pointers.position.x < host_joint.x + joint_image.height / 2 &&
-                Pointers.position.y > host_joint.y &&
-                Pointers.position.y < host_joint.y + joint_image.height / 2
-              ) {
-                let pp = new THREE.Vector3();
-                host_joint.getWorldPosition(pp);
-                p.add(pp);
-              } else p.add(ip);
-
-              if (p.y < 0) p.y = 0;
-              plug_model.mesh.position.copy(p);
-            } else {
-              plug_model.mesh.rotation.y = plug_model.yaw * Deg2Rad;
-              plug_model.mesh.position.copy(ip);
-              plug_model.mesh.position.y += plug_model.ground_offset;
-            }
-            //						}
-          }
-        }
+        Update_carried();
 
         Render();
+      };
+
+      /**
+       * Turn the carried part to suit a host joint: the swing mesh built for
+       * this beam, the yaw the pair calls for, and a handle's slope. Pulled
+       * out of Update_carried because it runs twice a frame when the snap
+       * search settles on a different joint than the plain nearest one.
+       */
+      const Orient_carried_to = (host) => {
+        // A swing switches to the mesh built for this beam's length as it is
+        // carried over the hanger. Its joint is found again by name, since
+        // morph rebuilds the joint list.
+        const carried_name = plug_joint.name;
+        const carried_index = plug_joint.index;
+        if (Morph_to_fit(plug_model, host)) {
+          plug_joint =
+            Find_saved_joint(plug_model, carried_name, carried_index) ||
+            plug_model.joints[0];
+          plug_joint_index = plug_model.joints.indexOf(plug_joint);
+        }
+
+        plug_model.mesh.rotation.y =
+          Lookup_yaw({
+            host_model_yaw: host.model.yaw,
+            host_joint_direction: host.direction,
+            plug_joint_direction: plug_joint.direction,
+          }) * Deg2Rad;
+
+        // A handle accessory follows its host step's slope.
+        if (host.layer == "handle") {
+          plug_model.mesh.traverse((mesh) => {
+            if (mesh.name && mesh.name.indexOf("_colorize_") != -1)
+              mesh.rotation.x = host.model.slope * Deg2Rad;
+          });
+        }
+      };
+
+      /** Mesh origin relative to the carried joint, for the current rotation. */
+      const Carried_offset = () => {
+        const pjp = new THREE.Vector3();
+        plug_joint.getWorldPosition(pjp);
+        const mjp = new THREE.Vector3();
+        plug_model.mesh.getWorldPosition(mjp);
+        return mjp.sub(pjp);
+      };
+
+      /**
+       * Where the carried part's outline would sit on screen with its joint at
+       * `at`, as a rectangle in canvas pixels. Null when any corner is behind
+       * the camera, which is rare enough not to be worth clipping properly.
+       */
+      const Carried_screen_rect = (at) => {
+        const mesh = plug_model.mesh;
+        mesh.updateMatrixWorld(true);
+        const box = new THREE.Box3().setFromObject(mesh);
+        if (box.isEmpty()) return null;
+        box.translate(new THREE.Vector3().subVectors(at, mesh.position));
+        const wh = 0.5 * renderer.getContext().canvas.width;
+        const hh = 0.5 * renderer.getContext().canvas.height;
+        let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+        const corner = new THREE.Vector3();
+        for (let i = 0; i < 8; i++) {
+          corner.set(
+            i & 1 ? box.max.x : box.min.x,
+            i & 2 ? box.max.y : box.min.y,
+            i & 4 ? box.max.z : box.min.z
+          );
+          corner.project(camera);
+          if (corner.z > 1) return null;
+          const sx = corner.x * wh + wh;
+          const sy = -(corner.y * hh) + hh;
+          if (sx < x0) x0 = sx;
+          if (sx > x1) x1 = sx;
+          if (sy < y0) y0 = sy;
+          if (sy > y1) y1 = sy;
+        }
+        return { x0, y0, x1, y1 };
+      };
+
+      /** Distance from a point to a rectangle's edge; zero inside it. */
+      const Rect_distance = (rect, x, y) => {
+        const dx = Math.max(rect.x0 - x, 0, x - rect.x1);
+        const dy = Math.max(rect.y0 - y, 0, y - rect.y1);
+        return Math.hypot(dx, dy);
+      };
+
+      /**
+       * The visible target the carried part should lock onto, or null.
+       *
+       * A dot qualifies when it is near the pointer or near the part's own
+       * outline at the position it would have if it kept following the
+       * pointer. Among those, the one nearest the pointer wins, so where four
+       * hangers sit along one beam the pointer still decides between them.
+       */
+      const Find_snap_joint = (targets, follow) => {
+        if (!targets.length) return null;
+        const size = joint_image.height / 2;
+        const rect = Carried_screen_rect(follow);
+        let best = null;
+        let best_distance = Infinity;
+        for (const joint of targets) {
+          const cx = joint.x + size / 2;
+          const cy = joint.y + size / 2;
+          const to_pointer = Math.hypot(cx - Pointers.position.x, cy - Pointers.position.y);
+          const to_body = rect ? Rect_distance(rect, cx, cy) : Infinity;
+          if (to_pointer > SNAP_RADIUS && to_body > SNAP_BODY_RADIUS) continue;
+          if (to_pointer < best_distance) {
+            best_distance = to_pointer;
+            best = joint;
+          }
+        }
+        return best;
+      };
+
+      /**
+       * Move the part in hand to follow the pointer, snapping it onto a target
+       * when one is close. Called every frame by Tik, and again by Pointer_down
+       * and the strip drag before they decide whether to attach -- on touch
+       * there is no hover, so the position it last saw can be a screen away.
+       */
+      const Update_carried = () => {
+        if (Mode.plugging != Mode.mode || !plug_model) return;
+        mouse.x = (Pointers.position.x / canvas.width) * 2 - 1;
+        mouse.y = (-Pointers.position.y / canvas.height) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        let intersectables = picked_meshes.slice();
+        intersectables.push(skybox.mesh);
+        let intersection_objects = raycaster.intersectObjects(intersectables, true);
+        if (intersection_objects.length == 0) return;
+        const ip = intersection_objects[0].point;
+
+        host_joint = Find_closest_available_joint({ position: Pointers.position });
+        if (host_joint != null) {
+          Orient_carried_to(host_joint);
+          const follow = Carried_offset().add(ip);
+          const snap = Find_snap_joint(carry_targets, follow);
+          if (snap && snap !== host_joint) {
+            host_joint = snap;
+            Orient_carried_to(host_joint);
+          }
+          snapped_joint = snap;
+
+          let p;
+          if (snap) {
+            p = Carried_offset();
+            const pp = new THREE.Vector3();
+            snap.getWorldPosition(pp);
+            p.add(pp);
+          } else {
+            p = follow;
+          }
+          if (p.y < 0) p.y = 0;
+          plug_model.mesh.position.copy(p);
+        } else {
+          snapped_joint = null;
+          plug_model.mesh.rotation.y = plug_model.yaw * Deg2Rad;
+          plug_model.mesh.position.copy(ip);
+          plug_model.mesh.position.y += plug_model.ground_offset;
+        }
       };
       const Pointer_down = (args) => {
         mouse.x = (Pointers.position.x / canvas.width) * 2 - 1;
@@ -5362,17 +5535,16 @@
             break;
           case Mode.plugging:
             {
+              // Bring the snap up to date for this exact position: a tap has
+              // no hover before it, so Tik may be holding a stale target.
+              Update_carried();
               const canConnect = host_joint && Can_connect({
                 plug_joint: plug_joint,
                 host_joint: host_joint,
               });
-              const inClickArea = host_joint &&
-                Pointers.position.x > host_joint.x &&
-                Pointers.position.x < host_joint.x + joint_image.height / 2 &&
-                Pointers.position.y > host_joint.y &&
-                Pointers.position.y < host_joint.y + joint_image.height / 2;
-
-              if (canConnect && inClickArea) {
+              // Snapped is the whole test now. The part is already sitting on
+              // the joint, so the click means "yes, there".
+              if (canConnect && snapped_joint === host_joint) {
                 Attach_plug_to(host_joint);
               }
             }
@@ -7824,7 +7996,15 @@
         mouse = new THREE.Vector2();
 
         orbitControls = new THREE.OrbitControls(camera, canvas);
-        orbitControls.enableDamping = false;
+        // Roughly half the stock speeds, with a little inertia. At the
+        // defaults a small wheel tick or a short drag threw the yard around,
+        // which kids found hard to control. Damping needs update() every
+        // frame, which Tik already does.
+        orbitControls.enableDamping = true;
+        orbitControls.dampingFactor = 0.12;
+        orbitControls.rotateSpeed = 0.5;
+        orbitControls.zoomSpeed = 0.5;
+        orbitControls.panSpeed = 0.6;
         orbitControls.maxPolarAngle = Math.PI / 2 - 0.01;
         // Zooming is the wheel, or a pinch on touch — OrbitControls handles
         // both. The slider that used to sit beside the top buttons is gone;
@@ -8294,6 +8474,8 @@
         strip.innerHTML = html;
 
         $(".part-tile").on("click", (event) => {
+          // The release that ended a drag out of the strip lands here too.
+          if (performance.now() < tile_drag.suppress_click_until) return;
           const tile = event.currentTarget;
           // Both are set: object ids are the real key, but Item_clicked still
           // falls back to the pair when object-mapping.json has not landed.
@@ -8305,6 +8487,11 @@
           Run_item_click(tile, object_id || null);
         });
 
+        // Press-and-drag from a tile carries the part straight into the
+        // yard, which is what people try before they learn "click, then aim".
+        $(".part-tile").on("pointerdown", Tile_pointer_down);
+        $(".part-tile").on("dragstart", (event) => event.preventDefault());
+
         // Hovering is a strong hint the item is about to be clicked, so
         // start the fetch now rather than on mousedown.
         $(".part-tile").on("mouseenter", (event) => {
@@ -8314,7 +8501,69 @@
         Highlight_item();
         Prefetch_parts(shown.map((part) => part.child.model));
         Refresh_panel();
+        Update_strip_arrows();
       };
+
+      // ---------------------------------------- dragging a part out of the strip
+      // A press on a tile that moves this far becomes a carry: the part appears
+      // under the pointer exactly as if the tile had been clicked, and follows
+      // it. Releasing on a snapped target attaches; releasing anywhere else
+      // leaves the part in hand, so nothing is lost by letting go early.
+      const TILE_DRAG_THRESHOLD = 10;
+      const tile_drag = {
+        tile: null,
+        x: 0,
+        y: 0,
+        carrying: false,
+        suppress_click_until: 0,
+      };
+      const Tile_pointer_down = (event) => {
+        const e = event.originalEvent || event;
+        if (e.button !== undefined && e.button !== 0) return;
+        tile_drag.tile = event.currentTarget;
+        tile_drag.x = e.clientX;
+        tile_drag.y = e.clientY;
+        tile_drag.carrying = false;
+      };
+      document.addEventListener("pointermove", (event) => {
+        if (!tile_drag.tile) return;
+        if (!tile_drag.carrying) {
+          const moved = Math.hypot(event.clientX - tile_drag.x, event.clientY - tile_drag.y);
+          if (moved < TILE_DRAG_THRESHOLD) return;
+          tile_drag.carrying = true;
+          const tile = tile_drag.tile;
+          category_index = parseInt(tile.getAttribute("data-category-index"), 10);
+          item_index = parseInt(tile.getAttribute("data-item-index"), 10);
+          selected_object_id = tile.getAttribute("data-object-id") || null;
+          Highlight_item();
+          Run_item_click(tile, selected_object_id);
+        }
+        // The tile holds the pointer on touch, so the canvas never hears
+        // these moves. Feed the position through directly.
+        Pointers.position.set(event.clientX, event.clientY);
+      });
+      document.addEventListener("pointerup", (event) => {
+        if (!tile_drag.tile) return;
+        const was_carrying = tile_drag.carrying;
+        tile_drag.tile = null;
+        tile_drag.carrying = false;
+        if (!was_carrying) return;
+        tile_drag.suppress_click_until = performance.now() + 400;
+        if (Mode.plugging != Mode.mode || !plug_model) return;
+        Pointers.position.set(event.clientX, event.clientY);
+        Update_carried();
+        if (
+          snapped_joint &&
+          snapped_joint === host_joint &&
+          Can_connect({ plug_joint: plug_joint, host_joint: host_joint })
+        ) {
+          Attach_plug_to(host_joint);
+        }
+      });
+      document.addEventListener("pointercancel", () => {
+        tile_drag.tile = null;
+        tile_drag.carrying = false;
+      });
 
       const Highlight_item = function () {
         $(".part-tile").removeClass("selected");
@@ -8323,6 +8572,47 @@
         }
       };
 
+
+      // ------------------------------------------------ paging the parts strip
+      // Arrows at either end for mice with no sideways wheel, hidden at the
+      // edge they cannot scroll past. A plain wheel over the strip scrolls it
+      // sideways too, since that is the wheel nearly everyone has.
+      const Update_strip_arrows = () => {
+        const strip = document.getElementById("part_strip");
+        const prev = document.getElementById("strip_prev");
+        const next = document.getElementById("strip_next");
+        if (!strip || !prev || !next) return;
+        const max = strip.scrollWidth - strip.clientWidth;
+        prev.classList.toggle("off", max <= 1 || strip.scrollLeft <= 1);
+        next.classList.toggle("off", max <= 1 || strip.scrollLeft >= max - 1);
+      };
+      const Page_strip = (direction) => {
+        const strip = document.getElementById("part_strip");
+        if (!strip) return;
+        strip.scrollBy({
+          left: direction * Math.max(140, strip.clientWidth - 120),
+          behavior: reduced_motion ? "auto" : "smooth",
+        });
+      };
+      (() => {
+        const strip = document.getElementById("part_strip");
+        if (!strip) return;
+        document.getElementById("strip_prev").addEventListener("click", () => Page_strip(-1));
+        document.getElementById("strip_next").addEventListener("click", () => Page_strip(1));
+        strip.addEventListener("scroll", Update_strip_arrows, { passive: true });
+        window.addEventListener("resize", Update_strip_arrows);
+        if (window.ResizeObserver) new ResizeObserver(Update_strip_arrows).observe(strip);
+        strip.addEventListener(
+          "wheel",
+          (event) => {
+            if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+            if (strip.scrollWidth <= strip.clientWidth) return;
+            event.preventDefault();
+            strip.scrollLeft += event.deltaMode === 1 ? event.deltaY * 40 : event.deltaY;
+          },
+          { passive: false }
+        );
+      })();
 
       // ---------------------------------------------------- the command strip
       $("#pill_undo").on("click", () => blueprint.undo());
