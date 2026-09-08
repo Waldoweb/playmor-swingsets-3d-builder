@@ -5343,26 +5343,31 @@
         return mjp.sub(pjp);
       };
 
+      /** The carried part's world-space bounding box at its current position. */
+      const Carried_box = () => {
+        plug_model.mesh.updateMatrixWorld(true);
+        const box = new THREE.Box3().setFromObject(plug_model.mesh);
+        return box.isEmpty() ? null : box;
+      };
+
       /**
-       * Where the carried part's outline would sit on screen with its joint at
-       * `at`, as a rectangle in canvas pixels. Null when any corner is behind
-       * the camera, which is rare enough not to be worth clipping properly.
+       * Where the carried part's outline would sit on screen with its mesh
+       * origin at `at`, as a rectangle in canvas pixels. `box` is the part's
+       * current world box, shifted rather than recomputed. Null when any
+       * corner is behind the camera, which is rare enough not to be worth
+       * clipping properly.
        */
-      const Carried_screen_rect = (at) => {
-        const mesh = plug_model.mesh;
-        mesh.updateMatrixWorld(true);
-        const box = new THREE.Box3().setFromObject(mesh);
-        if (box.isEmpty()) return null;
-        box.translate(new THREE.Vector3().subVectors(at, mesh.position));
+      const Carried_screen_rect = (box, at) => {
+        const shifted = box.clone().translate(new THREE.Vector3().subVectors(at, plug_model.mesh.position));
         const wh = 0.5 * renderer.getContext().canvas.width;
         const hh = 0.5 * renderer.getContext().canvas.height;
         let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
         const corner = new THREE.Vector3();
         for (let i = 0; i < 8; i++) {
           corner.set(
-            i & 1 ? box.max.x : box.min.x,
-            i & 2 ? box.max.y : box.min.y,
-            i & 4 ? box.max.z : box.min.z
+            i & 1 ? shifted.max.x : shifted.min.x,
+            i & 2 ? shifted.max.y : shifted.min.y,
+            i & 4 ? shifted.max.z : shifted.min.z
           );
           corner.project(camera);
           if (corner.z > 1) return null;
@@ -5376,6 +5381,28 @@
         return { x0, y0, x1, y1 };
       };
 
+      /**
+       * The part's outline if it were carried at this joint's distance from
+       * the camera, with its own joint under the pointer.
+       *
+       * The depth matters. The part actually follows wherever the pointer's
+       * ray lands, and over open sky that is the skybox, far away, where the
+       * outline projects to almost nothing. But someone lowering a swing onto
+       * a beam is picturing it in the beam's plane, so that is where the
+       * outline is measured: the pointer's ray meets a plane through the
+       * joint facing the camera, and the part is imagined there.
+       */
+      const Carried_rect_at = (joint, box, offset) => {
+        const at_joint = new THREE.Vector3();
+        joint.getWorldPosition(at_joint);
+        const facing = new THREE.Vector3();
+        camera.getWorldDirection(facing);
+        const plane = new THREE.Plane().setFromNormalAndCoplanarPoint(facing, at_joint);
+        const hit = new THREE.Vector3();
+        if (!raycaster.ray.intersectPlane(plane, hit)) return null;
+        return Carried_screen_rect(box, hit.add(offset));
+      };
+
       /** Distance from a point to a rectangle's edge; zero inside it. */
       const Rect_distance = (rect, x, y) => {
         const dx = Math.max(rect.x0 - x, 0, x - rect.x1);
@@ -5386,24 +5413,33 @@
       /**
        * The visible target the carried part should lock onto, or null.
        *
-       * A dot qualifies when it is near the pointer or near the part's own
-       * outline at the position it would have if it kept following the
-       * pointer. Among those, the one nearest the pointer wins, so where four
-       * hangers sit along one beam the pointer still decides between them.
+       * A dot qualifies when it is near the pointer, or near the part's own
+       * outline imagined at that dot's depth. Among those, the one nearest the
+       * pointer wins, so where four hangers sit along one beam the pointer
+       * still decides between them. The outline is only worked out for dots
+       * the pointer test has already missed.
        */
-      const Find_snap_joint = (targets, follow) => {
+      const Find_snap_joint = (targets) => {
         if (!targets.length) return null;
         const size = joint_image.height / 2;
-        const rect = Carried_screen_rect(follow);
+        let box = undefined;
+        let offset = null;
         let best = null;
         let best_distance = Infinity;
         for (const joint of targets) {
           const cx = joint.x + size / 2;
           const cy = joint.y + size / 2;
           const to_pointer = Math.hypot(cx - Pointers.position.x, cy - Pointers.position.y);
-          const to_body = rect ? Rect_distance(rect, cx, cy) : Infinity;
-          if (to_pointer > SNAP_RADIUS && to_body > SNAP_BODY_RADIUS) continue;
-          if (to_pointer < best_distance) {
+          let qualifies = to_pointer <= SNAP_RADIUS;
+          if (!qualifies) {
+            if (box === undefined) {
+              box = Carried_box();
+              offset = Carried_offset();
+            }
+            const rect = box ? Carried_rect_at(joint, box, offset) : null;
+            qualifies = !!rect && Rect_distance(rect, cx, cy) <= SNAP_BODY_RADIUS;
+          }
+          if (qualifies && to_pointer < best_distance) {
             best_distance = to_pointer;
             best = joint;
           }
@@ -5431,22 +5467,20 @@
         host_joint = Find_closest_available_joint({ position: Pointers.position });
         if (host_joint != null) {
           Orient_carried_to(host_joint);
-          const follow = Carried_offset().add(ip);
-          const snap = Find_snap_joint(carry_targets, follow);
+          const snap = Find_snap_joint(carry_targets);
           if (snap && snap !== host_joint) {
             host_joint = snap;
             Orient_carried_to(host_joint);
           }
           snapped_joint = snap;
 
-          let p;
+          const p = Carried_offset();
           if (snap) {
-            p = Carried_offset();
             const pp = new THREE.Vector3();
             snap.getWorldPosition(pp);
             p.add(pp);
           } else {
-            p = follow;
+            p.add(ip);
           }
           if (p.y < 0) p.y = 0;
           plug_model.mesh.position.copy(p);
