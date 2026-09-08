@@ -554,125 +554,101 @@
         }
       }
 
-      .custom-controls {
-        display: none;
-        padding: 10px 15px 10px 15px;
-        border-radius: 20px;
-        background: rgba(0, 0, 0, 0.5);
-        position: absolute;
-        top: calc(100vh - 180px);
-        left: calc(50vw - 200px);
-      }
-
-      #custom-controls-delete {
-        width: 50px;
-        height: 50px;
-      }
-
-      #custom-controls-delete img {
-        width: 100%;
-        height: 100%;
-      }
-
-      .custom-controls-line {
-        height: 100px;
-        width: 3px;
-        margin: 0 10px;
-        background: rgba(255, 255, 255, 0.8);
-      }
-
-      .custom-controls-color-container {
-        display: contents;
-      }
-
-      .custom-controls-color {
-        width: 50px;
-        height: 50px;
-        margin-right: 5px;
-        border-radius: 26px;
-        cursor: pointer;
-        border: 2px solid white;
-      }
-
-      .custom-controls-color img {
-        width: 100%;
-        height: 100%;
-      }
-
-      .custom-controls-roof {
-        display: none;
-        padding: 10px 15px 10px 15px;
-        border-radius: 20px;
-        background: rgba(0, 0, 0, 0.5);
-        position: absolute;
-        top: calc(100vh - 220px);
-        left: calc(50vw - 200px);
-      }
-
-      .custom-controls-roof-content {
-        display: inline-flex;
-        width: 100%;
-        padding: 5px;
-      }
-
-      .custom-controls-text {
-        color: white;
-        line-height: 50px;
-        height: 50px;
-        width: 70px;
-        text-align: left;
-      }
-
+      /* ---- the selection toolbar */
       .custom-controls-unified {
         display: none;
-        padding: 15px;
-        border-radius: 20px;
-        background: rgba(0, 0, 0, 0.5);
         position: fixed;
         bottom: calc(var(--bottom-bar-offset) + var(--bottom-bar-gap));
-        left: calc(50vw - 200px);
+        left: calc((100% - var(--panel-offset)) / 2);
+        transform: translateX(-50%);
+        z-index: 985;
         align-items: center;
-        flex-direction: row;
+        gap: 14px;
+        padding: 8px 8px 8px 16px;
+        border-radius: 22px;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+        color: #fff;
+        max-width: calc(100% - var(--panel-offset) - 24px);
+        box-sizing: border-box;
+        transition: bottom 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
       }
-
-      .custom-controls-row {
+      .sel-head { display: flex; align-items: center; gap: 6px; padding-right: 14px; border-right: 1px solid rgba(255, 255, 255, 0.2); align-self: stretch; }
+      .sel-name { font-size: 13px; font-weight: 700; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+      .sel-close {
+        width: 26px;
+        height: 26px;
+        border-radius: 13px;
+        border: 0;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.6);
         display: flex;
         align-items: center;
-        margin-bottom: 10px;
-        gap: 10px;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
       }
-
-      .custom-controls-row .custom-controls-text {
-        min-width: 60px;
+      .sel-close:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+      .sel-close svg, .sel-delete svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+      .sel-rows { display: flex; flex-direction: column; gap: 6px; }
+      .sel-rows[hidden] { display: none; }
+      .custom-controls-row { display: flex; align-items: center; gap: 12px; min-height: 36px; }
+      .custom-controls-text {
+        width: 46px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.6);
+        flex: 0 0 auto;
       }
-
-      .custom-controls-separator {
-        color: white;
-        font-weight: bold;
-        margin: 0 5px;
-      }
-
       .custom-controls-color-canopy,
       .custom-controls-color-poly,
       .custom-controls-color-frame,
       .custom-controls-color-trim,
-      .custom-controls-color-toy {
-        display: flex;
-        gap: 5px;
+      .custom-controls-color-toy { display: flex; gap: 6px; }
+      .custom-controls-color {
+        width: 34px;
+        height: 34px;
+        border-radius: 17px;
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        cursor: pointer;
+        overflow: hidden;
+        box-sizing: border-box;
+        transition: transform 0.15s ease, border-color 0.15s ease;
       }
-
-      .roof-type-group {
+      .custom-controls-color:hover { transform: scale(1.08); border-color: #fff; }
+      .custom-controls-color img { display: block; width: 100%; height: 100%; object-fit: cover; }
+      /* Canvas is round, the poly panel is a rounded square: the caption says
+         which is which, the shape confirms it at a glance. */
+      .custom-controls-color-poly .custom-controls-color { border-radius: 8px; }
+      .roof-type-group { display: flex; align-items: center; gap: 8px; }
+      .roof-type-group + .roof-type-group { padding-left: 12px; border-left: 1px solid rgba(255, 255, 255, 0.2); }
+      .roof-type-label { font-size: 11px; font-weight: 600; color: rgba(255, 255, 255, 0.75); }
+      .sel-actions { display: flex; align-items: center; padding-left: 14px; border-left: 1px solid rgba(255, 255, 255, 0.2); align-self: stretch; }
+      .sel-delete {
         display: flex;
         align-items: center;
-        gap: 8px;
-        margin-right: 15px;
+        gap: 7px;
+        height: 36px;
+        padding: 0 14px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: transparent;
+        color: #fff;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
       }
-
-      .roof-type-label {
-        color: white;
-        font-size: 14px;
-        font-weight: bold;
-        margin-right: 10px;
+      .sel-delete:hover { background: rgba(206, 3, 12, 0.85); border-color: #ce030c; color: #fff; }
+      .sel-delete[hidden] { display: none; }
+      @media (max-width: 900px) {
+        .custom-controls-unified { flex-wrap: wrap; justify-content: center; gap: 10px; padding: 10px 12px; }
+        .sel-head, .sel-actions { border: 0; padding: 0; }
       }
 
       .cedar-tan-split {
@@ -1647,13 +1623,11 @@
       body.panel-open #command_strip { left: calc(120px + (100% - var(--panel-w) - 120px) / 2); }
       body.panel-open #brand_logo { height: 52px; }
       #playground_snapshot img { max-height: 150px; object-fit: cover; }
-      .custom-controls-unified,
       #rotation-hint {
         transition: bottom 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
       }
       .bottom-bar { transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
       body.panel-open .bottom-bar { right: var(--panel-w); }
-      body.panel-open .custom-controls-unified { left: calc((100vw - var(--panel-w)) / 2 - 200px); }
       body.panel-open #rotation-hint { left: calc((100vw - var(--panel-w)) / 2); }
 
       @media (max-width: 1100px) {
@@ -1796,49 +1770,40 @@
         </div>
         <div id="part_strip"></div>
       </div>
-      <div class="custom-controls-unified" style="display: none">
-        <div id="custom-controls-delete" style="cursor: pointer;" title="Delete">
-          <img src="images/image_6eedc2a9.png" />
+      <!-- The selection toolbar: what the clicked part is, the colours it
+           offers, and Delete. Sits above the parts bar, centred over the yard. -->
+      <div class="custom-controls-unified" id="selection_bar" style="display: none" role="toolbar" aria-label="Selected part">
+        <div class="sel-head">
+          <div class="sel-name" id="selection_name">Part</div>
+          <button class="sel-close" id="selection_close" type="button" title="Close" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6 6 18"></path></svg></button>
         </div>
-        <div id="custom-controls-line" class="custom-controls-line"></div>
-
-        <div id="custom-controls-padding" style="display: block; margin-bottom: -10px; margin-left: 10px;">
-
-          <!-- Frame Section -->
+        <div id="custom-controls-padding" class="sel-rows">
           <div class="custom-controls-row" id="frame-section" style="display: none;">
-            <div class="custom-controls-text">FRAME:</div>
-            <div class="custom-controls-color-frame">
-            </div>
+            <div class="custom-controls-text">Frame</div>
+            <div class="custom-controls-color-frame"></div>
           </div>
-
-          <!-- Trim Section -->
           <div class="custom-controls-row" id="trim-section" style="display: none;">
-            <div class="custom-controls-text">TRIM:</div>
-            <div class="custom-controls-color-trim">
-            </div>
+            <div class="custom-controls-text">Trim</div>
+            <div class="custom-controls-color-trim"></div>
           </div>
-
-          <!-- Toy Section -->
           <div class="custom-controls-row" id="toy-section" style="display: none;">
-            <div class="custom-controls-text">COLOR:</div>
-            <div class="custom-controls-color-toy">
-            </div>
+            <div class="custom-controls-text">Color</div>
+            <div class="custom-controls-color-toy"></div>
           </div>
-
-          <!-- Roof Section -->
           <div class="custom-controls-row" id="roof-section" style="display: none;">
-            <div class="custom-controls-text">ROOF:</div>
+            <div class="custom-controls-text">Roof</div>
             <div class="roof-type-group">
-              <div class="custom-controls-color-canopy">
-              </div>
+              <span class="roof-type-label">Canvas</span>
+              <div class="custom-controls-color-canopy"></div>
             </div>
             <div class="roof-type-group" id="poly-group">
-              <span class="roof-type-label">POLY</span>
-              <div class="custom-controls-color-poly">
-                <div onclick="Change_roof_poly_color(0x01664b)" class="custom-controls-color" style="background-color: #01664b" title="Green"></div>
-              </div>
+              <span class="roof-type-label">Poly</span>
+              <div class="custom-controls-color-poly"></div>
             </div>
           </div>
+        </div>
+        <div class="sel-actions">
+          <button id="custom-controls-delete" class="sel-delete" type="button" title="Remove this part from the design"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M10 11v6M14 11v6"></path><path d="M6 7l1 13h10l1-13"></path><path d="M9 7V4h6v3"></path></svg><span>Delete</span></button>
         </div>
       </div>
 
@@ -5359,16 +5324,16 @@
                 let splits = picked_mesh.name.toLowerCase().split(",");
 
                 if (splits[0].toLowerCase().startsWith("flag")) {
-                  // Handle flags with JSON config colors - no labels or dividers
+                  // A flag is a piece of its tower: it takes a colour, but
+                  // Delete would remove the whole tower, so it is not offered.
+                  selection_name.textContent = "Flag";
                   $("#custom-controls-delete").hide();
-                  $("#custom-controls-line").hide();
                   $("#frame-section").hide();
                   $("#roof-section").hide();
-                  $("#toy-section").hide(); // Hide toy section when flag is selected
+                  $("#toy-section").hide();
                   $("#trim-section").show();
-                  
-                  // Hide trim label and remove styling for clean flag display
-                  $("#trim-section .custom-controls-text").hide();
+                  $("#custom-controls-padding").show();
+                  $("#trim-section .custom-controls-text").text("Flag");
                   
                   // Use flag colors from JSON config
                   if (colorConfig && colorConfig.constants && colorConfig.constants.flag_colors) {
@@ -5393,7 +5358,6 @@
                   }
                   
                   $(".custom-controls-unified").css("display", "flex");
-                  $(".custom-controls-unified").css("left", `calc(50vw - ${$(".custom-controls-unified").width() / 2}px)`);
                 } else {
                   // For all other elements (roof, towers, swings, etc.), show unified popup
                   Show_unified_popup();
@@ -8475,6 +8439,12 @@
         Hide_options();
         Trash_picked_mesh();
       });
+      $("#selection_close").on("click", () => {
+        Deselect_all();
+        picked_mesh = null;
+        Hide_options();
+        Offer_replacements(null);
+      });
 
       /**
        * Tuck the parts bar away, or bring it back.
@@ -8807,6 +8777,9 @@
 
         // Show delete button
         $("#custom-controls-delete").show();
+        const { objectName: selected_name } = getObjectInfoById(model.object_id);
+        selection_name.textContent = selected_name || "Selected part";
+        $("#trim-section .custom-controls-text").text("Trim");
 
         // Fallback to old logic if configs not loaded
         if (!colorConfig || !objectMapping) {
@@ -8818,6 +8791,8 @@
           $("#roof-section").hide();
           $("#trim-section").hide();
           $("#frame-section").show();
+          $("#custom-controls-padding").show();
+          selection_name.textContent = "Selected part";
           $(".custom-controls-unified").css("display", "flex");
           return;
         }
@@ -9015,27 +8990,10 @@
           }
         });
         
-        // Hide section labels if only one section is visible
-        if (visibleSections.length === 1) {
-          $(".custom-controls-text").hide();
-          $("#custom-controls-line").css("height", "50px");
-        } else {
-          $(".custom-controls-text").show();
-          $("#custom-controls-line").css("height", "100px");
-        }
-        
-        // Hide divider line if no color sections are visible
-        if (visibleSections.length === 0) {
-          $("#custom-controls-line").hide();
-          $("#custom-controls-padding").hide();
-        } else {
-          $("#custom-controls-line").show();
-          $("#custom-controls-padding").show();
-        }
-        
-        // Show the unified popup
+        // A part with no colours to choose is just a name and Delete.
+        $("#custom-controls-padding").toggle(visibleSections.length > 0);
+
         $(".custom-controls-unified").css("display", "flex");
-        $(".custom-controls-unified").css("left", `calc(50vw - ${$(".custom-controls-unified").width() / 2}px)`);
       };
       
       const Hide_options = (args) => {
