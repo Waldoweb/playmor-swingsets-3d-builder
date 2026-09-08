@@ -259,8 +259,7 @@
         --bottom-bar-offset: 0px;
       }
 
-      .custom-controls-unified,
-      #rotation-hint {
+      .custom-controls-unified {
         transition: bottom 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
@@ -1323,33 +1322,6 @@
         }
       }
 
-      #rotation-hint {
-        position: fixed;
-        bottom: calc(var(--bottom-bar-offset) + var(--bottom-bar-gap) + 60px);
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-family: Arial;
-        font-size: 14px;
-        z-index: 1000;
-        display: none;
-        animation: fadeInUp 0.3s ease;
-        pointer-events: none;
-      }
-
-      #rotation-hint .key {
-        display: inline-block;
-        background: #333;
-        color: white;
-        padding: 4px 8px;
-        margin: 0 4px;
-        border-radius: 4px;
-        font-weight: bold;
-        border: 1px solid #666;
-      }
 
       @keyframes fadeInUp {
         from {
@@ -1685,12 +1657,8 @@
       body.panel-open #command_strip { left: calc(120px + (100% - var(--panel-w) - 120px) / 2); }
       body.panel-open #brand_logo { height: 52px; }
       #playground_snapshot img { max-height: 150px; object-fit: cover; }
-      #rotation-hint {
-        transition: bottom 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      }
       .bottom-bar { transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
       body.panel-open .bottom-bar { right: var(--panel-w); }
-      body.panel-open #rotation-hint { left: calc((100vw - var(--panel-w)) / 2); }
 
       @media (max-width: 1100px) {
         #brand_logo { height: 52px; }
@@ -1934,7 +1902,8 @@
           <ul>
             <li>Drag to orbit, drag with the right button to pan, and scroll or pinch to zoom.</li>
             <li><b>View</b> &rsaquo; <b>Fit whole set in view</b> brings everything back into frame.</li>
-            <li>While carrying a part, <b>Space</b> changes which of its joints attaches, and <b>Esc</b> puts it down.</li>
+            <li>While carrying a part, click where it snaps to place it. Click anywhere else, click its tile again, or press <b>Esc</b> to put it down.</li>
+            <li><b>Space</b> changes which of a carried part's joints attaches.</li>
           </ul>
           <h3>The strip at the top</h3>
           <ul>
@@ -1953,11 +1922,6 @@
         <div id="small_throbber" class="throbber_arc"></div>
         <div id="tiny_throbber" class="throbber_arc"></div>
       </div>
-    </div>
-
-    <!-- Rotation hint tooltip -->
-    <div id="rotation-hint">
-      Press <span class="key">SPACE</span> to change connection point
     </div>
 
     <script>
@@ -2354,6 +2318,7 @@
        */
       const Drop_carried = () => {
         snapped_joint = null;
+        facing_chosen_by_hand = false;
         if (plug_model && plug_model.mesh && !picked_meshes.includes(plug_model.mesh)) {
           scene.remove(plug_model.mesh);
         }
@@ -2366,6 +2331,23 @@
       /** Nothing in the yard is selected. */
       const Deselect_all = () => {
         for (const model of models_with_available_joints) model.selected = false;
+      };
+
+      /**
+       * Put the carried part down without placing it, and show that it has
+       * gone: the tile that was lit goes dark.
+       *
+       * Esc was the only way to do this, which nobody finds without being
+       * told. Now a click on anything the part cannot snap to -- the ground,
+       * the sky, a part with no opening -- puts it down as well, the same
+       * gesture that deselects a placed part. So does clicking its lit tile
+       * again. A click with the part sitting on its target still places it.
+       */
+      const Put_down_carried = () => {
+        Drop_carried();
+        Mode.mode = Mode.normal;
+        selected_object_id = null;
+        if (typeof Highlight_item === "function") Highlight_item();
       };
       let file_button;
       let link = document.createElement("a");
@@ -2389,6 +2371,9 @@
       let host_joint = null;
       let plug_joint = null;
       let plug_joint_index = -1;
+      // Space picked the carried part's joint, so the hover must not pick it
+      // back. Cleared whenever the hand empties.
+      let facing_chosen_by_hand = false;
       let plug_model = null;
 
       let catalogProjects = [];
@@ -5330,6 +5315,17 @@
           plug_joint_index = plug_model.joints.indexOf(plug_joint);
         }
 
+        // A part with a front turns it towards the viewer here too, not only
+        // when it goes straight onto a chosen opening. Unless Space has said
+        // otherwise: a facing picked by hand is kept.
+        if (!facing_chosen_by_hand && Front_at(plug_model, 0)) {
+          const preferred = Find_plug_joint_for(plug_model, host);
+          if (preferred && preferred !== plug_joint) {
+            plug_joint = preferred;
+            plug_joint_index = plug_model.joints.indexOf(plug_joint);
+          }
+        }
+
         plug_model.mesh.rotation.y =
           Lookup_yaw({
             host_model_yaw: host.model.yaw,
@@ -5776,40 +5772,63 @@
       };
 
       /**
-       * Which way a part turns when it has a choice, or null when it has none.
+       * Which way the front of a part points once it stands at `yaw`, or null
+       * for a part that has no front to speak of.
        *
        * A part that faces two ways at one opening carries two joints at the
        * same point, one per facing -- the baby swing's `joint,0,s` and
-       * `joint,2,s`. Both fit, so whichever came first was taken, and that put
-       * the seat facing in along the beam.
+       * `joint,2,s`. Both fit, so which is taken decides which way the seat
+       * looks. It used to be a fixed choice of joint, and that is wrong half
+       * the time: the beam on the other side of the tower stands a half turn
+       * round, so the same joint put the seat facing away from the viewer.
        *
-       * No measurement can settle it: the two directions are mirror images
-       * about the beam, so the model cannot be asked which one is "out". Only
-       * someone who knows which way a child sits in it can say, so it is
-       * recorded per product in the manifest, like default_yaw.
+       * No measurement can find the front -- the two facings are mirror
+       * images about the beam -- so the manifest records where it is, as the
+       * heading of the front at yaw zero, in the same degrees as yaw. From
+       * that the front's heading at any yaw follows, and the joint whose yaw
+       * turns it towards the viewer's home position is the one to prefer.
        */
-      const Preferred_facing = (model) => {
+      const Front_at = (model, yaw) => {
         const entry =
           modelManifest && model && model.object_id
             ? modelManifest.products[model.object_id]
             : null;
-        return entry && typeof entry.default_facing === "number"
-          ? entry.default_facing
-          : null;
+        if (!entry || typeof entry.front_yaw !== "number") return null;
+        return new THREE.Vector3(0, 0, 1).applyAxisAngle(
+          Y_AXIS,
+          (entry.front_yaw + yaw) * Deg2Rad
+        );
+      };
+
+      /**
+       * How squarely the part would face the viewer's home position if it
+       * hung by `joint`: 1 straight at them, -1 straight away, 0 for a part
+       * with no front.
+       */
+      const Facing_score = (model, joint, host_joint) => {
+        const front = Front_at(
+          model,
+          Lookup_yaw({
+            host_model_yaw: host_joint.model.yaw,
+            host_joint_direction: host_joint.direction,
+            plug_joint_direction: joint.direction,
+          })
+        );
+        return front ? front.dot(home_facing) : 0;
       };
 
       const Find_plug_joint_for = (model, host_joint) => {
-        const wanted = Preferred_facing(model);
         let order = Joints_ends_first(model, host_joint);
-        if (wanted !== null) {
-          // A preference, not a requirement: a stable sort moves the wanted
-          // facing to the front and leaves every other joint in the order it
-          // was already in, so if that facing will not fit -- the twin taken,
-          // or something in the way -- the part still goes on the other way
-          // round rather than refusing.
-          order = order
-            .slice()
-            .sort((a, b) => (b.direction === wanted) - (a.direction === wanted));
+        if (Front_at(model, 0)) {
+          // A preference, not a requirement: a stable sort moves the facing
+          // that looks towards the viewer to the front and leaves every other
+          // joint in the order it was already in, so if that facing will not
+          // fit -- the twin taken, or something in the way -- the part still
+          // goes on the other way round rather than refusing.
+          const score = new Map(
+            order.map((joint) => [joint, Facing_score(model, joint, host_joint)])
+          );
+          order = order.slice().sort((a, b) => score.get(b) - score.get(a));
         }
         for (const joint of order) {
           if (!Joints_connect(joint, host_joint)) continue;
@@ -6242,8 +6261,6 @@
         // A tower joined to a bridge arrives fitted like any other.
         Fit_default_parts(just_placed);
 
-        // Hide rotation hint when object is successfully placed
-        document.getElementById('rotation-hint').style.display = 'none';
         /*
               if ( box3Helper ) scene . remove ( box3Helper )
               box = new THREE . Box3 ()
@@ -7282,11 +7299,7 @@
             {
               Deselect_all();
               picked_mesh = null;
-              Drop_carried();
-              Mode.mode = Mode.normal;
-
-              // Hide rotation hint when canceling object placement
-              document.getElementById('rotation-hint').style.display = 'none';
+              Put_down_carried();
 
               Hide_options();
               if (typeof Close_menus === "function") Close_menus();
@@ -7327,6 +7340,7 @@
                   plug_joint_index = 0;
 
                 plug_joint = plug_model.joints[plug_joint_index];
+                facing_chosen_by_hand = true;
 
                 plug_model.yaw = plug_joint_index * 90;
                 // Show joint selection feedback
@@ -7651,25 +7665,6 @@
             plug_joint = plug_model.joints[plug_joint_index];
           }
           Mode.mode = Mode.plugging;
-          
-          setTimeout(()=>{
-            // Show rotation hint when placing an object (only for multi-joint objects).
-            // A hundred milliseconds is long enough for the placement to have
-            // been finished or cancelled, which leaves plug_model null -- read
-            // it again here and the hint throws instead of not appearing.
-            if (Mode.mode === Mode.plugging && plug_model && plug_model.joints.length > 1) {
-              const rotationHint = document.getElementById('rotation-hint');
-              
-              rotationHint.style.display = 'block';
-              
-              // Auto-hide after 5 seconds
-              setTimeout(() => {
-                if (rotationHint.style.display === 'block') {
-                  rotationHint.style.display = 'none';
-                }
-              }, 5000);
-            }
-          }, 100);
         } else {
           models_with_available_joints.push(plug_model);
           picked_meshes.push(plug_model.mesh);
@@ -8138,6 +8133,7 @@
           distance * Math.cos(angleZ)  // Z component with Z rotation
         );
         camera.lookAt(intersection_point);
+        home_facing.copy(camera.position).setY(0).normalize();
         
         // Function to synchronize world rotation with camera rotation
         window.syncWorldRotationWithCamera = function() {
@@ -8185,6 +8181,8 @@
           Pointers.target = event.target;
 
           Pointers.delta.set(0, 0);
+          Pointers.down_position.copy(Pointers.position);
+          Pointers.pressed = true;
 
           // Clicking a ring while empty-handed picks the opening to fill, and
           // the catalog narrows to what fits it. Clicking away clears it.
@@ -8225,6 +8223,28 @@
           }
 
           Pointer_down();
+        });
+        // A click on the canvas with a part in hand that is not sitting on a
+        // target puts the part down. Decided on the release, not the press,
+        // because a press is also how an orbit starts: someone carrying a
+        // part round to the far side of the set must not lose it on the way.
+        // Placing stays on the press, in Pointer_down, so the mode has already
+        // left plugging by the time this runs for a click that placed.
+        canvas.addEventListener("pointerup", function (event) {
+          if (!Pointers.pressed) return;
+          Pointers.pressed = false;
+          if (event.button !== 0) return;
+          if (Mode.plugging != Mode.mode || !plug_model) return;
+          const moved = Math.hypot(
+            event.x - Pointers.down_position.x,
+            event.y - Pointers.down_position.y
+          );
+          if (moved > CLICK_SLOP) return;
+          if (snapped_joint) return;
+          Put_down_carried();
+        });
+        document.addEventListener("pointerup", () => {
+          Pointers.pressed = false;
         });
         canvas.addEventListener("pointermove", function (event) {
           if (event.type === "touchstart")
@@ -8275,6 +8295,9 @@
       const Pointers = {
         position: new THREE.Vector2(),
         down_position: new THREE.Vector2(),
+        // Set by a press on the canvas and cleared by the release, so a
+        // release that started on a tile is not mistaken for a canvas click.
+        pressed: false,
         old_position: new THREE.Vector2(),
         delta: new THREE.Vector2(),
 
@@ -8287,6 +8310,9 @@
 
         target: null,
       };
+      // How far a press may travel and still count as a click rather than
+      // the start of an orbit. Pixels.
+      const CLICK_SLOP = 6;
       const Keys = {
         code: 0,
         backspace: 8,
@@ -8305,6 +8331,11 @@
         down: 40,
       };
       const poi = new THREE.Vector3();
+      // Where the viewer stands when the page opens, as a unit vector on the
+      // ground from the set towards them. Set once the camera is placed. Parts
+      // with a front turn to face it; see Facing_score.
+      const home_facing = new THREE.Vector3(1, 0, 0);
+      const Y_AXIS = new THREE.Vector3(0, 1, 0);
       let mulch_enabled = true;
       // Legacy variables kept for backward compatibility with Categories system
       let category_index = 0;
@@ -8569,6 +8600,16 @@
           category_index = parseInt(tile.getAttribute("data-category-index"), 10);
           item_index = parseInt(tile.getAttribute("data-item-index"), 10);
           const object_id = tile.getAttribute("data-object-id");
+          // The lit tile is the part in hand; clicking it again puts it down.
+          if (
+            Mode.plugging == Mode.mode &&
+            plug_model &&
+            object_id &&
+            plug_model.object_id === object_id
+          ) {
+            Put_down_carried();
+            return;
+          }
           selected_object_id = object_id || null;
           Highlight_item();
           Run_item_click(tile, object_id || null);

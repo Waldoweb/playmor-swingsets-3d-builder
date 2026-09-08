@@ -184,21 +184,29 @@
     "the two: its mesh is 'Watch_tower' and it matched neither string."
   ],
 
-  "default_facing": {
-    "BS": 2
+  "front_yaw": {
+    "BS": 90
   },
-  "_default_facing_note": [
-    "Which way a part turns when it has a choice, as the direction field of the",
-    "joint to prefer.",
+  "_front_yaw_note": [
+    "Where a part's front is, for parts that can go on facing either way: the",
+    "heading its front points at when the model stands at yaw zero, in the",
+    "same degrees as yaw. 90 is +X, which is where the camera starts.",
     "",
     "A part that can face two ways at one opening is drawn with two joints at",
     "the same point, one per facing -- the baby swing has `joint,0,s` and",
     "`joint,2,s`. Whichever fits first was taken, which put the seat facing in",
-    "along the beam. Weldon asked for it facing out.",
+    "along the beam; then a fixed choice of joint was recorded, which put it",
+    "facing the viewer on one side of the tower and away from them on the",
+    "other, because the beam over there stands a half turn round. Weldon asked",
+    "for it facing the viewer on either beam.",
+    "",
+    "So this records the front rather than the joint. The builder works out",
+    "the heading the front would have on each candidate joint and takes the",
+    "one that looks most towards where the viewer stands when the page opens.",
     "",
     "This cannot be worked out from the model. The two directions are mirror",
     "images about the beam, so no measurement distinguishes them; only someone",
-    "who knows which way a child sits in it does. Hence a recorded choice, and",
+    "who knows which way a child sits in it does. Hence a recorded value, and",
     "hence keyed on the product id like default_yaw rather than on anything the",
     "geometry could be asked.",
     "",

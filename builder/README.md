@@ -50,7 +50,7 @@ The **3D Swing Set Builder** is an interactive web-based application that allows
 | Control | Action |
 |---------|--------|
 | **SPACE BAR** | Change connection point while placing items |
-| **ESC** | Cancel current item selection |
+| **ESC** | Put a carried part down without placing it (so does clicking anywhere it cannot snap, or clicking its tile again) |
 | **Mouse Drag** | Rotate and pan camera view |
 | **Mouse Wheel** | Zoom in/out |
 

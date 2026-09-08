@@ -253,12 +253,24 @@
 
     // Which of the two it took. Both fit, so the model cannot say which way
     // round the seat belongs -- the directions are mirror images about the
-    // beam -- and it used to take whichever came first, seat facing in.
-    // Weldon asked for it facing out, so the manifest records the choice.
-    const facing = modelManifest.products.BS.default_facing;
-    check("the manifest says which way a baby swing faces", typeof facing, "number");
-    check("and the placed one took that facing",
-      (placedSwing.joints.find((j) => j.connected) || {}).direction, facing);
+    // beam -- and it used to take whichever came first, seat facing in. Then
+    // a fixed joint, which faced the viewer on one beam and away on the
+    // other. Weldon asked for it facing the viewer on either beam, so the
+    // manifest records where the seat's front is and the builder turns it.
+    const front = modelManifest.products.BS.front_yaw;
+    check("the manifest says where a baby swing's front is", typeof front, "number");
+    const towardsViewer = (swing) => +Front_at(swing, swing.yaw).dot(home_facing).toFixed(3);
+    check("a baby swing on the first beam faces the viewer", towardsViewer(placedSwing), 1);
+
+    // The beam on the other side of the tower stands a half turn round, so
+    // the same joint would face the seat away. The other joint is taken.
+    const otherBeam = await place(socketFor(rig.tower, "b8"), "P-AB-3-8");
+    const otherSwing = otherBeam && (await place(socketFor(otherBeam, "s"), "BS"));
+    check("...and on the beam across the tower too", otherSwing ? towardsViewer(otherSwing) : "no swing", 1);
+    check("...by hanging from the other facing",
+      otherSwing ? (otherSwing.joints.find((j) => j.connected) || {}).direction
+        : "no swing",
+      (v) => v !== (placedSwing.joints.find((j) => j.connected) || {}).direction);
   } catch (e) { fail("sockets suite", e); }
 
   // ————————————————————————————————————————————————— swing fit

@@ -6201,7 +6201,7 @@
           "excluder_layer": null
         }
       ],
-      "default_facing": 2
+      "front_yaw": 90
     },
     "HG": {
       "name": "Horse Glider",

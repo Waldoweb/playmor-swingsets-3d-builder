@@ -274,8 +274,9 @@ function main() {
       const yaw = (socketConfig.default_yaw || {})[objectId];
       if (yaw !== undefined) products[objectId].default_yaw = yaw;
 
-      const facing = (socketConfig.default_facing || {})[objectId];
-      if (facing !== undefined) products[objectId].default_facing = facing;
+      // Where its front is, for the few that can go on facing either way.
+      const front = (socketConfig.front_yaw || {})[objectId];
+      if (front !== undefined) products[objectId].front_yaw = front;
 
       if ("tubular" in child) products[objectId].tubular = child.tubular;
       if ("slope" in child) products[objectId].slope = child.slope;
