@@ -2278,14 +2278,6 @@
               <img src="images/image_browse.png" />
               <span class="button-text">Show Catalog Sets</span>
             </div>
-            <div
-              id="controls-buttons-center-mulch"
-              class="controls-buttons-item"
-              title="Center your playset design in the play area"
-            >
-              <img src="images/image_0cdd7e4b.png" />
-              <span class="button-text">Center Playset</span>
-            </div>
           </div>
         </div>
         <div class="bottom-controls">
@@ -2783,14 +2775,6 @@
                 </td>
               </tr>
               <tr>
-                <td>
-                  <img
-                    id="center_mulch_img"
-                    src="images/image_0cdd7e4b.png"
-                    style="height: 49.6111px"
-                  />
-                  CENTER MULCH
-                </td>
                 <td>
                   <img
                     id="get_quote_img"
@@ -7218,20 +7202,6 @@
         Show_items();
         Update_measurements();
       };
-      const Center = (args) => {
-        if (!picked_meshes.length) return;
-
-        const center = new THREE.Vector3();
-        for (let mesh of picked_meshes) center.add(mesh.position);
-        center.divideScalar(picked_meshes.length);
-
-        for (let mesh of picked_meshes) {
-          mesh.position.x -= center.x;
-          mesh.position.z -= center.z;
-        }
-        // The bed follows the set back to the origin.
-        Update_measurements();
-      };
       const Help = (args) => {
 
         // Close all other modals first
@@ -7288,7 +7258,6 @@
         undo_img.style.height = h / d + "px";
         instructions_img.style.height = h / d + "px";
 
-        center_mulch_img.style.height = h / d + "px";
         get_quote_img.style.height = h / d + "px";
 
         download_img.style.height = h / d + "px";
@@ -7363,17 +7332,36 @@
         // The set has changed shape, so the bed under it follows.
         if (mulch) mulch.fit();
       };
+      /**
+       * Bring the whole set into view, and orbit around it from here on.
+       *
+       * The orbit used to stay on the world origin, which is where the first
+       * tower stands; a set that had grown out to one side of it turned
+       * lopsidedly until a "Center Playset" button dragged every part back
+       * to the origin. That button is gone -- the mulch bed follows the set
+       * now, and nothing in the design needs to move for the camera to
+       * circle it. The target moves instead, to the middle of the set's
+       * footprint, keeping the direction the person was already looking from.
+       */
       const View_all = (args) => {
-        let box = new THREE.Box3();
-        for (let mesh of picked_meshes) box.expandByObject(mesh);
+        const box = new THREE.Box3();
+        for (const mesh of picked_meshes) box.expandByObject(mesh);
 
-        let sphere = new THREE.Sphere();
+        const sphere = new THREE.Sphere();
         box.getBoundingSphere(sphere);
         let d = 5 * sphere.radius;
         if (d == 0) d = Math.sqrt(200);
 
-        camera.position.normalize();
-        camera.position.multiplyScalar(d);
+        const target = box.isEmpty()
+          ? new THREE.Vector3()
+          : box.getCenter(new THREE.Vector3()).setY(0);
+        const direction = new THREE.Vector3()
+          .subVectors(camera.position, orbitControls.target)
+          .normalize();
+        if (direction.lengthSq() === 0) direction.set(0, 0.5, 1).normalize();
+
+        orbitControls.target.copy(target);
+        camera.position.copy(target).addScaledVector(direction, d);
         orbitControls.update();
         if (window.syncWorldRotationWithCamera) syncWorldRotationWithCamera();
       };
@@ -8030,6 +8018,21 @@
       
       const Key_up = (args) => {
         switch (Keys.code) {
+          // Delete or Backspace removes the selected part, exactly as the
+          // toolbar's delete button does.
+          case Keys.delete:
+          case Keys.backspace:
+            {
+              if (
+                picked_mesh &&
+                picked_mesh.model &&
+                picked_meshes.includes(picked_mesh.model.mesh)
+              ) {
+                Hide_options();
+                Trash_picked_mesh();
+              }
+            }
+            break;
           case Keys.esc:
             {
               Deselect_all();
@@ -9104,6 +9107,17 @@
           Pointers.delta.set(0, 0);
         });
         document.addEventListener("keyup", function (event) {
+          // Keys typed into a field belong to the field. Without this a
+          // backspace in the quote form would delete the selected part.
+          const target = event.target;
+          if (
+            target &&
+            (target.isContentEditable ||
+              ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))
+          ) {
+            return;
+          }
+
           Keys.code = event.keyCode;
 
           Keys.alt = event.altKey;
@@ -9143,6 +9157,8 @@
       };
       const Keys = {
         code: 0,
+        backspace: 8,
+        delete: 46,
         esc: 27,
         space: 32,
         f2: 113,
@@ -9457,9 +9473,6 @@
       });
       $("#controls-buttons-undo").on("click", (event) => {
         blueprint.undo();
-      });
-      $("#controls-buttons-center-mulch").on("click", (event) => {
-        Center();
       });
 
       $("#controls-buttons-mulch").on("click", (event) => {
