@@ -728,6 +728,21 @@
       :root {
         --bottom-bar-h: 196px;
         --bottom-bar-gap: 16px;
+        /* How much of the screen the bar actually takes: its height, or
+           nothing once it is tucked away. The controls that sit above the
+           bar anchor to this, so they follow it down when it hides. */
+        --bottom-bar-offset: var(--bottom-bar-h);
+      }
+
+      body.bar-collapsed {
+        --bottom-bar-offset: 0px;
+      }
+
+      .bottom-controls,
+      .bottom-controls-right,
+      .custom-controls-unified,
+      #rotation-hint {
+        transition: bottom 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
       .bottom-bar {
@@ -744,6 +759,63 @@
         display: flex;
         flex-direction: column;
         box-sizing: border-box;
+      }
+
+      /* The bar slides down out of the way, leaving its top edge and the
+         tab showing. The transition is only switched on once the saved
+         state has been applied, so a page that opens with the bar hidden
+         does not animate it away on load. */
+      .bottom-bar.animate {
+        transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+
+      .bottom-bar.collapsed {
+        transform: translateY(calc(100% - 10px));
+      }
+
+      /* A small pill straddling the bar's top edge, with a chevron that
+         turns to say which way the bar will go. */
+      .bar-toggle {
+        position: absolute;
+        top: -14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 46px;
+        height: 24px;
+        padding: 0;
+        border-radius: 12px;
+        background: rgba(18, 18, 22, 0.85);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+        color: rgba(255, 255, 255, 0.85);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 1;
+        transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+      }
+
+      .bar-toggle:hover {
+        background: rgba(40, 40, 46, 0.95);
+        border-color: rgba(255, 255, 255, 0.5);
+        color: #fff;
+      }
+
+      .bar-toggle:focus-visible {
+        outline: 2px solid rgba(206, 3, 12, 0.8);
+        outline-offset: 2px;
+      }
+
+      .bar-toggle svg {
+        width: 14px;
+        height: 14px;
+        transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+
+      .bottom-bar.collapsed .bar-toggle svg {
+        transform: rotate(180deg);
       }
 
       /* Context row: category chips on the left, the "fits this spot"
@@ -974,53 +1046,6 @@
         top: 30px;
       }
 
-      .xxxzoom-slder {
-        width: 175px;
-        height: 15px;
-        position: absolute;
-        top: 60px;
-        left: 40px;
-      }
-
-      .xxzoom-top {
-        display: inline;
-        width: 30px;
-        height: 30px;
-      }
-
-      .xxxzoomtop_img {
-        width: 30px;
-        height: 30px;
-      }
-
-      .zoom-bottom {
-        width: 28px;
-        height: 28px;
-        top: 55px;
-        left: 5px;
-      }
-
-      .zoom-bottom img {
-        width: 100%;
-        height: 100%;
-      }
-
-      #zum_div {
-        display: flex;
-        margin-top: 10px;
-      }
-
-      .zum_image {
-        width: 28px;
-        height: 28px;
-      }
-
-      .xxxui-slider-handle {
-        border: 2px solid white !important;
-        width: 10px !important;
-        height: 20px !important;
-        background-color: rgba(0, 0, 0, 0.5) !important;
-      }
 
       .controls-buttons {
         display: flex;
@@ -1078,12 +1103,12 @@
 
       .bottom-controls {
         position: fixed;
-        bottom: calc(var(--bottom-bar-h) + var(--bottom-bar-gap));
+        bottom: calc(var(--bottom-bar-offset) + var(--bottom-bar-gap));
       }
 
       .bottom-controls-right {
         position: fixed;
-        bottom: calc(var(--bottom-bar-h) + var(--bottom-bar-gap));
+        bottom: calc(var(--bottom-bar-offset) + var(--bottom-bar-gap));
         right: 20px;
         z-index: 1000;
       }
@@ -1163,7 +1188,7 @@
         border-radius: 20px;
         background: rgba(0, 0, 0, 0.5);
         position: fixed;
-        bottom: calc(var(--bottom-bar-h) + var(--bottom-bar-gap));
+        bottom: calc(var(--bottom-bar-offset) + var(--bottom-bar-gap));
         left: calc(50vw - 200px);
         align-items: center;
         flex-direction: row;
@@ -2159,7 +2184,7 @@
 
       #rotation-hint {
         position: fixed;
-        bottom: calc(var(--bottom-bar-h) + var(--bottom-bar-gap) + 60px);
+        bottom: calc(var(--bottom-bar-offset) + var(--bottom-bar-gap) + 60px);
         left: 50%;
         transform: translateX(-50%);
         background: rgba(0, 0, 0, 0.8);
@@ -2261,26 +2286,6 @@
               <img src="images/image_0cdd7e4b.png" />
               <span class="button-text">Center Playset</span>
             </div>
-          </div>
-          <div id="zum_div">
-            <img
-              id="zum_in_button"
-              class="zum_image"
-              src="images/image_8b139000.png"
-            />
-            <input
-              class="slider"
-              type="range"
-              min="1"
-              max="49"
-              value="10"
-              id="zum_slider"
-            />
-            <img
-              id="zum_out_button"
-              class="zum_image"
-              src="images/image_c31154da.png"
-            />
           </div>
         </div>
         <div class="bottom-controls">
@@ -2393,6 +2398,11 @@
       </div>
 
       <div class="bottom-bar">
+        <button id="bar_toggle" class="bar-toggle" type="button" title="Hide the parts bar" aria-label="Hide the parts bar" aria-expanded="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
         <div class="bar-context">
           <div id="part_filter_row"></div>
         </div>
@@ -5895,11 +5905,6 @@
         orbitControls.update();
         if (window.syncWorldRotationWithCamera) syncWorldRotationWithCamera();
 
-        zum_slider.value = camera.position
-          .clone()
-          .sub(orbitControls.target)
-          .length();
-
         context.clearRect(0, 0, canvas.width, canvas.height);
 
         // highlight available hosts joints
@@ -6863,41 +6868,6 @@
         Update_measurements();
       };
 
-      zum_slider.oninput = (args) => {
-        camera.position.copy(
-          camera.position
-            .clone()
-            .sub(orbitControls.target)
-            .normalize()
-            .multiplyScalar(zum_slider.value)
-        );
-        orbitControls.update();
-        if (window.syncWorldRotationWithCamera) syncWorldRotationWithCamera();
-      };
-      const Zumin = (args) => {
-        if (--zum_slider.value < 1) zum_slider.value = 1;
-        camera.position.copy(
-          camera.position
-            .clone()
-            .sub(orbitControls.target)
-            .normalize()
-            .multiplyScalar(zum_slider.value)
-        );
-        orbitControls.update();
-        if (window.syncWorldRotationWithCamera) syncWorldRotationWithCamera();
-      };
-      const Zumout = (args) => {
-        if (++zum_slider.value > 49) zum_slider.value = 49;
-        camera.position.copy(
-          camera.position
-            .clone()
-            .sub(orbitControls.target)
-            .normalize()
-            .multiplyScalar(zum_slider.value)
-        );
-        orbitControls.update();
-        if (window.syncWorldRotationWithCamera) syncWorldRotationWithCamera();
-      };
       mulch_length_slider.oninput = (args) => {
         if (mulch) mulch.build({ depth: parseInt(mulch_length_slider.value) });
       };
@@ -7662,8 +7632,8 @@
           // canvas. The text used to go at the very bottom, where the bar
           // now covers it, so the toggle looked as though it did nothing.
           const bar = document.querySelector(".bottom-bar");
-          const bar_height = bar ? bar.getBoundingClientRect().height : 0;
-          let y = canvas.height - bar_height - 16;
+          const bar_top = bar ? bar.getBoundingClientRect().top : canvas.height;
+          let y = Math.min(canvas.height, bar_top) - 16;
           context.fillText(measurements, x - 0, y - 2);
           context.fillStyle = "black";
           context.fillText(measurements, x - 0, y - 1);
@@ -8893,6 +8863,10 @@
         orbitControls = new THREE.OrbitControls(camera, canvas);
         orbitControls.enableDamping = false;
         orbitControls.maxPolarAngle = Math.PI / 2 - 0.01;
+        // Zooming is the wheel, or a pinch on touch — OrbitControls handles
+        // both. The slider that used to sit beside the top buttons is gone;
+        // its range was 1 to 49, and these are the same limits.
+        orbitControls.minDistance = 1;
         orbitControls.maxDistance = 49;
         // Pan across the ground rather than in screen space. Screen-space
         // panning drags the orbit target vertically, and the camera follows it
@@ -9007,6 +8981,8 @@
                 replacing = null;
                 Show_items();
               }
+              // Asking what fits here is a reason to see the answer.
+              if (typeof Set_bar_collapsed === "function") Set_bar_collapsed(false);
               // Return before Pointer_down(): the ring sits on top of its own
               // model, so falling through would also select that model and pop
               // up its colour/delete toolbar over the choice just made.
@@ -9390,12 +9366,6 @@
       $("#controls-buttons-center-mulch").on("click", (event) => {
         Center();
       });
-      $("#zum_in_button").on("click", (event) => {
-        Zumin();
-      });
-      $("#zum_out_button").on("click", (event) => {
-        Zumout();
-      });
 
       $("#controls-buttons-mulch").on("click", (event) => {
         display_mulch = !display_mulch;
@@ -9459,6 +9429,40 @@
           display_email = true;
         }
       });
+
+      /**
+       * Tuck the parts bar away, or bring it back.
+       *
+       * Remembered per browser as a convenience, and only that: the design
+       * itself does not know or care. Picking a spot on the playset brings
+       * the bar back, because the whole point of picking one is to see what
+       * fits it.
+       */
+      const bar_element = document.querySelector(".bottom-bar");
+      const bar_toggle = document.getElementById("bar_toggle");
+      const Set_bar_collapsed = (collapsed) => {
+        if (!bar_element || !bar_toggle) return;
+        bar_element.classList.toggle("collapsed", collapsed);
+        document.body.classList.toggle("bar-collapsed", collapsed);
+        const label = collapsed ? "Show the parts bar" : "Hide the parts bar";
+        bar_toggle.title = label;
+        bar_toggle.setAttribute("aria-label", label);
+        bar_toggle.setAttribute("aria-expanded", String(!collapsed));
+        try {
+          localStorage.setItem("yard-bar-collapsed", collapsed ? "1" : "0");
+        } catch (error) {}
+      };
+      if (bar_element && bar_toggle) {
+        let collapsed = false;
+        try {
+          collapsed = localStorage.getItem("yard-bar-collapsed") === "1";
+        } catch (error) {}
+        Set_bar_collapsed(collapsed);
+        requestAnimationFrame(() => bar_element.classList.add("animate"));
+        bar_toggle.addEventListener("click", () =>
+          Set_bar_collapsed(!bar_element.classList.contains("collapsed"))
+        );
+      }
 
       // Load color configuration and object mapping
       let colorConfig = null;
