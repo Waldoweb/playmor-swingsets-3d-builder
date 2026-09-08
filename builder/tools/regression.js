@@ -830,8 +830,10 @@
     // be worked out by reading the name of the mesh inside the GLB, which stops
     // being true the moment a model is re-exported under a different object
     // name — and fails silently, with the tower simply facing the wrong way.
+    // The DX Summit Tower turns the other way, so its roofline runs across
+    // the home view rather than end-on (Weldon, 2026-09-08).
     for (const [id, degrees] of [
-      ["P-PT", 0], ["P-DPT", 0], ["P-WT", 0], ["P-DST", 0], ["P-DSMT", 0],
+      ["P-PT", 0], ["P-DPT", 0], ["P-WT", 0], ["P-DST", 0], ["P-DSMT", 270],
       ["P-ST", 90], ["P-KT", 90],
     ]) {
       await reset();

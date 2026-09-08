@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-08T17:23:36.702Z",
+  "generated_at": "2026-09-08T19:33:43.739Z",
   "product_count": 64,
   "default_fittings": [
     {
@@ -4221,7 +4221,8 @@
           "exclusion_layer": "2",
           "excluder_layer": "1"
         }
-      ]
+      ],
+      "default_yaw": 270
     },
     "P-KT": {
       "name": "King’s Tower",

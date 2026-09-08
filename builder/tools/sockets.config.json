@@ -167,7 +167,8 @@
 
   "default_yaw": {
     "P-ST": 90,
-    "P-KT": 90
+    "P-KT": 90,
+    "P-DSMT": 270
   },
   "_default_yaw_note": [
     "Which way a free-standing model faces when first placed, in degrees, for",
@@ -181,7 +182,11 @@
     "instead, which does not change when a model is rebuilt.",
     "",
     "The comment on the old test named the Watchtower, which was never one of",
-    "the two: its mesh is 'Watch_tower' and it matched neither string."
+    "the two: its mesh is 'Watch_tower' and it matched neither string.",
+    "",
+    "The DX Summit Tower joined the list on 2026-09-08, a quarter turn the",
+    "other way (270): Weldon asked for its roofline running right to left",
+    "from the home view instead of end-on."
   ],
 
   "front_yaw": {
