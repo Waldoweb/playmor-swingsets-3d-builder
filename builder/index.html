@@ -2021,18 +2021,24 @@
       // distance, but nobody is aiming at it.
       let snapped_joint = null;
       let carry_targets = [];
-      // How close counts as "on it", in screen pixels: from the pointer to a
-      // dot, or from the carried part's outline to a dot. The second is what
-      // lets a swing snap when its seat is put where the seat should hang,
-      // with the pointer a couple of feet above the hanger.
-      const SNAP_RADIUS = 80;
-      const SNAP_BODY_RADIUS = 24;
+      // How close counts as "on it". These are the knobs to turn if snapping
+      // feels too eager or too shy; they were all a notch looser at first and
+      // grabbed a little too readily.
+      //
+      // In screen pixels: from the pointer to a dot, or from the carried
+      // part's outline to a dot. The second is what lets a swing snap when its
+      // seat is put where the seat should hang, with the pointer a couple of
+      // feet above the hanger.
+      const SNAP_RADIUS = 60;
+      const SNAP_BODY_RADIUS = 16;
       // The body margin is also at least this far in metres, measured at the
-      // joint's depth, so it keeps up when the camera is zoomed in. A swing
-      // stood on the ground under its beam stops about half a metre short of
-      // the hanger -- it was built to hang, not stand -- and that gap has to
-      // count as "on it" whatever the zoom.
-      const SNAP_BODY_REACH = 0.6;
+      // joint's depth, so it keeps up when the camera is zoomed in.
+      const SNAP_BODY_REACH = 0.4;
+      // How far, in metres at the joint's depth, a part standing on the ground
+      // is imagined lifted towards a dot above it. A swing stood on the ground
+      // under its beam stops about half a metre short of the hanger -- it was
+      // built to hang, not stand -- and a shorter swing stops shorter still.
+      const SNAP_LIFT = 1.0;
 
       // The opening the user has picked, and every opening currently on screen.
       // Sockets rather than joints: one dot per place a part can go, however
@@ -5462,16 +5468,20 @@
               box = Carried_box();
               offset = box ? Carried_offset() : null;
               drawn = box ? Carried_screen_rect(box, follow) : null;
-              // Standing on the ground because it could not hang from where
-              // the pointer is: a swing over the mulch, a slide over the
-              // yard. It reaches its dot by being lifted, so the outline
-              // takes in the space above it, up to one part-height. A swing
-              // stood under its beam stops a good half metre short of the
-              // hanger, and a shorter swing stops shorter still.
-              if (drawn && grounded) drawn.y0 -= drawn.y1 - drawn.y0;
             }
-            const margin = Math.max(SNAP_BODY_RADIUS, SNAP_BODY_REACH * Pixels_per_metre_at(joint));
-            if (drawn && Rect_distance(drawn, cx, cy) <= margin) {
+            const per_metre = Pixels_per_metre_at(joint);
+            const margin = Math.max(SNAP_BODY_RADIUS, SNAP_BODY_REACH * per_metre);
+            let outline = drawn;
+            // Standing on the ground because it could not hang from where the
+            // pointer is: a swing over the mulch, a slide over the yard. It
+            // reaches its dot by being lifted, so the outline takes in the
+            // space above it -- SNAP_LIFT's worth, but never more than the
+            // part's own height.
+            if (drawn && grounded) {
+              const lift = Math.min(drawn.y1 - drawn.y0, SNAP_LIFT * per_metre);
+              outline = { x0: drawn.x0, x1: drawn.x1, y0: drawn.y0 - lift, y1: drawn.y1 };
+            }
+            if (outline && Rect_distance(outline, cx, cy) <= margin) {
               qualifies = true;
             } else if (box) {
               const rect = Carried_rect_at(joint, box, offset);
