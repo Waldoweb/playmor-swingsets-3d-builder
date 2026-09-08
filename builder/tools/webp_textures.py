@@ -15,7 +15,12 @@ Two things, both invisible in the yard:
    Textures are marked with EXT_texture_webp, which the app's GLTFLoader
    (r127) reads.
 
-2. The second UV set goes. Several models carry TEXCOORD_1 left over from
+2. Detail maps shrink to 512 square. Six climbers carry bump (normal) and
+   roughness maps at 1024 square that only read within arm's reach; at
+   builder distances they cannot be told from a quarter the size. Colour
+   maps keep their resolution. Weldon picked this over dropping the maps.
+
+3. The second UV set goes. Several models carry TEXCOORD_1 left over from
    lightmap baking; no material samples it and the app has no light or
    ambient-occlusion maps. Its accessors and buffer views are dropped.
 
@@ -58,16 +63,30 @@ def view_bytes(js, bin_, index):
     return bin_[start:start + bv["byteLength"]]
 
 
-def to_webp(data):
-    """The image as WebP, or None when that would not be smaller."""
+DETAIL_MAX = 512
+
+
+def to_webp(data, detail=False):
+    """The image as WebP, or None when there is nothing to gain.
+
+    A detail map (normal, roughness, occlusion) wider than DETAIL_MAX is
+    scaled down first. An image that is already WebP is left alone unless
+    it needs that scaling -- re-encoding lossy data only loses more of it.
+    """
     im = Image.open(io.BytesIO(data))
+    shrink = detail and max(im.size) > DETAIL_MAX
+    if im.format == "WEBP" and not shrink:
+        return None
+    if shrink:
+        scale = DETAIL_MAX / max(im.size)
+        im = im.resize((max(1, round(im.size[0] * scale)), max(1, round(im.size[1] * scale))), Image.LANCZOS)
     has_alpha = im.mode in ("RGBA", "LA") or (im.mode == "P" and "transparency" in im.info)
     out = io.BytesIO()
     if has_alpha:
         im.convert("RGBA").save(out, "WEBP", lossless=True, quality=100, method=6)
     else:
         im.convert("RGB").save(out, "WEBP", quality=85, method=6)
-    return out.getvalue() if out.tell() < len(data) else None
+    return out.getvalue() if (shrink or out.tell() < len(data)) else None
 
 
 def strip_uv1(js):
@@ -108,12 +127,19 @@ def convert(path):
     before = os.path.getsize(path)
     report = {"images": 0, "image_bytes": 0, "uv1_dropped": 0}
 
-    # 1. textures
+    # 1. textures. Which images are detail maps is read off the materials.
+    src = lambda tex: tex.get("source", tex.get("extensions", {}).get("EXT_texture_webp", {}).get("source"))
+    detail = set()
+    for m in js.get("materials", []):
+        pbr = m.get("pbrMetallicRoughness", {})
+        if "metallicRoughnessTexture" in pbr: detail.add(src(js["textures"][pbr["metallicRoughnessTexture"]["index"]]))
+        for key in ("normalTexture", "occlusionTexture"):
+            if key in m: detail.add(src(js["textures"][m[key]["index"]]))
     replacements = {}
     for i, image in enumerate(js.get("images", [])):
         if "bufferView" not in image: continue
         data = view_bytes(js, bin_, image["bufferView"])
-        webp = to_webp(data)
+        webp = to_webp(data, detail=i in detail)
         if webp is None: continue
         replacements[image["bufferView"]] = webp
         image["mimeType"] = "image/webp"
@@ -121,9 +147,9 @@ def convert(path):
         report["image_bytes"] += len(data) - len(webp)
     if replacements:
         for tex in js.get("textures", []):
-            src = tex.get("source")
-            if src is not None and js["images"][src].get("mimeType") == "image/webp":
-                tex.setdefault("extensions", {})["EXT_texture_webp"] = {"source": src}
+            s = src(tex)
+            if s is not None and js["images"][s].get("mimeType") == "image/webp":
+                tex.setdefault("extensions", {})["EXT_texture_webp"] = {"source": s}
         for key in ("extensionsUsed", "extensionsRequired"):
             lst = js.setdefault(key, [])
             if "EXT_texture_webp" not in lst: lst.append("EXT_texture_webp")

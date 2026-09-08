@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-08T16:56:45.199Z",
+  "generated_at": "2026-09-08T17:23:36.702Z",
   "product_count": 64,
   "default_fittings": [
     {
@@ -495,8 +495,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-DPT.40d50286.glb",
-          "bytes": 580524,
+          "file": "P-DPT.067c7fbb.glb",
+          "bytes": 677504,
           "joints": [
             "joint,0,5",
             "joint_scope,0,toy",
@@ -1148,8 +1148,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-WT.0a5609a7.glb",
-          "bytes": 433260,
+          "file": "P-WT.b8d008de.glb",
+          "bytes": 416444,
           "joints": [
             "joint,0,floor_center_watch",
             "joint,1,6,4,5",
@@ -1883,8 +1883,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-ST.5c78c4b3.glb",
-          "bytes": 352980,
+          "file": "P-ST.920666f4.glb",
+          "bytes": 350124,
           "joints": [
             "joint,0,s,tire",
             "Joint_beam_left,3,b8,5,6",
@@ -2484,8 +2484,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-DST.9e12bee6.glb",
-          "bytes": 564292,
+          "file": "P-DST.f7e9678c.glb",
+          "bytes": 538328,
           "joints": [
             "joint,1,6,4,5",
             "joint,1,8,6,7",
@@ -3267,8 +3267,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-DSMT.055c2f3c.glb",
-          "bytes": 581664,
+          "file": "P-DSMT.b588ca83.glb",
+          "bytes": 548552,
           "joints": [
             "joint,0,8,6,7",
             "joint,0,floor_center_watch",
@@ -4232,8 +4232,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-KT.b04e330c.glb",
-          "bytes": 397148,
+          "file": "P-KT.d1371fd8.glb",
+          "bytes": 387892,
           "joints": [
             "joint,0,8,1,2001",
             "joint,0,8,1,2002",
@@ -5066,8 +5066,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-AB-3-8.5a4bb458.glb",
-          "bytes": 46400,
+          "file": "P-AB-3-8.838dc42b.glb",
+          "bytes": 54428,
           "joints": [
             "joint,0,b8",
             "joint_female_1,0,s",
@@ -5197,8 +5197,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-AB-3-10.c17d32cb.glb",
-          "bytes": 46344,
+          "file": "P-AB-3-10.4b98adf0.glb",
+          "bytes": 54276,
           "joints": [
             "joint,0,b10",
             "joint,0,sh,_x_0",
@@ -5328,8 +5328,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-AB-4-8.611ee207.glb",
-          "bytes": 46348,
+          "file": "P-AB-4-8.c6183b03.glb",
+          "bytes": 54504,
           "joints": [
             "Joint,0,b8",
             "joint,0,sh,_x_0",
@@ -5484,8 +5484,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-AB-4-10.2022fbc1.glb",
-          "bytes": 46448,
+          "file": "P-AB-4-10.7a552f4a.glb",
+          "bytes": 54380,
           "joints": [
             "joint,0,b10",
             "joint,0,sh,_x_0",
@@ -5640,8 +5640,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-AB-DS-8.45da3e93.glb",
-          "bytes": 46760,
+          "file": "P-AB-DS-8.f353c4ac.glb",
+          "bytes": 55172,
           "joints": [
             "joint,0,b8",
             "joint,0,sh,_x_0",
@@ -5796,8 +5796,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-AB-DS-10.f23ab5de.glb",
-          "bytes": 46684,
+          "file": "P-AB-DS-10.95ffa1bc.glb",
+          "bytes": 55096,
           "joints": [
             "joint,0,b10",
             "joint_1,0,s",
@@ -5952,7 +5952,7 @@
       "files": [
         {
           "layer": "b8",
-          "file": "SS__b8.e61784ca.glb",
+          "file": "SS__b8.314179a9.glb",
           "bytes": 177884,
           "joints": [
             "joint,0,s"
@@ -5978,7 +5978,7 @@
         },
         {
           "layer": "b10",
-          "file": "SS__b10.4952614e.glb",
+          "file": "SS__b10.3e7a2a7b.glb",
           "bytes": 270812,
           "joints": [
             "joint,0,s"
@@ -6911,8 +6911,8 @@
       "files": [
         {
           "layer": null,
-          "file": "PT-K.55337921.glb",
-          "bytes": 87600,
+          "file": "PT-K.32b2ac48.glb",
+          "bytes": 122352,
           "joints": [
             "joint,0,picnic",
             "joint,1,picnic"
@@ -6972,8 +6972,8 @@
       "files": [
         {
           "layer": null,
-          "file": "KK.b6826854.glb",
-          "bytes": 205124,
+          "file": "KK.ea1e8904.glb",
+          "bytes": 199404,
           "joints": [
             "Joint,2,kitchen"
           ],
@@ -7395,8 +7395,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-GP-10.11328b90.glb",
-          "bytes": 536188,
+          "file": "P-GP-10.2f1f9c67.glb",
+          "bytes": 302252,
           "joints": [
             "joint,0,5"
           ],
@@ -7440,8 +7440,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-GP-12.d56daefc.glb",
-          "bytes": 533756,
+          "file": "P-GP-12.3ed77319.glb",
+          "bytes": 301804,
           "joints": [
             "joint,0,6"
           ],
@@ -7485,8 +7485,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-RC-5.22a0e577.glb",
-          "bytes": 676008,
+          "file": "P-RC-5.16541a83.glb",
+          "bytes": 470640,
           "joints": [
             "joint,2,6"
           ],
@@ -7530,8 +7530,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-RC-7.5dcc27e6.glb",
-          "bytes": 742752,
+          "file": "P-RC-7.3a62151b.glb",
+          "bytes": 537260,
           "joints": [
             "joint,0,8"
           ],
@@ -7575,8 +7575,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-CN-5.c3e6b05f.glb",
-          "bytes": 776460,
+          "file": "P-CN-5.b6c726ed.glb",
+          "bytes": 438764,
           "joints": [
             "joint,0,6"
           ],
@@ -7620,8 +7620,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-CC-5.e63c9d83.glb",
-          "bytes": 1359808,
+          "file": "P-CC-5.6bab4cbc.glb",
+          "bytes": 777828,
           "joints": [
             "joint_c,0,6"
           ],
@@ -7755,8 +7755,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-MB-A.e66d9fb2.glb",
-          "bytes": 90648,
+          "file": "P-MB-A.d7d6e886.glb",
+          "bytes": 103764,
           "joints": [
             "joint,2,6"
           ],
@@ -7800,8 +7800,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-MB-C.8fd2ea7b.glb",
-          "bytes": 78012,
+          "file": "P-MB-C.557e78e7.glb",
+          "bytes": 85836,
           "joints": [
             "joint,0,8"
           ],

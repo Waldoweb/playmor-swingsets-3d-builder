@@ -27,6 +27,44 @@ import bpy, sys, math, json, bmesh
 from mathutils import Matrix
 
 
+def mark_thick_edges(obj, angle):
+    """Weight the edges to bevel: sharp edges of loose parts that are at
+    least MIN_THICKNESS in every direction. Returns how many parts qualify."""
+    me = obj.data
+    bm = bmesh.new()
+    bm.from_mesh(me)
+    bm.verts.ensure_lookup_table()
+    bm.edges.ensure_lookup_table()
+    layer = bm.edges.layers.float.get("bevel_weight_edge") or bm.edges.layers.float.new("bevel_weight_edge")
+    for e in bm.edges:
+        e[layer] = 0.0
+    seen = set()
+    thick = 0
+    for v in bm.verts:
+        if v.index in seen:
+            continue
+        stack, comp = [v], []
+        while stack:
+            x = stack.pop()
+            if x.index in seen:
+                continue
+            seen.add(x.index)
+            comp.append(x)
+            for e in x.link_edges:
+                stack.append(e.other_vert(x))
+        xs = [c.co.x for c in comp]; ys = [c.co.y for c in comp]; zs = [c.co.z for c in comp]
+        if min(max(xs) - min(xs), max(ys) - min(ys), max(zs) - min(zs)) < MIN_THICKNESS:
+            continue
+        thick += 1
+        for c in comp:
+            for e in c.link_edges:
+                if len(e.link_faces) == 2 and e.calc_face_angle(0.0) >= angle:
+                    e[layer] = 1.0
+    bm.to_mesh(me)
+    bm.free()
+    return thick
+
+
 def round_poles(obj):
     """Replace square flag poles with cylinders.
 
@@ -92,9 +130,11 @@ inp, out, width, segments = argv[0], argv[1], float(argv[2]), int(argv[3])
 # the frame, fence slats and corner trim are poly-coated lumber and carry the
 # "Poly ..." names. Roof, flags, metal and glass are left square.
 prefixes = [s.strip().lower() for s in (argv[4] if len(argv) > 4 else "wood").split(",")]
-# Anything thinner than this in some direction is a slab -- the deck floor --
-# and stays square. Rounding it costs triangles for an edge nobody sees, and
-# Weldon found the frame's rounding alone was enough to drag the frame rate.
+# Anything thinner than this in some direction is a board -- deck flooring,
+# a plank -- and stays square. Rounding it costs triangles for an edge nobody
+# sees, and Weldon found the frame's rounding alone was enough to drag the
+# frame rate. Judged piece by piece: the Deluxe Play Tower keeps both floors'
+# boards in one mesh with its posts, so the mesh as a whole is not thin.
 MIN_THICKNESS = 0.05
 # The flag poles are drawn 35 mm square; the real ones are thin tubes. The
 # cylinder that replaces each one gets this diameter, whatever the box was.
@@ -121,9 +161,8 @@ for obj in list(bpy.data.objects):
         stats["poles"] = stats.get("poles", 0) + poles
 
     is_lumber = any(m.lower().startswith(pfx) for m in mats for pfx in prefixes)
-    is_slab = min(obj.dimensions) < MIN_THICKNESS
-    if not is_lumber or is_slab:
-        stats["skipped"].append([obj.name, mats, "slab" if is_lumber else "not lumber"])
+    if not is_lumber:
+        stats["skipped"].append([obj.name, mats, "not lumber"])
         continue
 
     # Only the lumber from here on. The importer keeps every face on its own
@@ -142,11 +181,16 @@ for obj in list(bpy.data.objects):
     bpy.ops.object.shade_smooth()
     welded = (len(obj.data.vertices), len(obj.data.edges))
 
+    # Only the thick pieces, by edge weight; a thin board keeps every edge.
+    thick = mark_thick_edges(obj, math.radians(30))
+    if not thick:
+        stats["skipped"].append([obj.name, mats, "boards only"])
+        continue
+
     mod = obj.modifiers.new("Bevel", "BEVEL")
     mod.width = width
     mod.segments = segments
-    mod.limit_method = "ANGLE"
-    mod.angle_limit = math.radians(30)
+    mod.limit_method = "WEIGHT"
     mod.harden_normals = True
     mod.miter_outer = "MITER_ARC"
     bpy.ops.object.modifier_apply(modifier=mod.name)
