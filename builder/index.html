@@ -4485,13 +4485,22 @@
         // bridge has to swing round to present its end, and with the yard at
         // certain angles every joint that gave a square, roof-aligned join was
         // rejected here, leaving only a crooked one.
+        //
+        // The turn is measured from the way the mesh is actually standing,
+        // which is where the offset above was read from. It used to be
+        // measured from the model's recorded yaw, and the two part company
+        // while a part is carried: the hover turns the mesh to face whichever
+        // opening is nearest without touching the record. Asked about a second
+        // beam mount while the beam was already turned for the first, this
+        // turned it again, tested a beam pointing back through the tower, and
+        // refused the mount -- so no marker for it while one beam was on.
         const turn =
           (Lookup_yaw({
             host_model_yaw: host_joint.model.yaw,
             host_joint_direction: host_joint.direction,
             plug_joint_direction: plug_joint.direction,
           }) -
-            (plug_joint.model.yaw || 0)) *
+            plug_joint.model.mesh.rotation.y / Deg2Rad) *
           Deg2Rad;
         const up = new THREE.Vector3(0, 1, 0);
         joint_offset.applyAxisAngle(up, turn);

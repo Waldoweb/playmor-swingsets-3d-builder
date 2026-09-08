@@ -262,6 +262,21 @@
     const towardsViewer = (swing) => +Front_at(swing, swing.yaw).dot(home_facing).toFixed(3);
     check("a baby swing on the first beam faces the viewer", towardsViewer(placedSwing), 1);
 
+    // Carrying a second beam has to offer the mount on the other side. It did
+    // not: the hover turns the carried mesh to face the nearest opening, and
+    // the collision test then turned it again, from the model's recorded yaw
+    // rather than from the mesh, and so tested a beam pointing back through
+    // the tower. The red marker still worked, because that flow never turns
+    // the mesh before asking.
+    selected_socket = null;
+    selected_object_id = "P-AB-3-8";
+    await Item_clicked();
+    Tik({});
+    const otherMount = rig.tower.joints.find((j) => j.layer === "b8" && j.available);
+    check("carrying a second beam offers the mount across the tower",
+      !!otherMount && carry_targets.includes(otherMount), true);
+    normal();
+
     // The beam on the other side of the tower stands a half turn round, so
     // the same joint would face the seat away. The other joint is taken.
     const otherBeam = await place(socketFor(rig.tower, "b8"), "P-AB-3-8");
