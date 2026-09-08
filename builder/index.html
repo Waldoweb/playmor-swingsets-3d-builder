@@ -2840,20 +2840,10 @@
                 if (model.roof_canopy_mesh) model.roof_canopy_mesh.visible = false;
                 if (model.roof_poly_mesh) {
                   model.roof_poly_mesh.visible = true;
-                  if (model.ruf_color == "tricolors") {
-                    model.roof_poly_mesh.traverse((mesh) => {
-                      if ("material" in mesh)
-                        mesh.material = model.roof_poly_material.clone();
-                    });
-                  } else {
-                    model.roof_poly_mesh.traverse((mesh) => {
-                      if ("material" in mesh)
-                        mesh.material = new THREE.MeshStandardMaterial({
-                          color: model.ruf_color,
-                          side: THREE.DoubleSide,
-                        });
-                    });
-                  }
+                  model.roof_poly_mesh.traverse((mesh) => {
+                    if (mesh.material && mesh.material.color)
+                      mesh.material.color = new THREE.Color(model.ruf_color);
+                  });
                 }
                 break;
             }
@@ -6029,6 +6019,15 @@
        * all read this one list; it used to be built twice, in two dialogs
        * that had drifted apart.
        */
+      /** The colour of a roof node, whichever of its meshes carries it. */
+      const Roof_colour_name = (root) => {
+        let colour = null;
+        root.traverse((node) => {
+          if (!colour && node.material && node.material.color) colour = node.material.color;
+        });
+        return colour ? Color2Name(colour) : "";
+      };
+
       const Build_part_list = () => {
         const list = [];
         for (const picked of picked_meshes) {
@@ -6037,9 +6036,9 @@
           const options = [];
 
           if (model.roof_canopy_mesh && model.roof_canopy_mesh.visible)
-            options.push("Canopy: " + Color2Name(model.roof_canopy_mesh.material.color));
+            options.push("Roof: Canvas, " + Roof_colour_name(model.roof_canopy_mesh));
           if (model.roof_poly_mesh && model.roof_poly_mesh.visible)
-            options.push("Canopy: Green Poly");
+            options.push("Roof: Poly, " + Roof_colour_name(model.roof_poly_mesh));
           if (model.toy_color)
             options.push("Color: " + Color2Name(new THREE.Color(model.toy_color)));
           if (model.trim_color)
@@ -6761,18 +6760,25 @@
         model.ruf = "canopy";
         model.ruf_color = color;
       };
+      /**
+       * A roof is one or the other. Choosing a poly colour used to show the
+       * poly panel over the canvas without hiding it, and recorded the choice
+       * in a field nothing read, so a saved design came back with its canvas
+       * roof. Now it mirrors the canvas handler: one roof visible, and the
+       * choice kept in `ruf` / `ruf_color`, which restore already honours.
+       */
       const Change_roof_poly_color = (color) => {
         let model = picked_mesh.model;
-        // Only change poly color, don't hide canopy
-        if (model.roof_poly_mesh) {
-          model.roof_poly_mesh.visible = true;
-          model.roof_poly_mesh.traverse((mesh) => {
-            if ("material" in mesh)
-              mesh.material.color = new THREE.Color(color);
-          });
-        }
+        if (!model.roof_poly_mesh) return;
+        if (model.roof_canopy_mesh) model.roof_canopy_mesh.visible = false;
+        model.roof_poly_mesh.visible = true;
+        model.roof_poly_mesh.traverse((mesh) => {
+          if (mesh.material && mesh.material.color)
+            mesh.material.color = new THREE.Color(color);
+        });
 
-        model.ruf_poly_color = color;
+        model.ruf = "poly";
+        model.ruf_color = color;
       };
       const Change_frame_color = (color) => {
         let model = picked_mesh.model;
