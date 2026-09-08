@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-07T17:21:04.196Z",
+  "generated_at": "2026-09-08T16:56:45.199Z",
   "product_count": 64,
   "default_fittings": [
     {
@@ -31,8 +31,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-PT.0f3318f9.glb",
-          "bytes": 653152,
+          "file": "P-PT.92444ad0.glb",
+          "bytes": 308116,
           "joints": [
             "joint,1,6",
             "joint,3,6",
@@ -495,8 +495,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-DPT.27174031.glb",
-          "bytes": 1030200,
+          "file": "P-DPT.40d50286.glb",
+          "bytes": 580524,
           "joints": [
             "joint,0,5",
             "joint_scope,0,toy",
@@ -1148,8 +1148,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-WT.1f5660b4.glb",
-          "bytes": 801212,
+          "file": "P-WT.0a5609a7.glb",
+          "bytes": 433260,
           "joints": [
             "joint,0,floor_center_watch",
             "joint,1,6,4,5",
@@ -1883,8 +1883,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-ST.c6609ed3.glb",
-          "bytes": 720612,
+          "file": "P-ST.5c78c4b3.glb",
+          "bytes": 352980,
           "joints": [
             "joint,0,s,tire",
             "Joint_beam_left,3,b8,5,6",
@@ -2484,8 +2484,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-DST.1161349e.glb",
-          "bytes": 932148,
+          "file": "P-DST.9e12bee6.glb",
+          "bytes": 564292,
           "joints": [
             "joint,1,6,4,5",
             "joint,1,8,6,7",
@@ -3267,8 +3267,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-DSMT.43f3e939.glb",
-          "bytes": 954528,
+          "file": "P-DSMT.055c2f3c.glb",
+          "bytes": 581664,
           "joints": [
             "joint,0,8,6,7",
             "joint,0,floor_center_watch",
@@ -4232,8 +4232,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-KT.36d13bcb.glb",
-          "bytes": 785664,
+          "file": "P-KT.b04e330c.glb",
+          "bytes": 397148,
           "joints": [
             "joint,0,8,1,2001",
             "joint,0,8,1,2002",
@@ -4926,8 +4926,8 @@
       "files": [
         {
           "layer": null,
-          "file": "Bridge.248e014c.glb",
-          "bytes": 427820,
+          "file": "Bridge.3ac0d3d0.glb",
+          "bytes": 106012,
           "joints": [
             "joint_back,2,deck",
             "joint_front,0,deck"
@@ -5066,8 +5066,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-AB-3-8.fece775b.glb",
-          "bytes": 75528,
+          "file": "P-AB-3-8.5a4bb458.glb",
+          "bytes": 46400,
           "joints": [
             "joint,0,b8",
             "joint_female_1,0,s",
@@ -5197,8 +5197,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-AB-3-10.a52d8302.glb",
-          "bytes": 75456,
+          "file": "P-AB-3-10.c17d32cb.glb",
+          "bytes": 46344,
           "joints": [
             "joint,0,b10",
             "joint,0,sh,_x_0",
@@ -5328,8 +5328,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-AB-4-8.52366e25.glb",
-          "bytes": 75444,
+          "file": "P-AB-4-8.611ee207.glb",
+          "bytes": 46348,
           "joints": [
             "Joint,0,b8",
             "joint,0,sh,_x_0",
@@ -5484,8 +5484,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-AB-4-10.29fdd5ea.glb",
-          "bytes": 75556,
+          "file": "P-AB-4-10.2022fbc1.glb",
+          "bytes": 46448,
           "joints": [
             "joint,0,b10",
             "joint,0,sh,_x_0",
@@ -5640,8 +5640,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-AB-DS-8.d3858826.glb",
-          "bytes": 75952,
+          "file": "P-AB-DS-8.45da3e93.glb",
+          "bytes": 46760,
           "joints": [
             "joint,0,b8",
             "joint,0,sh,_x_0",
@@ -5796,8 +5796,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-AB-DS-10.9911bcab.glb",
-          "bytes": 75860,
+          "file": "P-AB-DS-10.f23ab5de.glb",
+          "bytes": 46684,
           "joints": [
             "joint,0,b10",
             "joint_1,0,s",
@@ -6720,8 +6720,8 @@
       "files": [
         {
           "layer": null,
-          "file": "FK-WT.4c2e2494.glb",
-          "bytes": 349712,
+          "file": "FK-WT.e8e0ec67.glb",
+          "bytes": 28024,
           "joints": [
             "joint,0,floor_center_watch"
           ],
@@ -6765,8 +6765,8 @@
       "files": [
         {
           "layer": null,
-          "file": "FK-DXH.4415debf.glb",
-          "bytes": 349924,
+          "file": "FK-DXH.08fa72cd.glb",
+          "bytes": 28232,
           "joints": [
             "joint_left,1,floor_deluxe",
             "joint_right,3,floor_deluxe"
@@ -6821,8 +6821,8 @@
       "files": [
         {
           "layer": null,
-          "file": "FK-DXF.50872305.glb",
-          "bytes": 361452,
+          "file": "FK-DXF.0be2316a.glb",
+          "bytes": 39760,
           "joints": [
             "joint,1,floor_deluxe"
           ],
@@ -6866,8 +6866,8 @@
       "files": [
         {
           "layer": null,
-          "file": "FK-KT.cdf8962e.glb",
-          "bytes": 354724,
+          "file": "FK-KT.53b3ca31.glb",
+          "bytes": 33032,
           "joints": [
             "joint,0,floor_center_king"
           ],
@@ -6911,8 +6911,8 @@
       "files": [
         {
           "layer": null,
-          "file": "PT-K.4c8b09dd.glb",
-          "bytes": 108280,
+          "file": "PT-K.55337921.glb",
+          "bytes": 87600,
           "joints": [
             "joint,0,picnic",
             "joint,1,picnic"
@@ -6972,8 +6972,8 @@
       "files": [
         {
           "layer": null,
-          "file": "KK.0488b5d0.glb",
-          "bytes": 530036,
+          "file": "KK.b6826854.glb",
+          "bytes": 205124,
           "joints": [
             "Joint,2,kitchen"
           ],
@@ -7017,8 +7017,8 @@
       "files": [
         {
           "layer": null,
-          "file": "BUB.b459c1d9.glb",
-          "bytes": 140068,
+          "file": "BUB.0d40d848.glb",
+          "bytes": 78332,
           "joints": [
             "joint,0,deck"
           ],
@@ -7107,8 +7107,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-STEP-4.a135e0b8.glb",
-          "bytes": 94864,
+          "file": "P-STEP-4.d20a7404.glb",
+          "bytes": 62188,
           "joints": [
             "joint_right_handle,0,handle",
             "joint_left_handle,0,handle",
@@ -7203,8 +7203,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-STEP-5.f5888ab9.glb",
-          "bytes": 93768,
+          "file": "P-STEP-5.c11c8968.glb",
+          "bytes": 61320,
           "joints": [
             "joint_right_handle,0,handle",
             "joint_left_handle,0,handle",
@@ -7299,8 +7299,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-STEP-7.89fa84d3.glb",
-          "bytes": 130912,
+          "file": "P-STEP-7.20b5537b.glb",
+          "bytes": 91392,
           "joints": [
             "joint_right_handle,0,handle",
             "joint_left_handle,0,handle",
@@ -7395,8 +7395,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-GP-10.c77752cd.glb",
-          "bytes": 1151276,
+          "file": "P-GP-10.11328b90.glb",
+          "bytes": 536188,
           "joints": [
             "joint,0,5"
           ],
@@ -7440,8 +7440,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-GP-12.a04e739a.glb",
-          "bytes": 1148828,
+          "file": "P-GP-12.d56daefc.glb",
+          "bytes": 533756,
           "joints": [
             "joint,0,6"
           ],
@@ -7485,8 +7485,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-RC-5.e66b0de8.glb",
-          "bytes": 1111300,
+          "file": "P-RC-5.22a0e577.glb",
+          "bytes": 676008,
           "joints": [
             "joint,2,6"
           ],
@@ -7530,8 +7530,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-RC-7.a4fa2815.glb",
-          "bytes": 1200168,
+          "file": "P-RC-7.5dcc27e6.glb",
+          "bytes": 742752,
           "joints": [
             "joint,0,8"
           ],
@@ -7575,8 +7575,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-CN-5.29a19af1.glb",
-          "bytes": 1183936,
+          "file": "P-CN-5.c3e6b05f.glb",
+          "bytes": 776460,
           "joints": [
             "joint,0,6"
           ],
@@ -7620,8 +7620,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-CC-5.2612ca32.glb",
-          "bytes": 2173224,
+          "file": "P-CC-5.e63c9d83.glb",
+          "bytes": 1359808,
           "joints": [
             "joint_c,0,6"
           ],
@@ -7755,8 +7755,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-MB-A.afb50ef7.glb",
-          "bytes": 129756,
+          "file": "P-MB-A.e66d9fb2.glb",
+          "bytes": 90648,
           "joints": [
             "joint,2,6"
           ],
@@ -7800,8 +7800,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-MB-C.a5df4a5c.glb",
-          "bytes": 98688,
+          "file": "P-MB-C.8fd2ea7b.glb",
+          "bytes": 78012,
           "joints": [
             "joint,0,8"
           ],
@@ -8116,8 +8116,8 @@
       "files": [
         {
           "layer": null,
-          "file": "TTWSC-5.3a1696e4.glb",
-          "bytes": 572688,
+          "file": "TTWSC-5.5217e47a.glb",
+          "bytes": 510952,
           "joints": [
             "joint_c,1,6"
           ],
@@ -8208,8 +8208,8 @@
       "files": [
         {
           "layer": null,
-          "file": "TTWSC-7.a725b00c.glb",
-          "bytes": 479648,
+          "file": "TTWSC-7.72bbb6a5.glb",
+          "bytes": 417912,
           "joints": [
             "joint_c,1,8"
           ],
@@ -8661,8 +8661,8 @@
       "files": [
         {
           "layer": null,
-          "file": "TIC.5778c87e.glb",
-          "bytes": 507776,
+          "file": "TIC.596e428c.glb",
+          "bytes": 412124,
           "joints": [
             "joint,0,deck"
           ],
