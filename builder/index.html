@@ -2323,7 +2323,17 @@
           <div class="mulch-options-item">
             <div class="mulch-options-item-title">ENABLED</div>
             <div class="mulch-options-item-content">
-              <div class="mulch-options-item-checkbox">
+              <div id="mulch-enabled-checkbox" class="mulch-options-item-checkbox" title="Show the mulch bed">
+                <img
+                  src="images/image_fcb71549.png"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="mulch-options-item">
+            <div class="mulch-options-item-title">AUTO</div>
+            <div class="mulch-options-item-content">
+              <div id="mulch-auto-checkbox" class="mulch-options-item-checkbox" title="Size the bed to the set and keep the set centred in it">
                 <img
                   src="images/image_fcb71549.png"
                 />
@@ -3520,8 +3530,10 @@
             },
             mulch: {
               enabled: mulch_enabled,
+              auto: mulch.auto,
               width: mulch.width,
               depth: mulch.depth,
+              origin: { x: mulch.origin.x, z: mulch.origin.z },
               bounds_texture_index: mulch.bounds_texture_index,
               plane_texture_index: mulch.plane_texture_index,
             },
@@ -3620,9 +3632,16 @@
           mulch.build({
             width: state.mulch.width,
             depth: state.mulch.depth,
+            // Designs saved before the bed could size itself say nothing
+            // about it, and get the behaviour everything else now has.
+            auto: state.mulch.auto !== false,
+            origin: state.mulch.origin
+              ? new THREE.Vector3(state.mulch.origin.x || 0, 0, state.mulch.origin.z || 0)
+              : new THREE.Vector3(),
             bounds_texture_index: state.mulch.bounds_texture_index,
             plane_texture_index: state.mulch.plane_texture_index,
           });
+          Sync_mulch_panel();
 
           skybox.visible = state.skybox.visible;
 
@@ -4013,6 +4032,8 @@
           Blueprint.states = [this.get_snapshot()];
           display_mulch = true;
           mulch_enabled = true;
+          mulch.auto = true;
+          Sync_mulch_panel();
           Mode.mode = Mode.normal;
           Update_measurements();
           Show_items();
@@ -4193,9 +4214,19 @@
         }
       }
       class Mulch {
+        // The bed's default footprint, in scene units (metres), and how far
+        // it reaches past the set when it is sized automatically. Six feet
+        // is the use zone the safety guidance asks for around a playset.
+        static default_size = 10;
+        static margin = 6 / Meters2Feet;
+
         constructor(args) {
-          this.width = 10;
-          this.depth = 10;
+          this.width = Mulch.default_size;
+          this.depth = Mulch.default_size;
+          // Where the bed is centred. It follows the set when auto-sized, so
+          // the set never has to be moved to sit in the middle of it.
+          this.origin = new THREE.Vector3();
+          this.auto = true;
           this.texture = null;
           this.meshes = [];
           this.bounds_textures = [];
@@ -4256,6 +4287,10 @@
                         this.plane_textures.push(texture);
 
                         this.build();
+                        // A design may already be standing by the time the
+                        // textures arrive — the ?catalog-id path loads one
+                        // straight away — and it wants its bed fitted.
+                        this.fit();
                       }
                     );
                   }
@@ -4268,15 +4303,23 @@
           if (args) {
             if ("width" in args) this.width = args.width;
             if ("depth" in args) this.depth = args.depth;
+            if ("origin" in args) this.origin.copy(args.origin);
+            if ("auto" in args) this.auto = args.auto;
             if ("bounds_texture_index" in args)
               this.bounds_texture_index = args.bounds_texture_index;
             if ("plane_texture_index" in args)
               this.plane_texture_index = args.plane_texture_index;
           }
 
+          // Nothing to build with until the textures have arrived; the
+          // loader calls back here once they have.
+          if (this.bounds_textures.length < 4 || this.plane_textures.length < 2) return;
+
           for (let mesh of this.meshes) scene.remove(mesh);
 
           this.meshes = [];
+          const ox = this.origin.x;
+          const oz = this.origin.z;
 
           let xtexture = this.bounds_textures[this.bounds_texture_index * 2];
           xtexture.repeat.set(this.width, 0.5);
@@ -4301,7 +4344,7 @@
             new THREE.MeshStandardMaterial({ map: ztexture }), // front
             new THREE.MeshStandardMaterial({ map: ztexture }), // back
           ]);
-          zbox1.position.x = this.width / 2;
+          zbox1.position.set(ox + this.width / 2, 0, oz);
           zbox1.receiveShadow = shadows;
           this.meshes.push(zbox1);
           scene.add(zbox1);
@@ -4315,7 +4358,7 @@
             new THREE.MeshStandardMaterial({ map: ztexture }),
             new THREE.MeshStandardMaterial({ map: ztexture }),
           ]);
-          zbox2.position.x = -this.width / 2;
+          zbox2.position.set(ox - this.width / 2, 0, oz);
           zbox2.receiveShadow = shadows;
           this.meshes.push(zbox2);
           scene.add(zbox2);
@@ -4328,13 +4371,13 @@
             0.25
           );
           let xbox1 = new THREE.Mesh(xbox_geometry, xbox_material);
-          xbox1.position.z = this.depth / 2;
+          xbox1.position.set(ox, 0, oz + this.depth / 2);
           xbox1.receiveShadow = shadows;
           this.meshes.push(xbox1);
           scene.add(xbox1);
           xbox1.visible = false;
           let xbox2 = new THREE.Mesh(xbox_geometry, xbox_material);
-          xbox2.position.z = -this.depth / 2;
+          xbox2.position.set(ox, 0, oz - this.depth / 2);
           xbox2.receiveShadow = shadows;
           this.meshes.push(xbox2);
           scene.add(xbox2);
@@ -4349,13 +4392,54 @@
           });
           let plane = new THREE.Mesh(plane_geometry, plane_material);
           plane.rotation.x = -Math.PI / 2;
-          plane.position.y = 0;
+          plane.position.set(ox, 0, oz);
           plane.receiveShadow = shadows;
           this.meshes.push(plane);
           scene.add(plane);
           plane.visible = false;
         }
-        center(args) {}
+        /**
+         * Size the bed to the set and centre it under the set.
+         *
+         * Measured from the same box the dimensions readout uses, plus the
+         * margin on every side, and centred on the set's footprint. Only
+         * while `auto` holds: dragging either size slider hands the bed back
+         * to the person, and the Auto-size checkbox hands it back here. An
+         * empty yard gets the default bed at the origin.
+         *
+         * Runs from Update_measurements, so every placement, deletion, swap,
+         * restore and centring refits the bed without any of them knowing.
+         */
+        fit() {
+          if (!this.auto) return;
+
+          const round = (value) => Math.round(value * 100) / 100;
+          let width = Mulch.default_size;
+          let depth = Mulch.default_size;
+          const origin = new THREE.Vector3();
+
+          if (picked_meshes.length) {
+            const box = new THREE.Box3();
+            for (const mesh of picked_meshes) box.expandByObject(mesh);
+            if (!box.isEmpty()) {
+              const size = new THREE.Vector3();
+              const middle = new THREE.Vector3();
+              box.getSize(size);
+              box.getCenter(middle);
+              width = round(Math.max(Mulch.default_size / 2, size.x + 2 * Mulch.margin));
+              depth = round(Math.max(Mulch.default_size / 2, size.z + 2 * Mulch.margin));
+              origin.set(round(middle.x), 0, round(middle.z));
+            }
+          }
+
+          if (width === this.width && depth === this.depth && origin.equals(this.origin)) return;
+          this.build({ width, depth, origin });
+
+          // The sliders show the size the bed has taken, so a person who
+          // then drags one starts from where it is.
+          mulch_width_slider.value = Math.round(width);
+          mulch_length_slider.value = Math.round(depth);
+        }
       }
       class Model {
         static instances = [];
@@ -6868,11 +6952,17 @@
         Update_measurements();
       };
 
+      // Dragging a size slider is taking the bed over by hand, so auto-sizing
+      // stands down until the checkbox turns it back on.
       mulch_length_slider.oninput = (args) => {
-        if (mulch) mulch.build({ depth: parseInt(mulch_length_slider.value) });
+        if (!mulch) return;
+        Set_mulch_auto(false);
+        mulch.build({ depth: parseInt(mulch_length_slider.value) });
       };
       mulch_width_slider.oninput = (args) => {
-        if (mulch) mulch.build({ width: parseInt(mulch_width_slider.value) });
+        if (!mulch) return;
+        Set_mulch_auto(false);
+        mulch.build({ width: parseInt(mulch_width_slider.value) });
       };
 
       const Show_info = (args) => {
@@ -7139,6 +7229,8 @@
           mesh.position.x -= center.x;
           mesh.position.z -= center.z;
         }
+        // The bed follows the set back to the origin.
+        Update_measurements();
       };
       const Help = (args) => {
 
@@ -7267,6 +7359,9 @@
           "' x " +
           (size.z * Meters2Feet).toFixed(2) +
           "'";
+
+        // The set has changed shape, so the bed under it follows.
+        if (mulch) mulch.fit();
       };
       const View_all = (args) => {
         let box = new THREE.Box3();
@@ -9378,13 +9473,24 @@
       $("#controls-buttons-switch").on("click", (event) => {
         skybox.toggle();
       });
-      $(".mulch-options-item-checkbox").on("click", (event) => {
+      /** The two mulch checkboxes show what the bed is actually doing. */
+      const Sync_mulch_panel = () => {
+        $("#mulch-enabled-checkbox img").toggle(!!mulch_enabled);
+        $("#mulch-auto-checkbox img").toggle(!!(mulch && mulch.auto));
+      };
+      /** Hand the bed's size to the app, or take it back. */
+      const Set_mulch_auto = (auto) => {
+        if (!mulch || mulch.auto === auto) return;
+        mulch.auto = auto;
+        Sync_mulch_panel();
+        if (auto) mulch.fit();
+      };
+      $("#mulch-enabled-checkbox").on("click", (event) => {
         mulch_enabled = !mulch_enabled;
-        if (mulch_enabled) {
-          $(".mulch-options-item-checkbox img").show();
-        } else {
-          $(".mulch-options-item-checkbox img").hide();
-        }
+        Sync_mulch_panel();
+      });
+      $("#mulch-auto-checkbox").on("click", (event) => {
+        if (mulch) Set_mulch_auto(!mulch.auto);
       });
       $("#mulch-options-material-left").on("click", (event) => {
         if (mulch) mulch.build({ plane_texture_index: 0 });
