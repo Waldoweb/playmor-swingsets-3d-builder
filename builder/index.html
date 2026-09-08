@@ -2027,6 +2027,12 @@
       // with the pointer a couple of feet above the hanger.
       const SNAP_RADIUS = 80;
       const SNAP_BODY_RADIUS = 24;
+      // The body margin is also at least this far in metres, measured at the
+      // joint's depth, so it keeps up when the camera is zoomed in. A swing
+      // stood on the ground under its beam stops about half a metre short of
+      // the hanger -- it was built to hang, not stand -- and that gap has to
+      // count as "on it" whatever the zoom.
+      const SNAP_BODY_REACH = 0.6;
 
       // The opening the user has picked, and every opening currently on screen.
       // Sockets rather than joints: one dot per place a part can go, however
@@ -5403,6 +5409,17 @@
         return Carried_screen_rect(box, hit.add(offset));
       };
 
+      /** How many screen pixels one metre covers at this joint's depth. */
+      const Pixels_per_metre_at = (joint) => {
+        const wh = 0.5 * renderer.getContext().canvas.width;
+        const hh = 0.5 * renderer.getContext().canvas.height;
+        const at = new THREE.Vector3();
+        joint.getWorldPosition(at);
+        const a = at.clone().project(camera);
+        const b = at.clone().setY(at.y + 1).project(camera);
+        return Math.hypot((a.x - b.x) * wh, (a.y - b.y) * hh);
+      };
+
       /** Distance from a point to a rectangle's edge; zero inside it. */
       const Rect_distance = (rect, x, y) => {
         const dx = Math.max(rect.x0 - x, 0, x - rect.x1);
@@ -5414,16 +5431,25 @@
        * The visible target the carried part should lock onto, or null.
        *
        * A dot qualifies when it is near the pointer, or near the part's own
-       * outline imagined at that dot's depth. Among those, the one nearest the
-       * pointer wins, so where four hangers sit along one beam the pointer
-       * still decides between them. The outline is only worked out for dots
-       * the pointer test has already missed.
+       * outline. The outline is taken first from where the part is actually
+       * drawn -- `follow`, the spot it would occupy this frame if it kept
+       * following the pointer -- because that is what the user is looking at:
+       * a swing carried over the mulch stands on the ground under the pointer
+       * with its chains reaching up to the beam, and if the top of those
+       * chains sits on a hanger's dot, that is a snap. The depth-plane outline
+       * is the fallback for a pointer over open sky, where the drawn part is
+       * away on the skybox and too small to mean anything.
+       *
+       * Among qualifying dots the one nearest the pointer wins, so where four
+       * hangers sit along one beam the pointer still decides between them.
+       * Outlines are only worked out for dots the pointer test has missed.
        */
-      const Find_snap_joint = (targets) => {
+      const Find_snap_joint = (targets, follow, grounded) => {
         if (!targets.length) return null;
         const size = joint_image.height / 2;
         let box = undefined;
         let offset = null;
+        let drawn = null;
         let best = null;
         let best_distance = Infinity;
         for (const joint of targets) {
@@ -5434,10 +5460,23 @@
           if (!qualifies) {
             if (box === undefined) {
               box = Carried_box();
-              offset = Carried_offset();
+              offset = box ? Carried_offset() : null;
+              drawn = box ? Carried_screen_rect(box, follow) : null;
+              // Standing on the ground because it could not hang from where
+              // the pointer is: a swing over the mulch, a slide over the
+              // yard. It reaches its dot by being lifted, so the outline
+              // takes in the space above it, up to one part-height. A swing
+              // stood under its beam stops a good half metre short of the
+              // hanger, and a shorter swing stops shorter still.
+              if (drawn && grounded) drawn.y0 -= drawn.y1 - drawn.y0;
             }
-            const rect = box ? Carried_rect_at(joint, box, offset) : null;
-            qualifies = !!rect && Rect_distance(rect, cx, cy) <= SNAP_BODY_RADIUS;
+            const margin = Math.max(SNAP_BODY_RADIUS, SNAP_BODY_REACH * Pixels_per_metre_at(joint));
+            if (drawn && Rect_distance(drawn, cx, cy) <= margin) {
+              qualifies = true;
+            } else if (box) {
+              const rect = Carried_rect_at(joint, box, offset);
+              qualifies = !!rect && Rect_distance(rect, cx, cy) <= margin;
+            }
           }
           if (qualifies && to_pointer < best_distance) {
             best_distance = to_pointer;
@@ -5467,22 +5506,26 @@
         host_joint = Find_closest_available_joint({ position: Pointers.position });
         if (host_joint != null) {
           Orient_carried_to(host_joint);
-          const snap = Find_snap_joint(carry_targets);
+          // Where the part is drawn this frame unless it snaps: hanging from
+          // the ray's hit, but never below the ground.
+          const follow = Carried_offset().add(ip);
+          const grounded = follow.y < 0;
+          if (grounded) follow.y = 0;
+          const snap = Find_snap_joint(carry_targets, follow, grounded);
           if (snap && snap !== host_joint) {
             host_joint = snap;
             Orient_carried_to(host_joint);
           }
           snapped_joint = snap;
 
-          const p = Carried_offset();
+          let p = follow;
           if (snap) {
+            p = Carried_offset();
             const pp = new THREE.Vector3();
             snap.getWorldPosition(pp);
             p.add(pp);
-          } else {
-            p.add(ip);
+            if (p.y < 0) p.y = 0;
           }
-          if (p.y < 0) p.y = 0;
           plug_model.mesh.position.copy(p);
         } else {
           snapped_joint = null;
