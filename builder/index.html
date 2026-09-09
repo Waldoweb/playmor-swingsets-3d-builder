@@ -1993,6 +1993,14 @@
       // part's outline to a dot. The second is what lets a swing snap when its
       // seat is put where the seat should hang, with the pointer a couple of
       // feet above the hanger.
+      // Add-marker sizing. A marker is drawn at its base size when a metre
+      // at its position spans this many pixels -- roughly the home view --
+      // and scales with the camera between the two limits. The hit radius
+      // never drops below MARKER_HIT_MIN pixels, whatever is drawn.
+      const MARKER_PX_PER_METRE_REF = 42; // measured at the home view
+      const MARKER_SCALE_MIN = 0.8;
+      const MARKER_SCALE_MAX = 1.6;
+      const MARKER_HIT_MIN = 16; // the old square box was 32 px across
       const SNAP_RADIUS = 60;
       const SNAP_BODY_RADIUS = 16;
       // The body margin is also at least this far in metres, measured at the
@@ -5072,6 +5080,20 @@
        * reads as a hint. The hit target stays the sprite-sized box, so the
        * marker can shrink without becoming fiddly to click.
        */
+      /**
+       * Does this opening take a swing beam, and nothing else?
+       *
+       * The beam mount is the one spot people have to find to get anywhere,
+       * and it sits high on the tower's side where it is easy to miss. Its
+       * marker carries a beam silhouette instead of the plus, so it says
+       * what goes there before anyone clicks it. Takes a joint (carrying) or
+       * a socket (browsing); beam layers are `b8`, `b10` and the like.
+       */
+      const Is_beam_mount = (target) => {
+        const joints = target.joints || [target];
+        return joints.some((j) => /^b\d+$/.test(j.layer || ""));
+      };
+
       const Draw_add_marker = (joint, highlighted, locked) => {
         const size = joint_image.height / 2;
         const cx = joint.x + size / 2;
@@ -5079,7 +5101,27 @@
         // Locked: the part in hand has snapped onto this one. It grows, pulses
         // faster and gets a heavy white ring, and every other target steps
         // back so there is no doubt which joint a click will fill.
-        const r = locked ? 17 : highlighted ? 11 : 8;
+        // Beam mounts draw larger: they sit high on the tower's side, away
+        // from the cluster of deck openings, and carry a picture rather
+        // than a plus, which needs the room.
+        const beam_mount = Is_beam_mount(joint);
+        // Markers grow as the camera comes in and shrink as it pulls back,
+        // between a floor that keeps them readable and tappable from the
+        // home view and a ceiling that stops them covering the part they sit
+        // on up close. Sized from how big a metre looks at the marker, so a
+        // dot on the near post is visibly bigger than one on the far side.
+        const anchor = joint.getWorldPosition ? joint : joint.joints[0];
+        const scale = THREE.MathUtils.clamp(
+          Pixels_per_metre_at(anchor) / MARKER_PX_PER_METRE_REF,
+          MARKER_SCALE_MIN,
+          MARKER_SCALE_MAX
+        );
+        const r = scale * (beam_mount
+          ? locked ? 21 : highlighted ? 16 : 13
+          : locked ? 17 : highlighted ? 11 : 8);
+        // What a click or tap has to land in. Follows the drawn size, but
+        // never shrinks below a fingertip.
+        joint.hit_radius = Math.max(MARKER_HIT_MIN, r + 5);
         const rgb = highlighted ? ADD_MARKER_GREEN_RGB : ADD_MARKER_RED_RGB;
 
         context.save();
@@ -5105,12 +5147,68 @@
         context.strokeStyle = locked ? "#ffffff" : "rgba(255, 255, 255, 0.92)";
         context.stroke();
 
-        const arm = r * 0.48;
+        if (beam_mount) {
+          // A child on a swing, as a silhouette: chains from the top of the
+          // disc to a seat, and a small figure sitting on it -- head, body,
+          // arms up to the chains, legs hanging below the seat. Says
+          // "swings go here" faster than any diagram of the beam did.
+          const top = cy - r * 0.8;
+          const seat = cy + r * 0.3;
+          const chain = r * 0.36;
+          context.strokeStyle = "#ffffff";
+          context.fillStyle = "#ffffff";
+          context.lineCap = "round";
+          // chains and seat
+          context.lineWidth = Math.max(1.5, r * 0.11);
+          context.beginPath();
+          context.moveTo(cx - chain, top);
+          context.lineTo(cx - chain, seat);
+          context.moveTo(cx + chain, top);
+          context.lineTo(cx + chain, seat);
+          context.stroke();
+          context.lineWidth = Math.max(2, r * 0.16);
+          context.beginPath();
+          context.moveTo(cx - chain - r * 0.08, seat);
+          context.lineTo(cx + chain + r * 0.08, seat);
+          context.stroke();
+          // head
+          context.beginPath();
+          context.arc(cx, cy - r * 0.3, r * 0.17, 0, Math.PI * 2);
+          context.fill();
+          // body: a rounded block from the shoulders down onto the seat
+          const bw = r * 0.4, by0 = cy - r * 0.12, by1 = seat;
+          context.beginPath();
+          context.moveTo(cx - bw / 2, by0 + r * 0.08);
+          context.quadraticCurveTo(cx - bw / 2, by0, cx - bw / 2 + r * 0.08, by0);
+          context.lineTo(cx + bw / 2 - r * 0.08, by0);
+          context.quadraticCurveTo(cx + bw / 2, by0, cx + bw / 2, by0 + r * 0.08);
+          context.lineTo(cx + bw / 2, by1);
+          context.lineTo(cx - bw / 2, by1);
+          context.closePath();
+          context.fill();
+          // arms up to the chains, legs down past the seat
+          context.lineWidth = Math.max(1.5, r * 0.12);
+          context.beginPath();
+          context.moveTo(cx - bw / 2 + r * 0.04, by0 + r * 0.06);
+          context.lineTo(cx - chain, cy - r * 0.42);
+          context.moveTo(cx + bw / 2 - r * 0.04, by0 + r * 0.06);
+          context.lineTo(cx + chain, cy - r * 0.42);
+          context.moveTo(cx - r * 0.12, seat);
+          context.lineTo(cx - r * 0.16, seat + r * 0.36);
+          context.moveTo(cx + r * 0.12, seat);
+          context.lineTo(cx + r * 0.16, seat + r * 0.36);
+          context.stroke();
+          context.restore();
+          return;
+        }
         context.beginPath();
-        context.moveTo(cx - arm, cy);
-        context.lineTo(cx + arm, cy);
-        context.moveTo(cx, cy - arm);
-        context.lineTo(cx, cy + arm);
+        {
+          const arm = r * 0.48;
+          context.moveTo(cx - arm, cy);
+          context.lineTo(cx + arm, cy);
+          context.moveTo(cx, cy - arm);
+          context.lineTo(cx, cy + arm);
+        }
         context.strokeStyle = "#ffffff";
         context.lineWidth = Math.max(2, r * 0.26);
         context.lineCap = "round";
@@ -5122,6 +5220,11 @@
       /** Is this screen point inside a joint's ring? */
       const Joint_hit = (joint, point) => {
         const size = joint_image.height / 2;
+        if (joint.hit_radius) {
+          const cx = joint.x + size / 2;
+          const cy = joint.y + size / 2;
+          return Math.hypot(point.x - cx, point.y - cy) <= joint.hit_radius;
+        }
         return (
           point.x > joint.x &&
           point.x < joint.x + size &&
