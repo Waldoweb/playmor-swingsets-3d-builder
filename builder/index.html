@@ -1,6 +1,11 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <!-- Without this a phone lays the page out about 980px wide and shrinks
+         it, so the narrow-screen rules never apply and the command strip
+         lands on the Get a Quote button. Page zoom is off because the canvas
+         takes the pinch for the camera. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 
     <title>3D Swing Set Builder | PlayMor Swing Sets</title>
 
@@ -1683,7 +1688,10 @@
         #top_actions { top: 10px; }
         .cta { height: 40px; font-size: 14px; padding: 0 16px; }
         :root { --panel-w: 100vw; }
-        body.panel-open .bottom-bar { right: 0; }
+        /* The panel is the whole screen here, so the parts bar has nowhere
+           to move aside to; it slides away instead of lying over the form. */
+        body.panel-open .bottom-bar { right: 0; transform: translateY(100%); pointer-events: none; }
+        body.panel-open .bar-toggle { display: none; }
       }
 
     </style>
@@ -6900,8 +6908,14 @@
         // The set has changed shape, so the bed under it follows.
         if (mulch) mulch.fit();
 
-        // ...and so does the point the camera looks at and zooms toward.
-        target_height = box.isEmpty() ? 0 : (box.min.y + box.max.y) / 2;
+        // ...and so does the point the camera looks at and zooms toward:
+        // half the set's height, but never above a little under the 5 ft
+        // deck. Half-height on a tower with a roof and flags is up at the
+        // rails, and Weldon wanted the wheel to close in just below the
+        // floor (2026-09-09).
+        target_height = box.isEmpty()
+          ? 0
+          : Math.min((box.min.y + box.max.y) / 2, FOCUS_HEIGHT_MAX);
       };
       /**
        * Ease the orbit target up to the middle of the set.
@@ -8825,6 +8839,8 @@
       // rather than the ground under it. Update_measurements sets it and
       // Tik eases the orbit target toward it; see Aim_at_the_set.
       let target_height = 0;
+      // The 5 ft deck is at 1.52 m; this is a hand's breadth under it.
+      const FOCUS_HEIGHT_MAX = 1.4;
       // How far up the screen the picture is shifted so that the orbit
       // target lands in the middle of the part of the canvas the parts bar
       // is not covering, in pixels. Set by Frame_above_the_bar, eased and
