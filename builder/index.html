@@ -2001,6 +2001,13 @@
       const MARKER_SCALE_MIN = 0.8;
       const MARKER_SCALE_MAX = 1.6;
       const MARKER_HIT_MIN = 16; // the old square box was 32 px across
+      // Swings carry an unseen box filling the space between their chains,
+      // so a click there selects the swing instead of the yard behind it.
+      // It lives on this layer, which no camera renders and no raycast sees
+      // unless it asks -- only the selection pick does.
+      const HIT_BOX_NAME = "hit_box";
+      const HIT_BOX_LAYER = 1;
+      const HIT_BOX_MIN_DEPTH = 0.12; // metres; a swing seen edge-on is paper thin
       const SNAP_RADIUS = 60;
       const SNAP_BODY_RADIUS = 16;
       // The body margin is also at least this far in metres, measured at the
@@ -3581,6 +3588,52 @@
           if (typeof Sync_mulch_panel === "function") Sync_mulch_panel();
         }
       }
+      /**
+       * Give a swing an unseen box to click on.
+       *
+       * A swing is two chains and a seat, so most of the rectangle it draws
+       * on screen is the yard behind it, and a click there missed. This
+       * fills that rectangle -- the box round every mesh in the part except
+       * its joints, given a little depth so it still catches a ray from side
+       * on -- with a mesh on HIT_BOX_LAYER. Nothing renders that layer, and
+       * only Pointer_down's selection pick raycasts it, so the markers'
+       * occlusion tests and the carried part's ground ray look straight
+       * through it.
+       */
+      const Add_hit_box = (root, model) => {
+        if (root.children.some((child) => child.name === HIT_BOX_NAME)) return;
+
+        root.updateWorldMatrix(true, true);
+        const to_local = new THREE.Matrix4().getInverse(root.matrixWorld);
+        const box = new THREE.Box3();
+        const part = new THREE.Box3();
+        root.traverse((node) => {
+          if (!node.isMesh || !node.geometry) return;
+          if (node.name.toLowerCase().startsWith("joint")) return;
+          if (!node.geometry.boundingBox) node.geometry.computeBoundingBox();
+          part.copy(node.geometry.boundingBox).applyMatrix4(node.matrixWorld).applyMatrix4(to_local);
+          box.union(part);
+        });
+        if (box.isEmpty()) return;
+
+        const size = box.getSize(new THREE.Vector3());
+        const centre = box.getCenter(new THREE.Vector3());
+        const hit = new THREE.Mesh(
+          new THREE.BoxGeometry(
+            Math.max(size.x, HIT_BOX_MIN_DEPTH),
+            size.y,
+            Math.max(size.z, HIT_BOX_MIN_DEPTH)
+          ),
+          new THREE.MeshBasicMaterial()
+        );
+        hit.name = HIT_BOX_NAME;
+        hit.position.copy(centre);
+        hit.layers.set(HIT_BOX_LAYER);
+        hit.castShadow = false;
+        hit.receiveShadow = false;
+        hit.model = model;
+        root.add(hit);
+      };
       class Model {
         static instances = [];
 
@@ -3949,6 +4002,10 @@
           // Compute ground offset so models sit on the ground plane
           let bbox = new THREE.Box3().setFromObject(clone.mesh);
           clone.ground_offset = -bbox.min.y;
+
+          if (getCategoryFromObjectId(clone.object_id) === "swings")
+            for (const root of new Set([...clone.meshes, clone.mesh]))
+              Add_hit_box(root, clone);
 
           return clone;
         }
@@ -5117,7 +5174,7 @@
           MARKER_SCALE_MAX
         );
         const r = scale * (beam_mount
-          ? locked ? 21 : highlighted ? 16 : 13
+          ? locked ? 18 : highlighted ? 14 : 11
           : locked ? 17 : highlighted ? 11 : 8);
         // What a click or tap has to land in. Follows the drawn size, but
         // never shrinks below a fingertip.
@@ -5239,6 +5296,7 @@
 
         context.lineDashOffset = dashOffset--;
 
+        Aim_at_the_set(delta);
         orbitControls.update();
         if (window.syncWorldRotationWithCamera) syncWorldRotationWithCamera();
 
@@ -5671,11 +5729,33 @@
         switch (Mode.mode) {
           case Mode.normal:
             {
+              // The one raycast that sees the swings' hit boxes.
+              raycaster.layers.enable(HIT_BOX_LAYER);
               let intersection_objects = raycaster.intersectObjects(
                 picked_meshes,
                 true
               );
+              raycaster.layers.disable(HIT_BOX_LAYER);
               if (intersection_objects.length > 0) {
+                // A hit box stands in for its swing: the part's nearest real
+                // mesh under the pointer if there is one, else its first, so
+                // everything downstream sees a mesh with a name and material.
+                if (intersection_objects[0].object.name === HIT_BOX_NAME) {
+                  const model = intersection_objects[0].object.model;
+                  let real = intersection_objects.find(
+                    (hit) => hit.object.model === model && hit.object.name !== HIT_BOX_NAME
+                  );
+                  if (!real) {
+                    let mesh = null;
+                    model.mesh.traverse((node) => {
+                      if (mesh || !node.isMesh || node.name === HIT_BOX_NAME) return;
+                      if (node.name.toLowerCase().startsWith("joint")) return;
+                      mesh = node;
+                    });
+                    real = { object: mesh || model.mesh, point: intersection_objects[0].point };
+                  }
+                  intersection_objects = [real];
+                }
                 intersection_object = intersection_objects[0];
                 intersection_point.copy(intersection_object.point);
                 intersection_mesh = intersection_object.object;
@@ -6722,6 +6802,58 @@
 
         // The set has changed shape, so the bed under it follows.
         if (mulch) mulch.fit();
+
+        // ...and so does the point the camera looks at and zooms toward.
+        target_height = box.isEmpty() ? 0 : (box.min.y + box.max.y) / 2;
+      };
+      /**
+       * Ease the orbit target up to the middle of the set.
+       *
+       * The target used to sit on the ground, so the wheel dollied in on the
+       * mulch under the tower and the home view looked down on the set from
+       * above with the whole structure in the top half of the frame. Only
+       * the target moves: OrbitControls measures its offset from the camera
+       * afresh each frame, so the camera stays where it is and tilts to look
+       * at the new height, and the picture never jumps. A short ease covers
+       * the first tower going down and a taller one replacing it.
+       */
+      const Aim_at_the_set = (delta) => {
+        const ease = 1 - Math.exp(-6 * delta);
+        const gap = target_height - orbitControls.target.y;
+        if (Math.abs(gap) < 1e-3) orbitControls.target.y = target_height;
+        else orbitControls.target.y += gap * ease;
+
+        // The parts bar lies over the bottom of the canvas, so a target in
+        // the middle of the canvas sits low in what can be seen. Shifting the
+        // projection up by half the bar puts it in the middle of the rest.
+        let shift = applied_view_shift < 0 ? view_shift : applied_view_shift;
+        const shift_gap = view_shift - shift;
+        shift = Math.abs(shift_gap) < 0.5 ? view_shift : shift + shift_gap * ease;
+        Apply_view_shift(shift);
+      };
+      const Apply_view_shift = (shift) => {
+        if (shift === applied_view_shift) return;
+        applied_view_shift = shift;
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        if (shift) camera.setViewOffset(w, h, 0, shift, w, h);
+        else camera.clearViewOffset();
+      };
+      /**
+       * How much of the canvas the parts bar covers, halved.
+       *
+       * The bar's height rather than where its top edge is: it slides out
+       * over a third of a second, and measuring its edge while it moves
+       * gave the shift wherever the bar happened to be that frame.
+       */
+      const Frame_above_the_bar = () => {
+        const bar = document.querySelector(".bottom-bar");
+        if (!bar || bar.classList.contains("collapsed")) {
+          view_shift = 0;
+          return;
+        }
+        const covered = Math.min(bar.offsetHeight, window.innerHeight);
+        view_shift = Math.round(covered / 2);
       };
       /**
        * Bring the whole set into view, and orbit around it from here on.
@@ -6745,7 +6877,7 @@
 
         const target = box.isEmpty()
           ? new THREE.Vector3()
-          : box.getCenter(new THREE.Vector3()).setY(0);
+          : box.getCenter(new THREE.Vector3()).setY(target_height);
         const direction = new THREE.Vector3()
           .subVectors(camera.position, orbitControls.target)
           .normalize();
@@ -7213,6 +7345,9 @@
         canvas.height = window.innerHeight;
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
+        Frame_above_the_bar();
+        applied_view_shift = -1;
+        Apply_view_shift(view_shift);
         renderer.setSize(window.innerWidth, window.innerHeight);
         scene_render_target.setSize(window.innerWidth, window.innerHeight);
         email_render_target.setSize(window.innerWidth, window.innerHeight);
@@ -8136,6 +8271,9 @@
         return result;
       };
       const Setup_email_snapshot = (args) => {
+        // The emailed picture has no parts bar over it: centre the set.
+        const shift = applied_view_shift;
+        Apply_view_shift(0);
         renderer.setRenderTarget(email_render_target);
         renderer.clear();
         scene.background = white_color;
@@ -8155,6 +8293,7 @@
           for (let mesh of mulch.meshes) mesh.visible = false;
         if (plug_model) plug_model.mesh.visible = false;
         for (let mesh of picked_meshes) mesh.visible = false;
+        Apply_view_shift(shift);
 
         let render_target_pixels = new Uint8ClampedArray(
           4 * email_render_target.width * email_render_target.height
@@ -8552,6 +8691,17 @@
       // ground from the set towards them. Set once the camera is placed. Parts
       // with a front turn to face it; see Facing_score.
       const home_facing = new THREE.Vector3(1, 0, 0);
+      // How high off the ground the camera aims and zooms toward: half the
+      // set's height, so the wheel closes in on the middle of the tower
+      // rather than the ground under it. Update_measurements sets it and
+      // Tik eases the orbit target toward it; see Aim_at_the_set.
+      let target_height = 0;
+      // How far up the screen the picture is shifted so that the orbit
+      // target lands in the middle of the part of the canvas the parts bar
+      // is not covering, in pixels. Set by Frame_above_the_bar, eased and
+      // applied to the camera's view offset by Aim_at_the_set.
+      let view_shift = 0;
+      let applied_view_shift = -1;
       const Y_AXIS = new THREE.Vector3(0, 1, 0);
       let mulch_enabled = true;
       // Legacy variables kept for backward compatibility with Categories system
@@ -9108,6 +9258,8 @@
         try {
           localStorage.setItem("yard-bar-collapsed", collapsed ? "1" : "0");
         } catch (error) {}
+        // The eased shift in Aim_at_the_set follows the bar as it slides.
+        Frame_above_the_bar();
       };
       if (bar_element && bar_toggle) {
         let collapsed = false;
