@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-09-08T19:33:43.739Z",
+  "generated_at": "2026-09-09T16:06:02.371Z",
   "product_count": 64,
   "default_fittings": [
     {
@@ -320,7 +320,121 @@
                 "joint_r,2,6,3,4"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.171,
+              0,
+              -1.03
+            ],
+            [
+              1.171,
+              3.802,
+              1.03
+            ]
+          ],
+          "joint_positions": {
+            "joint,1,6": [
+              0.762,
+              1.87,
+              0
+            ],
+            "joint,3,6": [
+              -0.762,
+              1.87,
+              0
+            ],
+            "joint_back,2,end_rail": [
+              0,
+              0,
+              -0.615
+            ],
+            "joint_beam_back,2,b8,5,3": [
+              0,
+              2.56,
+              -0.485
+            ],
+            "joint_beam_front,0,b8,6,2": [
+              0,
+              2.56,
+              0.519
+            ],
+            "joint_front,0,end_rail": [
+              0,
+              0,
+              0.62
+            ],
+            "joint_l,0,6,1,2": [
+              -0.357,
+              1.87,
+              0.611
+            ],
+            "joint_l_scope,0,toy": [
+              -0.357,
+              2.339,
+              0.585
+            ],
+            "joint_l_wheel,0,toy": [
+              -0.36,
+              2.292,
+              -0.557
+            ],
+            "joint_l,2,6,3,4": [
+              0.355,
+              1.87,
+              -0.611
+            ],
+            "joint_l_scope,2,toy": [
+              -0.338,
+              2.339,
+              -0.59
+            ],
+            "joint_l_wheel,2,toy": [
+              -0.349,
+              2.288,
+              0.558
+            ],
+            "joint_pole_female,0,6,2,1": [
+              -0.001,
+              1.87,
+              0.611
+            ],
+            "joint_pole_female,2,6,4,3": [
+              0.001,
+              1.87,
+              -0.611
+            ],
+            "joint_r,0,6,1,2": [
+              0.357,
+              1.87,
+              0.611
+            ],
+            "joint_r_scope,0,toy": [
+              0.346,
+              2.339,
+              0.593
+            ],
+            "joint_r_wheel,0,toy": [
+              0.341,
+              2.294,
+              -0.557
+            ],
+            "joint_r,2,6,3,4": [
+              -0.355,
+              1.87,
+              -0.611
+            ],
+            "joint_r_scope,2,toy": [
+              0.346,
+              2.339,
+              -0.583
+            ],
+            "joint_r_wheel,2,toy": [
+              0.355,
+              2.299,
+              0.558
+            ]
+          }
         }
       ],
       "joints": [
@@ -328,161 +442,121 @@
           "name": "joint,1,6",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,3,6",
           "direction": 3,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_back,2,end_rail",
           "direction": 2,
           "layer": "end_rail",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_beam_back,2,b8,5,3",
           "direction": 2,
           "layer": "b8",
-          "tire_only": false,
-          "exclusion_layer": "5",
-          "excluder_layer": "3"
+          "tire_only": false
         },
         {
           "name": "joint_beam_front,0,b8,6,2",
           "direction": 0,
           "layer": "b8",
-          "tire_only": false,
-          "exclusion_layer": "6",
-          "excluder_layer": "2"
+          "tire_only": false
         },
         {
           "name": "joint_front,0,end_rail",
           "direction": 0,
           "layer": "end_rail",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l,0,6,1,2",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "1",
-          "excluder_layer": "2"
+          "tire_only": false
         },
         {
           "name": "joint_l_scope,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l_wheel,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l,2,6,3,4",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "3",
-          "excluder_layer": "4"
+          "tire_only": false
         },
         {
           "name": "joint_l_scope,2,toy",
           "direction": 2,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l_wheel,2,toy",
           "direction": 2,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_pole_female,0,6,2,1",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "2",
-          "excluder_layer": "1"
+          "tire_only": false
         },
         {
           "name": "joint_pole_female,2,6,4,3",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "4",
-          "excluder_layer": "3"
+          "tire_only": false
         },
         {
           "name": "joint_r,0,6,1,2",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "1",
-          "excluder_layer": "2"
+          "tire_only": false
         },
         {
           "name": "joint_r_scope,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r_wheel,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r,2,6,3,4",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "3",
-          "excluder_layer": "4"
+          "tire_only": false
         },
         {
           "name": "joint_r_scope,2,toy",
           "direction": 2,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r_wheel,2,toy",
           "direction": 2,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -917,7 +991,156 @@
                 "joint_r,3,6"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.118,
+              0,
+              -1.642
+            ],
+            [
+              1.129,
+              3.896,
+              1.25
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,5": [
+              -0.007,
+              1.557,
+              1.228
+            ],
+            "joint_scope,0,toy": [
+              -0.009,
+              2.023,
+              1.193
+            ],
+            "joint,1,5": [
+              0.761,
+              1.544,
+              0.555
+            ],
+            "joint,1,6": [
+              0.761,
+              1.846,
+              -0.584
+            ],
+            "joint_scope,1,toy": [
+              0.73,
+              2.02,
+              0.553
+            ],
+            "joint_wheel,1,toy": [
+              -0.713,
+              1.975,
+              0.568
+            ],
+            "joint_wheel,2,toy": [
+              -0.001,
+              1.982,
+              1.17
+            ],
+            "joint,3,5": [
+              -0.761,
+              1.544,
+              0.555
+            ],
+            "joint,3,6": [
+              -0.761,
+              1.846,
+              -0.584
+            ],
+            "joint_scope,3,toy": [
+              -0.739,
+              2.02,
+              0.561
+            ],
+            "joint_wheel,3,toy": [
+              0.713,
+              1.98,
+              0.542
+            ],
+            "joint_back,2,end_rail": [
+              0,
+              0,
+              -1.227
+            ],
+            "joint_beam,2,b8,3,2": [
+              0,
+              2.56,
+              -1.114
+            ],
+            "joint_front,0,end_rail": [
+              0,
+              0,
+              1.234
+            ],
+            "joint_l,0,5": [
+              -0.312,
+              1.557,
+              1.228
+            ],
+            "joint_l,1,5": [
+              0.761,
+              1.544,
+              0.825
+            ],
+            "joint_l,1,6": [
+              0.761,
+              1.846,
+              -0.318
+            ],
+            "joint_l,2,6,1,2": [
+              0.343,
+              1.846,
+              -1.232
+            ],
+            "joint_l,3,5": [
+              -0.761,
+              1.544,
+              0.291
+            ],
+            "joint_l,3,6": [
+              -0.761,
+              1.846,
+              -0.857
+            ],
+            "joint_pole_female,2,6,2,1": [
+              -0.002,
+              1.846,
+              -1.232
+            ],
+            "joint_r,0,5": [
+              0.31,
+              1.557,
+              1.228
+            ],
+            "joint_r,1,5": [
+              0.761,
+              1.544,
+              0.291
+            ],
+            "joint_r,1,6": [
+              0.761,
+              1.846,
+              -0.854
+            ],
+            "joint_r,2,6,1,2": [
+              -0.343,
+              1.846,
+              -1.232
+            ],
+            "joint_r,3,5": [
+              -0.761,
+              1.544,
+              0.825
+            ],
+            "joint_r,3,6": [
+              -0.761,
+              1.846,
+              -0.318
+            ]
+          }
         }
       ],
       "joints": [
@@ -925,217 +1148,163 @@
           "name": "joint,0,5",
           "direction": 0,
           "layer": "5",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_scope,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,1,5",
           "direction": 1,
           "layer": "5",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,1,6",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_scope,1,toy",
           "direction": 1,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_wheel,1,toy",
           "direction": 1,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_wheel,2,toy",
           "direction": 2,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,3,5",
           "direction": 3,
           "layer": "5",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,3,6",
           "direction": 3,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_scope,3,toy",
           "direction": 3,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_wheel,3,toy",
           "direction": 3,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_back,2,end_rail",
           "direction": 2,
           "layer": "end_rail",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_beam,2,b8,3,2",
           "direction": 2,
           "layer": "b8",
-          "tire_only": false,
-          "exclusion_layer": "3",
-          "excluder_layer": "2"
+          "tire_only": false
         },
         {
           "name": "joint_front,0,end_rail",
           "direction": 0,
           "layer": "end_rail",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l,0,5",
           "direction": 0,
           "layer": "5",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l,1,5",
           "direction": 1,
           "layer": "5",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l,1,6",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l,2,6,1,2",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "1",
-          "excluder_layer": "2"
+          "tire_only": false
         },
         {
           "name": "joint_l,3,5",
           "direction": 3,
           "layer": "5",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l,3,6",
           "direction": 3,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_pole_female,2,6,2,1",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "2",
-          "excluder_layer": "1"
+          "tire_only": false
         },
         {
           "name": "joint_r,0,5",
           "direction": 0,
           "layer": "5",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r,1,5",
           "direction": 1,
           "layer": "5",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r,1,6",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r,2,6,1,2",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "1",
-          "excluder_layer": "2"
+          "tire_only": false
         },
         {
           "name": "joint_r,3,5",
           "direction": 3,
           "layer": "5",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r,3,6",
           "direction": 3,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -1644,7 +1813,161 @@
                 "joint_right_r,1,6,5,4"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.262,
+              0,
+              -1.1
+            ],
+            [
+              1.262,
+              4.629,
+              1.093
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,floor_center_watch": [
+              0,
+              0.153,
+              0
+            ],
+            "joint,1,6,4,5": [
+              0.762,
+              1.785,
+              0
+            ],
+            "joint,3,6,9,10": [
+              -0.762,
+              1.785,
+              0
+            ],
+            "joint_back,2,end_rail": [
+              0,
+              0,
+              -0.777
+            ],
+            "joint_back_l_wheel,0,toy": [
+              0.312,
+              2.205,
+              -0.711
+            ],
+            "joint_back_l,2,6,7,6": [
+              0.312,
+              1.785,
+              -0.765
+            ],
+            "joint_back_l_scope,2,toy": [
+              0.312,
+              2.685,
+              -0.735
+            ],
+            "joint_back_r_wheel,0,toy": [
+              -0.312,
+              2.205,
+              -0.711
+            ],
+            "joint_back_r,2,6,7,6": [
+              -0.312,
+              1.785,
+              -0.765
+            ],
+            "joint_back_r_scope,2,toy": [
+              -0.312,
+              2.685,
+              -0.735
+            ],
+            "joint_beam_back,2,b8,8,6": [
+              0,
+              2.56,
+              -0.661
+            ],
+            "joint_beam_front,0,b8,3,1": [
+              0,
+              2.56,
+              0.661
+            ],
+            "joint_floor_center,0,picnic": [
+              0,
+              0,
+              0
+            ],
+            "joint_front,0,end_rail": [
+              0,
+              0,
+              0.777
+            ],
+            "joint_front_l,0,6,2,1": [
+              -0.312,
+              1.785,
+              0.765
+            ],
+            "joint_front_l_scope,0,toy": [
+              -0.312,
+              2.685,
+              0.738
+            ],
+            "joint_front_l_wheel,2,toy": [
+              -0.312,
+              2.205,
+              0.706
+            ],
+            "joint_front_r,0,6,2,1": [
+              0.312,
+              1.785,
+              0.765
+            ],
+            "joint_front_r_scope,0,toy": [
+              0.312,
+              2.685,
+              0.738
+            ],
+            "joint_front_r_wheel,2,toy": [
+              0.312,
+              2.205,
+              0.706
+            ],
+            "joint_left,3,end_rail": [
+              -0.78,
+              0,
+              0
+            ],
+            "joint_left_l,3,6,10,9": [
+              -0.762,
+              1.785,
+              -0.27
+            ],
+            "joint_left_r,3,6,10,9": [
+              -0.762,
+              1.785,
+              0.27
+            ],
+            "joint_pole_female,0,6,1,2": [
+              0,
+              1.785,
+              0.764
+            ],
+            "joint_pole_female,2,6,67": [
+              0,
+              1.785,
+              -0.764
+            ],
+            "joint_right,1,end_rail": [
+              0.783,
+              0,
+              0
+            ],
+            "joint_right_l,1,6,5,4": [
+              0.762,
+              1.785,
+              0.27
+            ],
+            "joint_right_r,1,6,5,4": [
+              0.762,
+              1.785,
+              -0.27
+            ]
+          }
         }
       ],
       "joints": [
@@ -1652,225 +1975,169 @@
           "name": "joint,0,floor_center_watch",
           "direction": 0,
           "layer": "floor_center_watch",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,1,6,4,5",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "4",
-          "excluder_layer": "5"
+          "tire_only": false
         },
         {
           "name": "joint,3,6,9,10",
           "direction": 3,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "9",
-          "excluder_layer": "10"
+          "tire_only": false
         },
         {
           "name": "joint_back,2,end_rail",
           "direction": 2,
           "layer": "end_rail",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_back_l_wheel,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_back_l,2,6,7,6",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "7",
-          "excluder_layer": "6"
+          "tire_only": false
         },
         {
           "name": "joint_back_l_scope,2,toy",
           "direction": 2,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_back_r_wheel,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_back_r,2,6,7,6",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "7",
-          "excluder_layer": "6"
+          "tire_only": false
         },
         {
           "name": "joint_back_r_scope,2,toy",
           "direction": 2,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_beam_back,2,b8,8,6",
           "direction": 2,
           "layer": "b8",
-          "tire_only": false,
-          "exclusion_layer": "8",
-          "excluder_layer": "6"
+          "tire_only": false
         },
         {
           "name": "joint_beam_front,0,b8,3,1",
           "direction": 0,
           "layer": "b8",
-          "tire_only": false,
-          "exclusion_layer": "3",
-          "excluder_layer": "1"
+          "tire_only": false
         },
         {
           "name": "joint_floor_center,0,picnic",
           "direction": 0,
           "layer": "picnic",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_front,0,end_rail",
           "direction": 0,
           "layer": "end_rail",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_front_l,0,6,2,1",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "2",
-          "excluder_layer": "1"
+          "tire_only": false
         },
         {
           "name": "joint_front_l_scope,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_front_l_wheel,2,toy",
           "direction": 2,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_front_r,0,6,2,1",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "2",
-          "excluder_layer": "1"
+          "tire_only": false
         },
         {
           "name": "joint_front_r_scope,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_front_r_wheel,2,toy",
           "direction": 2,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_left,3,end_rail",
           "direction": 3,
           "layer": "end_rail",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_left_l,3,6,10,9",
           "direction": 3,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "10",
-          "excluder_layer": "9"
+          "tire_only": false
         },
         {
           "name": "joint_left_r,3,6,10,9",
           "direction": 3,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "10",
-          "excluder_layer": "9"
+          "tire_only": false
         },
         {
           "name": "joint_pole_female,0,6,1,2",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "1",
-          "excluder_layer": "2"
+          "tire_only": false
         },
         {
           "name": "joint_pole_female,2,6,67",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "67",
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_right,1,end_rail",
           "direction": 1,
           "layer": "end_rail",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_right_l,1,6,5,4",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "5",
-          "excluder_layer": "4"
+          "tire_only": false
         },
         {
           "name": "joint_right_r,1,6,5,4",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "5",
-          "excluder_layer": "4"
+          "tire_only": false
         }
       ]
     },
@@ -1935,7 +2202,7 @@
             {
               "marker": [
                 -0.675,
-                2.545,
+                2.915,
                 0
               ],
               "accepts": [
@@ -1946,12 +2213,17 @@
               ],
               "joints": [
                 "Joint_beam_left,3,b8,5,6"
+              ],
+              "marker_offset": [
+                0,
+                0.37,
+                0
               ]
             },
             {
               "marker": [
                 0.678,
-                2.545,
+                2.915,
                 0
               ],
               "accepts": [
@@ -1962,6 +2234,11 @@
               ],
               "joints": [
                 "Joint_beam_right,1,b8,3,1"
+              ],
+              "marker_offset": [
+                0,
+                0.37,
+                0
               ]
             },
             {
@@ -2284,7 +2561,136 @@
                 "joint_right_r,1,6,2,1"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.107,
+              0,
+              -1.555
+            ],
+            [
+              1.1,
+              4.547,
+              1.555
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,s,tire": [
+              0,
+              1.5,
+              0
+            ],
+            "Joint_beam_left,3,b8,5,6": [
+              -0.675,
+              2.545,
+              0
+            ],
+            "Joint_beam_right,1,b8,3,1": [
+              0.678,
+              2.545,
+              0
+            ],
+            "joint_l,0,6": [
+              -0.296,
+              1.792,
+              0.762
+            ],
+            "joint_l_scope,1,toy": [
+              0.74,
+              2.648,
+              0.283
+            ],
+            "joint_l_wheel,1,toy": [
+              -0.716,
+              2.188,
+              0.283
+            ],
+            "joint_l,2,6": [
+              0.296,
+              1.792,
+              -0.762
+            ],
+            "joint_l_scope,3,toy": [
+              -0.741,
+              2.648,
+              0.283
+            ],
+            "joint_l_wheel,3,toy": [
+              0.716,
+              2.188,
+              0.283
+            ],
+            "joint_left_l,3,6,5,4": [
+              -0.763,
+              1.792,
+              -0.305
+            ],
+            "joint_left_r,3,6,5,4": [
+              -0.763,
+              1.792,
+              0.305
+            ],
+            "joint_pole_female,0,6": [
+              0,
+              1.792,
+              0.762
+            ],
+            "joint_pole_female,1,6,1,2": [
+              0.763,
+              1.792,
+              0
+            ],
+            "joint_pole_female,2,6": [
+              0,
+              1.792,
+              -0.762
+            ],
+            "joint_pole_female,3,6,4,5": [
+              -0.763,
+              1.792,
+              0
+            ],
+            "joint_r,0,6": [
+              0.296,
+              1.792,
+              0.762
+            ],
+            "joint_r_scope,1,toy": [
+              0.74,
+              2.648,
+              -0.284
+            ],
+            "joint_r_wheel,1,toy": [
+              -0.716,
+              2.188,
+              -0.284
+            ],
+            "joint_r,2,6": [
+              -0.296,
+              1.792,
+              -0.762
+            ],
+            "joint_r_scope,3,toy": [
+              -0.741,
+              2.648,
+              -0.284
+            ],
+            "joint_r_wheel,3,toy": [
+              0.716,
+              2.188,
+              -0.284
+            ],
+            "joint_right_l,1,6,2,1": [
+              0.763,
+              1.792,
+              0.305
+            ],
+            "joint_right_r,1,6,2,1": [
+              0.763,
+              1.792,
+              -0.305
+            ]
+          }
         }
       ],
       "joints": [
@@ -2292,185 +2698,139 @@
           "name": "joint,0,s,tire",
           "direction": 0,
           "layer": "s",
-          "tire_only": true,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": true
         },
         {
           "name": "Joint_beam_left,3,b8,5,6",
           "direction": 3,
           "layer": "b8",
-          "tire_only": false,
-          "exclusion_layer": "5",
-          "excluder_layer": "6"
+          "tire_only": false
         },
         {
           "name": "Joint_beam_right,1,b8,3,1",
           "direction": 1,
           "layer": "b8",
-          "tire_only": false,
-          "exclusion_layer": "3",
-          "excluder_layer": "1"
+          "tire_only": false
         },
         {
           "name": "joint_l,0,6",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l_scope,1,toy",
           "direction": 1,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l_wheel,1,toy",
           "direction": 1,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l,2,6",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l_scope,3,toy",
           "direction": 3,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l_wheel,3,toy",
           "direction": 3,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_left_l,3,6,5,4",
           "direction": 3,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "5",
-          "excluder_layer": "4"
+          "tire_only": false
         },
         {
           "name": "joint_left_r,3,6,5,4",
           "direction": 3,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "5",
-          "excluder_layer": "4"
+          "tire_only": false
         },
         {
           "name": "joint_pole_female,0,6",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_pole_female,1,6,1,2",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "1",
-          "excluder_layer": "2"
+          "tire_only": false
         },
         {
           "name": "joint_pole_female,2,6",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_pole_female,3,6,4,5",
           "direction": 3,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "4",
-          "excluder_layer": "5"
+          "tire_only": false
         },
         {
           "name": "joint_r,0,6",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r_scope,1,toy",
           "direction": 1,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r_wheel,1,toy",
           "direction": 1,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r,2,6",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r_scope,3,toy",
           "direction": 3,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r_wheel,3,toy",
           "direction": 3,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_right_l,1,6,2,1",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "2",
-          "excluder_layer": "1"
+          "tire_only": false
         },
         {
           "name": "joint_right_r,1,6,2,1",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "2",
-          "excluder_layer": "1"
+          "tire_only": false
         }
       ],
       "default_yaw": 90
@@ -2980,7 +3340,191 @@
                 "jointj,0,floor_deluxe"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.309,
+              0,
+              -1.869
+            ],
+            [
+              1.309,
+              4.461,
+              1.801
+            ]
+          ],
+          "joint_positions": {
+            "joint,1,6,4,5": [
+              0.764,
+              1.833,
+              0.719
+            ],
+            "joint,1,8,6,7": [
+              0.764,
+              2.452,
+              -0.737
+            ],
+            "joint,2,8,8,9": [
+              -0.003,
+              2.452,
+              -1.523
+            ],
+            "joint,3,6,13,14": [
+              -0.764,
+              1.833,
+              0.719
+            ],
+            "joint,3,8,11,12": [
+              -0.764,
+              2.452,
+              -0.737
+            ],
+            "joint_back,2,end_rail": [
+              0,
+              0,
+              -1.565
+            ],
+            "joint_back,2,kitchen,7,6": [
+              0,
+              0,
+              -1.565
+            ],
+            "joint_back_l,2,8,9,8": [
+              0.29,
+              2.452,
+              -1.524
+            ],
+            "joint_back_r,2,8,9,8": [
+              -0.29,
+              2.452,
+              -1.524
+            ],
+            "joint_beam_back,2,b10,10,8": [
+              0,
+              3.2,
+              -1.413
+            ],
+            "joint_beam_front,0,b8,3,1": [
+              0,
+              2.56,
+              1.427
+            ],
+            "joint_floor_back,0,picnic": [
+              0,
+              0.153,
+              0.684
+            ],
+            "joint_floor_front,0,picnic,6,7": [
+              0,
+              0.153,
+              -0.684
+            ],
+            "joint_front,0,end_rail": [
+              0,
+              0,
+              1.565
+            ],
+            "joint_front_l,0,6,2,1": [
+              -0.29,
+              1.833,
+              1.515
+            ],
+            "joint_front_r,0,6,2,1": [
+              0.29,
+              1.833,
+              1.524
+            ],
+            "joint_l,0,6,1,2": [
+              -0.324,
+              1.833,
+              1.524
+            ],
+            "joint_l_wheel,0,toy": [
+              -0.295,
+              2.868,
+              -1.471
+            ],
+            "joint_l,2,8,8,9": [
+              0.313,
+              2.452,
+              -1.523
+            ],
+            "joint_l_scope,2,toy": [
+              -0.276,
+              2.938,
+              -1.513
+            ],
+            "joint_left_l,3,6,14,13": [
+              -0.764,
+              1.833,
+              0.998
+            ],
+            "joint_left_l,3,8,12,11": [
+              -0.764,
+              2.452,
+              -0.448
+            ],
+            "joint_left_r,3,6,14,13": [
+              -0.764,
+              1.833,
+              0.431
+            ],
+            "joint_left_r,3,8,12,11": [
+              -0.764,
+              2.452,
+              -1.013
+            ],
+            "joint_pole_female_f,0,6,1,2": [
+              0.003,
+              1.833,
+              1.524
+            ],
+            "joint_r,0,6,1,2": [
+              0.308,
+              1.833,
+              1.524
+            ],
+            "joint_r_wheel,0,toy": [
+              0.272,
+              2.877,
+              -1.471
+            ],
+            "joint_r,2,8,8,9": [
+              -0.308,
+              2.452,
+              -1.523
+            ],
+            "joint_r_scope,2,toy": [
+              0.291,
+              2.938,
+              -1.501
+            ],
+            "joint_right_l,1,6,5,4": [
+              0.764,
+              1.833,
+              0.998
+            ],
+            "joint_right_l,1,8,7,6": [
+              0.764,
+              2.452,
+              -0.448
+            ],
+            "joint_right_r,1,6,5,4": [
+              0.764,
+              1.833,
+              0.432
+            ],
+            "joint_right_r,1,8,7,6": [
+              0.764,
+              2.452,
+              -1.013
+            ],
+            "jointj,0,floor_deluxe": [
+              0,
+              0.153,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -2988,273 +3532,205 @@
           "name": "joint,1,6,4,5",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "4",
-          "excluder_layer": "5"
+          "tire_only": false
         },
         {
           "name": "joint,1,8,6,7",
           "direction": 1,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "6",
-          "excluder_layer": "7"
+          "tire_only": false
         },
         {
           "name": "joint,2,8,8,9",
           "direction": 2,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "8",
-          "excluder_layer": "9"
+          "tire_only": false
         },
         {
           "name": "joint,3,6,13,14",
           "direction": 3,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "13",
-          "excluder_layer": "14"
+          "tire_only": false
         },
         {
           "name": "joint,3,8,11,12",
           "direction": 3,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "11",
-          "excluder_layer": "12"
+          "tire_only": false
         },
         {
           "name": "joint_back,2,end_rail",
           "direction": 2,
           "layer": "end_rail",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_back,2,kitchen,7,6",
           "direction": 2,
           "layer": "kitchen",
-          "tire_only": false,
-          "exclusion_layer": "7",
-          "excluder_layer": "6"
+          "tire_only": false
         },
         {
           "name": "joint_back_l,2,8,9,8",
           "direction": 2,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "9",
-          "excluder_layer": "8"
+          "tire_only": false
         },
         {
           "name": "joint_back_r,2,8,9,8",
           "direction": 2,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "9",
-          "excluder_layer": "8"
+          "tire_only": false
         },
         {
           "name": "joint_beam_back,2,b10,10,8",
           "direction": 2,
           "layer": "b10",
-          "tire_only": false,
-          "exclusion_layer": "10",
-          "excluder_layer": "8"
+          "tire_only": false
         },
         {
           "name": "joint_beam_front,0,b8,3,1",
           "direction": 0,
           "layer": "b8",
-          "tire_only": false,
-          "exclusion_layer": "3",
-          "excluder_layer": "1"
+          "tire_only": false
         },
         {
           "name": "joint_floor_back,0,picnic",
           "direction": 0,
           "layer": "picnic",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_floor_front,0,picnic,6,7",
           "direction": 0,
           "layer": "picnic",
-          "tire_only": false,
-          "exclusion_layer": "6",
-          "excluder_layer": "7"
+          "tire_only": false
         },
         {
           "name": "joint_front,0,end_rail",
           "direction": 0,
           "layer": "end_rail",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_front_l,0,6,2,1",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "2",
-          "excluder_layer": "1"
+          "tire_only": false
         },
         {
           "name": "joint_front_r,0,6,2,1",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "2",
-          "excluder_layer": "1"
+          "tire_only": false
         },
         {
           "name": "joint_l,0,6,1,2",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "1",
-          "excluder_layer": "2"
+          "tire_only": false
         },
         {
           "name": "joint_l_wheel,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l,2,8,8,9",
           "direction": 2,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "8",
-          "excluder_layer": "9"
+          "tire_only": false
         },
         {
           "name": "joint_l_scope,2,toy",
           "direction": 2,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_left_l,3,6,14,13",
           "direction": 3,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "14",
-          "excluder_layer": "13"
+          "tire_only": false
         },
         {
           "name": "joint_left_l,3,8,12,11",
           "direction": 3,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "12",
-          "excluder_layer": "11"
+          "tire_only": false
         },
         {
           "name": "joint_left_r,3,6,14,13",
           "direction": 3,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "14",
-          "excluder_layer": "13"
+          "tire_only": false
         },
         {
           "name": "joint_left_r,3,8,12,11",
           "direction": 3,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "12",
-          "excluder_layer": "11"
+          "tire_only": false
         },
         {
           "name": "joint_pole_female_f,0,6,1,2",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "1",
-          "excluder_layer": "2"
+          "tire_only": false
         },
         {
           "name": "joint_r,0,6,1,2",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "1",
-          "excluder_layer": "2"
+          "tire_only": false
         },
         {
           "name": "joint_r_wheel,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r,2,8,8,9",
           "direction": 2,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "8",
-          "excluder_layer": "9"
+          "tire_only": false
         },
         {
           "name": "joint_r_scope,2,toy",
           "direction": 2,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_right_l,1,6,5,4",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "5",
-          "excluder_layer": "4"
+          "tire_only": false
         },
         {
           "name": "joint_right_l,1,8,7,6",
           "direction": 1,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "7",
-          "excluder_layer": "6"
+          "tire_only": false
         },
         {
           "name": "joint_right_r,1,6,5,4",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "5",
-          "excluder_layer": "4"
+          "tire_only": false
         },
         {
           "name": "joint_right_r,1,8,7,6",
           "direction": 1,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "7",
-          "excluder_layer": "6"
+          "tire_only": false
         },
         {
           "name": "jointj,0,floor_deluxe",
           "direction": 0,
           "layer": "floor_deluxe",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -3873,7 +4349,236 @@
                 "joint_right_r,3,6,2,1"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.097,
+              0,
+              -1.85
+            ],
+            [
+              1.106,
+              4.461,
+              2.108
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,8,6,7": [
+              0.031,
+              2.452,
+              1.58
+            ],
+            "joint,0,floor_center_watch": [
+              0.011,
+              0.16,
+              0.838
+            ],
+            "joint,0,s,tire": [
+              0,
+              1.5,
+              -0.421
+            ],
+            "joint,1,6,4,5": [
+              0.772,
+              1.792,
+              -0.421
+            ],
+            "joint,1,8,8,9": [
+              0.778,
+              2.452,
+              0.836
+            ],
+            "joint,2,6": [
+              0,
+              1.792,
+              -1.121
+            ],
+            "joint,3,6,1,2": [
+              -0.773,
+              1.792,
+              -0.421
+            ],
+            "joint,3,8,8,9": [
+              -0.769,
+              2.452,
+              0.836
+            ],
+            "joint_back,1,end_rail": [
+              0.817,
+              0,
+              0.838
+            ],
+            "joint_back,1,kitchen,7,6": [
+              0.817,
+              0,
+              0.838
+            ],
+            "joint_back_l,1,8,9,8": [
+              0.778,
+              2.452,
+              1.119
+            ],
+            "joint_back_r,1,8,9,8": [
+              0.778,
+              2.452,
+              0.558
+            ],
+            "joint_beam_back,1,b10,10,8": [
+              0.673,
+              3.2,
+              0.838
+            ],
+            "joint_beam_front,3,b10,10,8": [
+              -0.667,
+              3.2,
+              0.838
+            ],
+            "joint_floor_front,0,picnic,6,7": [
+              -0.02,
+              0.153,
+              0.838
+            ],
+            "joint_front,3,end_rail": [
+              -0.829,
+              0,
+              0.838
+            ],
+            "joint_front,3,kitchen,7,6": [
+              -0.829,
+              0,
+              0.838
+            ],
+            "joint_front_l,2,6": [
+              0.3,
+              1.792,
+              -1.121
+            ],
+            "joint_front_l,3,8,8,9": [
+              -0.77,
+              2.452,
+              1.119
+            ],
+            "joint_front_r,2,6": [
+              -0.3,
+              1.792,
+              -1.121
+            ],
+            "joint_front_r,3,8,8,9": [
+              -0.77,
+              2.452,
+              0.558
+            ],
+            "joint_l_scope,1,toy": [
+              0.75,
+              2.235,
+              -0.68
+            ],
+            "joint_l_wheel,1,toy": [
+              -0.724,
+              2.188,
+              -0.68
+            ],
+            "joint_l_scope,3,toy": [
+              -0.75,
+              2.235,
+              -0.68
+            ],
+            "joint_l_wheel,3,toy": [
+              0.724,
+              2.188,
+              -0.68
+            ],
+            "joint_l_8_scope,1,toy": [
+              0.756,
+              2.938,
+              0.57
+            ],
+            "joint_l_8_wheel,1,toy": [
+              -0.721,
+              2.868,
+              0.552
+            ],
+            "joint_l_8_scope,3,toy": [
+              -0.745,
+              2.938,
+              0.57
+            ],
+            "joint_l_8_wheel,3,toy": [
+              0.728,
+              2.868,
+              0.552
+            ],
+            "joint_left_l,1,6,5,4": [
+              0.772,
+              1.792,
+              -0.14
+            ],
+            "joint_left_r,1,6,5,4": [
+              0.772,
+              1.792,
+              -0.701
+            ],
+            "joint_r_scope,1,toy": [
+              0.75,
+              2.235,
+              -0.16
+            ],
+            "joint_r_wheel,1,toy": [
+              -0.724,
+              2.188,
+              -0.16
+            ],
+            "joint_r_scope,3,toy": [
+              -0.75,
+              2.235,
+              -0.16
+            ],
+            "joint_r_wheel,3,toy": [
+              0.724,
+              2.188,
+              -0.16
+            ],
+            "joint_r_8_scope,1,toy": [
+              0.756,
+              2.938,
+              1.12
+            ],
+            "joint_r_8_wheel,1,toy": [
+              -0.721,
+              2.868,
+              1.115
+            ],
+            "joint_r_8_scope,3,toy": [
+              -0.745,
+              2.938,
+              1.12
+            ],
+            "joint_r_8_wheel,3,toy": [
+              0.728,
+              2.868,
+              1.115
+            ],
+            "joint_right_l,0,8,7,6": [
+              -0.243,
+              2.452,
+              1.58
+            ],
+            "joint_right_l,3,6,2,1": [
+              -0.772,
+              1.792,
+              -0.701
+            ],
+            "joint_right_r,0,8,7,6": [
+              0.293,
+              2.452,
+              1.58
+            ],
+            "joint_right_r,3,6,2,1": [
+              -0.772,
+              1.792,
+              -0.14
+            ]
+          }
         }
       ],
       "joints": [
@@ -3881,345 +4586,259 @@
           "name": "joint,0,8,6,7",
           "direction": 0,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "6",
-          "excluder_layer": "7"
+          "tire_only": false
         },
         {
           "name": "joint,0,floor_center_watch",
           "direction": 0,
           "layer": "floor_center_watch",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,0,s,tire",
           "direction": 0,
           "layer": "s",
-          "tire_only": true,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": true
         },
         {
           "name": "joint,1,6,4,5",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "4",
-          "excluder_layer": "5"
+          "tire_only": false
         },
         {
           "name": "joint,1,8,8,9",
           "direction": 1,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "8",
-          "excluder_layer": "9"
+          "tire_only": false
         },
         {
           "name": "joint,2,6",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,3,6,1,2",
           "direction": 3,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "1",
-          "excluder_layer": "2"
+          "tire_only": false
         },
         {
           "name": "joint,3,8,8,9",
           "direction": 3,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "8",
-          "excluder_layer": "9"
+          "tire_only": false
         },
         {
           "name": "joint_back,1,end_rail",
           "direction": 1,
           "layer": "end_rail",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_back,1,kitchen,7,6",
           "direction": 1,
           "layer": "kitchen",
-          "tire_only": false,
-          "exclusion_layer": "7",
-          "excluder_layer": "6"
+          "tire_only": false
         },
         {
           "name": "joint_back_l,1,8,9,8",
           "direction": 1,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "9",
-          "excluder_layer": "8"
+          "tire_only": false
         },
         {
           "name": "joint_back_r,1,8,9,8",
           "direction": 1,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "9",
-          "excluder_layer": "8"
+          "tire_only": false
         },
         {
           "name": "joint_beam_back,1,b10,10,8",
           "direction": 1,
           "layer": "b10",
-          "tire_only": false,
-          "exclusion_layer": "10",
-          "excluder_layer": "8"
+          "tire_only": false
         },
         {
           "name": "joint_beam_front,3,b10,10,8",
           "direction": 3,
           "layer": "b10",
-          "tire_only": false,
-          "exclusion_layer": "10",
-          "excluder_layer": "8"
+          "tire_only": false
         },
         {
           "name": "joint_floor_front,0,picnic,6,7",
           "direction": 0,
           "layer": "picnic",
-          "tire_only": false,
-          "exclusion_layer": "6",
-          "excluder_layer": "7"
+          "tire_only": false
         },
         {
           "name": "joint_front,3,end_rail",
           "direction": 3,
           "layer": "end_rail",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_front,3,kitchen,7,6",
           "direction": 3,
           "layer": "kitchen",
-          "tire_only": false,
-          "exclusion_layer": "7",
-          "excluder_layer": "6"
+          "tire_only": false
         },
         {
           "name": "joint_front_l,2,6",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_front_l,3,8,8,9",
           "direction": 3,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "8",
-          "excluder_layer": "9"
+          "tire_only": false
         },
         {
           "name": "joint_front_r,2,6",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_front_r,3,8,8,9",
           "direction": 3,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "8",
-          "excluder_layer": "9"
+          "tire_only": false
         },
         {
           "name": "joint_l_scope,1,toy",
           "direction": 1,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l_wheel,1,toy",
           "direction": 1,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l_scope,3,toy",
           "direction": 3,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l_wheel,3,toy",
           "direction": 3,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l_8_scope,1,toy",
           "direction": 1,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l_8_wheel,1,toy",
           "direction": 1,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l_8_scope,3,toy",
           "direction": 3,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_l_8_wheel,3,toy",
           "direction": 3,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_left_l,1,6,5,4",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "5",
-          "excluder_layer": "4"
+          "tire_only": false
         },
         {
           "name": "joint_left_r,1,6,5,4",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "5",
-          "excluder_layer": "4"
+          "tire_only": false
         },
         {
           "name": "joint_r_scope,1,toy",
           "direction": 1,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r_wheel,1,toy",
           "direction": 1,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r_scope,3,toy",
           "direction": 3,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r_wheel,3,toy",
           "direction": 3,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r_8_scope,1,toy",
           "direction": 1,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r_8_wheel,1,toy",
           "direction": 1,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r_8_scope,3,toy",
           "direction": 3,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_r_8_wheel,3,toy",
           "direction": 3,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_right_l,0,8,7,6",
           "direction": 0,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "7",
-          "excluder_layer": "6"
+          "tire_only": false
         },
         {
           "name": "joint_right_l,3,6,2,1",
           "direction": 3,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "2",
-          "excluder_layer": "1"
+          "tire_only": false
         },
         {
           "name": "joint_right_r,0,8,7,6",
           "direction": 0,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "7",
-          "excluder_layer": "6"
+          "tire_only": false
         },
         {
           "name": "joint_right_r,3,6,2,1",
           "direction": 3,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": "2",
-          "excluder_layer": "1"
+          "tire_only": false
         }
       ],
       "default_yaw": 270
@@ -4687,7 +5306,161 @@
                 "Joint_right_r,1,8,4,3"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.588,
+              0,
+              -1.247
+            ],
+            [
+              1.58,
+              4.888,
+              1.247
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,8,1,2001": [
+              0.156,
+              2.485,
+              0.768
+            ],
+            "joint,0,8,1,2002": [
+              -0.156,
+              2.485,
+              0.768
+            ],
+            "joint,0,8,1,2003": [
+              -0.467,
+              2.485,
+              0.768
+            ],
+            "joint,0,8,1,2004": [
+              -0.778,
+              2.485,
+              0.768
+            ],
+            "joint,0,8,1,2005": [
+              0.467,
+              2.485,
+              0.768
+            ],
+            "joint,0,8,1,2006": [
+              0.778,
+              2.485,
+              0.768
+            ],
+            "joint_scope,0,toy": [
+              -0.006,
+              2.953,
+              0.733
+            ],
+            "joint_wheel,0,toy": [
+              -0.007,
+              2.881,
+              -0.715
+            ],
+            "joint,1,8,3,4": [
+              1.223,
+              2.445,
+              0
+            ],
+            "joint,2,8,6,7001": [
+              -0.156,
+              2.485,
+              -0.801
+            ],
+            "joint,2,8,6,7002": [
+              0.156,
+              2.485,
+              -0.801
+            ],
+            "joint,2,8,6,7003": [
+              0.467,
+              2.485,
+              -0.801
+            ],
+            "joint,2,8,6,7004": [
+              -0.467,
+              2.485,
+              -0.801
+            ],
+            "joint,2,8,6,7005": [
+              -0.778,
+              2.485,
+              -0.801
+            ],
+            "joint,2,8,6,7006": [
+              0.778,
+              2.485,
+              -0.801
+            ],
+            "joint_scope,2,toy": [
+              0,
+              2.953,
+              -0.731
+            ],
+            "joint_wheel,2,toy": [
+              0.007,
+              2.89,
+              0.715
+            ],
+            "joint,3,8,8,9": [
+              -1.244,
+              2.485,
+              0
+            ],
+            "joint_beam_left,3,b10,10,8": [
+              -1.183,
+              3.2,
+              0
+            ],
+            "joint_beam_right,1,b10,5,3": [
+              1.183,
+              3.2,
+              0
+            ],
+            "joint_floor_center,0,floor_center_king": [
+              0,
+              0.153,
+              0
+            ],
+            "joint_floor_center,0,picnic": [
+              0,
+              0.153,
+              0
+            ],
+            "joint_left,3,end_rail": [
+              -1.216,
+              0,
+              0
+            ],
+            "joint_left,3,kitchen": [
+              -1.216,
+              0,
+              0
+            ],
+            "Joint_left_l,3,8,9,8": [
+              -1.244,
+              2.485,
+              -0.33
+            ],
+            "Joint_left_r,3,8,9,8": [
+              -1.244,
+              2.485,
+              0.33
+            ],
+            "Joint_right_l,1,8,4,3": [
+              1.223,
+              2.445,
+              0.33
+            ],
+            "Joint_right_r,1,8,4,3": [
+              1.223,
+              2.445,
+              -0.33
+            ]
+          }
         }
       ],
       "joints": [
@@ -4695,225 +5468,169 @@
           "name": "joint,0,8,1,2001",
           "direction": 0,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "1",
-          "excluder_layer": "2001"
+          "tire_only": false
         },
         {
           "name": "joint,0,8,1,2002",
           "direction": 0,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "1",
-          "excluder_layer": "2002"
+          "tire_only": false
         },
         {
           "name": "joint,0,8,1,2003",
           "direction": 0,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "1",
-          "excluder_layer": "2003"
+          "tire_only": false
         },
         {
           "name": "joint,0,8,1,2004",
           "direction": 0,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "1",
-          "excluder_layer": "2004"
+          "tire_only": false
         },
         {
           "name": "joint,0,8,1,2005",
           "direction": 0,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "1",
-          "excluder_layer": "2005"
+          "tire_only": false
         },
         {
           "name": "joint,0,8,1,2006",
           "direction": 0,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "1",
-          "excluder_layer": "2006"
+          "tire_only": false
         },
         {
           "name": "joint_scope,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_wheel,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,1,8,3,4",
           "direction": 1,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "3",
-          "excluder_layer": "4"
+          "tire_only": false
         },
         {
           "name": "joint,2,8,6,7001",
           "direction": 2,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "6",
-          "excluder_layer": "7001"
+          "tire_only": false
         },
         {
           "name": "joint,2,8,6,7002",
           "direction": 2,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "6",
-          "excluder_layer": "7002"
+          "tire_only": false
         },
         {
           "name": "joint,2,8,6,7003",
           "direction": 2,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "6",
-          "excluder_layer": "7003"
+          "tire_only": false
         },
         {
           "name": "joint,2,8,6,7004",
           "direction": 2,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "6",
-          "excluder_layer": "7004"
+          "tire_only": false
         },
         {
           "name": "joint,2,8,6,7005",
           "direction": 2,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "6",
-          "excluder_layer": "7005"
+          "tire_only": false
         },
         {
           "name": "joint,2,8,6,7006",
           "direction": 2,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "6",
-          "excluder_layer": "7006"
+          "tire_only": false
         },
         {
           "name": "joint_scope,2,toy",
           "direction": 2,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_wheel,2,toy",
           "direction": 2,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,3,8,8,9",
           "direction": 3,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "8",
-          "excluder_layer": "9"
+          "tire_only": false
         },
         {
           "name": "joint_beam_left,3,b10,10,8",
           "direction": 3,
           "layer": "b10",
-          "tire_only": false,
-          "exclusion_layer": "10",
-          "excluder_layer": "8"
+          "tire_only": false
         },
         {
           "name": "joint_beam_right,1,b10,5,3",
           "direction": 1,
           "layer": "b10",
-          "tire_only": false,
-          "exclusion_layer": "5",
-          "excluder_layer": "3"
+          "tire_only": false
         },
         {
           "name": "joint_floor_center,0,floor_center_king",
           "direction": 0,
           "layer": "floor_center_king",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_floor_center,0,picnic",
           "direction": 0,
           "layer": "picnic",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_left,3,end_rail",
           "direction": 3,
           "layer": "end_rail",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_left,3,kitchen",
           "direction": 3,
           "layer": "kitchen",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "Joint_left_l,3,8,9,8",
           "direction": 3,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "9",
-          "excluder_layer": "8"
+          "tire_only": false
         },
         {
           "name": "Joint_left_r,3,8,9,8",
           "direction": 3,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "9",
-          "excluder_layer": "8"
+          "tire_only": false
         },
         {
           "name": "Joint_right_l,1,8,4,3",
           "direction": 1,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "4",
-          "excluder_layer": "3"
+          "tire_only": false
         },
         {
           "name": "Joint_right_r,1,8,4,3",
           "direction": 1,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": "4",
-          "excluder_layer": "3"
+          "tire_only": false
         }
       ],
       "default_yaw": 90
@@ -4966,7 +5683,31 @@
                 "joint_front,0,deck"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.5,
+              -0.135,
+              -1.5
+            ],
+            [
+              0.5,
+              0.865,
+              1.513
+            ]
+          ],
+          "joint_positions": {
+            "joint_back,2,deck": [
+              0,
+              0.365,
+              -1.45
+            ],
+            "joint_front,0,deck": [
+              0,
+              0.365,
+              1.463
+            ]
+          }
         }
       ],
       "joints": [
@@ -4974,17 +5715,13 @@
           "name": "joint_back,2,deck",
           "direction": 2,
           "layer": "deck",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_front,0,deck",
           "direction": 0,
           "layer": "deck",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -5036,7 +5773,31 @@
                 "joint,2,deck"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.5,
+              -0.043,
+              -1.04
+            ],
+            [
+              0.5,
+              0.957,
+              1.04
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,deck": [
+              0,
+              0.457,
+              0.99
+            ],
+            "joint,2,deck": [
+              0,
+              0.457,
+              -0.99
+            ]
+          }
         }
       ],
       "joints": [
@@ -5044,17 +5805,13 @@
           "name": "joint,0,deck",
           "direction": 0,
           "layer": "deck",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,2,deck",
           "direction": 2,
           "layer": "deck",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -5143,7 +5900,46 @@
                 "joint_female_3,0,sh,_x_0"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.966,
+              -0.015,
+              -0.083
+            ],
+            [
+              0.966,
+              2.75,
+              4.25
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,b8": [
+              0,
+              2.64,
+              4.25
+            ],
+            "joint_female_1,0,s": [
+              0,
+              2.514,
+              3.463
+            ],
+            "joint_female_2,0,s": [
+              0,
+              2.514,
+              2.21
+            ],
+            "joint_female_3,0,s,_x_0": [
+              0,
+              2.514,
+              0.958
+            ],
+            "joint_female_3,0,sh,_x_0": [
+              0,
+              2.514,
+              0.958
+            ]
+          }
         }
       ],
       "joints": [
@@ -5151,41 +5947,31 @@
           "name": "joint,0,b8",
           "direction": 0,
           "layer": "b8",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_female_1,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_female_2,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_female_3,0,s,_x_0",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": "_x_0",
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_female_3,0,sh,_x_0",
           "direction": 0,
           "layer": "sh",
-          "tire_only": false,
-          "exclusion_layer": "_x_0",
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -5274,7 +6060,46 @@
                 "joint_swing_2_female,0,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.18,
+              -0.019,
+              -0.102
+            ],
+            [
+              1.18,
+              3.307,
+              4.215
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,b10": [
+              0,
+              3.161,
+              4.215
+            ],
+            "joint,0,sh,_x_0": [
+              0,
+              3.071,
+              0.958
+            ],
+            "joint_swing_1_female,0,s": [
+              0,
+              3.071,
+              3.463
+            ],
+            "joint_swing_2_female,0,s": [
+              0,
+              3.071,
+              2.21
+            ],
+            "joint_swing_3_female,0,s,_x_0": [
+              0,
+              3.071,
+              0.958
+            ]
+          }
         }
       ],
       "joints": [
@@ -5282,41 +6107,31 @@
           "name": "joint,0,b10",
           "direction": 0,
           "layer": "b10",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,0,sh,_x_0",
           "direction": 0,
           "layer": "sh",
-          "tire_only": false,
-          "exclusion_layer": "_x_0",
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_swing_1_female,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_swing_2_female,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_swing_3_female,0,s,_x_0",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": "_x_0",
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -5422,7 +6237,51 @@
                 "joint_female_3,0,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.966,
+              -0.015,
+              -0.083
+            ],
+            [
+              0.966,
+              2.75,
+              5.345
+            ]
+          ],
+          "joint_positions": {
+            "Joint,0,b8": [
+              0,
+              2.654,
+              5.345
+            ],
+            "joint,0,sh,_x_0": [
+              0,
+              2.514,
+              0.958
+            ],
+            "joint_female_1,0,s": [
+              0,
+              2.514,
+              4.685
+            ],
+            "joint_female_2,0,s": [
+              0,
+              2.514,
+              3.463
+            ],
+            "joint_female_3,0,s": [
+              0,
+              2.514,
+              2.25
+            ],
+            "joint_female_4,0,s,_x_0": [
+              0,
+              2.514,
+              0.958
+            ]
+          }
         }
       ],
       "joints": [
@@ -5430,49 +6289,37 @@
           "name": "Joint,0,b8",
           "direction": 0,
           "layer": "b8",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,0,sh,_x_0",
           "direction": 0,
           "layer": "sh",
-          "tire_only": false,
-          "exclusion_layer": "_x_0",
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_female_1,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_female_2,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_female_3,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_female_4,0,s,_x_0",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": "_x_0",
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -5578,7 +6425,51 @@
                 "joint_swing_3_female,0,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.18,
+              -0.019,
+              -0.102
+            ],
+            [
+              1.18,
+              3.307,
+              5.345
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,b10": [
+              0,
+              3.161,
+              5.345
+            ],
+            "joint,0,sh,_x_0": [
+              0,
+              3.071,
+              0.958
+            ],
+            "joint_swing_1_female,0,s": [
+              0,
+              3.071,
+              4.685
+            ],
+            "joint_swing_2_female,0,s": [
+              0,
+              3.071,
+              3.463
+            ],
+            "joint_swing_3_female,0,s": [
+              0,
+              3.071,
+              2.21
+            ],
+            "joint_swing_4_female,0,s,_x_0": [
+              0,
+              3.071,
+              0.958
+            ]
+          }
         }
       ],
       "joints": [
@@ -5586,49 +6477,37 @@
           "name": "joint,0,b10",
           "direction": 0,
           "layer": "b10",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,0,sh,_x_0",
           "direction": 0,
           "layer": "sh",
-          "tire_only": false,
-          "exclusion_layer": "_x_0",
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_swing_1_female,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_swing_2_female,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_swing_3_female,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_swing_4_female,0,s,_x_0",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": "_x_0",
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -5734,7 +6613,51 @@
                 "joint_swing_female_2,0,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.966,
+              -0.015,
+              -1.501
+            ],
+            [
+              0.966,
+              2.75,
+              4.25
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,b8": [
+              0,
+              2.625,
+              4.25
+            ],
+            "joint,0,sh,_x_0": [
+              0,
+              2.514,
+              0.958
+            ],
+            "joint_disc_swing_female,0,ds": [
+              0,
+              2.744,
+              -1.081
+            ],
+            "joint_swing_female_1,0,s": [
+              0,
+              2.514,
+              3.463
+            ],
+            "joint_swing_female_2,0,s": [
+              0,
+              2.514,
+              2.21
+            ],
+            "joint_swing_female_3,0,s,_x_0": [
+              0,
+              2.514,
+              0.958
+            ]
+          }
         }
       ],
       "joints": [
@@ -5742,49 +6665,37 @@
           "name": "joint,0,b8",
           "direction": 0,
           "layer": "b8",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,0,sh,_x_0",
           "direction": 0,
           "layer": "sh",
-          "tire_only": false,
-          "exclusion_layer": "_x_0",
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_disc_swing_female,0,ds",
           "direction": 0,
           "layer": "ds",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_swing_female_1,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_swing_female_2,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_swing_female_3,0,s,_x_0",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": "_x_0",
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -5890,7 +6801,51 @@
                 "joint_disc_swing_female,0,ds"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.18,
+              -0.019,
+              -1.501
+            ],
+            [
+              1.18,
+              3.307,
+              4.215
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,b10": [
+              0,
+              3.161,
+              4.215
+            ],
+            "joint_1,0,s": [
+              0,
+              3.071,
+              3.463
+            ],
+            "joint_2,0,s": [
+              0,
+              3.071,
+              2.21
+            ],
+            "joint_3,0,s,_x_0": [
+              0,
+              3.071,
+              0.958
+            ],
+            "joint_4,0,sh,_x_0": [
+              0,
+              3.071,
+              0.958
+            ],
+            "joint_disc_swing_female,0,ds": [
+              0,
+              3.301,
+              -1.061
+            ]
+          }
         }
       ],
       "joints": [
@@ -5898,49 +6853,37 @@
           "name": "joint,0,b10",
           "direction": 0,
           "layer": "b10",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_1,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_2,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_3,0,s,_x_0",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": "_x_0",
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_4,0,sh,_x_0",
           "direction": 0,
           "layer": "sh",
-          "tire_only": false,
-          "exclusion_layer": "_x_0",
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_disc_swing_female,0,ds",
           "direction": 0,
           "layer": "ds",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -5975,7 +6918,26 @@
                 "joint,0,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.063,
+              0.363,
+              -0.355
+            ],
+            [
+              0.06,
+              2.453,
+              0.355
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,s": [
+              0,
+              2.42,
+              0
+            ]
+          }
         },
         {
           "layer": "b10",
@@ -6001,7 +6963,26 @@
                 "joint,0,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.063,
+              0.363,
+              -0.354
+            ],
+            [
+              0.06,
+              3.059,
+              0.356
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,s": [
+              0,
+              3.03,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -6009,17 +6990,13 @@
           "name": "joint,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -6054,7 +7031,26 @@
                 "joint,0,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.033,
+              0.783,
+              -0.402
+            ],
+            [
+              0.033,
+              2.453,
+              0.4
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,s": [
+              0,
+              2.42,
+              0
+            ]
+          }
         },
         {
           "layer": "b10",
@@ -6080,7 +7076,26 @@
                 "joint,0,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.033,
+              0.783,
+              -0.402
+            ],
+            [
+              0.033,
+              3.019,
+              0.4
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,s": [
+              0,
+              2.99,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -6088,17 +7103,13 @@
           "name": "joint,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -6136,7 +7147,31 @@
                 "joint,2,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              0.005,
+              0.694,
+              -0.208
+            ],
+            [
+              0.278,
+              2.498,
+              0.208
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,s": [
+              0.01,
+              2.465,
+              0
+            ],
+            "joint,2,s": [
+              0.01,
+              2.465,
+              0
+            ]
+          }
         },
         {
           "layer": "b10",
@@ -6165,7 +7200,31 @@
                 "joint,2,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.002,
+              0.694,
+              -0.208
+            ],
+            [
+              0.278,
+              3.104,
+              0.208
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,s": [
+              0,
+              3.075,
+              0
+            ],
+            "joint,2,s": [
+              0,
+              3.075,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -6173,33 +7232,25 @@
           "name": "joint,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,2,s",
           "direction": 2,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,2,s",
           "direction": 2,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ],
       "front_yaw": 90
@@ -6235,7 +7286,26 @@
                 "joint,1,sh"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.227,
+              0.359,
+              -0.457
+            ],
+            [
+              0.227,
+              2.515,
+              0.457
+            ]
+          ],
+          "joint_positions": {
+            "joint,1,sh": [
+              0,
+              2.48,
+              0
+            ]
+          }
         },
         {
           "layer": "b10",
@@ -6261,7 +7331,26 @@
                 "joint,1,sh"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.227,
+              0.359,
+              -0.457
+            ],
+            [
+              0.227,
+              3.142,
+              0.457
+            ]
+          ],
+          "joint_positions": {
+            "joint,1,sh": [
+              0,
+              3.106,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -6269,17 +7358,13 @@
           "name": "joint,1,sh",
           "direction": 1,
           "layer": "sh",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,1,sh",
           "direction": 1,
           "layer": "sh",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -6314,7 +7399,26 @@
                 "joint,0,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.081,
+              0.524,
+              -0.352
+            ],
+            [
+              0.081,
+              2.432,
+              0.34
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,s": [
+              0,
+              2.4,
+              0
+            ]
+          }
         },
         {
           "layer": "b10",
@@ -6340,7 +7444,26 @@
                 "joint,0,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.081,
+              0.524,
+              -0.348
+            ],
+            [
+              0.081,
+              3.043,
+              0.337
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,s": [
+              0,
+              3.01,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -6348,17 +7471,13 @@
           "name": "joint,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -6393,7 +7512,26 @@
                 "joint,0,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.173,
+              0.476,
+              -0.173
+            ],
+            [
+              0.173,
+              2.491,
+              0.173
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,s": [
+              0,
+              2.455,
+              0
+            ]
+          }
         },
         {
           "layer": "b10",
@@ -6419,7 +7557,26 @@
                 "joint,0,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.173,
+              0.979,
+              -0.173
+            ],
+            [
+              0.173,
+              3.146,
+              0.173
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,s": [
+              0,
+              3.115,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -6427,17 +7584,13 @@
           "name": "joint,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -6472,7 +7625,26 @@
                 "joint,0,ds"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.149,
+              0.51,
+              -0.149
+            ],
+            [
+              0.149,
+              2.765,
+              0.149
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,ds": [
+              0,
+              2.673,
+              0
+            ]
+          }
         },
         {
           "layer": "b10",
@@ -6498,7 +7670,26 @@
                 "joint,0,ds"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.149,
+              0.51,
+              -0.149
+            ],
+            [
+              0.149,
+              3.408,
+              0.149
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,ds": [
+              0,
+              3.314,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -6506,17 +7697,13 @@
           "name": "joint,0,ds",
           "direction": 0,
           "layer": "ds",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,0,ds",
           "direction": 0,
           "layer": "ds",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -6551,7 +7738,26 @@
                 "joint,0,sh"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.365,
+              0.357,
+              -0.45
+            ],
+            [
+              0.365,
+              2.461,
+              0.45
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,sh": [
+              0,
+              2.461,
+              0
+            ]
+          }
         },
         {
           "layer": "b10",
@@ -6577,7 +7783,26 @@
                 "joint,0,sh"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.365,
+              0.357,
+              -0.45
+            ],
+            [
+              0.365,
+              3.071,
+              0.45
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,sh": [
+              0,
+              3.07,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -6585,17 +7810,13 @@
           "name": "joint,0,sh",
           "direction": 0,
           "layer": "sh",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,0,sh",
           "direction": 0,
           "layer": "sh",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -6630,7 +7851,26 @@
                 "joint,0,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.317,
+              0.856,
+              -0.317
+            ],
+            [
+              0.317,
+              2.465,
+              0.317
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,s": [
+              0,
+              2.411,
+              0
+            ]
+          }
         },
         {
           "layer": "b10",
@@ -6656,7 +7896,26 @@
                 "joint,0,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.317,
+              0.856,
+              -0.317
+            ],
+            [
+              0.317,
+              3.074,
+              0.317
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,s": [
+              0,
+              3.075,
+              0
+            ]
+          }
         },
         {
           "layer": "tire",
@@ -6682,7 +7941,26 @@
                 "joint,0,s"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.317,
+              0.256,
+              -0.317
+            ],
+            [
+              0.317,
+              1.445,
+              0.317
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,s": [
+              0,
+              1.445,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -6690,25 +7968,19 @@
           "name": "joint,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,0,s",
           "direction": 0,
           "layer": "s",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -6743,7 +8015,26 @@
                 "joint,0,floor_center_watch"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.768,
+              0.153,
+              -0.777
+            ],
+            [
+              0.784,
+              0.183,
+              0.777
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,floor_center_watch": [
+              0,
+              0.153,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -6751,9 +8042,7 @@
           "name": "joint,0,floor_center_watch",
           "direction": 0,
           "layer": "floor_center_watch",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -6791,7 +8080,31 @@
                 "joint_right,3,floor_deluxe"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.534,
+              0.153,
+              -0.746
+            ],
+            [
+              -0.001,
+              0.183,
+              0.731
+            ]
+          ],
+          "joint_positions": {
+            "joint_left,1,floor_deluxe": [
+              0,
+              0.153,
+              -0.001
+            ],
+            "joint_right,3,floor_deluxe": [
+              0,
+              0.153,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -6799,17 +8112,13 @@
           "name": "joint_left,1,floor_deluxe",
           "direction": 1,
           "layer": "floor_deluxe",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_right,3,floor_deluxe",
           "direction": 3,
           "layer": "floor_deluxe",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -6844,7 +8153,26 @@
                 "joint,1,floor_deluxe"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.5,
+              0.153,
+              -0.746
+            ],
+            [
+              1.518,
+              0.183,
+              0.731
+            ]
+          ],
+          "joint_positions": {
+            "joint,1,floor_deluxe": [
+              0,
+              0.153,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -6852,9 +8180,7 @@
           "name": "joint,1,floor_deluxe",
           "direction": 1,
           "layer": "floor_deluxe",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -6889,7 +8215,26 @@
                 "joint,0,floor_center_king"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.175,
+              0.153,
+              -0.723
+            ],
+            [
+              1.183,
+              0.184,
+              0.723
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,floor_center_king": [
+              0,
+              0.153,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -6897,9 +8242,7 @@
           "name": "joint,0,floor_center_king",
           "direction": 0,
           "layer": "floor_center_king",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -6942,7 +8285,31 @@
                 0
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.627,
+              0.106,
+              -0.682
+            ],
+            [
+              0.629,
+              0.546,
+              0.682
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,picnic": [
+              0,
+              0.05,
+              0
+            ],
+            "joint,1,picnic": [
+              0,
+              0.05,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -6950,17 +8317,13 @@
           "name": "joint,0,picnic",
           "direction": 0,
           "layer": "picnic",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint,1,picnic",
           "direction": 1,
           "layer": "picnic",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -6995,7 +8358,26 @@
                 "Joint,2,kitchen"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.679,
+              0,
+              -0.31
+            ],
+            [
+              0.679,
+              1.91,
+              0.013
+            ]
+          ],
+          "joint_positions": {
+            "Joint,2,kitchen": [
+              0,
+              -0.051,
+              0.08
+            ]
+          }
         }
       ],
       "joints": [
@@ -7003,9 +8385,7 @@
           "name": "Joint,2,kitchen",
           "direction": 2,
           "layer": "kitchen",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -7040,7 +8420,26 @@
                 "joint,0,deck"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.455,
+              -0.455,
+              -0.232
+            ],
+            [
+              0.455,
+              0.455,
+              0.06
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,deck": [
+              0,
+              0,
+              0.01
+            ]
+          }
         }
       ],
       "joints": [
@@ -7048,9 +8447,7 @@
           "name": "joint,0,deck",
           "direction": 0,
           "layer": "deck",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -7085,7 +8482,26 @@
                 "joint,2,end_rail"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.6,
+              0.039,
+              -0.047
+            ],
+            [
+              0.6,
+              0.942,
+              0.027
+            ]
+          ],
+          "joint_positions": {
+            "joint,2,end_rail": [
+              0,
+              0,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -7093,9 +8509,7 @@
           "name": "joint,2,end_rail",
           "direction": 2,
           "layer": "end_rail",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -7164,7 +8578,36 @@
                 "Joint_!,0,5"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.254,
+              0.001,
+              -0.085
+            ],
+            [
+              0.254,
+              1.816,
+              0.687
+            ]
+          ],
+          "joint_positions": {
+            "joint_right_handle,0,handle": [
+              0.225,
+              1.06,
+              0.476
+            ],
+            "joint_left_handle,0,handle": [
+              -0.225,
+              1.06,
+              0.476
+            ],
+            "Joint_!,0,5": [
+              0,
+              1.566,
+              0.637
+            ]
+          }
         }
       ],
       "joints": [
@@ -7172,25 +8615,19 @@
           "name": "joint_right_handle,0,handle",
           "direction": 0,
           "layer": "handle",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_left_handle,0,handle",
           "direction": 0,
           "layer": "handle",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "Joint_!,0,5",
           "direction": 0,
           "layer": "5",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ],
       "slope": -62
@@ -7260,7 +8697,36 @@
                 "Joint_!,0,6"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.3,
+              -0.028,
+              -0.851
+            ],
+            [
+              0.3,
+              1.86,
+              -0.057
+            ]
+          ],
+          "joint_positions": {
+            "joint_right_handle,0,handle": [
+              -0.24,
+              1.511,
+              -0.259
+            ],
+            "joint_left_handle,0,handle": [
+              0.24,
+              1.511,
+              -0.259
+            ],
+            "Joint_!,0,6": [
+              0,
+              1.81,
+              -0.082
+            ]
+          }
         }
       ],
       "joints": [
@@ -7268,25 +8734,19 @@
           "name": "joint_right_handle,0,handle",
           "direction": 0,
           "layer": "handle",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_left_handle,0,handle",
           "direction": 0,
           "layer": "handle",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "Joint_!,0,6",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ],
       "slope": -68
@@ -7356,7 +8816,36 @@
                 "Joint_!,0,8"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.254,
+              0.001,
+              -0.085
+            ],
+            [
+              0.254,
+              2.73,
+              0.693
+            ]
+          ],
+          "joint_positions": {
+            "joint_right_handle,0,handle": [
+              0.227,
+              2,
+              0.517
+            ],
+            "joint_left_handle,0,handle": [
+              -0.219,
+              2,
+              0.517
+            ],
+            "Joint_!,0,8": [
+              0,
+              2.48,
+              0.643
+            ]
+          }
         }
       ],
       "joints": [
@@ -7364,25 +8853,19 @@
           "name": "joint_right_handle,0,handle",
           "direction": 0,
           "layer": "handle",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "joint_left_handle,0,handle",
           "direction": 0,
           "layer": "handle",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         },
         {
           "name": "Joint_!,0,8",
           "direction": 0,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ],
       "slope": -73
@@ -7418,7 +8901,26 @@
                 "joint,0,5"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.289,
+              -0.006,
+              -0.007
+            ],
+            [
+              0.289,
+              2.046,
+              3.548
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,5": [
+              0,
+              1.546,
+              3.298
+            ]
+          }
         }
       ],
       "joints": [
@@ -7426,9 +8928,7 @@
           "name": "joint,0,5",
           "direction": 0,
           "layer": "5",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -7463,7 +8963,26 @@
                 "joint,0,6"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.289,
+              0,
+              -0.009
+            ],
+            [
+              0.289,
+              2.39,
+              3.568
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,6": [
+              0,
+              1.89,
+              3.318
+            ]
+          }
         }
       ],
       "joints": [
@@ -7471,9 +8990,7 @@
           "name": "joint,0,6",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -7508,7 +9025,26 @@
                 "joint,2,6"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.445,
+              -0.018,
+              -0.873
+            ],
+            [
+              0.445,
+              2.346,
+              0.048
+            ]
+          ],
+          "joint_positions": {
+            "joint,2,6": [
+              0,
+              1.846,
+              -0.815
+            ]
+          }
         }
       ],
       "joints": [
@@ -7516,9 +9052,7 @@
           "name": "joint,2,6",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -7553,7 +9087,26 @@
                 "joint,0,8"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.457,
+              -0.018,
+              -0.048
+            ],
+            [
+              0.457,
+              2.59,
+              0.897
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,8": [
+              0,
+              2.465,
+              0.847
+            ]
+          }
         }
       ],
       "joints": [
@@ -7561,9 +9114,7 @@
           "name": "joint,0,8",
           "direction": 0,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -7598,7 +9149,26 @@
                 "joint,0,6"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.465,
+              0.011,
+              -1.112
+            ],
+            [
+              0.465,
+              1.955,
+              0.5
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,6": [
+              0,
+              1.83,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -7606,9 +9176,7 @@
           "name": "joint,0,6",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -7643,7 +9211,26 @@
                 "joint_c,0,6"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.629,
+              -0.02,
+              -0.047
+            ],
+            [
+              0.63,
+              2.117,
+              0.852
+            ]
+          ],
+          "joint_positions": {
+            "joint_c,0,6": [
+              0,
+              1.867,
+              0.727
+            ]
+          }
         }
       ],
       "joints": [
@@ -7651,9 +9238,7 @@
           "name": "joint_c,0,6",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -7688,7 +9273,26 @@
                 "joint_pole,1,6"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.02,
+              0.01,
+              -0.5
+            ],
+            [
+              0.441,
+              2.917,
+              0.5
+            ]
+          ],
+          "joint_positions": {
+            "joint_pole,1,6": [
+              0.391,
+              1.85,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -7696,9 +9300,7 @@
           "name": "joint_pole,1,6",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -7733,7 +9335,26 @@
                 "joint_pole,1,6"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.02,
+              0.01,
+              -0.5
+            ],
+            [
+              0.461,
+              2.917,
+              0.5
+            ]
+          ],
+          "joint_positions": {
+            "joint_pole,1,6": [
+              0.411,
+              1.85,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -7741,9 +9362,7 @@
           "name": "joint_pole,1,6",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -7778,7 +9397,26 @@
                 "joint,2,6"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.916,
+              -0.003,
+              -0.228
+            ],
+            [
+              0.916,
+              1.982,
+              2.211
+            ]
+          ],
+          "joint_positions": {
+            "joint,2,6": [
+              0,
+              1.83,
+              -0.226
+            ]
+          }
         }
       ],
       "joints": [
@@ -7786,9 +9424,7 @@
           "name": "joint,2,6",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -7823,7 +9459,26 @@
                 "joint,0,8"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.914,
+              0,
+              -0.23
+            ],
+            [
+              0.914,
+              2.595,
+              3.19
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,8": [
+              0,
+              2.345,
+              2.99
+            ]
+          }
         }
       ],
       "joints": [
@@ -7831,9 +9486,7 @@
           "name": "joint,0,8",
           "direction": 0,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -7868,7 +9521,26 @@
                 "joint,2,handle"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.008,
+              -0.001,
+              -0.198
+            ],
+            [
+              0.008,
+              0.063,
+              0.198
+            ]
+          ],
+          "joint_positions": {
+            "joint,2,handle": [
+              0,
+              0,
+              0.195
+            ]
+          }
         }
       ],
       "joints": [
@@ -7876,9 +9548,7 @@
           "name": "joint,2,handle",
           "direction": 2,
           "layer": "handle",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -7913,7 +9583,26 @@
                 "joint,2,handle"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.016,
+              0,
+              -0.597
+            ],
+            [
+              0.016,
+              0.072,
+              0.597
+            ]
+          ],
+          "joint_positions": {
+            "joint,2,handle": [
+              0,
+              -0.001,
+              0.552
+            ]
+          }
         }
       ],
       "joints": [
@@ -7921,9 +9610,7 @@
           "name": "joint,2,handle",
           "direction": 2,
           "layer": "handle",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -7958,7 +9645,26 @@
                 "joint,0,6"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.285,
+              -0.009,
+              -0.101
+            ],
+            [
+              0.285,
+              2.015,
+              3.228
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,6": [
+              0,
+              1.89,
+              2.728
+            ]
+          }
         }
       ],
       "joints": [
@@ -7966,9 +9672,7 @@
           "name": "joint,0,6",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -8003,7 +9707,26 @@
                 "joint,0,6"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.326,
+              -0.144,
+              -0.152
+            ],
+            [
+              0.326,
+              1.971,
+              2.828
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,6": [
+              0,
+              1.846,
+              2.328
+            ]
+          }
         }
       ],
       "joints": [
@@ -8011,9 +9734,7 @@
           "name": "joint,0,6",
           "direction": 0,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -8048,7 +9769,26 @@
                 "joint,0,8"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.297,
+              -0.041,
+              -3.884
+            ],
+            [
+              0.297,
+              2.583,
+              0.193
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,8": [
+              0,
+              2.445,
+              -0.091
+            ]
+          }
         }
       ],
       "joints": [
@@ -8056,9 +9796,7 @@
           "name": "joint,0,8",
           "direction": 0,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -8093,7 +9831,26 @@
                 "joint_c,1,6"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.119,
+              0,
+              -0.712
+            ],
+            [
+              0.601,
+              2.329,
+              0.967
+            ]
+          ],
+          "joint_positions": {
+            "joint_c,1,6": [
+              0.551,
+              1.829,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -8101,9 +9858,7 @@
           "name": "joint_c,1,6",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ],
       "tubular": true
@@ -8139,7 +9894,26 @@
                 "joint_c,1,6"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.119,
+              0,
+              -0.967
+            ],
+            [
+              0.601,
+              2.329,
+              0.712
+            ]
+          ],
+          "joint_positions": {
+            "joint_c,1,6": [
+              0.551,
+              1.829,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -8147,9 +9921,7 @@
           "name": "joint_c,1,6",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ],
       "tubular": true
@@ -8185,7 +9957,26 @@
                 "joint_c,1,8"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.184,
+              0.021,
+              -1.359
+            ],
+            [
+              0.601,
+              2.938,
+              1.148
+            ]
+          ],
+          "joint_positions": {
+            "joint_c,1,8": [
+              0.551,
+              2.438,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -8193,9 +9984,7 @@
           "name": "joint_c,1,8",
           "direction": 1,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ],
       "tubular": true
@@ -8231,7 +10020,26 @@
                 "joint_c,1,8"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.184,
+              0.021,
+              -1.148
+            ],
+            [
+              0.681,
+              2.938,
+              1.359
+            ]
+          ],
+          "joint_positions": {
+            "joint_c,1,8": [
+              0.631,
+              2.438,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -8239,9 +10047,7 @@
           "name": "joint_c,1,8",
           "direction": 1,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ],
       "tubular": true
@@ -8277,7 +10083,26 @@
                 "joint_c,1,6"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.833,
+              0.008,
+              -2.757
+            ],
+            [
+              0.05,
+              2.355,
+              0.5
+            ]
+          ],
+          "joint_positions": {
+            "joint_c,1,6": [
+              0,
+              1.855,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -8285,9 +10110,7 @@
           "name": "joint_c,1,6",
           "direction": 1,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ],
       "tubular": true
@@ -8323,7 +10146,26 @@
                 "joint_c,1,8"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.833,
+              0.001,
+              -0.454
+            ],
+            [
+              0.091,
+              2.889,
+              2.262
+            ]
+          ],
+          "joint_positions": {
+            "joint_c,1,8": [
+              0.041,
+              2.465,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -8331,9 +10173,7 @@
           "name": "joint_c,1,8",
           "direction": 1,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ],
       "tubular": true
@@ -8369,7 +10209,26 @@
                 "joint,2,6"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.645,
+              -0.01,
+              -1.059
+            ],
+            [
+              0.664,
+              2.364,
+              0.645
+            ]
+          ],
+          "joint_positions": {
+            "joint,2,6": [
+              0.367,
+              1.829,
+              -1.009
+            ]
+          }
         }
       ],
       "joints": [
@@ -8377,9 +10236,7 @@
           "name": "joint,2,6",
           "direction": 2,
           "layer": "6",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -8414,7 +10271,26 @@
                 "joint,3,8"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -1.028,
+              -0.004,
+              -0.611
+            ],
+            [
+              0.608,
+              2.938,
+              0.635
+            ]
+          ],
+          "joint_positions": {
+            "joint,3,8": [
+              -0.978,
+              2.438,
+              -0.318
+            ]
+          }
         }
       ],
       "joints": [
@@ -8422,9 +10298,7 @@
           "name": "joint,3,8",
           "direction": 3,
           "layer": "8",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -8459,7 +10333,26 @@
                 "joint_wheel,0,toy"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.133,
+              -0.133,
+              -0.059
+            ],
+            [
+              0.133,
+              0.133,
+              0
+            ]
+          ],
+          "joint_positions": {
+            "joint_wheel,0,toy": [
+              0,
+              0,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -8467,9 +10360,7 @@
           "name": "joint_wheel,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -8504,7 +10395,26 @@
                 "joint_wheel,0,toy"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.198,
+              -0.224,
+              -0.061
+            ],
+            [
+              0.198,
+              0.224,
+              -0.001
+            ]
+          ],
+          "joint_positions": {
+            "joint_wheel,0,toy": [
+              0,
+              0,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -8512,9 +10422,7 @@
           "name": "joint_wheel,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -8549,7 +10457,26 @@
                 "joint_scope,0,toy"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.035,
+              0,
+              -0.198
+            ],
+            [
+              0.035,
+              0.1,
+              0.131
+            ]
+          ],
+          "joint_positions": {
+            "joint_scope,0,toy": [
+              0,
+              0,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -8557,9 +10484,7 @@
           "name": "joint_scope,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -8594,7 +10519,26 @@
                 "joint_mailbox_or_phone,0,toy"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.128,
+              -0.121,
+              -0.006
+            ],
+            [
+              0.128,
+              0.119,
+              0.149
+            ]
+          ],
+          "joint_positions": {
+            "joint_mailbox_or_phone,0,toy": [
+              0,
+              0,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -8602,9 +10546,7 @@
           "name": "joint_mailbox_or_phone,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -8639,7 +10581,26 @@
                 "joint_mailbox_or_phone,0,toy"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.032,
+              -0.102,
+              0
+            ],
+            [
+              0.032,
+              0.102,
+              0.092
+            ]
+          ],
+          "joint_positions": {
+            "joint_mailbox_or_phone,0,toy": [
+              0,
+              0,
+              0
+            ]
+          }
         }
       ],
       "joints": [
@@ -8647,9 +10608,7 @@
           "name": "joint_mailbox_or_phone,0,toy",
           "direction": 0,
           "layer": "toy",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ]
     },
@@ -8684,7 +10643,26 @@
                 "joint,0,deck"
               ]
             }
-          ]
+          ],
+          "bounds": [
+            [
+              -0.174,
+              -0.188,
+              -0.046
+            ],
+            [
+              0.173,
+              0.498,
+              0.046
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,deck": [
+              0,
+              0,
+              0.08
+            ]
+          }
         }
       ],
       "joints": [
@@ -8692,9 +10670,7 @@
           "name": "joint,0,deck",
           "direction": 0,
           "layer": "deck",
-          "tire_only": false,
-          "exclusion_layer": null,
-          "excluder_layer": null
+          "tire_only": false
         }
       ],
       "cutout": [

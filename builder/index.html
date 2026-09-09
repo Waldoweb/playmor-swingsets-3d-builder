@@ -2001,8 +2001,9 @@
       const MARKER_SCALE_MIN = 0.8;
       const MARKER_SCALE_MAX = 1.6;
       const MARKER_HIT_MIN = 16; // the old square box was 32 px across
-      // Swings carry an unseen box filling the space between their chains,
-      // so a click there selects the swing instead of the yard behind it.
+      // Swings and climbers carry an unseen box filling the space between
+      // their chains, rungs or ropes, so a click there selects the part
+      // instead of the yard behind it.
       // It lives on this layer, which no camera renders and no raycast sees
       // unless it asks -- only the selection pick does.
       const HIT_BOX_NAME = "hit_box";
@@ -2024,6 +2025,9 @@
       // many joints describe it.
       let selected_socket = null;
       let browse_sockets = [];
+      // Raised by every path that changes the yard, so the fit answers cached
+      // per opening and the placed parts' boxes are measured again.
+      let fit_version = 0;
       /** Can anything still go here? */
       const Socket_is_open = (socket) => socket.joints.some((j) => j.available);
 
@@ -3715,6 +3719,7 @@
               mesh.castShadow = shadows;
               mesh.receiveShadow = shadows;
               Tune_material(mesh.material, Is_fabric(mesh));
+              Paint_metal(this.object_id, mesh);
               if (mesh.name && mesh.name.toLowerCase().startsWith("roof_canopy"))
                 this.roof_canopy_mesh = mesh;
               if (mesh.name && mesh.name.toLowerCase().startsWith("roof_poly"))
@@ -3725,8 +3730,6 @@
                 mesh.layer = splits[2].toLowerCase();
                 // Check if this is a tire-only joint (joint,0,s,tire)
                 mesh.tire_only = (splits.length > 3 && splits[3].toLowerCase() === "tire");
-                mesh.exclusion_layer = (splits.length > 3 && splits[3].toLowerCase() !== "tire") ? splits[3] : null;
-                mesh.excluder_layer = splits.length > 4 ? splits[4] : null;
                 mesh.available = true;
                 mesh.connected = null;
                 mesh.visible = false;
@@ -3844,6 +3847,7 @@
               mesh.castShadow = shadows;
               mesh.receiveShadow = shadows;
               Tune_material(mesh.material, Is_fabric(mesh));
+              Paint_metal(this.object_id, mesh);
               if (mesh.name && mesh.name.toLowerCase().startsWith("roof_canopy")) {
                 this.roof_canopy_mesh = mesh;
                 this.roof_canopy_material = mesh.material;
@@ -3856,8 +3860,6 @@
                 mesh.layer = splits[2].toLowerCase();
                 // Check if this is a tire-only joint (joint,0,s,tire)
                 mesh.tire_only = (splits.length > 3 && splits[3].toLowerCase() === "tire");
-                mesh.exclusion_layer = (splits.length > 3 && splits[3].toLowerCase() !== "tire") ? splits[3] : null;
-                mesh.excluder_layer = splits.length > 4 ? splits[4] : null;
                 mesh.available = true;
                 mesh.visible = false;
                 this.joints.push(mesh);
@@ -3890,14 +3892,13 @@
                 mesh.castShadow = shadows;
                 mesh.receiveShadow = shadows;
                 Tune_material(mesh.material, Is_fabric(mesh));
+                Paint_metal(this.object_id, mesh);
                 if (mesh.name.toLowerCase().startsWith("joint")) {
                   let splits = mesh.name.split(",");
                   mesh.direction = parseInt(splits[1]);
                   mesh.layer = splits[2].toLowerCase();
                   // Check if this is a tire-only joint (joint,0,s,tire)
                   mesh.tire_only = (splits.length > 3 && splits[3].toLowerCase() === "tire");
-                  mesh.exclusion_layer = (splits.length > 3 && splits[3].toLowerCase() !== "tire") ? splits[3] : null;
-                  mesh.excluder_layer = splits.length > 4 ? splits[4] : null;
                   mesh.available = true;
                   mesh.visible = false;
                   this.joints.push(mesh);
@@ -3977,8 +3978,6 @@
               mesh.layer = splits[2].toLowerCase();
               // Check if this is a tire-only joint (joint,0,s,tire)
               mesh.tire_only = (splits.length > 3 && splits[3].toLowerCase() === "tire");
-              mesh.exclusion_layer = (splits.length > 3 && splits[3].toLowerCase() !== "tire") ? splits[3] : null;
-              mesh.excluder_layer = splits.length > 4 ? splits[4] : null;
               mesh.available = true;
               mesh.connected = null;
               mesh.visible = mesh.children.length != 0;
@@ -4003,7 +4002,15 @@
           let bbox = new THREE.Box3().setFromObject(clone.mesh);
           clone.ground_offset = -bbox.min.y;
 
-          if (getCategoryFromObjectId(clone.object_id) === "swings")
+          // Swings, and the climbers: a ladder is two rails and some rungs, a
+          // cargo net is mostly holes, a pole is a line. Handle accessories
+          // are left out -- they mount flush on the steps they belong to, and a
+          // box round them would take the steps' clicks.
+          const category = getCategoryFromObjectId(clone.object_id);
+          if (
+            category === "swings" ||
+            (category === "entries_climbers" && !Is_handle_accessory(clone))
+          )
             for (const root of new Set([...clone.meshes, clone.mesh]))
               Add_hit_box(root, clone);
 
@@ -4155,12 +4162,20 @@
           while (!found && i < own_joints.length) {
             found = own_joints[i++].layer === "deck";
           }
+          // Asked about one opening, the answer is also whether there is room:
+          // Fits_at, the question the markers ask once the part is in hand, so
+          // a dot is only shown, and a part only listed, where placing would
+          // succeed. A part being swapped out is left out of the room test.
+          const here = args && args.socket;
+          const exclude = replacing ? replacing.model : null;
           if (found) {
-            let valid = 0;
+            const seekers = own_joints.filter((joint) => joint.layer === "deck");
             for (const joint of hosts) {
-              if (joint.available && Is_deck_layer(joint.layer)) valid++;
+              if (!joint.available || !Is_deck_layer(joint.layer)) continue;
+              if (!here) return true;
+              if (seekers.some((seeking) => Fits_at(seeking, joint, exclude))) return true;
             }
-            return valid != 0;
+            return false;
           }
 
           // Otherwise, some free host joint this part's joints would mate with.
@@ -4172,7 +4187,8 @@
           for (const seeking of own_joints) {
             for (const joint of hosts) {
               if (!joint.available || Category_of(joint.model) === "swings") continue;
-              if (Joints_connect(seeking, joint)) return true;
+              if (here ? Fits_at(seeking, joint, exclude) : Joints_connect(seeking, joint))
+                return true;
             }
           }
           return false;
@@ -4512,108 +4528,223 @@
         }
       }
 
-      const Can_connect = (args) => {
-        //for ( let box3 of box3s ) scene . remove ( box3 )
+      /**
+       * The part's box and the joint it hangs by, from the manifest.
+       *
+       * A swing has one file per beam length, and which one it will be is
+       * decided by the hanger, so the file is chosen the way the morph will
+       * choose it. Null when the manifest cannot say, in which case the fit
+       * test lets the part through on the layer rules alone.
+       */
+      const Plug_geometry = (plug_joint, host_joint) => {
+        const model = plug_joint.model;
+        const entry =
+          modelManifest && model && model.object_id
+            ? modelManifest.products[model.object_id]
+            : null;
+        if (!entry || !entry.files || !entry.files.length) return null;
+        let file = entry.files[0];
+        if (entry.files.length > 1) {
+          const layer = Morph_target_for(host_joint) || model.layer;
+          file = entry.files.find((f) => f.layer === layer) || file;
+        }
+        const position = file.joint_positions && file.joint_positions[plug_joint.name];
+        if (!position || !file.bounds) return null;
+        return {
+          position: new THREE.Vector3().fromArray(position),
+          bounds: new THREE.Box3(
+            new THREE.Vector3().fromArray(file.bounds[0]),
+            new THREE.Vector3().fromArray(file.bounds[1])
+          ),
+        };
+      };
 
+      /**
+       * The box round every placed part, measured once per change of the yard,
+       * with where each is anchored: the world position of every joint of its
+       * that is connected to something. Bumped by fit_version, which every
+       * path that changes the yard raises.
+       */
+      let placed_boxes = null;
+      let placed_boxes_key = "";
+      const Placed_boxes = () => {
+        const key = fit_version + ":" + models_with_available_joints.length + ":" + picked_meshes.length;
+        if (placed_boxes && placed_boxes_key === key) return placed_boxes;
+        placed_boxes_key = key;
+        placed_boxes = [];
+        for (const model of models_with_available_joints) {
+          if (!model.mesh) continue;
+          const box = new THREE.Box3().setFromObject(model.mesh);
+          if (box.isEmpty()) continue;
+          const anchors = model.joints
+            .filter((joint) => joint.connected)
+            .map((joint) => joint.getWorldPosition(new THREE.Vector3()));
+          if (!anchors.length) anchors.push(model.mesh.getWorldPosition(new THREE.Vector3()));
+          // A toy is all toy joints; a tower merely offers toy mounts.
+          const on_a_post =
+            model.joints.length > 0 && model.joints.every((joint) => joint.layer === "toy");
+          placed_boxes.push({ model, box, anchors, on_a_post });
+        }
+        return placed_boxes;
+      };
+
+      /**
+       * A box drawn in to three quarters about a point.
+       *
+       * The tolerance the fit test allows, so that parts which touch -- a
+       * ladder beside a slide -- are not counted as colliding. It used to be
+       * drawn in about the model's origin, which on a swing beam is the far
+       * A-frame end: the beam's box then stopped a metre short of the tower,
+       * and a beam was offered over a climber, or a climber under a beam.
+       * Drawn in about the part's attachment point, the end that touches the
+       * tower stays where it is and the tolerance grows away from it.
+       */
+      const Shrunk_about = (box, anchor) =>
+        new THREE.Box3(anchor.clone().lerp(box.min, 0.75), anchor.clone().lerp(box.max, 0.75));
+
+      /**
+       * Would this part, hung by this joint on that opening, run into anything?
+       *
+       * The part's box from the manifest is put where placing would put it --
+       * its joint on the opening, turned to face the host as Lookup_yaw says,
+       * never below the ground -- and drawn in about that joint, then tested
+       * against the placed parts' boxes drawn in about their own attachment
+       * nearest the opening. The host itself is left out: parts mount flush
+       * against what they hang from. An opening whose point already lies
+       * inside another part is taken outright.
+       *
+       * This used to clone the part's mesh and every placed mesh to measure
+       * them, which meant it could only be asked about a part in hand. Asked
+       * from the manifest it answers for any part in the catalogue, which is
+       * what lets the browse dots and the strip give the same answer as the
+       * markers do once a part is picked up.
+       */
+      const Can_connect = (args) => {
         const plug_joint = args.plug_joint;
         const host_joint = args.host_joint;
 
         // Handle accessories mount flush against their host, so the box test
         // would always report them as colliding with the thing they attach to.
         if (Is_handle_accessory(plug_joint.model)) return true;
+        // What hangs by a `toy` joint -- the scope and wheel every tower comes
+        // with, the phone, the mailbox -- sits on a post or a rail of the
+        // structure rather than in an opening, so it neither takes room nor
+        // needs any. A beam's box reaches the post the scope sits on; that is
+        // not a collision. By the joint, not the category: Tic-Tac-Toe is
+        // filed under toys but goes where a slide goes, and takes that room.
+        if (plug_joint.layer === "toy") return true;
 
-        // Direct occupancy check: if the host joint's world position is already inside
-        // the bounding box of any placed model, the space is physically occupied — hide the ring.
-        const hostJointPos = new THREE.Vector3();
-        host_joint.getWorldPosition(hostJointPos);
-        for (let model of models_with_available_joints) {
-          if (model === host_joint.model || model === args.exclude_preview) continue;
-          const box = new THREE.Box3().setFromObject(model.mesh);
-          if (box.containsPoint(hostJointPos)) {
-            return false;
-          }
-        }
-
-        let plug_mesh = plug_joint.model.mesh.clone();
-
-        // Position the plug mesh where it would actually land when connected to this host joint.
-        // The template mesh is not in the scene, so force its matrix to be current first.
-        plug_joint.model.mesh.updateMatrixWorld(true);
-
-        // World position of the plug joint within the template
-        const pjp = new THREE.Vector3();
-        plug_joint.getWorldPosition(pjp);
-
-        // World position of the template mesh origin
-        const mjp = new THREE.Vector3();
-        plug_joint.model.mesh.getWorldPosition(mjp);
-
-        // Offset from mesh origin to plug joint (in world space)
-        const joint_offset = new THREE.Vector3().subVectors(pjp, mjp);
-
-        // Host joint world position
+        const placed = Placed_boxes().filter(
+          (p) =>
+            p.model !== host_joint.model &&
+            p.model !== args.exclude_preview &&
+            !p.on_a_post
+        );
         const hjp = new THREE.Vector3();
         host_joint.getWorldPosition(hjp);
+        for (const p of placed) if (p.box.containsPoint(hjp)) return false;
 
-        // Connecting turns the part to face its host, so test the space it will
-        // actually occupy rather than the space it occupies now. Measuring the
-        // unturned pose refuses placements that would fit: a tower meeting a
-        // bridge has to swing round to present its end, and with the yard at
-        // certain angles every joint that gave a square, roof-aligned join was
-        // rejected here, leaving only a crooked one.
-        //
-        // The turn is measured from the way the mesh is actually standing,
-        // which is where the offset above was read from. It used to be
-        // measured from the model's recorded yaw, and the two part company
-        // while a part is carried: the hover turns the mesh to face whichever
-        // opening is nearest without touching the record. Asked about a second
-        // beam mount while the beam was already turned for the first, this
-        // turned it again, tested a beam pointing back through the tower, and
-        // refused the mount -- so no marker for it while one beam was on.
-        const turn =
-          (Lookup_yaw({
+        const geometry = Plug_geometry(plug_joint, host_joint);
+        if (!geometry) return true;
+
+        const yaw =
+          Lookup_yaw({
             host_model_yaw: host_joint.model.yaw,
             host_joint_direction: host_joint.direction,
             plug_joint_direction: plug_joint.direction,
-          }) -
-            plug_joint.model.mesh.rotation.y / Deg2Rad) *
-          Deg2Rad;
-        const up = new THREE.Vector3(0, 1, 0);
-        joint_offset.applyAxisAngle(up, turn);
-        plug_mesh.rotation.y += turn;
-
-        // Place plug mesh so its joint aligns with the host joint
-        const desired_pos = new THREE.Vector3().subVectors(hjp, joint_offset);
-        if (desired_pos.y < 0) desired_pos.y = 0;
-        plug_mesh.position.copy(desired_pos);
-        plug_mesh.scale.set(0.75, 0.75, 0.75);
-        let plug_box3 = new THREE.Box3().setFromObject(plug_mesh);
-        //const plug_box3Helper = new THREE . Box3Helper ( plug_box3 , 0xff0000 )
-        //scene . add  ( plug_box3Helper )
-        //box3s . push ( plug_box3Helper )
-
-        for (let model of models_with_available_joints) {
-          if (model != host_joint.model && model != args.exclude_preview) {
-            let m = model.mesh.clone();
-            let p = new THREE.Vector3();
-            let q = new THREE.Quaternion();
-            model.mesh.getWorldQuaternion(q);
-            m.quaternion.copy(q);
-            model.mesh.getWorldPosition(p);
-            m.position.copy(p);
-            m.scale.set(0.75, 0.75, 0.75);
-            const model_box3 = new THREE.Box3().setFromObject(m);
-            //const box3Helper = new THREE . Box3Helper ( model_box3 , 0x0000ff )
-            //scene . add  ( box3Helper )
-            //box3s . push ( box3Helper )
-
-            if (plug_box3.intersectsBox(model_box3)) {
-              return false;
-            }
-          }
+          }) * Deg2Rad;
+        const rotation = new THREE.Quaternion().setFromAxisAngle(Y_AXIS, yaw);
+        const turned_joint = geometry.position.clone().applyQuaternion(rotation);
+        const origin = hjp.clone().sub(turned_joint);
+        if (origin.y < 0) origin.y = 0;
+        // Where the part's joint ends up: on the opening, unless the part had
+        // to be lifted to keep its feet on the ground.
+        const anchor = origin.clone().add(turned_joint);
+        const plug_box = geometry.bounds
+          .clone()
+          .applyMatrix4(
+            new THREE.Matrix4()
+              .compose(anchor, rotation, new THREE.Vector3(0.75, 0.75, 0.75))
+              .multiply(new THREE.Matrix4().makeTranslation(-geometry.position.x, -geometry.position.y, -geometry.position.z))
+          );
+        for (const p of placed) {
+          let nearest = p.anchors[0];
+          for (const candidate of p.anchors)
+            if (candidate.distanceToSquared(hjp) < nearest.distanceToSquared(hjp)) nearest = candidate;
+          if (plug_box.intersectsBox(Shrunk_about(p.box, nearest))) return false;
         }
-
         return true;
+      };
+
+      /**
+       * Which openings a fitting is offered on, over and above the layers: a
+       * pole goes only to a pole socket, a "joint_c" fitting to a plain joint
+       * or a pole, and a handle to a handle, a step or anything on a climber.
+       *
+       * The handle rule used to take in layer `8` as well, which is the 7 ft
+       * deck layer: it refused a 7 ft tower on the far end of a bridge while
+       * it was carried, though placing it by the strip went through. Handles
+       * only, now, which is what the rule was written for.
+       */
+      const Marker_rule = (plug_joint, host_joint) => {
+        if (plug_joint.name.startsWith("joint_pole,"))
+          return host_joint.name.startsWith("joint_pole_female");
+        if (plug_joint.name.startsWith("joint_c"))
+          return host_joint.name.startsWith("joint,") || host_joint.name.startsWith("joint_pole");
+        if (plug_joint.layer === "handle") {
+          const category = host_joint.model.object_id
+            ? getCategoryFromObjectId(host_joint.model.object_id)
+            : null;
+          return (
+            host_joint.layer === "handle" ||
+            host_joint.layer === "8" ||
+            category === "entries_climbers"
+          );
+        }
+        return true;
+      };
+
+      /**
+       * The one question: can this part, by this joint, go on that opening?
+       *
+       * Free, the right kind, allowed by the marker rules, and with room for
+       * it. The markers while a part is carried, the dots while browsing and
+       * the strip's list for a chosen dot all ask this and nothing else, so a
+       * dot is shown exactly when the strip behind it would not be empty.
+       * `exclude` is a part to leave out of the room test: the one in hand,
+       * or the one being swapped out -- whose opening still reads as connected
+       * to it while the strip is lent the opening as free (With_opening_free).
+       */
+      const Fits_at = (plug_joint, host_joint, exclude) =>
+        host_joint.available &&
+        (!host_joint.connected || (exclude && host_joint.connected.model === exclude)) &&
+        !(
+          host_joint.name &&
+          host_joint.name.indexOf("_no_tube_slides") > -1 &&
+          plug_joint.model.tubular
+        ) &&
+        Joints_connect(plug_joint, host_joint) &&
+        Marker_rule(plug_joint, host_joint) &&
+        Can_connect({ plug_joint, host_joint, exclude_preview: exclude });
+
+      /** Every product in the catalogue, loaded or not. */
+      const Templates = () => {
+        const out = [];
+        if (typeof Categories === "undefined") return out;
+        for (const category of Categories)
+          for (const child of category.children || []) if (child.model) out.push(child.model);
+        return out;
+      };
+
+      /**
+       * Does anything in the catalogue fit this opening? Cached per opening
+       * until the yard changes, since it asks about every product.
+       */
+      const Socket_takes_anything = (socket) => {
+        if (socket.fit_version === fit_version) return socket.fits;
+        socket.fit_version = fit_version;
+        socket.fits = Templates().some((model) => model.capable({ socket }));
+        return socket.fits;
       };
       /**
        * The volume a joint carves out of its host's railing.
@@ -4728,6 +4859,7 @@
        * honest, and only ever reopens joints this rule itself closed.
        */
       const Sync_sockets = () => {
+        fit_version++;
         for (const model of models_with_available_joints) {
           if (!model.mesh) continue;
           for (const socket of model.sockets()) {
@@ -4755,15 +4887,11 @@
         plug_joint.connected = host_joint;
         host_joint.connected = plug_joint;
 
-        if (host_joint.excluder_layer)
-          for (let joint of host_joint.model.joints)
-            if (joint.exclusion_layer == host_joint.excluder_layer) {
-              joint.available = false;
-            }
-
-        // REMOVED: This code was incorrectly marking the "ds" joint as unavailable
-        // on Disc Swing Beams, preventing Disc Swings from connecting.
-        // The "ds" joint should remain available for Disc Swing connections.
+        // The towers used to carry "exclusion groups" in their joint names,
+        // closing hand-picked neighbours when this joint was taken. They were
+        // incomplete -- the Summit's left beam mount named a group no joint
+        // had -- and they are gone: whether a neighbouring opening is still
+        // usable is now measured, by Fits_at, the same way for every part.
 
         Hide_touched_fences({ parent: host_joint, toucher: plug_joint });
         Hide_touched_fences({ parent: plug_joint, toucher: host_joint });
@@ -5314,35 +5442,8 @@
               // deck height and category — which is what stops the copies
               // drifting apart. The wildcard branches that used to follow are
               // gone with the wildcard layer itself.
-              const we_gud =
-                joint.available &&
-                !joint.connected &&
-                !(
-                  joint.name &&
-                  joint.name.indexOf("_no_tube_slides") > -1 &&
-                  plug_joint.model.tubular
-                ) &&
-                Joints_connect(plug_joint, joint);
-              if (we_gud) {
-                let show_joint = true;
-
-                if (plug_joint.name.startsWith("joint_pole,")) {
-                  show_joint = joint.name.startsWith("joint_pole_female");
-                } else if (plug_joint.name.startsWith("joint_c"))
-                  show_joint =
-                    joint.name.startsWith("joint,") ||
-                    joint.name.startsWith("joint_pole");
-                else if (plug_joint.layer === "handle" || plug_joint.layer === "8") {
-                  // Handle joints should be shown for handrails connecting to entries_climbers
-                  const jointCategory = joint.model.object_id ? getCategoryFromObjectId(joint.model.object_id) : null;
-                  show_joint = (joint.layer === "handle" || joint.layer === "8") ||
-                               (jointCategory === 'entries_climbers');
-                } else {
-                }
-
-                const canConnect = Can_connect({ plug_joint: plug_joint, host_joint: joint, exclude_preview: plug_model });
-
-                if (canConnect && show_joint) {
+              // The same question the browse dots and the strip ask.
+              if (Fits_at(plug_joint, joint, plug_model)) {
                   // Get the joint's world position once — used for both occlusion and drawing.
                   joint.updateMatrixWorld();
                   const jointWorldPos = new THREE.Vector3().setFromMatrixPosition(joint.matrixWorld);
@@ -5397,7 +5498,6 @@
                     carry_targets.push(joint);
                   }
                 }
-              }
             }
         }
 
@@ -5449,8 +5549,11 @@
               // post offering a scope or a wheel is one dot; taking either one
               // closes it, which is what stops the twin advertising a spot
               // that is already filled.
+              // ...and something in the catalogue has to fit it. A beam
+              // across a side, or a wide panel on it, leaves the joints
+              // beside it flagged free while nothing can go there.
               const open = socket.joints.filter((j) => j.available);
-              if (!open.length) {
+              if (!open.length || !Socket_takes_anything(socket)) {
                 socket.x = -9999;
                 socket.y = -9999;
                 continue;
@@ -6724,13 +6827,6 @@
             if (other.model.mesh) {
               Show_touched_fences({ joint: joint, mesh: other.model.mesh });
             }
-            if (other.excluder_layer) {
-              for (const sibling of other.model.joints)
-                if (sibling.exclusion_layer == other.excluder_layer) {
-                  sibling.available = true;
-                  sibling.connected = null;
-                }
-            }
           }
         }
 
@@ -6787,6 +6883,7 @@
         }
       };
       const Update_measurements = (args) => {
+        fit_version++;
         let box = new THREE.Box3();
         for (let mesh of picked_meshes) box.expandByObject(mesh);
 
@@ -7151,6 +7248,38 @@
         if (!material.isMeshStandardMaterial) return;
         if (fabric) material.roughness = Math.max(material.roughness, 0.85);
         material.envMapIntensity = material.metalness >= 0.5 ? 1 : 0.35;
+      };
+
+      /**
+       * Painted metal: a product whose metal is powder-coat, not bare steel.
+       * Declared per product in color-config.json (painted_metal), which
+       * names the colour; every metallic material on the product -- the one
+       * named Metal, and the unnamed one on a pole's bracket -- is made matte
+       * paint of that colour, so the environment map stops reading it as
+       * chrome. The poles and the monkey bars' rungs are the cases: dark
+       * green, per Weldon (2026-09-09). Wood and frame materials are not
+       * metallic, so the frame colour choices are untouched.
+       */
+      const Paint_metal = (object_id, mesh) => {
+        if (!colorConfig || !colorConfig.painted_metal || !object_id) return;
+        const paint = colorConfig.painted_metal[object_id];
+        if (!paint || typeof paint !== "string") return;
+        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+        for (const material of materials) {
+          if (!material || !material.isMeshStandardMaterial) continue;
+          const metallic =
+            (material.name || "").startsWith("Metal") || material.metalness >= 0.5;
+          if (!metallic) continue;
+          const hex = paint.startsWith("@")
+            ? colorConfig.constants.colors[paint.slice(1)]
+            : paint;
+          if (!hex) continue;
+          material.color.set(hex);
+          material.metalness = 0.2;
+          material.roughness = 0.5;
+          material.envMapIntensity = 0.35;
+          material.needsUpdate = true;
+        }
       };
 
       const Load_base_64 = (args) => {
@@ -9359,7 +9488,7 @@
 
       const loadColorConfig = async () => {
         try {
-          const response = await fetch('color-config.json');
+          const response = await fetch('color-config.json', { cache: 'no-cache' });
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
@@ -9373,7 +9502,7 @@
       
       const loadObjectMapping = async () => {
         try {
-          const response = await fetch('object-mapping.json');
+          const response = await fetch('object-mapping.json', { cache: 'no-cache' });
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }

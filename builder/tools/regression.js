@@ -1096,13 +1096,13 @@
         made >= consistent && made <= records.length, true);
 
       // A joint may legitimately be closed without a connection: the socket
-      // rule retires the twin of a filled opening, and a tower's exclusion
-      // group retires the positions a climber now overlaps. Anything closed
-      // for neither reason has lost track of why.
+      // rule retires the twin of a filled opening. Anything closed for any
+      // other reason has lost track of why. (The towers' exclusion groups,
+      // which used to close neighbours by name, are gone; room is measured.)
       const dangling = [];
       for (const m of models_with_available_joints)
         for (const j of m.joints)
-          if (!j.available && !j.connected && !j.closed_by_socket && !j.exclusion_layer)
+          if (!j.available && !j.connected && !j.closed_by_socket)
             dangling.push(`${m.object_id}.${j.name}`);
       check(`${file.slice(0, 22)} leaves no joint closed for no reason`, dangling, []);
       check(`${file.slice(0, 22)} links all point both ways`, brokenLinks(), []);

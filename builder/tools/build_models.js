@@ -24,7 +24,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
-const { readJointPositions, deriveSockets } = require("./sockets");
+const { readJointPositions, readBounds, deriveSockets } = require("./sockets");
 
 const CATEGORIES_JS = "js/categories.js";
 const OBJECT_MAPPING = "object-mapping.json";
@@ -115,8 +115,6 @@ function parseJoint(name) {
     direction: parseInt(parts[1], 10),
     layer: parts.length > 2 ? parts[2].toLowerCase() : null,
     tire_only: fourth === "tire",
-    exclusion_layer: fourth && fourth !== "tire" ? parts[3] : null,
-    excluder_layer: parts.length > 4 ? parts[4] : null,
   };
 }
 
@@ -238,11 +236,16 @@ function main() {
         // its joints once per beam length, and only the active layer's are in
         // the scene. Deriving per file keeps each set with the geometry it
         // belongs to.
-        const sockets = deriveSockets(
-          readJointPositions(buffer, sanitizeNodeName),
-          parseJoint,
-          socketConfig
-        );
+        const positions = readJointPositions(buffer, sanitizeNodeName);
+        const sockets = deriveSockets(positions, parseJoint, socketConfig);
+
+        // Where each joint sits and how big the part is, so the app can work
+        // out whether the part would fit an opening without loading it. The
+        // fit test places the box with the joint on the opening, turned to
+        // face it, and asks whether it runs into anything already placed.
+        const joint_positions = {};
+        for (const joint of positions)
+          joint_positions[joint.name] = joint.position.map((v) => Math.round(v * 1000) / 1000);
 
         files.push({
           layer: source.layer,
@@ -250,6 +253,8 @@ function main() {
           bytes: buffer.length,
           joints: names,
           sockets,
+          bounds: readBounds(buffer),
+          joint_positions,
         });
         joints.push(...names);
       }

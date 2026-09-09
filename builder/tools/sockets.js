@@ -75,6 +75,15 @@ function originOf(matrix) {
   return [matrix[12], matrix[13], matrix[14]];
 }
 
+/** A point carried through a matrix. */
+function transformPoint(m, p) {
+  return [
+    m[0] * p[0] + m[4] * p[1] + m[8] * p[2] + m[12],
+    m[1] * p[0] + m[5] * p[1] + m[9] * p[2] + m[13],
+    m[2] * p[0] + m[6] * p[1] + m[10] * p[2] + m[14],
+  ];
+}
+
 // ------------------------------------------------------------------ glb nodes
 
 /** Read a GLB's JSON chunk. */
@@ -120,6 +129,53 @@ function readJointPositions(buffer, sanitize) {
   };
   for (const root of roots) walk(root, identity());
   return found;
+}
+
+/**
+ * The box round everything in the file, in model space.
+ *
+ * Every mesh's accessor extents, carried through its node's world matrix and
+ * merged -- the same box THREE.Box3.setFromObject measures on the loaded
+ * model, hidden joint geometry included, which is what the fit test used to
+ * clone the mesh to get. Read here so the app can ask whether a part would
+ * fit somewhere before its model has been downloaded.
+ */
+function readBounds(buffer) {
+  const gltf = readGltfJson(buffer);
+  const nodes = gltf.nodes || [];
+  const roots = (gltf.scenes && gltf.scenes[gltf.scene || 0])
+    ? gltf.scenes[gltf.scene || 0].nodes || []
+    : nodes.map((_, index) => index);
+
+  const min = [Infinity, Infinity, Infinity];
+  const max = [-Infinity, -Infinity, -Infinity];
+  const walk = (index, parentMatrix) => {
+    const node = nodes[index];
+    if (!node) return;
+    const worldMatrix = multiply(parentMatrix, localMatrix(node));
+    if (node.mesh !== undefined && gltf.meshes && gltf.meshes[node.mesh]) {
+      for (const primitive of gltf.meshes[node.mesh].primitives || []) {
+        const accessor = gltf.accessors[(primitive.attributes || {}).POSITION];
+        if (!accessor || !accessor.min || !accessor.max) continue;
+        for (let corner = 0; corner < 8; corner++) {
+          const local = [
+            corner & 1 ? accessor.max[0] : accessor.min[0],
+            corner & 2 ? accessor.max[1] : accessor.min[1],
+            corner & 4 ? accessor.max[2] : accessor.min[2],
+          ];
+          const world = transformPoint(worldMatrix, local);
+          for (let axis = 0; axis < 3; axis++) {
+            if (world[axis] < min[axis]) min[axis] = world[axis];
+            if (world[axis] > max[axis]) max[axis] = world[axis];
+          }
+        }
+      }
+    }
+    for (const child of node.children || []) walk(child, worldMatrix);
+  };
+  for (const root of roots) walk(root, identity());
+  if (!Number.isFinite(min[0])) return null;
+  return [min.map(round), max.map(round)];
 }
 
 // -------------------------------------------------------------------- sockets
@@ -190,4 +246,4 @@ function deriveSockets(joints, parseJoint, config) {
   });
 }
 
-module.exports = { readJointPositions, deriveSockets };
+module.exports = { readJointPositions, readBounds, deriveSockets };
