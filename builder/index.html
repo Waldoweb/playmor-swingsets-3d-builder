@@ -3177,7 +3177,7 @@
           radius: 70,
           height: 60,
           segments: 96, // higher = rounder horizon
-          grass_tile: 33, // world units per grass tile
+          grass_tile: 2.5, // metres per repeat of the grass texture
         };
 
         constructor(args) {
@@ -3247,6 +3247,10 @@
               THREE.RepeatWrapping;
             let tiles = ground_size / Skybox.sky.grass_tile;
             ground_texture.repeat.set(tiles, tiles);
+            // Seen at the grazing angle a lawn is always seen at, the
+            // default filtering smears the far ground into a blur.
+            // Anisotropic sampling keeps it sharp toward the horizon.
+            ground_texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
             ground_texture.needsUpdate = true;
             this.ground_material.map = ground_texture;
             this.ground_material.color.set("white");

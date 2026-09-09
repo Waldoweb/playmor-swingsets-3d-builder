@@ -49,7 +49,11 @@ PLAN = {
     3: ("mulch_tar", None, "webp"),
     4: ("mulch_blue", None, "webp"),
     5: ("joint_ring", None, "keep"),         # sprite strip; do not touch
-    8: ("ground_grass", 1024, "webp"),       # was 1920x1920, non-POT
+    # 8 was ground_grass, the 1920px drone photo. The lawn is no longer
+    # sourced from assets.js: since 2026-09-09 it is a purchased seamless
+    # tile ("Grass Texture_05" from the 12 Organic Grass Textures pack),
+    # resized to 1024 and saved as WebP by hand, repeating every 2.5 m.
+    # Leaving it out here keeps a rerun from putting the old photo back.
 }
 QUALITY = 75
 
