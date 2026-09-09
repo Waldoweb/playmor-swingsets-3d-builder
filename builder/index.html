@@ -7454,34 +7454,36 @@
         outliner.outline({ render_target: scene_render_target });
 
         if (show_mesurements) {
-          context.font = measurements_font_height + "px Impact";
-          context.fillStyle = "black";
-          let w = context.measureText(measurements).width;
-          let x = (canvas.width - w) / 2;
-          // Just above the parts bar, which lies over the bottom of the
-          // canvas. The text used to go at the very bottom, where the bar
-          // now covers it, so the toggle looked as though it did nothing.
+          // Two labelled lines, the set over the bed. The bed's line is left
+          // out while the bed is hidden. Just above the parts bar, which lies
+          // over the bottom of the canvas: the text used to go at the very
+          // bottom, where the bar now covers it, so the toggle looked as
+          // though it did nothing.
           const bar = document.querySelector(".bottom-bar");
           const bar_top = bar ? bar.getBoundingClientRect().top : canvas.height;
-          let y = Math.min(canvas.height, bar_top) - 16;
-          context.fillText(measurements, x - 0, y - 2);
-          context.fillStyle = "black";
-          context.fillText(measurements, x - 0, y - 1);
-          context.fillStyle = "black";
-          context.fillText(measurements, x + 1, y - 0);
-          context.fillStyle = "black";
-          context.fillText(measurements, x + 2, y - 0);
-          context.fillStyle = "black";
-          context.fillText(measurements, x - 0, y + 1);
-          context.fillStyle = "black";
-          context.fillText(measurements, x - 0, y + 2);
-          context.fillStyle = "black";
-          context.fillText(measurements, x - 1, y - 0);
-          context.fillStyle = "black";
-          context.fillText(measurements, x - 2, y - 0);
-          context.fillStyle = "white";
-          context.fillText(measurements, x, y);
+          const bottom = Math.min(canvas.height, bar_top) - 16;
+          const lines = [["Playset", measurements]];
+          if (mulch_enabled && mulch)
+            lines.push([
+              "Mulch bed",
+              (mulch.width * Meters2Feet).toFixed(2) + "' x " + (mulch.depth * Meters2Feet).toFixed(2) + "'",
+            ]);
+          const line_height = measurements_font_height + 8;
+          lines.forEach(([label, value], index) => {
+            const y = bottom - (lines.length - 1 - index) * line_height;
+            Draw_outlined_text(label + "  " + value, y);
+          });
         }
+      };
+      /** Impact in white with a black outline, centred on the canvas. */
+      const Draw_outlined_text = (text, y) => {
+        context.font = measurements_font_height + "px Impact";
+        const x = (canvas.width - context.measureText(text).width) / 2;
+        context.fillStyle = "black";
+        for (const [dx, dy] of [[0, -2], [0, -1], [1, 0], [2, 0], [0, 1], [0, 2], [-1, 0], [-2, 0]])
+          context.fillText(text, x + dx, y + dy);
+        context.fillStyle = "white";
+        context.fillText(text, x, y);
       };
       const Resize = (args) => {
         canvas.width = window.innerWidth;
