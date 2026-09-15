@@ -3577,9 +3577,9 @@
           const origin = new THREE.Vector3();
 
           if (picked_meshes.length) {
-            const box = new THREE.Box3();
-            for (const mesh of picked_meshes) box.expandByObject(mesh);
-            if (!box.isEmpty()) {
+            // The set's footprint, not the box round its roof and flags.
+            const box = set_box;
+            if (box && !box.isEmpty()) {
               const size = new THREE.Vector3();
               const middle = new THREE.Vector3();
               box.getSize(size);
@@ -6890,10 +6890,52 @@
           }, 300);
         }
       };
+      /**
+       * The set as it stands on the ground.
+       *
+       * The box round every vertex low enough to be a post foot, an A-frame
+       * foot, a slide's run-out or a climber's base, with the height of the
+       * whole set. The plain box round the meshes took in the roof's overhang
+       * and the flags, and reported the DX Sky Tower's 10 by 5 ft posts as
+       * 12 by 8.6 (Weldon, 2026-09-09). Measured once per change of the
+       * yard; the dimension lines, the readout and the mulch bed's auto-fit
+       * all read set_box.
+       */
+      const FOOTPRINT_HEIGHT = 0.35; // metres: what counts as standing on the ground
+      // Null until the first measurement: this line runs before THREE has
+      // been brought in, so nothing can be constructed here.
+      let set_box = null;
+      const Measure_set = () => {
+        const whole = new THREE.Box3();
+        for (const mesh of picked_meshes) whole.expandByObject(mesh);
+        if (whole.isEmpty()) return whole;
+
+        const ground = new THREE.Box3();
+        const v = new THREE.Vector3();
+        for (const root of picked_meshes)
+          root.traverse((node) => {
+            if (!node.isMesh || !node.geometry || node.name === HIT_BOX_NAME) return;
+            if (node.name.toLowerCase().startsWith("joint")) return;
+            const position = node.geometry.attributes.position;
+            if (!position) return;
+            node.updateWorldMatrix(true, false);
+            for (let i = 0; i < position.count; i++) {
+              v.fromBufferAttribute(position, i).applyMatrix4(node.matrixWorld);
+              if (v.y <= FOOTPRINT_HEIGHT) ground.expandByPoint(v);
+            }
+          });
+        // Nothing stands on the ground -- a part on its own mid-restore --
+        // so the whole box is the best there is.
+        if (ground.isEmpty()) return whole;
+        return new THREE.Box3(
+          new THREE.Vector3(ground.min.x, whole.min.y, ground.min.z),
+          new THREE.Vector3(ground.max.x, whole.max.y, ground.max.z)
+        );
+      };
       const Update_measurements = (args) => {
         fit_version++;
-        let box = new THREE.Box3();
-        for (let mesh of picked_meshes) box.expandByObject(mesh);
+        set_box = Measure_set();
+        const box = set_box;
 
         let size = new THREE.Vector3();
         box.getSize(size);
@@ -7453,37 +7495,156 @@
 
         outliner.outline({ render_target: scene_render_target });
 
-        if (show_mesurements) {
-          // Two labelled lines, the set over the bed. The bed's line is left
-          // out while the bed is hidden. Just above the parts bar, which lies
-          // over the bottom of the canvas: the text used to go at the very
-          // bottom, where the bar now covers it, so the toggle looked as
-          // though it did nothing.
-          const bar = document.querySelector(".bottom-bar");
-          const bar_top = bar ? bar.getBoundingClientRect().top : canvas.height;
-          const bottom = Math.min(canvas.height, bar_top) - 16;
-          const lines = [["Playset", measurements]];
-          if (mulch_enabled && mulch)
-            lines.push([
-              "Mulch bed",
-              (mulch.width * Meters2Feet).toFixed(2) + "' x " + (mulch.depth * Meters2Feet).toFixed(2) + "'",
-            ]);
-          const line_height = measurements_font_height + 8;
-          lines.forEach(([label, value], index) => {
-            const y = bottom - (lines.length - 1 - index) * line_height;
-            Draw_outlined_text(label + "  " + value, y);
-          });
+        if (show_mesurements) Draw_dimensions();
+      };
+
+      /**
+       * Dimension lines round the set and the mulch bed, drawn on the overlay.
+       *
+       * Three for the set -- length, width, height -- and two for the bed,
+       * each a line a little outside the edge with a tick at either end,
+       * extension lines back to the corners, and the length in feet at the
+       * middle. They go on the edges facing the camera so they are not drawn
+       * across the set, and the height line stands on the corner nearest the
+       * viewer, dropping out when the view is close to straight down. Drawn
+       * over the parts rather than as lines in the scene, which the parts
+       * would hide: dimension lines sit outside the thing they measure.
+       */
+      const DIMENSION_MARGIN = 0.35; // metres the set's lines stand off its box
+      const BED_DIMENSION_MARGIN = 0.4; // metres the bed's lines stand off the curb
+      const Draw_dimensions = () => {
+        if (!picked_meshes.length) return;
+        const box = set_box;
+        if (!box || box.isEmpty()) return;
+
+        const cam = camera.position;
+        const centre = box.getCenter(new THREE.Vector3());
+        const V = (x, y, z) => new THREE.Vector3(x, y, z);
+
+        // The set: on the sides facing the camera, on the ground.
+        const sx = cam.x >= centre.x ? 1 : -1;
+        const sz = cam.z >= centre.z ? 1 : -1;
+        const near_x = sx > 0 ? box.max.x : box.min.x;
+        const near_z = sz > 0 ? box.max.z : box.min.z;
+        const m = DIMENSION_MARGIN;
+        Draw_dimension_line(
+          V(box.min.x, 0, near_z + sz * m), V(box.max.x, 0, near_z + sz * m),
+          V(box.min.x, 0, near_z), V(box.max.x, 0, near_z),
+          "Set", centre
+        );
+        Draw_dimension_line(
+          V(near_x + sx * m, 0, box.min.z), V(near_x + sx * m, 0, box.max.z),
+          V(near_x, 0, box.min.z), V(near_x, 0, box.max.z),
+          "Set", centre
+        );
+        const look = new THREE.Vector3().subVectors(cam, orbitControls.target);
+        const elevation = Math.asin(look.y / look.length());
+        if (elevation < Math.PI / 3)
+          Draw_dimension_line(
+            V(near_x + sx * m, 0, near_z + sz * m), V(near_x + sx * m, box.max.y, near_z + sz * m),
+            V(near_x, 0, near_z), V(near_x, box.max.y, near_z),
+            "Set", centre, 1
+          );
+
+        // The bed: just outside the curb, on the sides facing the camera.
+        if (mulch_enabled && mulch) {
+          const ox = mulch.origin.x, oz = mulch.origin.z;
+          const hx = mulch.width / 2 + 0.125, hz = mulch.depth / 2 + 0.125;
+          const bx = cam.x >= ox ? 1 : -1;
+          const bz = cam.z >= oz ? 1 : -1;
+          const ex = ox + bx * hx, ez = oz + bz * hz;
+          const b = BED_DIMENSION_MARGIN;
+          const bed_centre = V(ox, 0, oz);
+          Draw_dimension_line(
+            V(ox - hx, 0, ez + bz * b), V(ox + hx, 0, ez + bz * b),
+            V(ox - hx, 0, ez), V(ox + hx, 0, ez),
+            "Mulch", bed_centre
+          );
+          Draw_dimension_line(
+            V(ex + bx * b, 0, oz - hz), V(ex + bx * b, 0, oz + hz),
+            V(ex, 0, oz - hz), V(ex, 0, oz + hz),
+            "Mulch", bed_centre
+          );
         }
       };
-      /** Impact in white with a black outline, centred on the canvas. */
-      const Draw_outlined_text = (text, y) => {
-        context.font = measurements_font_height + "px Impact";
-        const x = (canvas.width - context.measureText(text).width) / 2;
-        context.fillStyle = "black";
-        for (const [dx, dy] of [[0, -2], [0, -1], [1, 0], [2, 0], [0, 1], [0, 2], [-1, 0], [-2, 0]])
-          context.fillText(text, x + dx, y + dy);
+
+      /** A world point on the overlay, or null when it is behind the camera. */
+      const To_screen = (v) => {
+        const p = v.clone().project(camera);
+        if (p.z > 1 || p.z < -1) return null;
+        return new THREE.Vector2(((p.x + 1) / 2) * canvas.width, ((1 - p.y) / 2) * canvas.height);
+      };
+
+      /**
+       * One dimension line from a to b, with extension lines from the points
+       * it measures (from_a, from_b), ticks at the ends, and the length in
+       * feet at the middle, set off on the side away from `away_from`.
+       * `label_at` moves the label along the line, 0 at a to 1 at b: the
+       * height line puts its label at the top, in the sky, clear of the
+       * markers on the set.
+       */
+      const Draw_dimension_line = (a, b, from_a, from_b, label, away_from, label_at = 0.5) => {
+        const A = To_screen(a), B = To_screen(b);
+        const FA = To_screen(from_a), FB = To_screen(from_b);
+        const C = To_screen(away_from);
+        if (!A || !B || !FA || !FB || !C) return;
+
+        const dir = new THREE.Vector2().subVectors(B, A);
+        const length = dir.length();
+        if (length < 24) return; // too short to read
+        dir.divideScalar(length);
+        const normal = new THREE.Vector2(-dir.y, dir.x);
+        // Ticks and label go on the side facing away from the object.
+        const mid = new THREE.Vector2().addVectors(A, B).multiplyScalar(0.5);
+        if (new THREE.Vector2().subVectors(C, mid).dot(normal) > 0) normal.negate();
+
+        const stroke = (path, width, style) => {
+          context.beginPath();
+          path();
+          context.lineWidth = width;
+          context.strokeStyle = style;
+          context.lineCap = "round";
+          context.stroke();
+        };
+        const draw = () => {
+          context.moveTo(FA.x, FA.y); context.lineTo(A.x, A.y);
+          context.moveTo(FB.x, FB.y); context.lineTo(B.x, B.y);
+          context.moveTo(A.x, A.y); context.lineTo(B.x, B.y);
+          for (const P of [A, B]) {
+            context.moveTo(P.x - normal.x * 6, P.y - normal.y * 6);
+            context.lineTo(P.x + normal.x * 6, P.y + normal.y * 6);
+          }
+        };
+        stroke(draw, 4, "rgba(0, 0, 0, 0.8)");
+        stroke(draw, 1.5, label === "Mulch" ? "#fac606" : "#ffffff");
+
+        const feet = (a.distanceTo(b) * Meters2Feet).toFixed(1) + "'";
+        const at = new THREE.Vector2().lerpVectors(A, B, label_at);
+        // Past the end of the line when the label sits at an end.
+        const along = label_at >= 1 ? 14 : label_at <= 0 ? -14 : 0;
+        // The number alone: the line says what it measures, and the colour
+        // says whether it is the set or the bed.
+        Outlined_text(
+          feet,
+          at.x + normal.x * 14 * (along ? 0 : 1) + dir.x * along,
+          at.y + normal.y * 14 * (along ? 0 : 1) + dir.y * along,
+          15
+        );
+      };
+
+      /** The page's own face, semi-bold, white with a soft dark edge, centred on a point. */
+      const Outlined_text = (text, x, y, size) => {
+        context.font = "600 " + size + 'px "Segoe UI", Arial, sans-serif';
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.lineJoin = "round";
+        context.lineWidth = 3;
+        context.strokeStyle = "rgba(0, 0, 0, 0.75)";
+        context.strokeText(text, x, y);
         context.fillStyle = "white";
         context.fillText(text, x, y);
+        context.textAlign = "start";
+        context.textBaseline = "alphabetic";
       };
       const Resize = (args) => {
         canvas.width = window.innerWidth;
