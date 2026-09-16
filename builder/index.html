@@ -4293,10 +4293,22 @@
         }
         set_size(args) {
           this.render_target.setSize(args.width / 1, args.height / 1);
+          this.forget();
         }
         outline(args) {
           if (!args) return null;
           if (!"render_target" in args) return null;
+
+          // The contours are screen-space, so while the view and the selection
+          // are what they were last frame they are the same lines, and only
+          // the stroking is repeated. Tracing them is the expensive part: a
+          // scene render, a readback from the GPU, and three passes over
+          // every pixel in JavaScript, which came to most of a frame on a
+          // 1024 by 768 canvas and several times that on a Retina display.
+          if (args.key !== undefined && args.key === this.key && this.strokes) {
+            this.draw();
+            return;
+          }
 
           this.mesh.material.uniforms["source_texture"] = {
             value: args.render_target.texture,
@@ -4422,22 +4434,28 @@
           //let imageData = new ImageData ( flipped_render_target_pixels , this . render_target . width , this . render_target . height )
           //context . putImageData ( imageData , 0 , 0 )
 
+          this.strokes = strokes;
+          this.key = args.key;
+          this.draw();
+        }
+        /** Stroke the cached contours: a light line with a dark dash over it. */
+        draw() {
+          const strokes = this.strokes;
+          if (!strokes) return;
           context.lineWidth = 2;
 
           context.strokeStyle = "#80c0ff";
-          //context . setLineDash ( [ 8 , 8 ] )
-          for (stroke of strokes) {
+          for (const stroke of strokes) {
             context.beginPath();
             context.moveTo(stroke[0].x, stroke[0].y);
             for (let i = 1; i < stroke.length; i++)
               context.lineTo(stroke[i].x, stroke[i].y);
             context.stroke();
           }
-          //context . setLineDash ( [] )
 
           context.strokeStyle = "#406080";
           context.setLineDash([4, 8]);
-          for (stroke of strokes) {
+          for (const stroke of strokes) {
             context.beginPath();
             context.moveTo(stroke[0].x, stroke[0].y);
             for (let i = 1; i < stroke.length; i++)
@@ -4445,6 +4463,11 @@
             context.stroke();
           }
           context.setLineDash([]);
+        }
+        /** Nothing outlined: the next selection is traced afresh. */
+        forget() {
+          this.strokes = null;
+          this.key = null;
         }
       }
       class Thumbnailer {
@@ -7527,44 +7550,95 @@
           }
         else Load_files({ files: event.dataTransfer.files });
       };
+      /**
+       * What the selection outline depends on. The same key next frame means
+       * the same lines on screen, and the trace is skipped. The camera and
+       * its view offset move the lines; the yard's version covers parts
+       * added, removed, moved or morphed; a carried part moves with the
+       * pointer, so its own transform is in here and keeps it live; a roof
+       * swapped between canvas and poly changes the silhouette without
+       * touching either.
+       */
+      const Model_outline_signature = (model) => {
+        const mesh = model.mesh;
+        let key = model.object_id + ":";
+        if (mesh)
+          key +=
+            mesh.uuid +
+            ":" +
+            mesh.position.x.toFixed(3) +
+            "," +
+            mesh.position.y.toFixed(3) +
+            "," +
+            mesh.position.z.toFixed(3) +
+            "," +
+            mesh.rotation.y.toFixed(3);
+        if (model.roof_canopy_mesh && model.roof_canopy_mesh.visible) key += ":c";
+        if (model.roof_poly_mesh && model.roof_poly_mesh.visible) key += ":p";
+        return key;
+      };
+      const Outline_key = () => {
+        const p = camera.position;
+        const q = camera.quaternion;
+        let key =
+          p.x.toFixed(4) + "," + p.y.toFixed(4) + "," + p.z.toFixed(4) + "," +
+          q.x.toFixed(5) + "," + q.y.toFixed(5) + "," + q.z.toFixed(5) + "," + q.w.toFixed(5) +
+          "|" + canvas.width + "x" + canvas.height +
+          "|" + applied_view_shift +
+          "|" + fit_version;
+        for (const model of models_with_available_joints)
+          if (model.selected) key += "|s" + Model_outline_signature(model);
+        if (picked_mesh && picked_mesh.model) key += "|p" + Model_outline_signature(picked_mesh.model);
+        if (plug_model) key += "|c" + Model_outline_signature(plug_model);
+        return key;
+      };
       const Render = (args) => {
-        if (picked_mesh) {
-          // The whole part is outlined, whichever piece of it was clicked.
-          // This used to trace only the colourable trim — a hint of what the
-          // colour picker would change — and the roof or flag alone when one
-          // of those was clicked. The settings dialog now covers trim, frame
-          // and roof together, so the hint said less than a plain "this is
-          // what you have selected", and on a tower it looked like a bug.
-          //
-          // Only the root is shown: its children keep their own visibility,
-          // so a hidden poly roof or an inactive beam length stays out of
-          // the outline.
-          picked_mesh.model.mesh.traverse(function (mesh) {
-            mesh.ov = mesh.visible;
-          });
-          picked_mesh.model.mesh.visible = true;
-        } else {
-          // The outline pass: only the selected part is drawn. Over the
-          // placed models, not Model.instances — that list is the templates
-          // now, none of which is in the scene.
-          for (const model of models_with_available_joints)
-            model.mesh.visible = model.selected;
-        }
-        if (plug_model) plug_model.mesh.visible = true;
-        scene.background = null;
-        renderer.setRenderTarget(scene_render_target);
-        renderer.clear();
-        renderer.render(scene, camera);
-        if (plug_model) plug_model.mesh.visible = false;
-        if (picked_mesh) {
-          picked_mesh.model.mesh.traverse(function (mesh) {
-            mesh.visible = mesh.ov;
-          });
-          picked_mesh.model.mesh.visible = false;
-        } else {
-          for (const mesh of picked_meshes) mesh.visible = false;
-        }
+        // The outline pass costs a scene render, a readback from the GPU and a
+        // trace over every pixel. With nothing selected and nothing carried it
+        // was spent on an outline of nothing, every frame.
+        const outlining =
+          !!picked_mesh ||
+          !!plug_model ||
+          models_with_available_joints.some((model) => model.selected);
+        if (outlining) {
+          if (picked_mesh) {
+            // The whole part is outlined, whichever piece of it was clicked.
+            // This used to trace only the colourable trim — a hint of what the
+            // colour picker would change — and the roof or flag alone when one
+            // of those was clicked. The settings dialog now covers trim, frame
+            // and roof together, so the hint said less than a plain "this is
+            // what you have selected", and on a tower it looked like a bug.
+            //
+            // Only the root is shown: its children keep their own visibility,
+            // so a hidden poly roof or an inactive beam length stays out of
+            // the outline.
+            picked_mesh.model.mesh.traverse(function (mesh) {
+              mesh.ov = mesh.visible;
+            });
+            picked_mesh.model.mesh.visible = true;
+          } else {
+            // The outline pass: only the selected part is drawn. Over the
+            // placed models, not Model.instances — that list is the templates
+            // now, none of which is in the scene.
+            for (const model of models_with_available_joints)
+              model.mesh.visible = model.selected;
+          }
+          if (plug_model) plug_model.mesh.visible = true;
+          scene.background = null;
+          renderer.setRenderTarget(scene_render_target);
+          renderer.clear();
+          renderer.render(scene, camera);
+          if (plug_model) plug_model.mesh.visible = false;
+          if (picked_mesh) {
+            picked_mesh.model.mesh.traverse(function (mesh) {
+              mesh.visible = mesh.ov;
+            });
+            picked_mesh.model.mesh.visible = false;
+          } else {
+            for (const mesh of picked_meshes) mesh.visible = false;
+          }
 
+        }
         renderer.setRenderTarget(null);
         renderer.clear();
         scene.background = white_color;
@@ -7585,7 +7659,8 @@
         if (plug_model) plug_model.mesh.visible = false;
         for (let mesh of picked_meshes) mesh.visible = false;
 
-        outliner.outline({ render_target: scene_render_target });
+        if (outlining) outliner.outline({ render_target: scene_render_target, key: Outline_key() });
+        else outliner.forget();
 
         if (show_mesurements) Draw_dimensions();
       };
