@@ -5121,6 +5121,68 @@
         }));
       };
 
+      /**
+       * Is the dot on a side of its tower that is turned away from the camera?
+       *
+       * The ray bundle asks whether something stands in the way, and a fence
+       * is mostly gap, so a dot on the far rail can still sit in clear line of
+       * sight: past the near rail's top, through the fence under the roof, or
+       * along a side seen at a shallow angle. The user reads those as noise —
+       * they want the dots on the faces they are looking at, not what shows
+       * through. This is the rule they are asking for, stated directly: a
+       * tower has four sides, and a dot on a side turned away is not offered.
+       *
+       * Which side a dot is on is measured, not read from the joint: a joint's
+       * `direction` is the yaw a part takes there, and a wheel's is a half
+       * turn from the scope's on the same post. The dot's offset from its
+       * model's centre, scaled by the model's half-size on each axis, is the
+       * side's outward normal — a corner dot gets a diagonal, which is right,
+       * since it belongs to both faces.
+       *
+       * Towers only. A swing beam's hangers run along its middle, a bridge's
+       * ends are along its length, and both are open air with nothing to hide
+       * behind — the earlier position-only rule culled half the hangers on a
+       * beam. Those keep the ray test alone.
+       *
+       * Floor-level dots are left alone too: the frame under a deck is open,
+       * so a dot at the back of the base is seen through it and is fine to
+       * offer. They are the exception the user asked for.
+       */
+      const FACING_FLOOR_HEIGHT = 0.6;
+      /**
+       * Nearer the middle than this, on the scaled offset, is inside the model
+       * rather than on a side — floor sockets, a picnic table mount. Every
+       * side socket in the catalogue measures 0.47 or more.
+       */
+      const FACING_MIN_OFFSET = 0.35;
+      /**
+       * Cosine of the angle between the side's normal and the way to the
+       * camera below which the side counts as turned away. Zero is edge-on;
+       * a little past it keeps the dots on a side the user is looking straight
+       * along, where they sit on the silhouette and are still usable.
+       */
+      const FACING_HIDE_BELOW = -0.15;
+
+      const Marker_faces_away = (joint, world, box) => {
+        if (getCategoryFromObjectId(joint.model.object_id) !== "towers") return false;
+        if (world.y < FACING_FLOOR_HEIGHT) return false;
+        if (!box) return false;
+        const hx = 0.5 * (box.max.x - box.min.x);
+        const hz = 0.5 * (box.max.z - box.min.z);
+        if (hx < 0.01 || hz < 0.01) return false;
+        const nx = (world.x - 0.5 * (box.max.x + box.min.x)) / hx;
+        const nz = (world.z - 0.5 * (box.max.z + box.min.z)) / hz;
+        const length = Math.hypot(nx, nz);
+        if (length < FACING_MIN_OFFSET) return false;
+        // On the ground plane: this is about turning round a tower, and a
+        // camera looking down from above still sees only the near sides.
+        const tx = camera.position.x - world.x;
+        const tz = camera.position.z - world.z;
+        const to_camera = Math.hypot(tx, tz);
+        if (to_camera < 1e-6) return false;
+        return (nx * tx + nz * tz) / (length * to_camera) < FACING_HIDE_BELOW;
+      };
+
       /** Is the dot behind something, testing it as a disc? */
       const Marker_is_hidden = (joint, world, ignore_mesh) => {
         const dir = new THREE.Vector3().subVectors(world, camera.position).normalize();
@@ -5213,7 +5275,10 @@
         if (marker_offset) world.add(marker_offset);
 
         if (retest || joint.hidden_marker === undefined) {
-          joint.hidden_marker = Marker_is_hidden(joint, world, ignore_mesh);
+          const own = occluder_boxes.find((o) => o.mesh === joint.model.mesh);
+          joint.hidden_marker =
+            Marker_faces_away(joint, world, own && own.box) ||
+            Marker_is_hidden(joint, world, ignore_mesh);
         }
         if (joint.hidden_marker) {
           joint.x = -9999;
@@ -5442,9 +5507,18 @@
         //for ( let box3 of box3s ) scene . remove ( box3 )
         carry_targets = [];
         if (Mode.plugging != Mode.mode || !plug_model) snapped_joint = null;
-        if (Mode.plugging == Mode.mode) {
+        // The part can be gone while the mode still says carrying: Drop_carried
+        // clears it and the caller sets the mode after, and a frame between
+        // the two asked Fits_at about a null joint.
+        if (Mode.plugging == Mode.mode && plug_model && plug_joint) {
           let size = joint_image.height / 2;
-          for (let model of models_with_available_joints)
+          // The boxes the facing test measures against. Hosts stand still
+          // while a part is carried, so they only go stale when the yard
+          // gains or loses a model.
+          if (occluder_boxes.length !== picked_meshes.length) Refresh_occluder_boxes();
+          for (let model of models_with_available_joints) {
+            const own = occluder_boxes.find((o) => o.mesh === model.mesh);
+            const own_box = own && own.box;
             for (let joint of model.joints) {
               // The same predicate every other path asks — layer, tire rule,
               // deck height and category — which is what stops the copies
@@ -5460,15 +5534,20 @@
                   // If any placed model (other than this joint's own model and the
                   // floating preview) blocks the ray before it reaches the joint,
                   // the joint is on the hidden side of the structure — skip the ring.
-                  const camPos = camera.position;
-                  const rayDir = new THREE.Vector3().subVectors(jointWorldPos, camPos).normalize();
-                  const distToJoint = camPos.distanceTo(jointWorldPos);
-                  raycaster.set(camPos, rayDir);
-                  const occluders = picked_meshes.filter(
-                    m => m !== plug_model?.mesh && m !== joint.model.mesh
-                  );
-                  const hits = raycaster.intersectObjects(occluders, true);
-                  const isOccluded = hits.length > 0 && hits[0].distance < distToJoint - 0.1;
+                  // A dot on a side turned away goes first, before any ray
+                  // is spent on it — the same rule the browse dots follow.
+                  let isOccluded = Marker_faces_away(joint, jointWorldPos, own_box);
+                  if (!isOccluded) {
+                    const camPos = camera.position;
+                    const rayDir = new THREE.Vector3().subVectors(jointWorldPos, camPos).normalize();
+                    const distToJoint = camPos.distanceTo(jointWorldPos);
+                    raycaster.set(camPos, rayDir);
+                    const occluders = picked_meshes.filter(
+                      m => m !== plug_model?.mesh && m !== joint.model.mesh
+                    );
+                    const hits = raycaster.intersectObjects(occluders, true);
+                    isOccluded = hits.length > 0 && hits[0].distance < distToJoint - 0.1;
+                  }
 
                   if (isOccluded) {
                     // Push click zone off-screen so hidden joints aren't accidentally clickable.
@@ -5507,6 +5586,7 @@
                   }
                 }
             }
+          }
         }
 
         // Browse mode: nothing is being carried, so every free joint is shown
@@ -7418,39 +7498,20 @@
       };
       const Render = (args) => {
         if (picked_mesh) {
+          // The whole part is outlined, whichever piece of it was clicked.
+          // This used to trace only the colourable trim — a hint of what the
+          // colour picker would change — and the roof or flag alone when one
+          // of those was clicked. The settings dialog now covers trim, frame
+          // and roof together, so the hint said less than a plain "this is
+          // what you have selected", and on a tower it looked like a bug.
+          //
+          // Only the root is shown: its children keep their own visibility,
+          // so a hidden poly roof or an inactive beam length stays out of
+          // the outline.
           picked_mesh.model.mesh.traverse(function (mesh) {
             mesh.ov = mesh.visible;
-            mesh.visible = false;
           });
-
-          if (
-            picked_mesh.name &&
-            picked_mesh.name.indexOf("roof") == -1 &&
-            picked_mesh.name.indexOf("flag") == -1
-          ) {
-            let colorized = 0;
-            picked_mesh.model.mesh.traverse(function (mesh) {
-              if (mesh.name && mesh.name.indexOf("_colorize_") != -1) {
-                mesh.visible = true;
-                while (mesh != null) {
-                  mesh.visible = true;
-                  mesh = mesh.parent;
-                }
-                colorized++;
-              }
-            });
-            if (colorized == 0) {
-              picked_mesh.model.mesh.traverse(function (mesh) {
-                mesh.visible = true;
-              });
-            }
-          } else {
-            let mesh = picked_mesh;
-            while (mesh != null) {
-              mesh.visible = true;
-              mesh = mesh.parent;
-            }
-          }
+          picked_mesh.model.mesh.visible = true;
         } else {
           // The outline pass: only the selected part is drawn. Over the
           // placed models, not Model.instances — that list is the templates
