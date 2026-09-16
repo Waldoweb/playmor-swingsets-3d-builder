@@ -5948,9 +5948,25 @@
                 // everything downstream sees a mesh with a name and material.
                 if (intersection_objects[0].object.name === HIT_BOX_NAME) {
                   const model = intersection_objects[0].object.model;
-                  let real = intersection_objects.find(
-                    (hit) => hit.object.model === model && hit.object.name !== HIT_BOX_NAME
+                  // A hand rail or grip sits flush on its steps, inside the
+                  // steps' box, so the box was always the first hit and the
+                  // handle could never be selected to change its colour. A
+                  // handle only exists mounted on a step, so if the ray meets
+                  // one at all the click was aimed at it, and it wins over the
+                  // box. A click in a rung gap has no handle in the list and
+                  // still goes to the steps.
+                  const handle = intersection_objects.find(
+                    (hit) =>
+                      hit.object.name !== HIT_BOX_NAME &&
+                      hit.object.model &&
+                      hit.object.model !== model &&
+                      Is_handle_accessory(hit.object.model)
                   );
+                  let real =
+                    handle ||
+                    intersection_objects.find(
+                      (hit) => hit.object.model === model && hit.object.name !== HIT_BOX_NAME
+                    );
                   if (!real) {
                     let mesh = null;
                     model.mesh.traverse((node) => {
