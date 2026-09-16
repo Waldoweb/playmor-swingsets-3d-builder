@@ -663,7 +663,9 @@
       .sel-rows[hidden] { display: none; }
       .custom-controls-row { display: flex; align-items: center; gap: 12px; min-height: 36px; }
       .custom-controls-text {
-        width: 46px;
+        /* Wide enough for "Frame (all)" on one line; the other captions are
+           shorter and share the column so the swatches stay aligned. */
+        width: 84px;
         font-size: 11px;
         font-weight: 700;
         letter-spacing: 0.08em;
@@ -1823,7 +1825,7 @@
         </div>
         <div id="custom-controls-padding" class="sel-rows">
           <div class="custom-controls-row" id="frame-section" style="display: none;">
-            <div class="custom-controls-text">Frame</div>
+            <div class="custom-controls-text" title="The frame colour for every part of the set">Frame (all)</div>
             <div class="custom-controls-color-frame"></div>
           </div>
           <div class="custom-controls-row" id="trim-section" style="display: none;">
@@ -2395,6 +2397,14 @@
       let models_with_available_joints = [];
       let picked_meshes = [];
       let picked_mesh = null;
+      /**
+       * The lumber colour of the whole set. PlayMor ships one frame colour
+       * per order, so the frame swatch recolours every part, a new part
+       * arrives in the colour the set already has, and Reset goes back to the
+       * default. Each model still carries its own frame_color, which is what
+       * the save format records; this is what they are all kept equal to.
+       */
+      let set_frame_color = "cedar_tan";
       let host_joint = null;
       let plug_joint = null;
       let plug_joint_index = -1;
@@ -3003,16 +3013,18 @@
             }
 
             // Handle frame color restoration with proper cedar_tan support
-            if (model_data.frame_color && typeof Change_frame_color === 'function') {
-              // Temporarily set picked_mesh to apply frame color
-              let original_picked_mesh = picked_mesh;
-              picked_mesh = { model: model };
+            // Saves record the colour on each part; they all agree in a save
+            // made since the frame colour became set-wide, and in an older
+            // one the last read stands for the set. Only parts with a frame
+            // count: a toy carries the field too, at the constructor's
+            // default, and read last it would put the set back to cedar.
+            if (model_data.frame_color && typeof Apply_frame_color === 'function' && Has_frame(model)) {
+              set_frame_color = model_data.frame_color;
               try {
-                Change_frame_color(model_data.frame_color);
+                Apply_frame_color(model, set_frame_color);
               } catch (error) {
                 console.warn('Error applying frame color:', error);
               }
-              picked_mesh = original_picked_mesh;
             }
         }
 
@@ -3169,6 +3181,9 @@
           models_with_available_joints = [];
           picked_meshes = [];
           picked_mesh = null;
+          // A load or an undo sets it again from the save; a Reset leaves it
+          // at the default.
+          set_frame_color = "cedar_tan";
 
           // The joint-first state points at models that no longer exist. Left
           // alone, a socket chosen before an Undo still read as open — its
@@ -7774,8 +7789,26 @@
         model.ruf = "poly";
         model.ruf_color = color;
       };
+      /**
+       * The frame swatch: every part in the yard that has a frame takes the
+       * colour, not only the one selected. Parts without frame meshes in the
+       * colour config — swings, toys — are left as they are, as before.
+       */
       const Change_frame_color = (color) => {
-        let model = picked_mesh.model;
+        set_frame_color = color;
+        for (const model of models_with_available_joints)
+          if (model.mesh && Has_frame(model)) Apply_frame_color(model, color);
+        if (typeof Refresh_panel === "function") Refresh_panel();
+      };
+
+      /** Does the colour config give this part lumber to recolour? */
+      const Has_frame = (model) => {
+        if (!model.object_id) return false;
+        const { objectConfig } = getObjectInfoById(model.object_id);
+        return !!(objectConfig && objectConfig.sections && objectConfig.sections.includes("frame") && objectConfig.frame_meshes);
+      };
+
+      const Apply_frame_color = (model, color) => {
         model.frame_color = color;
         
         // Use object_id to find object name and config
@@ -7917,9 +7950,11 @@
         const { objectName, objectConfig } = getObjectInfoById(model.object_id);
 
         // Apply frame color if requested and object has frame configuration
-        if (applyFrameColor && model.frame_color) {
+        // In the set's colour, not the part's own default: a white set
+        // stays white when a ladder is added.
+        if (applyFrameColor && set_frame_color) {
           if (objectConfig && objectConfig.sections && objectConfig.sections.includes('frame') && objectConfig.frame_meshes) {
-            Change_frame_color(model.frame_color);
+            Apply_frame_color(model, set_frame_color);
           }
         }
 
