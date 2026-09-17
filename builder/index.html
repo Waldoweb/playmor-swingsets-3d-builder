@@ -7157,11 +7157,6 @@
         const box = new THREE.Box3();
         for (const mesh of picked_meshes) box.expandByObject(mesh);
 
-        const sphere = new THREE.Sphere();
-        box.getBoundingSphere(sphere);
-        let d = 5 * sphere.radius;
-        if (d == 0) d = Math.sqrt(200);
-
         const target = box.isEmpty()
           ? new THREE.Vector3()
           : box.getCenter(new THREE.Vector3()).setY(target_height);
@@ -7169,6 +7164,50 @@
           .subVectors(camera.position, orbitControls.target)
           .normalize();
         if (direction.lengthSq() === 0) direction.set(0, 0.5, 1).normalize();
+
+        // How far back the camera must sit, along the direction it already
+        // looks from, for every corner of the set's box to land inside the
+        // frame. The distance used to be a flat five bounding-sphere radii,
+        // which with a 50 degree field of view left a tower at about half
+        // the size it could be. Each corner is measured in camera axes: its
+        // depth along the view line plus how far off-axis it sits, scaled
+        // by the half-angle of the frame in that direction. The strips under
+        // the parts bar and the command strip are treated as not there. The
+        // view offset already lifts the target to the middle of what is
+        // left above the bar, so the strip along the top eats into the top
+        // half only; the tighter half sets the fit.
+        const h = window.innerHeight || 1;
+        const strip = document.getElementById("command_strip");
+        const covered_top = strip ? Math.max(0, strip.getBoundingClientRect().bottom) : 0;
+        const visible = Math.max(0.25, (h - 2 * view_shift - 2 * covered_top) / h);
+        const tan_half = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+        const tan_v = tan_half * visible;
+        const tan_h = tan_half * camera.aspect;
+        const margin = 1.1;
+
+        const forward = direction.clone().negate();
+        const right = new THREE.Vector3().crossVectors(forward, camera.up);
+        if (right.lengthSq() < 1e-6) right.set(1, 0, 0);
+        right.normalize();
+        const up = new THREE.Vector3().crossVectors(right, forward);
+
+        let d = 0;
+        if (!box.isEmpty()) {
+          const corner = new THREE.Vector3();
+          for (let i = 0; i < 8; i++) {
+            corner.set(
+              i & 1 ? box.max.x : box.min.x,
+              i & 2 ? box.max.y : box.min.y,
+              i & 4 ? box.max.z : box.min.z
+            ).sub(target);
+            const depth = corner.dot(direction);
+            const across = Math.abs(corner.dot(right)) * margin;
+            const above = Math.abs(corner.dot(up)) * margin;
+            d = Math.max(d, depth + across / tan_h, depth + above / tan_v);
+          }
+        }
+        if (!(d > 0)) d = Math.sqrt(200);
+        d = THREE.MathUtils.clamp(d, orbitControls.minDistance, orbitControls.maxDistance);
 
         orbitControls.target.copy(target);
         camera.position.copy(target).addScaledVector(direction, d);
