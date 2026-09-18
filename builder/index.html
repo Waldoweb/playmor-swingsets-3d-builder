@@ -1399,25 +1399,12 @@
         padding: 4px;
         border-radius: 24px;
         background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
         max-width: calc(100% - 24px);
         box-sizing: border-box;
         transition: left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      }
-      /* The blur lives on a pseudo-element rather than the strip itself. A
-         backdrop-filter makes an element the containing block for
-         fixed-position descendants, and when the strip is narrow enough to
-         scroll, its menus are fixed so they can escape its overflow clip;
-         on the strip, that filter pinned them inside it. The backing colour
-         stays on the strip so it cannot scroll away with the content. */
-      #command_strip::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        z-index: -1;
-        border-radius: inherit;
-        backdrop-filter: blur(10px);
       }
       .pill {
         display: flex;
@@ -1702,6 +1689,13 @@
           max-width: calc(100% - var(--panel-w) - 24px);
           overflow-x: auto;
           scrollbar-width: none;
+          /* A backdrop-filter makes an element the containing block for
+             fixed-position descendants. The menus are fixed here to escape
+             the strip's overflow clip, so the blur has to go or they open
+             inside the strip and are clipped away. A touch more opacity
+             stands in for it. */
+          backdrop-filter: none;
+          background: rgba(0, 0, 0, 0.86);
         }
         body.panel-open .pill-menu { position: static; }
         body.panel-open .menu { left: 12px; top: 124px; position: fixed; }
@@ -1716,6 +1710,10 @@
           overflow-x: auto;
           scrollbar-width: none;
           top: 60px;
+          /* No blur here either, for the same reason as with the panel
+             open: the menus below are fixed and must not be held inside. */
+          backdrop-filter: none;
+          background: rgba(0, 0, 0, 0.86);
         }
         #command_strip::-webkit-scrollbar { display: none; }
         .pill-menu { position: static; }
