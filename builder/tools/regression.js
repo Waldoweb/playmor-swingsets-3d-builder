@@ -482,6 +482,12 @@
     check("a second tower is offered at the bridge's free end", at_far_end.includes("P-WT"), true);
     check("King's Tower is not — it has no 5 ft deck", at_far_end.includes("P-KT"), false);
     check("nor is a 7 ft slide", at_far_end.includes("SWS-14"), false);
+    // Weldon: only another tower goes on the far end. A 5 ft rock climb's
+    // joint is layer 6 like the deck the bridge is locked to, so the layers
+    // alone let it, the steps and the slides hold up one end of the span.
+    check("only towers are offered there",
+      at_far_end.filter((id) => getCategoryFromObjectId(id) !== "towers"), []);
+    check("and more than one of them", at_far_end.length > 1, true);
 
     const far = await place(farEnd, "P-WT");
     check("and it attaches", !!far, true);

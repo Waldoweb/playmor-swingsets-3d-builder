@@ -2252,6 +2252,23 @@
       };
 
       /**
+       * A `deck` mount meets a tower's deck and nothing else.
+       *
+       * `deck` matches every deck height, and the layers cannot tell whose
+       * joint a height is on: a tower's opening is layer 6, and so is the
+       * joint a 5 ft rock climb hangs by. So the free end of a bridge or
+       * tunnel took steps, slides and rock climbs, each of which would have
+       * been holding up one end of the span. Only something standing on its
+       * own ground can do that, and the bubble panel and tic-tac-toe board
+       * fill a tower's opening likewise.
+       */
+      const Deck_mount_meets_a_tower = (plug_joint, host_joint) => {
+        if (plug_joint.layer === "deck") return Is_free_standing(host_joint.model);
+        if (host_joint.layer === "deck") return Is_free_standing(plug_joint.model);
+        return true;
+      };
+
+      /**
        * Can this part become a tire swing?
        *
        * Two hangers in the catalog take only a tire swing — one each on the
@@ -2322,6 +2339,7 @@
         Layers_connect(plug_joint.layer, host_joint.layer) &&
         Tire_rule_holds(plug_joint, host_joint) &&
         Deck_heights_agree(plug_joint, host_joint) &&
+        Deck_mount_meets_a_tower(plug_joint, host_joint) &&
         Category_allows(plug_joint.model, host_joint.model);
 
       /**
