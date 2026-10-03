@@ -7112,20 +7112,34 @@
         }
       };
       /**
-       * The set as it stands on the ground.
+       * The set's footprint: how far it reaches, seen from above, with the
+       * height of the whole set.
        *
-       * The box round every vertex low enough to be a post foot, an A-frame
-       * foot, a slide's run-out or a climber's base, with the height of the
-       * whole set. The plain box round the meshes took in the roof's overhang
-       * and the flags, and reported the DX Sky Tower's 10 by 5 ft posts as
-       * 12 by 8.6 (Weldon, 2026-09-09). Measured once per change of the
-       * yard; the dimension lines, the readout and the mulch bed's auto-fit
-       * all read set_box.
+       * Towers (bridge and tunnel included) and swing beams count whole --
+       * a roof's overhang, the Extended Beam's top running out past its legs
+       * to carry the swings hung there -- but not their flags. Every other
+       * part counts only what is low enough to be a foot, a slide's run-out
+       * or a climber's base, so a wheel or scope on a rail and a swing seat
+       * do not stretch the set.
+       *
+       * History: this was all parts at the ground once the plain box round
+       * the meshes reported the DX Sky Tower's 10 by 5 ft posts as 12 by 8.6
+       * (Weldon, 2026-09-09); that left the Extended Beam's overhang off the
+       * dimensions and the bed, and Weldon then wanted roof overhangs in too
+       * (2026-10-03). Measured once per change of the yard; the dimension
+       * lines, the readout and the mulch bed's auto-fit all read set_box.
        */
+      const WHOLE_PART_CATEGORIES = ["towers", "swing_beams"];
       const FOOTPRINT_HEIGHT = 0.35; // metres: what counts as standing on the ground
       // Null until the first measurement: this line runs before THREE has
       // been brought in, so nothing can be constructed here.
       let set_box = null;
+      /** A flag's pole or cloth: named flag..., or under a node that is. */
+      const Is_flag = (node) => {
+        for (let n = node; n; n = n.parent)
+          if (n.name && n.name.toLowerCase().split(",")[0].startsWith("flag")) return true;
+        return false;
+      };
       const Measure_set = () => {
         const whole = new THREE.Box3();
         for (const mesh of picked_meshes) whole.expandByObject(mesh);
@@ -7133,18 +7147,35 @@
 
         const ground = new THREE.Box3();
         const v = new THREE.Vector3();
-        for (const root of picked_meshes)
+        for (const root of picked_meshes) {
+          const object_id = root.model && root.model.object_id;
+          const whole_part = !!(
+            objectMapping &&
+            object_id &&
+            objectMapping.objects[object_id] &&
+            WHOLE_PART_CATEGORIES.includes(objectMapping.objects[object_id].category)
+          );
+          // Hidden pieces -- a roof not chosen, a beam length not in use --
+          // are not part of the set. The root itself is hidden between
+          // frames, so only what lies under it is asked.
+          const shown = (node) => {
+            for (let n = node; n && n !== root; n = n.parent) if (!n.visible) return false;
+            return true;
+          };
           root.traverse((node) => {
             if (!node.isMesh || !node.geometry || node.name === HIT_BOX_NAME) return;
             if (node.name.toLowerCase().startsWith("joint")) return;
+            if (!shown(node)) return;
+            if (whole_part && Is_flag(node)) return;
             const position = node.geometry.attributes.position;
             if (!position) return;
             node.updateWorldMatrix(true, false);
             for (let i = 0; i < position.count; i++) {
               v.fromBufferAttribute(position, i).applyMatrix4(node.matrixWorld);
-              if (v.y <= FOOTPRINT_HEIGHT) ground.expandByPoint(v);
+              if (whole_part || v.y <= FOOTPRINT_HEIGHT) ground.expandByPoint(v);
             }
           });
+        }
         // Nothing stands on the ground -- a part on its own mid-restore --
         // so the whole box is the best there is.
         if (ground.isEmpty()) return whole;
