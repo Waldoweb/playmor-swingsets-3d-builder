@@ -6794,13 +6794,24 @@
        * all read this one list; it used to be built twice, in two dialogs
        * that had drifted apart.
        */
-      /** The colour of a roof node, whichever of its meshes carries it. */
+      /**
+       * The colour of a roof node, whichever of its meshes carries it. The
+       * tri-color canvas is a texture on a white material, so a mapped
+       * material is tri-color whatever its colour reads.
+       */
       const Roof_colour_name = (root) => {
-        let colour = null;
+        let material = null;
         root.traverse((node) => {
-          if (!colour && node.material && node.material.color) colour = node.material.color;
+          if (!material && node.material && node.material.color) material = node.material;
         });
-        return colour ? Color2Name(colour) : "";
+        if (!material) return "";
+        return material.map ? "Tri-Color" : Color2Name(material.color);
+      };
+
+      /** The frame colour's label from the colour config, e.g. "Cedar/Tan". */
+      const Frame_colour_name = (model) => {
+        const frame = colorConfig.constants.frame_colors[model.frame_color];
+        return frame ? frame.label : "";
       };
 
       const Build_part_list = () => {
@@ -6810,14 +6821,16 @@
           const { objectName } = getObjectInfoById(model.object_id);
           const options = [];
 
-          if (model.roof_canopy_mesh && model.roof_canopy_mesh.visible)
-            options.push("Roof: Canvas, " + Roof_colour_name(model.roof_canopy_mesh));
-          if (model.roof_poly_mesh && model.roof_poly_mesh.visible)
-            options.push("Roof: Poly, " + Roof_colour_name(model.roof_poly_mesh));
+          if (Has_frame(model) && Frame_colour_name(model))
+            options.push("Frame: " + Frame_colour_name(model));
           if (model.toy_color)
             options.push("Color: " + Color2Name(new THREE.Color(model.toy_color)));
           if (model.trim_color)
             options.push("Trim: " + Color2Name(new THREE.Color(model.trim_color)));
+          if (model.roof_canopy_mesh && model.roof_canopy_mesh.visible)
+            options.push("Roof: " + Roof_colour_name(model.roof_canopy_mesh) + " Canvas");
+          if (model.roof_poly_mesh && model.roof_poly_mesh.visible)
+            options.push("Roof: " + Roof_colour_name(model.roof_poly_mesh) + " Poly");
 
           let flag = 0;
           model.mesh.traverse((node) => {
