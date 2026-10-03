@@ -3013,11 +3013,7 @@
                     });
                   } else {
                     model.roof_canopy_mesh.traverse((mesh) => {
-                      if ("material" in mesh)
-                        mesh.material = new THREE.MeshStandardMaterial({
-                          color: model.ruf_color,
-                          side: THREE.DoubleSide,
-                        });
+                      if ("material" in mesh) mesh.material = Canvas_material(model.ruf_color);
                     });
                   }
                 }
@@ -6831,7 +6827,8 @@
           if (!material && node.material && node.material.color) material = node.material;
         });
         if (!material) return "";
-        return material.map ? "Tri-Color" : Color2Name(material.color);
+        if (material.map) return "Tri-Color";
+        return Color2Name(material.userData.swatch || material.color);
       };
 
       /** The frame colour's label from the colour config, e.g. "Cedar/Tan". */
@@ -7967,6 +7964,25 @@
           picked_mesh.material.color = new THREE.Color(color);
         }
       };
+      /**
+       * A plain canvas roof in the swatch colour. Where the colour config
+       * gives a `render` shade the canvas is drawn in that instead: green and
+       * red read too light on the canvas at their swatch colour. The swatch
+       * colour stays what is saved and what names the roof, kept on the
+       * material for Roof_colour_name.
+       */
+      const Canvas_material = (color) => {
+        const swatch = new THREE.Color(color);
+        const entry = Object.values(colorConfig?.constants?.roof_canopy_colors || {}).find(
+          (option) => option && option.hex && new THREE.Color(parseInt(option.hex, 16)).equals(swatch)
+        );
+        const material = new THREE.MeshStandardMaterial({
+          color: entry && entry.render ? new THREE.Color(entry.render) : swatch,
+          side: THREE.DoubleSide,
+        });
+        material.userData.swatch = swatch;
+        return material;
+      };
       const Change_roof_canopy_color = (color) => {
         let model = picked_mesh.model;
         if (model.roof_poly_mesh) model.roof_poly_mesh.visible = false;
@@ -7978,11 +7994,7 @@
           });
         } else {
           model.roof_canopy_mesh.traverse((mesh) => {
-            if ("material" in mesh)
-              mesh.material = new THREE.MeshStandardMaterial({
-                color: color,
-                side: THREE.DoubleSide,
-              });
+            if ("material" in mesh) mesh.material = Canvas_material(color);
           });
         }
 

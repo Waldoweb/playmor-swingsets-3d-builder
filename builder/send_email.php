@@ -144,7 +144,7 @@ if ($dailyCap > 0 && !recordSendAgainstDailyCap($counterFile, $dailyCap)) {
 $htmlContent = "
 <html>
 <body style=\"font-family: Arial, sans-serif; margin: 40px; color: #333;\">
-  <h2 style=\"color: #4CAF50;\">New Quote Request - Yard Designer</h2>
+  <h2 style=\"color: #ce030c;\">New 3D Configurator Quote Request</h2>
   
   <div style=\"background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0;\">
     <h3>Customer Information</h3>
@@ -162,13 +162,13 @@ $htmlContent .= "
   
   " . generateDesignViewsHTML($designImages) . "
   
-  <div style=\"background: #f0f8f0; padding: 20px; border-radius: 8px;\">
+  <div style=\"background: #f9f9f9; padding: 20px; border-radius: 8px;\">
     <h3>Parts List</h3>
     " . generatePartsListHTML($input['part_list']) . "
   </div>
   
   <p style=\"color: #666; font-size: 12px; margin-top: 30px;\">
-    This quote was generated automatically from the Yard Designer tool at playmorswingsets.com
+    This quote was generated automatically from the 3D Configurator at playmorswingsets.com
   </p>
 </body>
 </html>";

@@ -42,7 +42,8 @@
     "roof_canopy_colors": {
       "green": {
         "color": "@roof_green",
-        "hex": "0x01664b"
+        "hex": "0x01664b",
+        "render": "#014231"
       },
       "blue": {
         "color": "@roof_blue",
@@ -50,7 +51,8 @@
       },
       "red": {
         "color": "@roof_red",
-        "hex": "0x93293b"
+        "hex": "0x93293b",
+        "render": "#601b26"
       },
       "gray": {
         "color": "@roof_gray",
