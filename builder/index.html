@@ -3461,6 +3461,10 @@
         // on every side.
         static default_size = 10;
         static margin = 3 / Meters2Feet;
+        // The curb round the bed, in metres: it stands outside the mulch,
+        // its inside edge on the bed's edge, so the bed's width and depth
+        // are the mulch to buy (Weldon, 2026-10-03).
+        static curb = 0.25;
 
         constructor(args) {
           this.width = Mulch.default_size;
@@ -3572,10 +3576,13 @@
           ztexture.repeat.set(0.5, this.depth);
           ztexture.needsUpdate = true;
 
+          // The two short sides fit between the long ones, which run the
+          // full length corners and all, so no two pieces overlap.
+          const curb = Mulch.curb;
           let zbox_geometry = new THREE.BoxGeometry(
-            0.25,
+            curb,
             0.125,
-            this.depth + 0.24
+            this.depth
           );
           // right
           let zbox1 = new THREE.Mesh(zbox_geometry, [
@@ -3586,7 +3593,7 @@
             new THREE.MeshStandardMaterial({ map: ztexture }), // front
             new THREE.MeshStandardMaterial({ map: ztexture }), // back
           ]);
-          zbox1.position.set(ox + this.width / 2, 0, oz);
+          zbox1.position.set(ox + this.width / 2 + curb / 2, 0, oz);
           zbox1.receiveShadow = shadows;
           this.meshes.push(zbox1);
           scene.add(zbox1);
@@ -3600,7 +3607,7 @@
             new THREE.MeshStandardMaterial({ map: ztexture }),
             new THREE.MeshStandardMaterial({ map: ztexture }),
           ]);
-          zbox2.position.set(ox - this.width / 2, 0, oz);
+          zbox2.position.set(ox - this.width / 2 - curb / 2, 0, oz);
           zbox2.receiveShadow = shadows;
           this.meshes.push(zbox2);
           scene.add(zbox2);
@@ -3608,18 +3615,18 @@
 
           let xbox_material = new THREE.MeshStandardMaterial({ map: xtexture });
           let xbox_geometry = new THREE.BoxGeometry(
-            this.width + 0.24,
+            this.width + 2 * curb,
             0.125,
-            0.25
+            curb
           );
           let xbox1 = new THREE.Mesh(xbox_geometry, xbox_material);
-          xbox1.position.set(ox, 0, oz + this.depth / 2);
+          xbox1.position.set(ox, 0, oz + this.depth / 2 + curb / 2);
           xbox1.receiveShadow = shadows;
           this.meshes.push(xbox1);
           scene.add(xbox1);
           xbox1.visible = false;
           let xbox2 = new THREE.Mesh(xbox_geometry, xbox_material);
-          xbox2.position.set(ox, 0, oz - this.depth / 2);
+          xbox2.position.set(ox, 0, oz - this.depth / 2 - curb / 2);
           xbox2.receiveShadow = shadows;
           this.meshes.push(xbox2);
           scene.add(xbox2);
@@ -7870,13 +7877,16 @@
             "Set", centre, 1
           );
 
-        // The bed: just outside the curb, on the sides facing the camera.
+        // The bed: drawn just outside the curb, on the sides facing the
+        // camera, but measuring the mulch itself -- the size the bed's panel
+        // shows, which is what sets how much mulch to buy. The curb stands
+        // outside the bed, so its outside is a curb further.
         if (mulch_enabled && mulch) {
           const ox = mulch.origin.x, oz = mulch.origin.z;
-          const hx = mulch.width / 2 + 0.125, hz = mulch.depth / 2 + 0.125;
+          const hx = mulch.width / 2, hz = mulch.depth / 2;
           const bx = cam.x >= ox ? 1 : -1;
           const bz = cam.z >= oz ? 1 : -1;
-          const ex = ox + bx * hx, ez = oz + bz * hz;
+          const ex = ox + bx * (hx + Mulch.curb), ez = oz + bz * (hz + Mulch.curb);
           const b = BED_DIMENSION_MARGIN;
           const bed_centre = V(ox, 0, oz);
           Draw_dimension_line(
