@@ -6,7 +6,9 @@ Run from builder/:
 
 Arguments after `--`: input GLB, output GLB, how far to lower the seat in
 metres, and the height (model z, before export) that separates what moves
-from what stays.
+from what stays. An optional fifth argument `above` moves what is above the
+height instead -- shortening the chain from the top, hanger and all, with
+the seat left where it is.
 
 The sling swing's chain is real links at the top and bottom with a plain
 plastic-coated tube between them. Everything below the tube's top ring --
@@ -17,11 +19,22 @@ is untouched. Then run tools/glb_reorder_nodes.py on the result as usual.
 
 Weldon asked for it 2026-09-08: the seat hung 0.87 m up, about 34 inches;
 a child wants 16 to 18.
+
+Also used 2026-10-03 for the Tire Swing's beam models, which get chain
+extensions on a beam: MTS__b8 by 0.648 at 1.6, MTS__b10 by 0.579 at 1.9.
+Its chain is links at each end with a plain coated tube between and nothing
+inside, so the tube's middle is the place to stretch. The tire now hangs
+12.3 inches up, as it does under a Summit Tower.
+
+And with `above` on MTS__b8 (0.054 at 1.9): its hanger bracket was drawn on
+top of the joint, 5 cm up inside the beam, where the 10 ft and Summit Tower
+versions hang theirs below it. The bracket and upper links drop to match.
 """
 import bpy, sys, json
 
 argv = sys.argv[sys.argv.index("--") + 1:]
 inp, out, delta, threshold = argv[0], argv[1], float(argv[2]), float(argv[3])
+above = len(argv) > 4 and argv[4] == "above"
 bpy.ops.wm.read_factory_settings(use_empty=True)
 bpy.ops.import_scene.gltf(filepath=inp, merge_vertices=True)
 bpy.ops.object.select_all(action="DESELECT")
@@ -36,7 +49,7 @@ for obj in bpy.data.objects:
     inv = obj.matrix_world.inverted()
     moved = 0
     for v in obj.data.vertices:
-        if (obj.matrix_world @ v.co).z < threshold:
+        if ((obj.matrix_world @ v.co).z > threshold) == above:
             v.co = inv @ ((obj.matrix_world @ v.co) - __import__("mathutils").Vector((0, 0, delta)))
             moved += 1
     if moved:

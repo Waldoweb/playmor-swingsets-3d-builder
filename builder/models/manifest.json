@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-10-03T13:15:25.448Z",
+  "generated_at": "2026-10-03T14:12:41.098Z",
   "product_count": 64,
   "default_fittings": [
     {
@@ -7117,8 +7117,8 @@
       "files": [
         {
           "layer": "b8",
-          "file": "BS__b8.41ec2857.glb",
-          "bytes": 631384,
+          "file": "BS__b8.0c34039d.glb",
+          "bytes": 751128,
           "joints": [
             "joint,0,s",
             "joint,2,s"
@@ -7145,14 +7145,14 @@
           ],
           "bounds": [
             [
-              0.005,
+              0.001,
               0.694,
-              -0.208
+              -0.214
             ],
             [
-              0.278,
+              0.286,
               2.498,
-              0.208
+              0.214
             ]
           ],
           "joint_positions": {
@@ -7170,8 +7170,8 @@
         },
         {
           "layer": "b10",
-          "file": "BS__b10.8fefbf69.glb",
-          "bytes": 741844,
+          "file": "BS__b10.70a131fd.glb",
+          "bytes": 969668,
           "joints": [
             "joint,0,s",
             "joint,2,s"
@@ -7200,12 +7200,12 @@
             [
               -0.002,
               0.694,
-              -0.208
+              -0.214
             ],
             [
-              0.278,
+              0.286,
               3.104,
-              0.208
+              0.214
             ]
           ],
           "joint_positions": {
@@ -7599,8 +7599,8 @@
       "files": [
         {
           "layer": "b8",
-          "file": "DS-KR__b8.7d32a703.glb",
-          "bytes": 45820,
+          "file": "DS-KR__b8.936ca195.glb",
+          "bytes": 49136,
           "joints": [
             "joint,0,swivel"
           ],
@@ -7630,7 +7630,7 @@
             ],
             [
               0.149,
-              2.765,
+              2.443,
               0.149
             ]
           ],
@@ -7644,8 +7644,8 @@
         },
         {
           "layer": "b10",
-          "file": "DS-KR__b10.7b497372.glb",
-          "bytes": 45832,
+          "file": "DS-KR__b10.42156fec.glb",
+          "bytes": 49144,
           "joints": [
             "joint,0,swivel"
           ],
@@ -7675,7 +7675,7 @@
             ],
             [
               0.149,
-              3.408,
+              3.084,
               0.149
             ]
           ],
@@ -7825,8 +7825,8 @@
       "files": [
         {
           "layer": "b8",
-          "file": "MTS__b8.1ab9ad67.glb",
-          "bytes": 263500,
+          "file": "MTS__b8.82aed876.glb",
+          "bytes": 263508,
           "joints": [
             "joint,0,s"
           ],
@@ -7851,12 +7851,12 @@
           "bounds": [
             [
               -0.317,
-              0.856,
+              0.208,
               -0.317
             ],
             [
               0.317,
-              2.465,
+              2.411,
               0.317
             ]
           ],
@@ -7870,8 +7870,8 @@
         },
         {
           "layer": "b10",
-          "file": "MTS__b10.ae10a746.glb",
-          "bytes": 273008,
+          "file": "MTS__b10.2be72d34.glb",
+          "bytes": 274680,
           "joints": [
             "joint,0,s"
           ],
@@ -7896,7 +7896,7 @@
           "bounds": [
             [
               -0.317,
-              0.856,
+              0.277,
               -0.317
             ],
             [

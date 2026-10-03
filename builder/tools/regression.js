@@ -1342,6 +1342,40 @@
     const seat = new THREE.Box3().setFromObject(disc.mesh).min.y * 39.3701;
     check("its seat hangs about 20 inches up", seat > 17 && seat < 24, true);
 
+    // The tire swing gets chain extensions on a beam, so it hangs at the same
+    // height as under a Summit Tower -- about 12 inches -- rather than the
+    // 38 its beam models were drawn at. Geometry in the GLBs, so asserted.
+    remove(disc);
+    const tire = await place(
+      discRig.beam.sockets().find((s) => s.joints.some((j) => j.layer === "swivel")),
+      "MTS"
+    );
+    const tireLow = tire ? new THREE.Box3().setFromObject(tire.mesh).min.y * 39.3701 : 0;
+    check("the tire swing on a beam hangs about 12 inches up", tireLow > 10 && tireLow < 15, true);
+
+    // Both hang from a swivel hanger mounted under the beam, not inside it.
+    // The disc swing's rope once went up through the beam, and the hanger
+    // first copied in for it was drawn on top of the joint, 5 cm into the
+    // beam -- as the 8 ft tire swing's own was.
+    const beamParts = [];
+    discRig.beam.mesh.traverse((n) => { if (n.isMesh && n.name !== HIT_BOX_NAME) beamParts.push(n); });
+    const hangAt = new THREE.Vector3();
+    discRig.beam.sockets().find((s) => s.joints.some((j) => j.layer === "swivel")).joints[0].getWorldPosition(hangAt);
+    const underside = new THREE.Raycaster(new THREE.Vector3(hangAt.x, 0.5, hangAt.z), new THREE.Vector3(0, 1, 0))
+      .intersectObjects(beamParts, false).find((h) => h.point.y > 1.5).point.y;
+    const topOf = (m) => {
+      let top = -Infinity;
+      m.mesh.traverse((n) => { if (n.isMesh && n.name !== HIT_BOX_NAME) top = Math.max(top, new THREE.Box3().setFromObject(n).max.y); });
+      return top;
+    };
+    check("the tire swing's hanger is under the beam, not in it", !!tire && topOf(tire) <= underside, true);
+    remove(tire);
+    const disc2 = await place(
+      discRig.beam.sockets().find((s) => s.joints.some((j) => j.layer === "swivel")),
+      "DS-KR"
+    );
+    check("the disc swing's hanger is under the beam, not in it", !!disc2 && topOf(disc2) <= underside, true);
+
     // Where a swing beam's dot is drawn, and where the beam actually bolts on,
     // are two different heights on three of the towers. Both are asserted
     // together on purpose: raising the attachment instead of the marker would
