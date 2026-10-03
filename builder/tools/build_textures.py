@@ -53,9 +53,16 @@ PLAN = {
     # sourced from assets.js: since 2026-09-09 it is a purchased seamless
     # tile ("Grass Texture_05" from the 12 Organic Grass Textures pack),
     # resized to 1024 and saved as WebP by hand, repeating every 2.5 m.
+    # Re-encoded at WebP quality 60 on 2026-10-03 (575 KB -> 379 KB, no
+    # visible change even zoomed into the lawn; 512 px was visibly soft).
     # Leaving it out here keeps a rerun from putting the old photo back.
 }
 QUALITY = 75
+
+# Textures that live only as files in textures/, with nothing in assets.js
+# to extract them from. Both modes keep them in the manifest, and the
+# extract mode does not delete them, so a rerun never drops the lawn.
+FILE_ONLY = ("ground_grass",)
 
 
 def content_hash(data: bytes) -> str:
@@ -116,8 +123,9 @@ def main():
     manifest, before, after = {}, 0, 0
 
     if embedded:
+        keep = {existing[name] for name in FILE_ONLY if name in existing}
         for filename in os.listdir(OUT_DIR):
-            if filename != "manifest.json":
+            if filename != "manifest.json" and filename not in keep:
                 os.unlink(os.path.join(OUT_DIR, filename))
         for name, (ext, data) in embedded.items():
             out_ext, out_data = convert(name, ext, data)
@@ -130,8 +138,12 @@ def main():
             print(f"  {name:<20}{len(data)//1024:>6}K -> {len(out_data)//1024:>5}K  {pct:>4}%")
         print(f"\n  {'total':<20}{before//1024:>6}K -> {after//1024:>5}K"
               f"  {100 - after * 100 // before:>4}%")
+        for name in FILE_ONLY:
+            if name not in existing:
+                sys.exit(f"No file for texture '{name}' in {OUT_DIR}/")
+            manifest[name] = existing[name]
     else:
-        for name, _, _ in PLAN.values():
+        for name in [name for name, _, _ in PLAN.values()] + list(FILE_ONLY):
             if name not in existing:
                 sys.exit(f"No file for texture '{name}' in {OUT_DIR}/")
             manifest[name] = existing[name]
@@ -141,6 +153,7 @@ def main():
 
     with open(os.path.join(OUT_DIR, "manifest.json"), "w") as handle:
         json.dump({"textures": manifest}, handle, indent=2)
+        handle.write("\n")
     print(f"  manifest: {OUT_DIR}/manifest.json")
 
 
