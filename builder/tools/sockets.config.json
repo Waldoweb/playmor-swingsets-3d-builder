@@ -23,16 +23,15 @@
 
   "default_fittings": [
     { "part": "SSC", "layer": "toy", "mount": "scope", "prefer": "high" },
-    { "part": "SW", "layer": "toy", "mount": "wheel", "prefer": "low" },
-    { "part": "DS-KR", "layer": "ds", "mount": "disc_swing" }
+    { "part": "SW", "layer": "toy", "mount": "wheel", "prefer": "low" }
   ],
   "_default_fittings_note": [
     "Parts a product arrives with. Fitted when one is placed, and removable",
     "like anything else -- deleting one takes only that one.",
     "",
-    "A tower brings its two toys. A disc swing beam brings the disc swing:",
-    "the hanger on its end takes that part and nothing else, so shipping the",
-    "beam bare only ever meant a second click to reach a foregone conclusion.",
+    "A tower brings its two toys. The Extended Beam used to bring a disc swing",
+    "(it was the Disc Swing Beam); since 2026-10-03 it comes bare, with two",
+    "swivel hangers on its extension that take any swing but the Horse Glider.",
     "",
     "`layer` is which openings on the host to consider, and `mount` narrows",
     "those by joint name. Scope and wheel mounts are",
@@ -139,7 +138,10 @@
     "Tunnel": { "from": "*", "to": "deck" },
     "BUB":    { "from": "*", "to": "deck" },
     "TIC":    { "from": "*", "to": "deck" },
-    "BNS":    { "from": "s", "to": "sh" }
+    "BNS":    { "from": "s", "to": "sh" },
+    "P-AB-DS-8":  { "from": "ds", "to": "swivel" },
+    "P-AB-DS-10": { "from": "ds", "to": "swivel" },
+    "DS-KR":      { "from": "ds", "to": "swivel" }
   },
   "_layer_overrides_note": [
     "Applied to the model files themselves by tools/set_joint_layers.js, because",
@@ -162,7 +164,25 @@
     "",
     "This is also the answer to whether 's' and 'sh' should merge: they should",
     "not. 'sh' is not a second name for a swing hanger, it is the end position,",
-    "and two products in the catalog are sold only for it."
+    "and two products in the catalog are sold only for it.",
+    "",
+    "P-AB-DS-8/10, the Extended Beams (formerly Disc Swing Beams), carry two",
+    "swivel hangers on the part past the legs. That opening was 'ds' and took",
+    "only the Disc Swing; as 'swivel' it takes any swing -- 's', 'sh', and the",
+    "Disc Swing, which moved to 'swivel' with it since it hangs nowhere else --",
+    "except a part listed in not_on_swivel (Layers_connect, Swivel_allows",
+    "in index.html). 'ds' is retired. The joint was also lowered to the other hangers' height",
+    "and the Disc Swing's own joint raised by the same 0.23 (tools/move_joint.py),",
+    "so a sling swing there hangs level with its neighbours and the disc swing",
+    "hangs exactly where it did."
+  ],
+
+  "not_on_swivel": ["HG"],
+  "_not_on_swivel_note": [
+    "Swings that may not hang from a swivel hanger. The Horse Glider rocks on",
+    "fixed pivots, so Weldon excludes it from the Extended Beam's swivel",
+    "hangers; every other swing goes there. Becomes `not_on_swivel: true` on",
+    "the product in the manifest."
   ],
 
   "default_yaw": {

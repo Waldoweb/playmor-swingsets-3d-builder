@@ -328,43 +328,58 @@
       ["deck", "s", false],
       ["deck", "picnic", false],
       ["deck", "0", false],
-      // A beam mount does NOT fit the disc-swing hanger. This table used to
-      // say it did, which was a transcription of the implementation rather
-      // than anything the catalog wants: a tower's beam mount carries `b8`,
-      // so the hanger at the end of a disc swing beam offered all seven
-      // towers alongside the disc swing. The disc swing itself carries `ds`
-      // on both joints and connects by plain equality, so nothing was relying
-      // on the wider rule.
-      ["b8", "ds", false],
-      ["b10", "ds", false],
-      ["ds", "ds", true],
+      // A beam mount does NOT fit the swivel hanger (the disc-swing hanger,
+      // once). This table used to say it did, a transcription of the
+      // implementation rather than anything the catalog wants: a tower's
+      // beam mount carries `b8`, so the hanger at the end of the beam
+      // offered all seven towers.
+      ["b8", "swivel", false],
+      ["b10", "swivel", false],
       ["s", "s", true],
+      // The Extended Beam's swivel hangers take any swing's layer, and
+      // nothing that is not a swing. The Disc Swing is on `swivel` itself.
+      ["s", "swivel", true],
+      ["sh", "swivel", true],
+      ["swivel", "swivel", true],
+      ["6", "swivel", false],
+      ["swivel", "s", false],
     ]) {
       check(`${plug} -> ${host}`, Layers_connect(plug, host), want);
     }
 
-    // ...and the same thing asked the way a person meets it: click the hanger
-    // on the end of a disc swing beam and see what the bar offers.
+    // ...and the same thing asked the way a person meets it: click the
+    // swivel hangers on the end of an Extended Beam and see what the bar
+    // offers. Every swing -- the tire, disc and bird's nest swings included --
+    // but the Horse Glider, which rocks on fixed pivots.
     await reset();
-    const discRig = await beamRig("P-WT", "P-AB-DS-8");
+    const extRig = await beamRig("P-WT", "P-AB-DS-8");
     await idle(250);
-    // The beam ships with its swing, which fills the very hanger this is
-    // about, so take it off to ask the question of a free one. Conditional
-    // rather than assumed: the fitting is skipped when the disc swing's
-    // geometry has not arrived yet, and this suite runs early enough that it
-    // sometimes has not -- which would otherwise make the test pass or fail on
-    // download timing rather than on the rule.
-    const preFitted = models_with_available_joints.find((m) => m.object_id === "DS-KR");
-    if (preFitted) remove(preFitted);
-    const dsSocket = discRig.beam.sockets().find((s) =>
-      s.joints.some((j) => j.available && j.layer === "ds")
+    const swivelSocket = extRig.beam.sockets().find((s) =>
+      s.joints.some((j) => j.available && j.layer === "swivel")
     );
-    check("the disc swing beam has a disc-swing hanger", !!dsSocket, true);
-    const atDisc = templates()
-      .filter((m) => m.capable({ socket: dsSocket }))
+    check("the Extended Beam has a swivel hanger", !!swivelSocket, true);
+    const atSwivel = templates()
+      .filter((m) => m.capable({ socket: swivelSocket }))
       .map((m) => m.object_id)
       .sort();
-    check("only the disc swing fits the disc-swing hanger", atDisc, ["DS-KR"]);
+    check("every swing but the Horse Glider fits the swivel hanger", atSwivel,
+      ["BB", "BNS", "BS", "DS-KR", "MTS", "SS", "TZR", "VTS"]);
+
+    // Hung level with its neighbours: the swivel joint was lowered to the
+    // other hangers' height, so a sling swing there is not 9 inches higher.
+    const regular = await place(socketFor(extRig.beam, "s"), "SS");
+    const onSwivel = await place(swivelSocket, "SS");
+    check("a swing on the swivel hangs level with one on a plain hanger",
+      !!regular && !!onSwivel &&
+        Math.abs(new THREE.Box3().setFromObject(regular.mesh).min.y -
+          new THREE.Box3().setFromObject(onSwivel.mesh).min.y) < 0.005,
+      true);
+
+    // The disc swing goes only on the swivel hangers, as before.
+    const atPlain = templates()
+      .filter((m) => m.capable({ socket: socketFor(extRig.beam, "s") }))
+      .map((m) => m.object_id);
+    check("the disc swing does not fit a plain hanger", atPlain.includes("DS-KR"), false);
 
     // Only a part with a tire mesh variant may take a tire-only hanger. This
     // was enforced in the catalog listing but in none of the placement rules,
@@ -770,39 +785,16 @@
       }
     }
 
-    // A disc swing beam brings its swing. The hanger on its end takes exactly
-    // one part in the catalog, so the beam is sold with it on.
+    // The Extended Beam (the Disc Swing Beam, once) is sold bare now: its
+    // swivel hangers take any swing, so there is no foregone conclusion to
+    // fit for the person.
     await reset();
-    const discRig2 = await beamRig("P-WT", "P-AB-DS-8");
+    await beamRig("P-WT", "P-AB-DS-8");
     await settle();
-    check("a disc swing beam arrives with the disc swing",
-      placed().includes("DS-KR"), true);
-
-    // Exactly one. The disc swing carries `ds` on both its joints, so the one
-    // left free after it is hung is a hanger of the same layer -- fit it a
-    // second time and the beam grows a chain of them. Attach_plug_to calls the
-    // fitting back for whatever it just placed, so this is guarded rather than
-    // merely unlikely.
-    check("and exactly one of them",
-      placed().filter((id) => id === "DS-KR").length, 1);
-
-    const hung = models_with_available_joints.find((m) => m.object_id === "DS-KR");
-    check("hung from the beam's disc-swing hanger",
-      !!hung.joints.find((j) => j.connected && j.connected.name.includes("disc_swing")), true);
-
-    // Removable, and it does not come back when something else is placed.
-    remove(hung);
-    check("deleting it takes only the swing",
+    check("an Extended Beam arrives with no swing",
       placed().sort(), ["P-AB-DS-8", "P-WT", "SSC", "SW"]);
-    const spare = discRig2.beam.sockets().find((s) =>
-      s.joints.some((j) => j.available && j.layer === "s")
-    );
-    await place(spare, "SS");
-    await settle();
-    check("and placing a swing does not refit it",
-      placed().filter((id) => id === "DS-KR").length, 0);
 
-    // A plain swing beam has no disc-swing hanger and so brings nothing.
+    // Nor does a plain swing beam.
     await reset();
     await beamRig("P-WT", "P-AB-3-8");
     await settle();
@@ -1335,11 +1327,18 @@
     // the seat back at shoulder height with nothing else complaining. It hung
     // at 45 inches while every other seat on a beam sat between 14 and 31;
     // Weldon put it level with the tire and ball swings.
+    //
+    // It is no longer fitted with the beam, so it is hung here by hand. Its
+    // joint and the beam's were both moved 0.23 down when the swivel hangers
+    // came in, which must leave the seat exactly where it was.
     await reset();
-    await beamRig("P-WT", "P-AB-DS-8");
+    const discRig = await beamRig("P-WT", "P-AB-DS-8");
     await idle(250);
-    const disc = models_with_available_joints.find((m) => m.object_id === "DS-KR");
-    check("the disc swing is fitted", !!disc, true);
+    const disc = await place(
+      discRig.beam.sockets().find((s) => s.joints.some((j) => j.layer === "swivel")),
+      "DS-KR"
+    );
+    check("the disc swing hangs on the Extended Beam", !!disc, true);
     const seat = new THREE.Box3().setFromObject(disc.mesh).min.y * 39.3701;
     check("its seat hangs about 20 inches up", seat > 17 && seat < 24, true);
 

@@ -283,6 +283,10 @@ function main() {
       const front = (socketConfig.front_yaw || {})[objectId];
       if (front !== undefined) products[objectId].front_yaw = front;
 
+      // A swing that may not hang from a swivel hanger -- the Horse Glider.
+      if ((socketConfig.not_on_swivel || []).includes(objectId))
+        products[objectId].not_on_swivel = true;
+
       if ("tubular" in child) products[objectId].tubular = child.tubular;
       if ("slope" in child) products[objectId].slope = child.slope;
     });

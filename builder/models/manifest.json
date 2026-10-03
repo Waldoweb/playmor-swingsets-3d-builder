@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-10-03T12:02:41.860Z",
+  "generated_at": "2026-10-03T13:15:25.448Z",
   "product_count": 64,
   "default_fittings": [
     {
@@ -14,11 +14,6 @@
       "layer": "toy",
       "mount": "wheel",
       "prefer": "low"
-    },
-    {
-      "part": "DS-KR",
-      "layer": "ds",
-      "mount": "disc_swing"
     }
   ],
   "products": {
@@ -6512,7 +6507,7 @@
       ]
     },
     "P-AB-DS-8": {
-      "name": "Disc Swing Beam - 8 ft",
+      "name": "Extended Beam - 8 ft",
       "category": "swing_beams",
       "category_index": 1,
       "children_index": 4,
@@ -6520,12 +6515,12 @@
       "files": [
         {
           "layer": null,
-          "file": "P-AB-DS-8.f353c4ac.glb",
-          "bytes": 55172,
+          "file": "P-AB-DS-8.7999ebe0.glb",
+          "bytes": 55180,
           "joints": [
             "joint,0,b8",
             "joint,0,sh,_x_0",
-            "joint_disc_swing_female,0,ds",
+            "joint_disc_swing_female,0,swivel",
             "joint_swing_female_1,0,s",
             "joint_swing_female_2,0,s",
             "joint_swing_female_3,0,s,_x_0"
@@ -6568,17 +6563,17 @@
             {
               "marker": [
                 0,
-                2.744,
+                2.514,
                 -1.081
               ],
               "accepts": [
-                "ds"
+                "swivel"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint_disc_swing_female,0,ds"
+                "joint_disc_swing_female,0,swivel"
               ]
             },
             {
@@ -6637,9 +6632,9 @@
               2.514,
               0.958
             ],
-            "joint_disc_swing_female,0,ds": [
+            "joint_disc_swing_female,0,swivel": [
               0,
-              2.744,
+              2.514,
               -1.081
             ],
             "joint_swing_female_1,0,s": [
@@ -6674,9 +6669,9 @@
           "tire_only": false
         },
         {
-          "name": "joint_disc_swing_female,0,ds",
+          "name": "joint_disc_swing_female,0,swivel",
           "direction": 0,
-          "layer": "ds",
+          "layer": "swivel",
           "tire_only": false
         },
         {
@@ -6700,7 +6695,7 @@
       ]
     },
     "P-AB-DS-10": {
-      "name": "Disc Swing Beam - 10 ft",
+      "name": "Extended Beam - 10 ft",
       "category": "swing_beams",
       "category_index": 1,
       "children_index": 5,
@@ -6708,15 +6703,15 @@
       "files": [
         {
           "layer": null,
-          "file": "P-AB-DS-10.95ffa1bc.glb",
-          "bytes": 55096,
+          "file": "P-AB-DS-10.00871808.glb",
+          "bytes": 55100,
           "joints": [
             "joint,0,b10",
             "joint_1,0,s",
             "joint_2,0,s",
             "joint_3,0,s,_x_0",
             "joint_4,0,sh,_x_0",
-            "joint_disc_swing_female,0,ds"
+            "joint_disc_swing_female,0,swivel"
           ],
           "sockets": [
             {
@@ -6788,17 +6783,17 @@
             {
               "marker": [
                 0,
-                3.301,
+                3.071,
                 -1.061
               ],
               "accepts": [
-                "ds"
+                "swivel"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint_disc_swing_female,0,ds"
+                "joint_disc_swing_female,0,swivel"
               ]
             }
           ],
@@ -6840,9 +6835,9 @@
               3.071,
               0.958
             ],
-            "joint_disc_swing_female,0,ds": [
+            "joint_disc_swing_female,0,swivel": [
               0,
-              3.301,
+              3.071,
               -1.061
             ]
           }
@@ -6880,9 +6875,9 @@
           "tire_only": false
         },
         {
-          "name": "joint_disc_swing_female,0,ds",
+          "name": "joint_disc_swing_female,0,swivel",
           "direction": 0,
-          "layer": "ds",
+          "layer": "swivel",
           "tire_only": false
         }
       ]
@@ -7366,7 +7361,8 @@
           "layer": "sh",
           "tire_only": false
         }
-      ]
+      ],
+      "not_on_swivel": true
     },
     "VTS": {
       "name": "Vinyl Tire Swing",
@@ -7603,26 +7599,26 @@
       "files": [
         {
           "layer": "b8",
-          "file": "DS-KR__b8.3cff755d.glb",
-          "bytes": 45816,
+          "file": "DS-KR__b8.7d32a703.glb",
+          "bytes": 45820,
           "joints": [
-            "joint,0,ds"
+            "joint,0,swivel"
           ],
           "sockets": [
             {
               "marker": [
                 0,
-                2.673,
+                2.443,
                 0
               ],
               "accepts": [
-                "ds"
+                "swivel"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint,0,ds"
+                "joint,0,swivel"
               ]
             }
           ],
@@ -7639,35 +7635,35 @@
             ]
           ],
           "joint_positions": {
-            "joint,0,ds": [
+            "joint,0,swivel": [
               0,
-              2.673,
+              2.443,
               0
             ]
           }
         },
         {
           "layer": "b10",
-          "file": "DS-KR__b10.f64d8f8e.glb",
-          "bytes": 45828,
+          "file": "DS-KR__b10.7b497372.glb",
+          "bytes": 45832,
           "joints": [
-            "joint,0,ds"
+            "joint,0,swivel"
           ],
           "sockets": [
             {
               "marker": [
                 0,
-                3.314,
+                3.084,
                 0
               ],
               "accepts": [
-                "ds"
+                "swivel"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint,0,ds"
+                "joint,0,swivel"
               ]
             }
           ],
@@ -7684,9 +7680,9 @@
             ]
           ],
           "joint_positions": {
-            "joint,0,ds": [
+            "joint,0,swivel": [
               0,
-              3.314,
+              3.084,
               0
             ]
           }
@@ -7694,15 +7690,15 @@
       ],
       "joints": [
         {
-          "name": "joint,0,ds",
+          "name": "joint,0,swivel",
           "direction": 0,
-          "layer": "ds",
+          "layer": "swivel",
           "tire_only": false
         },
         {
-          "name": "joint,0,ds",
+          "name": "joint,0,swivel",
           "direction": 0,
-          "layer": "ds",
+          "layer": "swivel",
           "tire_only": false
         }
       ]

@@ -2078,9 +2078,11 @@
        * fourth clause ends up in two of them. Stated once:
        *
        *   equal   the ordinary case, which is every named socket -- `s`, `sh`,
-       *           `toy`, `end_rail`, and `ds`, the disc-swing hanger. A disc
-       *           swing carries `ds` on both its joints, so equality is all it
-       *           has ever needed.
+       *           `toy`, `end_rail` and the rest
+       *   swivel  the Extended Beam's swivel hangers, which take any swing:
+       *           `s`, `sh` (the Bird's Nest) and, by equality, the Disc
+       *           Swing, which hangs nowhere else. The Horse Glider is kept
+       *           off by Swivel_allows, not here
        *   deck    parts that fit any deck height — bridges, tunnels, the bubble
        *           panel and the tic-tac-toe board, which span or fill a deck
        *           opening whatever height it is at
@@ -2193,6 +2195,7 @@
        */
       const Layers_connect = (plug_layer, host_layer) => {
         if (plug_layer === host_layer) return true;
+        if (host_layer === "swivel") return plug_layer === "s" || plug_layer === "sh";
         if (plug_layer === "deck") return Is_deck_layer(host_layer);
         if (host_layer === "deck") return Is_deck_layer(plug_layer);
         return false;
@@ -2305,8 +2308,28 @@
       const Tire_rule_holds = (plug_joint, host_joint) => {
         if (host_joint.tire_only) return Has_tire_variant(plug_joint.model);
         if (plug_joint.tire_only) return Has_tire_variant(host_joint.model);
-        if (Has_tire_variant(plug_joint.model)) return false;
+        // The Extended Beam's swivel hangers are the one other place it goes.
+        if (Has_tire_variant(plug_joint.model)) return host_joint.layer === "swivel";
         return true;
+      };
+
+      /**
+       * A swivel hanger takes any swing but one that must not spin.
+       *
+       * The Extended Beam's swivel hangers take every swing in the catalog --
+       * the tire, disc and bird's nest swings included -- except the Horse
+       * Glider, which rocks on fixed pivots. Which parts those are is data:
+       * `not_on_swivel` in tools/sockets.config.json, carried to the product
+       * in the manifest.
+       */
+      const Swivel_allows = (plug_joint, host_joint) => {
+        if (host_joint.layer !== "swivel") return true;
+        const model = plug_joint.model;
+        const entry =
+          modelManifest && model && model.object_id
+            ? modelManifest.products[model.object_id]
+            : null;
+        return !(entry && entry.not_on_swivel);
       };
 
       /**
@@ -2323,6 +2346,7 @@
       const Joints_connect = (plug_joint, host_joint) =>
         Layers_connect(plug_joint.layer, host_joint.layer) &&
         Tire_rule_holds(plug_joint, host_joint) &&
+        Swivel_allows(plug_joint, host_joint) &&
         Deck_heights_agree(plug_joint, host_joint) &&
         Deck_mount_meets_a_tower(plug_joint, host_joint) &&
         Category_allows(plug_joint.model, host_joint.model);
@@ -2342,7 +2366,7 @@
        */
       const Morph_target_for = (host_joint) => {
         if (host_joint.tire_only) return "tire";
-        if (["s", "sh", "ds"].includes(host_joint.layer)) {
+        if (["s", "sh", "swivel"].includes(host_joint.layer)) {
           const first = host_joint.model && host_joint.model.joints[0];
           return first ? first.layer : null;
         }
@@ -6499,14 +6523,10 @@
        * Fit the parts a product comes with.
        *
        * A tower arrives with a super scope and a steering wheel already on it,
-       * which is how they are sold, and a disc swing beam arrives with the
-       * disc swing. Any of them can be deleted like anything else: a fitting
-       * rests on its host, so removing one takes only that one.
-       *
-       * The disc swing is the clearest case for this. The hanger on the end of
-       * that beam takes exactly one part in the whole catalog, so shipping the
-       * beam bare only ever meant a second click to reach a foregone
-       * conclusion.
+       * which is how they are sold. Either can be deleted like anything else:
+       * a fitting rests on its host, so removing one takes only that one.
+       * (The Extended Beam used to arrive with a disc swing; it is sold bare
+       * now that its swivel hangers take any swing.)
        *
        * Each goes on the mount it was modelled for. Scope and wheel mounts
        * share a layer now, but they are not interchangeable: on the DX Play
@@ -6528,10 +6548,9 @@
        * Not re-entrant, and it has to say so itself. Fitting a part goes
        * through Attach_plug_to, which calls back here for the thing just
        * placed — so a part that carries the layer it is fitted to would fit
-       * one to itself for ever. The disc swing is exactly that shape: two `ds`
-       * joints, one of which is still free once it is hanging. This used to be
-       * covered by only ever fitting free-standing hosts, which is no longer
-       * true now a beam brings its swing.
+       * one to itself for ever. The disc swing, when it was fitted to its beam,
+       * was exactly that shape. Kept, because the guard costs nothing and the
+       * next fitting may be shaped the same way.
        */
       let fitting_defaults = false;
       const Fit_default_parts = (model) => {
@@ -9530,6 +9549,10 @@
         let html = "";
         for (const part of shown) {
           const object_id = (part.child.model && part.child.model.object_id) || "";
+          // object-mapping.json is fetched fresh; categories.js is a script
+          // a browser may hold on to, so a renamed part kept its old name on
+          // the tile for returning visitors.
+          const name = (object_id && getObjectInfoById(object_id).objectName) || part.child.name;
           html +=
             '<div class="part-tile" data-object-id="' +
             Escape_html(object_id) +
@@ -9538,7 +9561,7 @@
             '" data-item-index="' +
             part.child.index +
             '" title="' +
-            Escape_html(part.child.name) +
+            Escape_html(name) +
             " — " +
             Escape_html(part.name) +
             '">' +
@@ -9546,7 +9569,7 @@
             part.child.thumbnail +
             '"/>' +
             '<div class="part-tile-text">' +
-            Escape_html(part.child.name) +
+            Escape_html(name) +
             "</div>" +
             "</div>";
         }
