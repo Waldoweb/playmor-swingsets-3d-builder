@@ -677,7 +677,10 @@
       .custom-controls-color-poly,
       .custom-controls-color-frame,
       .custom-controls-color-trim,
-      .custom-controls-color-toy { display: flex; gap: 6px; }
+      .custom-controls-color-toy,
+      .custom-controls-color-mulch { display: flex; gap: 6px; }
+      .custom-controls-color-mulch .custom-controls-color { background-size: cover; background-position: center; }
+      .custom-controls-color.selected { border-color: #fff; box-shadow: 0 0 0 2px rgba(206, 3, 12, 0.8); }
       .custom-controls-color {
         width: 34px;
         height: 34px;
@@ -1477,17 +1480,7 @@
       }
       .menu-row:hover { background: rgba(255, 255, 255, 0.06); }
       .menu-row .grow { flex: 1 1 auto; }
-      .menu-row.menu-slider { cursor: default; }
-      .menu-row.menu-slider:hover { background: transparent; }
       .menu-rule { height: 1px; background: rgba(255, 255, 255, 0.12); margin: 6px 14px; }
-      .menu-title {
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.55);
-        padding: 8px 14px 2px 14px;
-      }
       .switch {
         width: 36px;
         height: 20px;
@@ -1509,25 +1502,13 @@
         transition: left 0.2s ease;
       }
       .switch.on .knob { left: 18px; }
-      /* The sliders stand down while the bed sizes itself. */
-      .menu-slider-label { width: 52px; font-size: 13px; }
-      .menu-slider-value { width: 32px; font-size: 12px; text-align: right; opacity: 0.8; }
-      .menu-slider .slider { flex: 1 1 auto; width: auto; margin: 0; }
-      #mulch_menu.auto .menu-slider { opacity: 0.45; }
-      .menu-swatches { gap: 10px; min-height: 48px; }
-      .swatch {
-        width: 36px;
-        height: 36px;
-        border-radius: 18px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        background-size: cover;
-        background-position: center;
-        padding: 0;
-        cursor: pointer;
-        transition: border-color 0.15s ease, transform 0.15s ease;
-      }
-      .swatch:hover { transform: scale(1.06); }
-      .swatch.selected { border-color: #fff; box-shadow: 0 0 0 2px rgba(206, 3, 12, 0.8); }
+      /* The bed's size rows in the selection toolbar. The sliders stand
+         down while the bed sizes itself. */
+      .mulch-auto { display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; user-select: none; }
+      .mulch-dim .slider { width: 160px; margin: 0; }
+      .mulch-dim-value { width: 32px; font-size: 12px; text-align: right; opacity: 0.8; }
+      #mulch-size-section.auto .mulch-dim { opacity: 0.45; }
+      #mulch-size-section .custom-controls-row { margin-top: 6px; }
 
       #top_actions {
         position: fixed;
@@ -1773,26 +1754,6 @@
             <div class="menu-row" id="menu_fit" role="menuitem" tabindex="0"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true" ><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"></path></svg><span class="grow">Fit whole set in view</span></div>
           </div>
         </div>
-        <div class="pill-menu">
-          <button class="pill" id="pill_mulch" type="button" title="The mulch bed under the set" aria-haspopup="true" aria-expanded="false"><svg class="" viewBox="0 0 24 24" aria-hidden="true" ><rect x="3" y="6" width="18" height="12" rx="1"></rect></svg><span class="pill-label">Mulch</span><svg class="pill-chevron" viewBox="0 0 24 24" aria-hidden="true" ><path d="m6 9 6 6 6-6"></path></svg></button>
-          <div class="menu" id="mulch_menu" role="menu" hidden>
-            <div class="menu-row" id="menu_mulch_enabled" role="menuitemcheckbox" tabindex="0"><span class="grow">Show mulch bed</span><span class="switch" id="switch_mulch"><span class="knob"></span></span></div>
-            <div class="menu-row" id="menu_mulch_auto" role="menuitemcheckbox" tabindex="0" title="Size the bed to the set and keep the set centred in it"><span class="grow">Size it to the set</span><span class="switch" id="switch_auto"><span class="knob"></span></span></div>
-            <div class="menu-row menu-slider" id="menu_mulch_length"><span class="menu-slider-label">Length</span><input type="range" min="5" max="50" value="10" class="slider" id="mulch_length_slider" aria-label="Mulch bed length" /><span class="menu-slider-value" id="mulch_length_value">33'</span></div>
-            <div class="menu-row menu-slider" id="menu_mulch_width"><span class="menu-slider-label">Width</span><input type="range" min="5" max="50" value="10" class="slider" id="mulch_width_slider" aria-label="Mulch bed width" /><span class="menu-slider-value" id="mulch_width_value">33'</span></div>
-            <div class="menu-rule"></div>
-            <div class="menu-title">Mulch</div>
-            <div class="menu-row menu-swatches">
-              <button type="button" class="swatch" id="mulch-options-material-left" title="Rubber mulch" style="background-image: url('images/image_315c775f.png')"></button>
-              <button type="button" class="swatch" id="mulch-options-material-right" title="Blue rubber mulch" style="background-image: url('images/image_a7e75c5a.png')"></button>
-            </div>
-            <div class="menu-title">Curb</div>
-            <div class="menu-row menu-swatches">
-              <button type="button" class="swatch" id="mulch-options-crub-left" title="Timber curb" style="background-image: url('images/image_53984dfc.png')"></button>
-              <button type="button" class="swatch" id="mulch-options-crub-right" title="Coloured curb" style="background-image: url('images/image_20799396.png')"></button>
-            </div>
-          </div>
-        </div>
         <div class="pill-sep"></div>
         <button class="pill" id="pill_help" type="button" title="How to use the builder"><svg class="" viewBox="0 0 24 24" aria-hidden="true" ><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.7"></path><path d="M12 17h.01"></path></svg><span class="pill-label">Help</span></button>
       </div>
@@ -1880,6 +1841,30 @@
               <div class="custom-controls-color-poly"></div>
             </div>
           </div>
+          <!-- The mulch or the border round it, when one of those is clicked. -->
+          <div class="custom-controls-row" id="mulch-section" style="display: none;">
+            <div class="custom-controls-text">Style</div>
+            <div class="custom-controls-color-mulch"></div>
+          </div>
+          <!-- Showing and sizing the bed: only on the mulch itself, not its border. -->
+          <div id="mulch-size-section" style="display: none;">
+            <div class="custom-controls-row">
+              <div class="custom-controls-text">Bed</div>
+              <div class="mulch-auto" id="mulch_show_row" role="switch" tabindex="0" title="Show or hide the mulch bed. Click the ground under the set to bring this back."><span class="switch" id="switch_mulch"><span class="knob"></span></span><span>Show mulch bed</span></div>
+            </div>
+            <div class="custom-controls-row">
+              <div class="custom-controls-text">Size</div>
+              <div class="mulch-auto" id="mulch_auto_row" role="switch" tabindex="0" title="Size the bed to the set and keep the set centred in it"><span class="switch" id="switch_auto"><span class="knob"></span></span><span>Fit to the set</span></div>
+            </div>
+            <div class="custom-controls-row mulch-dim">
+              <div class="custom-controls-text">Length</div>
+              <input type="range" min="3" max="50" value="10" class="slider" id="mulch_length_slider" aria-label="Mulch bed length" /><span class="mulch-dim-value" id="mulch_length_value">33'</span>
+            </div>
+            <div class="custom-controls-row mulch-dim">
+              <div class="custom-controls-text">Width</div>
+              <input type="range" min="3" max="50" value="10" class="slider" id="mulch_width_slider" aria-label="Mulch bed width" /><span class="mulch-dim-value" id="mulch_width_value">33'</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1952,7 +1937,7 @@
           <ul>
             <li><b>Undo</b> steps back one change. <b>Reset</b> clears the yard.</li>
             <li><b>Open</b> and <b>Save</b> keep a design as a file on your computer. <b>Catalog</b> starts from one of our sets.</li>
-            <li><b>Parts</b> lists everything in the design. <b>View</b> and <b>Mulch</b> hold the scene and the mulch bed settings.</li>
+            <li><b>Parts</b> lists everything in the design. <b>View</b> holds the scene settings. Click the mulch or its border to change its style, size, or hide it; click the ground under the set to bring it back.</li>
           </ul>
           <p>When you are happy with it, press <b>Get a Quote</b> and we will take it from there.</p>
         </div>
@@ -3436,10 +3421,10 @@
       }
       class Mulch {
         // The bed's default footprint, in scene units (metres), and how far
-        // it reaches past the set when it is sized automatically. Six feet
-        // is the use zone the safety guidance asks for around a playset.
+        // it reaches past the set when it is sized automatically: three feet
+        // on every side.
         static default_size = 10;
-        static margin = 6 / Meters2Feet;
+        static margin = 3 / Meters2Feet;
 
         constructor(args) {
           this.width = Mulch.default_size;
@@ -3650,8 +3635,10 @@
               const middle = new THREE.Vector3();
               box.getSize(size);
               box.getCenter(middle);
-              width = round(Math.max(Mulch.default_size / 2, size.x + 2 * Mulch.margin));
-              depth = round(Math.max(Mulch.default_size / 2, size.z + 2 * Mulch.margin));
+              // No floor: a lone tower gets its three feet too, rather than
+              // a 5 m bed that left it twice that.
+              width = round(size.x + 2 * Mulch.margin);
+              depth = round(size.z + 2 * Mulch.margin);
               origin.set(round(middle.x), 0, round(middle.z));
             }
           }
@@ -6076,7 +6063,8 @@
                   $("#frame-section").hide();
                   $("#roof-section").hide();
                   $("#toy-section").hide();
-                  $("#trim-section").show();
+                  $("#mulch-section, #mulch-size-section").hide();
+                            $("#trim-section").show();
                   $("#custom-controls-padding").show();
                   $("#trim-section .custom-controls-text").text("Flag");
                   
@@ -6108,10 +6096,14 @@
                   Show_unified_popup();
                 }
               } else {
+                // Missed every part. The bed under the set is the next thing
+                // the click could be for: its mulch or its border.
+                const surface = Mulch_hit();
                 Deselect_all();
                 picked_mesh = null;
                 Hide_options();
                 Offer_replacements(null);
+                if (surface) Show_mulch_options(surface);
               }
             }
             break;
@@ -6777,14 +6769,18 @@
       // stands down until the checkbox turns it back on.
       mulch_length_slider.oninput = (args) => {
         if (!mulch) return;
+        // Read first: turning auto off syncs the sliders to the bed's size.
+        const depth = parseInt(mulch_length_slider.value);
         Set_mulch_auto(false);
-        mulch.build({ depth: parseInt(mulch_length_slider.value) });
+        mulch.build({ depth });
         Sync_mulch_panel();
       };
       mulch_width_slider.oninput = (args) => {
         if (!mulch) return;
+        // Read first: turning auto off syncs the sliders to the bed's size.
+        const width = parseInt(mulch_width_slider.value);
         Set_mulch_auto(false);
-        mulch.build({ width: parseInt(mulch_width_slider.value) });
+        mulch.build({ width });
         Sync_mulch_panel();
       };
 
@@ -9739,7 +9735,6 @@
         pill.setAttribute("aria-expanded", "true");
       };
       $("#pill_view").on("click", () => Toggle_menu(pill_view, view_menu));
-      $("#pill_mulch").on("click", () => Toggle_menu(pill_mulch, mulch_menu));
       // A click anywhere else puts a menu away. Captured, so the canvas's own
       // pointer handling does not swallow it.
       document.addEventListener(
@@ -9751,7 +9746,7 @@
       );
       // Rows are divs so a switch can sit inside them; Enter and Space still
       // press them.
-      $("#view_menu .menu-row, #mulch_menu .menu-row").on("keydown", (event) => {
+      $("#view_menu .menu-row, #mulch_auto_row, #mulch_show_row").on("keydown", (event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
           event.currentTarget.click();
@@ -9776,22 +9771,18 @@
         Close_menus();
       });
 
-      /** The Mulch menu shows what the bed is actually doing. */
+      /** The mulch switch and the bed's toolbar show what the bed is doing. */
       const Feet = (metres) => Math.round(metres * Meters2Feet) + "'";
       const Sync_mulch_panel = () => {
         switch_mulch.classList.toggle("on", !!mulch_enabled);
         const auto = !!(mulch && mulch.auto);
         switch_auto.classList.toggle("on", auto);
-        mulch_menu.classList.toggle("auto", auto);
+        $("#mulch-size-section").toggleClass("auto", auto);
         if (!mulch) return;
         mulch_length_slider.value = Math.round(mulch.depth);
         mulch_width_slider.value = Math.round(mulch.width);
         mulch_length_value.textContent = Feet(mulch.depth);
         mulch_width_value.textContent = Feet(mulch.width);
-        $("#mulch-options-material-left").toggleClass("selected", mulch.plane_texture_index === 0);
-        $("#mulch-options-material-right").toggleClass("selected", mulch.plane_texture_index === 1);
-        $("#mulch-options-crub-left").toggleClass("selected", mulch.bounds_texture_index === 0);
-        $("#mulch-options-crub-right").toggleClass("selected", mulch.bounds_texture_index === 1);
       };
       /** Hand the bed's size to the app, or take it back. */
       const Set_mulch_auto = (auto) => {
@@ -9800,29 +9791,82 @@
         if (auto) mulch.fit();
         Sync_mulch_panel();
       };
-      $("#menu_mulch_enabled").on("click", () => {
+      $("#mulch_show_row").on("click", () => {
         mulch_enabled = !mulch_enabled;
         Sync_mulch_panel();
       });
-      $("#menu_mulch_auto").on("click", () => {
+      $("#mulch_auto_row").on("click", () => {
         if (mulch) Set_mulch_auto(!mulch.auto);
       });
-      $("#mulch-options-material-left").on("click", () => {
-        if (mulch) mulch.build({ plane_texture_index: 0 });
+      /**
+       * The styles the bed offers, per surface. Clicking the mulch or the
+       * border brings up that surface's choices in the selection toolbar;
+       * they used to sit at the foot of the Mulch menu, out of sight of the
+       * thing they change.
+       */
+      const Mulch_styles = {
+        mulch: {
+          name: "Mulch",
+          key: "plane_texture_index",
+          options: [
+            { title: "Rubber mulch", image: "images/image_315c775f.png" },
+            { title: "Blue rubber mulch", image: "images/image_a7e75c5a.png" },
+          ],
+        },
+        border: {
+          name: "Border",
+          key: "bounds_texture_index",
+          options: [
+            { title: "Timber border", image: "images/image_53984dfc.png" },
+            { title: "Colored border", image: "images/image_20799396.png" },
+          ],
+        },
+      };
+
+      /**
+       * Which surface of the bed is under the pointer, if any.
+       *
+       * A hidden bed still answers -- the raycast does not care that it is
+       * not drawn -- so clicking the bare ground under the set brings up the
+       * mulch options, which is the way to show it again. Its border is not
+       * there to see then, so the whole footprint counts as the mulch.
+       */
+      const Mulch_hit = () => {
+        if (!mulch || !mulch.meshes.length) return null;
+        const hits = raycaster.intersectObjects(mulch.meshes, false);
+        if (!hits.length) return null;
+        if (!mulch_enabled) return "mulch";
+        // The plane is built last; the four curbs before it.
+        return hits[0].object === mulch.meshes[mulch.meshes.length - 1] ? "mulch" : "border";
+      };
+
+      const Show_mulch_options = (kind) => {
+        const styles = Mulch_styles[kind];
+        selection_name.textContent = styles.name;
+        $("#custom-controls-delete").hide();
+        $("#frame-section, #roof-section, #trim-section, #toy-section").hide();
+        $(".custom-controls-color-mulch").html(
+          styles.options
+            .map(
+              (option, index) =>
+                `<div onclick="Change_mulch_style('${kind}', ${index})" class="custom-controls-color${
+                  mulch[styles.key] === index ? " selected" : ""
+                }" style="background-image: url('${option.image}')" title="${option.title}"></div>`
+            )
+            .join("")
+        );
+        $("#mulch-section").show();
+        $("#mulch-size-section").toggle(kind === "mulch");
         Sync_mulch_panel();
-      });
-      $("#mulch-options-material-right").on("click", () => {
-        if (mulch) mulch.build({ plane_texture_index: 1 });
-        Sync_mulch_panel();
-      });
-      $("#mulch-options-crub-left").on("click", () => {
-        if (mulch) mulch.build({ bounds_texture_index: 0 });
-        Sync_mulch_panel();
-      });
-      $("#mulch-options-crub-right").on("click", () => {
-        if (mulch) mulch.build({ bounds_texture_index: 1 });
-        Sync_mulch_panel();
-      });
+        $("#custom-controls-padding").show();
+        $(".custom-controls-unified").css("display", "flex");
+      };
+
+      const Change_mulch_style = (kind, index) => {
+        if (!mulch) return;
+        mulch.build({ [Mulch_styles[kind].key]: index });
+        Show_mulch_options(kind);
+      };
       $("#custom-controls-delete").on("click", (event) => {
         // Hide color options popup immediately when delete is pressed
         Hide_options();
@@ -10239,7 +10283,8 @@
         $("#roof-section").hide();
         $("#trim-section").hide();
         $("#toy-section").hide();
-        
+        $("#mulch-section, #mulch-size-section").hide();
+
         const visibleSections = [];
 
         
@@ -10391,6 +10436,7 @@
         $(".custom-controls").css("display", "none");
         $(".custom-controls-roof").css("display", "none");
         $(".custom-controls-unified").css("display", "none");
+        $("#mulch-section, #mulch-size-section").hide();
 
         Deselect_all();
       };
