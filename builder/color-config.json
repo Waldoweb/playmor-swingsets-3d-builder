@@ -33,6 +33,10 @@
         "type": "solid",
         "color": "@white",
         "label": "White"
+      },
+      "cedar": {
+        "type": "natural",
+        "label": "Cedar (Premium)"
       }
     },
     "roof_canopy_colors": {

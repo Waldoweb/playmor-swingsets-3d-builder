@@ -727,6 +727,11 @@
         border: 2px solid white;
       }
 
+      .cedar-solid {
+        background: #8B4513;
+        border: 2px solid white;
+      }
+
       #info-modal-container {
         display: none;
         position: absolute;
@@ -8017,6 +8022,34 @@
         return !!(objectConfig && objectConfig.sections && objectConfig.sections.includes("frame") && objectConfig.frame_meshes);
       };
 
+      /**
+       * The board's own texture, kept the first time a frame colour touches
+       * it. Kept even when it is none: a tan board has no texture, and must
+       * not keep the cedar one Cedar (Premium) lends it.
+       */
+      const Original_map = (material) => {
+        if (!("_originalMap" in material)) material._originalMap = material.map;
+        return material._originalMap;
+      };
+
+      /**
+       * The cedar wood texture for a part's tan boards under Cedar (Premium):
+       * the part's own cedar board's, or, for a part with no cedar board (the
+       * bridge, the kit's sandbox), any other part's in the yard.
+       */
+      const Cedar_map = (model) => {
+        for (const candidate of [model, ...models_with_available_joints]) {
+          if (!candidate.mesh || !candidate.object_id) continue;
+          const cedar_meshes = getObjectInfoById(candidate.object_id).objectConfig?.frame_meshes?.cedar_meshes || [];
+          let map = null;
+          candidate.mesh.traverse((mesh) => {
+            if (!map && mesh.material && cedar_meshes.includes(mesh.name)) map = Original_map(mesh.material);
+          });
+          if (map) return map;
+        }
+        return null;
+      };
+
       const Apply_frame_color = (model, color) => {
         model.frame_color = color;
         
@@ -8049,11 +8082,8 @@
           
           model.mesh.traverse((mesh) => {
             if (mesh.material && mesh.material.color) {
-              // Save original map if not already saved
-              if (!mesh.material._originalMap && mesh.material.map) {
-                mesh.material._originalMap = mesh.material.map;
-              }
-              
+              Original_map(mesh.material);
+
               // Check if mesh matches cedar mesh patterns
               let isCedarMesh = cedarMeshes.some(pattern => 
                 mesh.name === pattern
@@ -8066,8 +8096,8 @@
               
               if (isCedarMesh) {
                 // Cedar meshes should be white color to represent natural cedar
-                mesh.material.color.setHex(0xffffff); // Set to white for cedar
-                mesh.material.emissive.setHex(0x000000); // Reset emissive
+                mesh.material.color = new THREE.Color(0xffffff); // Set to white for cedar
+                mesh.material.emissive = new THREE.Color(0x000000); // Reset emissive
                 mesh.material.emissiveIntensity = 0; // Reset emissive intensity
                 // Restore original texture map for natural wood appearance
                 if (mesh.material._originalMap) {
@@ -8075,6 +8105,8 @@
                 }
                 mesh.material.needsUpdate = true;
               } else if (isTanMesh) {
+                // Its own texture back, if it had one: not Cedar (Premium)'s
+                mesh.material.map = mesh.material._originalMap;
                 // Override map color while keeping texture style for tan
                 if (mesh.material.map) {
                   mesh.material.color = tanColor;
@@ -8087,8 +8119,30 @@
               }
             }
           });
+        } else if (frameColorConfig.type === 'natural') {
+          // Cedar (Premium): every board in cedar wood, as the cedar boards
+          // are under Cedar/Tan. Cedar boards keep their own texture; tan
+          // boards borrow it. With no texture to hand, flat cedar.
+          const objectFrameMeshes = objectConfig?.frame_meshes;
+          if (!objectFrameMeshes?.all_meshes) {
+            console.error("Object-specific all_meshes required for cedar:", objectName);
+            return;
+          }
+          const cedarMeshes = objectFrameMeshes.cedar_meshes || [];
+          const cedarMap = Cedar_map(model);
+
+          model.mesh.traverse((mesh) => {
+            if (!mesh.material || !mesh.material.color || !objectFrameMeshes.all_meshes.includes(mesh.name)) return;
+            const ownMap = Original_map(mesh.material);
+            const map = cedarMeshes.includes(mesh.name) && ownMap ? ownMap : cedarMap;
+            mesh.material.map = map;
+            mesh.material.color = new THREE.Color(map ? 0xffffff : colorConfig.constants.colors.cedar);
+            mesh.material.emissive = new THREE.Color(0x000000);
+            mesh.material.emissiveIntensity = 0;
+            mesh.material.needsUpdate = true;
+          });
         } else {
-          // Handle solid colors (cedar, tan, white)
+          // Handle solid colors (white)
           let colorValue = frameColorConfig.color.replace('@', '');
           let colorHex = new THREE.Color(colorConfig.constants.colors[colorValue]);
           
@@ -8104,9 +8158,8 @@
           
           model.mesh.traverse((mesh) => {
             if (mesh.material && mesh.material.color) {
-              // Save original map if not already saved
-              mesh.material._originalMap = mesh.material.map;
-              
+              Original_map(mesh.material);
+
               // Check if mesh matches any of the frame mesh patterns
               let isFrameMesh = meshNames.some(pattern => 
                 mesh.name ===pattern
@@ -8116,6 +8169,8 @@
                 // For solid colors, remove map and apply color
                 mesh.material.map = null;
                 mesh.material.color = colorHex;
+                mesh.material.emissive = new THREE.Color(0x000000);
+                mesh.material.emissiveIntensity = 0;
                 mesh.material.needsUpdate = true;
               }
             }
@@ -10326,6 +10381,9 @@
                 if (colorData.type === "split") {
                   // Cedar/Tan split color
                   frameHtml += `<div onclick="Change_frame_color('cedar_tan')" class="custom-controls-color cedar-tan-split" title="${colorData.label}"></div>`;
+                } else if (colorData.type === "natural") {
+                  // Cedar (Premium): cedar wood on every board
+                  frameHtml += `<div onclick="Change_frame_color('${key}')" class="custom-controls-color cedar-solid" title="${colorData.label}"></div>`;
                 } else if (colorData.type === "solid") {
                   // Solid color like white
                   frameHtml += `<div onclick="Change_frame_color('${key}')" class="custom-controls-color" style="background-color: ${colorData.color}" title="${colorData.label}"></div>`;
