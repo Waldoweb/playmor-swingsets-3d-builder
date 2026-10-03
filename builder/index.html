@@ -1745,7 +1745,13 @@
         <button class="pill" id="pill_reset" type="button" title="Clear the yard and start again"><svg class="" viewBox="0 0 24 24" aria-hidden="true" ><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg><span class="pill-label">Reset</span></button>
         <div class="pill-sep"></div>
         <button class="pill" id="pill_open" type="button" title="Open a design you saved earlier"><svg class="" viewBox="0 0 24 24" aria-hidden="true" ><path d="M12 3v12"></path><path d="m7 8 5-5 5 5"></path><path d="M4 21h16"></path></svg><span class="pill-label">Open</span></button>
-        <button class="pill" id="pill_save" type="button" title="Save this design to a file you can open later"><svg class="" viewBox="0 0 24 24" aria-hidden="true" ><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M4 21h16"></path></svg><span class="pill-label">Save</span></button>
+        <div class="pill-menu">
+          <button class="pill" id="pill_save" type="button" title="Save this design as a file or a PDF" aria-haspopup="true" aria-expanded="false"><svg class="" viewBox="0 0 24 24" aria-hidden="true" ><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M4 21h16"></path></svg><span class="pill-label">Save</span><svg class="pill-chevron" viewBox="0 0 24 24" aria-hidden="true" ><path d="m6 9 6 6 6-6"></path></svg></button>
+          <div class="menu" id="save_menu" role="menu" hidden>
+            <div class="menu-row" id="menu_save_design" role="menuitem" tabindex="0" title="A file you can open here again later"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true" ><path d="M14 3H6v18h12V7z"></path><path d="M14 3v4h4"></path></svg><span class="grow">Design file</span></div>
+            <div class="menu-row" id="menu_save_pdf" role="menuitem" tabindex="0" title="A picture of each side and the parts list"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true" ><path d="M6 9V3h12v6"></path><rect x="3" y="9" width="18" height="8" rx="1"></rect><path d="M6 14h12v7H6z"></path></svg><span class="grow">PDF</span></div>
+          </div>
+        </div>
         <button class="pill" id="pill_catalog" type="button" title="Start from one of our catalogue sets"><svg class="" viewBox="0 0 24 24" aria-hidden="true" ><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 10h18"></path></svg><span class="pill-label">Catalog</span></button>
         <div class="pill-sep"></div>
         <button class="pill" id="pill_parts" type="button" title="Every part in this design"><svg class="" viewBox="0 0 24 24" aria-hidden="true" ><path d="M8 6h13M8 12h13M8 18h13"></path><path d="M3 6h.01M3 12h.01M3 18h.01"></path></svg><span class="pill-label">Parts</span><span class="pill-count" id="parts_count">0</span></button>
@@ -1941,7 +1947,7 @@
           <h3>The strip at the top</h3>
           <ul>
             <li><b>Undo</b> steps back one change. <b>Reset</b> clears the yard.</li>
-            <li><b>Open</b> and <b>Save</b> keep a design as a file on your computer. <b>Catalog</b> starts from one of our sets.</li>
+            <li><b>Open</b> and <b>Save</b> keep a design as a file on your computer; <b>Save</b> can also make a PDF with a picture of each side and the parts list. <b>Catalog</b> starts from one of our sets.</li>
             <li><b>Parts</b> lists everything in the design. <b>View</b> holds the scene settings. Click the mulch or its border to change its style, size, or hide it; click the ground under the set to bring it back.</li>
           </ul>
           <p>When you are happy with it, press <b>Get a Quote</b> and we will take it from there.</p>
@@ -8702,11 +8708,29 @@
         try {
           throbber.style.display = "block";
 
-          // Generate PDF with parts list
-          const pdf = await generatePartsPDF();
+          // A frame for the throbber to show before the renders hold the page.
+          await new Promise((resolve) => setTimeout(resolve, 50));
+
+          // The four sides, rendered once: small in the email itself, a
+          // little larger in the attached PDF.
+          const views = Render_side_views();
+          const parts = Grouped_part_list();
+          const pdf = await Build_design_pdf({
+            views,
+            parts,
+            quality: Pdf_quality.email,
+            customer: {
+              name: first_name.value + " " + last_name.value,
+              email: email.value,
+              phone: phone_number.value,
+              zip: zip_code.value,
+              notes: notes.value,
+            },
+          });
           const pdfBase64 = pdf.output('datauristring').split(',')[1]; // Remove data:application/pdf;base64,
 
-          // Prepare data for PHP backend
+          // Prepare data for PHP backend. The parts go without their
+          // thumbnails, which the email does not use.
           const emailData = {
             first_name: first_name.value,
             last_name: last_name.value,
@@ -8714,9 +8738,12 @@
             phone_number: phone_number.value,
             zip_code: zip_code.value,
             notes: notes.value,
-            design_image: email_scene_snapshot,
+            design_images: views.map((view, i) => ({
+              label: Side_views[i].name,
+              image: Jpeg(view, 560, 0.72),
+            })),
             parts_pdf: pdfBase64,
-            part_list: part_list,
+            part_list: parts.map(({ name, options, count }) => ({ name, options, count })),
             blueprint_json: blueprint.get_snapshot()
           };
 
@@ -8763,126 +8790,6 @@
         }
       };
       
-      const generatePartsPDF = async () => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        
-        // Header
-        doc.setFontSize(20);
-        doc.text('Yard Designer - Quote Request', 20, 30);
-        
-        // Customer info
-        doc.setFontSize(12);
-        let yPos = 50;
-        doc.text(`Customer: ${first_name.value} ${last_name.value}`, 20, yPos);
-        yPos += 10;
-        doc.text(`Email: ${email.value}`, 20, yPos);
-        yPos += 10;
-        doc.text(`Phone: ${phone_number.value}`, 20, yPos);
-        yPos += 10;
-        doc.text(`Zip Code: ${zip_code.value}`, 20, yPos);
-        yPos += 20;
-        
-        if (notes.value) {
-          doc.text(`Notes: ${notes.value}`, 20, yPos);
-          yPos += 20;
-        }
-        
-        // Design Preview Image
-        doc.setFontSize(14);
-        doc.text('Design Preview:', 20, yPos);
-        yPos += 10;
-        
-        // Add the design image to PDF
-        if (email_scene_snapshot) {
-          try {
-            // Calculate image dimensions to fit on page
-            const maxWidth = 170;  // Max width in PDF units
-            const maxHeight = 100; // Max height in PDF units
-            
-            doc.addImage(email_scene_snapshot, 'JPEG', 20, yPos, maxWidth, maxHeight);
-            yPos += maxHeight + 20; // Move position down after image
-            
-            // Start new page if needed
-            if (yPos > 200) {
-              doc.addPage();
-              yPos = 20;
-            }
-          } catch (error) {
-            console.log('Could not add image to PDF:', error);
-            doc.text('Design image could not be added to PDF', 20, yPos);
-            yPos += 20;
-          }
-        }
-        
-        // Parts list
-        doc.setFontSize(14);
-        doc.text('Parts List:', 20, yPos);
-        yPos += 10;
-        
-        doc.setFontSize(10);
-        for (let part of part_list) {
-          doc.text(`• ${part.name}`, 25, yPos);
-          yPos += 8;
-          if (part.options && part.options.length > 0) {
-            for (let option of part.options) {
-              doc.text(`  - ${option}`, 30, yPos);
-              yPos += 6;
-            }
-          }
-          yPos += 5;
-          
-          // Start new page if needed
-          if (yPos > 280) {
-            doc.addPage();
-            yPos = 20;
-          }
-        }
-        
-        return doc;
-      };
-      
-      const generatePartsListText = () => {
-        let text = `Quote Request from ${first_name.value} ${last_name.value}\n\n`;
-        text += `Contact Info:\n`;
-        text += `Email: ${email.value}\n`;
-        text += `Phone: ${phone_number.value}\n`;
-        text += `Zip Code: ${zip_code.value}\n\n`;
-        
-        if (notes.value) {
-          text += `Notes: ${notes.value}\n\n`;
-        }
-        
-        text += `Parts List:\n`;
-        for (let part of part_list) {
-          text += `• ${part.name}\n`;
-          if (part.options && part.options.length > 0) {
-            for (let option of part.options) {
-              text += `  - ${option}\n`;
-            }
-          }
-          text += `\n`;
-        }
-        
-        return text;
-      };
-      
-      const generatePartsListHTML = () => {
-        let html = '<ul style="margin: 10px 0; padding-left: 20px;">';
-        for (let part of part_list) {
-          html += `<li style="margin: 8px 0; font-weight: bold;">${part.name}`;
-          if (part.options && part.options.length > 0) {
-            html += '<ul style="margin: 5px 0; padding-left: 20px; font-weight: normal;">';
-            for (let option of part.options) {
-              html += `<li style="margin: 3px 0; color: #666;">${option}</li>`;
-            }
-            html += '</ul>';
-          }
-          html += '</li>';
-        }
-        html += '</ul>';
-        return html;
-      };
       const Color2Name = (color) => {
         let result = "Tri colored";
         let hex_color = color.getHexString().toLowerCase();
@@ -8936,16 +8843,18 @@
 
         return result;
       };
-      const Setup_email_snapshot = (args) => {
-        // The emailed picture has no parts bar over it: centre the set.
-        const shift = applied_view_shift;
-        Apply_view_shift(0);
-        renderer.setRenderTarget(email_render_target);
+      /**
+       * The scene as the canvas draws it -- ground and sky, then the parts and
+       * the mulch bed -- rendered through the given camera into a render
+       * target and read back as a 2D canvas the right way up.
+       */
+      const Snapshot = (render_target, view_camera) => {
+        renderer.setRenderTarget(render_target);
         renderer.clear();
         scene.background = white_color;
 
         if (skybox && skybox.visible) skybox.mesh.visible = true;
-        renderer.render(scene, camera);
+        renderer.render(scene, view_camera);
         if (skybox && skybox.visible) skybox.mesh.visible = false;
         scene.background = null;
         renderer.clearDepth();
@@ -8954,51 +8863,36 @@
         if (plug_model) plug_model.mesh.visible = true;
         if (mulch_enabled && mulch)
           for (let mesh of mulch.meshes) mesh.visible = true;
-        renderer.render(scene, camera);
+        renderer.render(scene, view_camera);
         if (mulch_enabled && mulch)
           for (let mesh of mulch.meshes) mesh.visible = false;
         if (plug_model) plug_model.mesh.visible = false;
         for (let mesh of picked_meshes) mesh.visible = false;
-        Apply_view_shift(shift);
 
-        let render_target_pixels = new Uint8ClampedArray(
-          4 * email_render_target.width * email_render_target.height
-        );
-        renderer.readRenderTargetPixels(
-          email_render_target,
-          0,
-          0,
-          email_render_target.width,
-          email_render_target.height,
-          render_target_pixels
-        );
-        let flipped_render_target_pixels = new Uint8ClampedArray(
-          4 * email_render_target.width * email_render_target.height
-        );
-        for (let y = 0; y < email_render_target.height; y++) {
-          for (let x = 0; x < email_render_target.width; x++) {
-            let si = y * email_render_target.width * 4 + x * 4;
-            let di =
-              (email_render_target.height - y) * email_render_target.width * 4 +
-              x * 4;
-            flipped_render_target_pixels[di + 0] = render_target_pixels[si + 0];
-            flipped_render_target_pixels[di + 1] = render_target_pixels[si + 1];
-            flipped_render_target_pixels[di + 2] = render_target_pixels[si + 2];
-            flipped_render_target_pixels[di + 3] = render_target_pixels[si + 3];
-          }
-        }
-        let imageData = new ImageData(
-          flipped_render_target_pixels,
-          email_render_target.width,
-          email_render_target.height
-        );
-        let canvas = document.createElement("canvas");
-        canvas.width = email_render_target.width;
-        canvas.height = email_render_target.height;
-        let context = canvas.getContext("2d");
-        context.putImageData(imageData, 0, 0);
-
+        const width = render_target.width;
+        const height = render_target.height;
+        const pixels = new Uint8ClampedArray(4 * width * height);
+        renderer.readRenderTargetPixels(render_target, 0, 0, width, height, pixels);
         renderer.setRenderTarget(null);
+
+        // WebGL reads bottom row first.
+        const row = 4 * width;
+        const flipped = new Uint8ClampedArray(pixels.length);
+        for (let y = 0; y < height; y++)
+          flipped.set(pixels.subarray(y * row, (y + 1) * row), (height - 1 - y) * row);
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").putImageData(new ImageData(flipped, width, height), 0, 0);
+        return canvas;
+      };
+      const Setup_email_snapshot = (args) => {
+        // The emailed picture has no parts bar over it: centre the set.
+        const shift = applied_view_shift;
+        Apply_view_shift(0);
+        const canvas = Snapshot(email_render_target, camera);
+        Apply_view_shift(shift);
 
         const snapshotCanvas = document.createElement("canvas");
         const maxSnapshotWidth = 1000;
@@ -9015,6 +8909,331 @@
 
         email_scene_snapshot = snapshotCanvas.toDataURL("image/jpeg", 0.82);
       };
+
+      /**
+       * The four sides of the set, for the PDF. Front is the side the
+       * builder opens looking at; right, back and left follow round it a
+       * quarter turn at a time, right being the viewer's right when facing
+       * the front. Each is seen from a little above, with its own camera
+       * fitted to the parts -- the mulch bed may run off the edges -- so the
+       * view on screen is not touched.
+       */
+      const Side_views = [
+        { name: "Front", turn: 0 },
+        { name: "Right side", turn: 90 },
+        { name: "Back", turn: 180 },
+        { name: "Left side", turn: 270 },
+      ];
+      const Side_view_size = { width: 1600, height: 1000 };
+      const Side_view_elevation = 12; // degrees above level
+      const Side_view_fov = 30;
+
+      /** The box round the parts as drawn: hidden roofs and beam lengths left out. */
+      const Drawn_box = () => {
+        const box = new THREE.Box3();
+        for (const root of picked_meshes) {
+          const was = root.visible;
+          root.visible = true;
+          root.updateMatrixWorld(true);
+          root.traverseVisible((node) => {
+            if (!node.isMesh || !node.geometry) return;
+            if (node.name && node.name.toLowerCase().startsWith("joint")) return;
+            if (!node.geometry.boundingBox) node.geometry.computeBoundingBox();
+            box.union(node.geometry.boundingBox.clone().applyMatrix4(node.matrixWorld));
+          });
+          root.visible = was;
+        }
+        return box;
+      };
+
+      /** Each side as a canvas Side_view_size big, in Side_views order. */
+      const Render_side_views = () => {
+        const box = Drawn_box();
+        if (box.isEmpty()) return [];
+        const target = box.getCenter(new THREE.Vector3());
+
+        // Rendered at twice the size and drawn down, for smoother edges:
+        // the renderer runs without antialiasing.
+        const max = renderer.capabilities.maxTextureSize || 4096;
+        const scale = Math.min(2, max / Side_view_size.width, max / Side_view_size.height);
+        const render_target = new THREE.WebGLRenderTarget(
+          Math.round(Side_view_size.width * scale),
+          Math.round(Side_view_size.height * scale)
+        );
+        const view_camera = new THREE.PerspectiveCamera(
+          Side_view_fov,
+          Side_view_size.width / Side_view_size.height,
+          0.1,
+          1000
+        );
+        const tan_v = Math.tan(THREE.MathUtils.degToRad(Side_view_fov / 2));
+        const tan_h = tan_v * view_camera.aspect;
+        const margin = 1.08;
+        const elevation = THREE.MathUtils.degToRad(Side_view_elevation);
+        const up = new THREE.Vector3(0, 1, 0);
+
+        const images = [];
+        for (const side of Side_views) {
+          const facing = home_facing
+            .clone()
+            .applyAxisAngle(up, THREE.MathUtils.degToRad(side.turn));
+          const direction = facing
+            .multiplyScalar(Math.cos(elevation))
+            .setY(Math.sin(elevation))
+            .normalize();
+          const forward = direction.clone().negate();
+          const right = new THREE.Vector3().crossVectors(forward, up).normalize();
+          const cam_up = new THREE.Vector3().crossVectors(right, forward);
+
+          // Far enough back that every corner of the box is in frame, as in
+          // View_all.
+          let d = 0;
+          const corner = new THREE.Vector3();
+          for (let i = 0; i < 8; i++) {
+            corner.set(
+              i & 1 ? box.max.x : box.min.x,
+              i & 2 ? box.max.y : box.min.y,
+              i & 4 ? box.max.z : box.min.z
+            ).sub(target);
+            const depth = corner.dot(direction);
+            d = Math.max(
+              d,
+              depth + (Math.abs(corner.dot(right)) * margin) / tan_h,
+              depth + (Math.abs(corner.dot(cam_up)) * margin) / tan_v
+            );
+          }
+          view_camera.position.copy(target).addScaledVector(direction, d);
+          view_camera.lookAt(target);
+          view_camera.updateMatrixWorld();
+
+          const full = Snapshot(render_target, view_camera);
+          const image = document.createElement("canvas");
+          image.width = Side_view_size.width;
+          image.height = Side_view_size.height;
+          const context = image.getContext("2d");
+          context.imageSmoothingQuality = "high";
+          context.drawImage(full, 0, 0, image.width, image.height);
+          images.push(image);
+        }
+        render_target.dispose();
+        return images;
+      };
+
+      /**
+       * The parts list for the PDF: the same part in the same colours is
+       * one row with a count.
+       */
+      const Grouped_part_list = () => {
+        const rows = [];
+        const by_key = new Map();
+        for (const part of Build_part_list()) {
+          const key = part.name + "|" + part.options.join("|");
+          const row = by_key.get(key);
+          if (row) row.count++;
+          else {
+            const added = { ...part, count: 1 };
+            by_key.set(key, added);
+            rows.push(added);
+          }
+        }
+        return rows;
+      };
+
+      /** A canvas drawn down to the given width, as a JPEG data URL. */
+      const Jpeg = (source, width, quality) => {
+        const scale = Math.min(1, width / source.width);
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(source.width * scale);
+        canvas.height = Math.round(source.height * scale);
+        const context = canvas.getContext("2d");
+        // White under a transparent part thumbnail, which JPEG cannot keep.
+        context.fillStyle = "#fff";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.imageSmoothingQuality = "high";
+        context.drawImage(source, 0, 0, canvas.width, canvas.height);
+        return canvas.toDataURL("image/jpeg", quality);
+      };
+      const Load_image = (src) =>
+        new Promise((resolve, reject) => {
+          const image = new Image();
+          image.onload = () => resolve(image);
+          image.onerror = reject;
+          image.src = src;
+        });
+
+      /**
+       * How big the pictures in a PDF are. The download is for printing; the
+       * one attached to the quote email is kept small, as the request carries
+       * it to send_email.php base64-encoded and the server caps uploads.
+       */
+      const Pdf_quality = {
+        download: { view_width: 1600, view_quality: 0.88, thumb_width: 0, thumb_quality: 0 },
+        email: { view_width: 1100, view_quality: 0.72, thumb_width: 96, thumb_quality: 0.8 },
+      };
+
+      /**
+       * The design as a PDF: for a quote, a page of the customer's details
+       * first; then a landscape page for each side of the set; then the
+       * parts list. Views are the canvases from Render_side_views.
+       */
+      const Build_design_pdf = async ({ views, parts, quality, customer }) => {
+        const date = new Date().toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+          orientation: customer ? "portrait" : "landscape",
+          unit: "mm",
+          format: "letter",
+        });
+        const red = [206, 3, 12];
+        const grey = [110, 110, 110];
+        const dark = [30, 30, 30];
+
+        const Header = (title, page_width) => {
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(16);
+          doc.setTextColor(...red);
+          doc.text("PlayMor Swing Sets", 14, 16);
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(10);
+          doc.setTextColor(...grey);
+          doc.text(date, page_width - 14, 16, { align: "right" });
+          doc.setDrawColor(220, 220, 220);
+          doc.line(14, 20, page_width - 14, 20);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(13);
+          doc.setTextColor(...dark);
+          doc.text(title, 14, 29);
+        };
+
+        // The customer, for a quote.
+        if (customer) {
+          const page_width = doc.internal.pageSize.getWidth();
+          Header("Quote request", page_width);
+          let y = 42;
+          const Field = (label, value) => {
+            if (!value) return;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.setTextColor(...grey);
+            doc.text(label, 14, y);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(...dark);
+            const lines = doc.splitTextToSize(String(value), page_width - 28 - 30);
+            doc.text(lines, 44, y);
+            y += Math.max(1, lines.length) * 5.5 + 3;
+          };
+          Field("Name", customer.name);
+          Field("Email", customer.email);
+          Field("Phone", customer.phone);
+          Field("Zip code", customer.zip);
+          Field("Notes", customer.notes);
+        }
+
+        // The sides, one to a page.
+        views.forEach((view, i) => {
+          if (i > 0 || customer) doc.addPage("letter", "landscape");
+          const page_width = doc.internal.pageSize.getWidth();
+          const page_height = doc.internal.pageSize.getHeight();
+          Header(Side_views[i].name, page_width);
+          const max_w = page_width - 28;
+          const max_h = page_height - 34 - 16;
+          const aspect = view.width / view.height;
+          const w = Math.min(max_w, max_h * aspect);
+          const h = w / aspect;
+          const x = (page_width - w) / 2;
+          doc.addImage(Jpeg(view, quality.view_width, quality.view_quality), "JPEG", x, 34, w, h);
+          doc.setDrawColor(220, 220, 220);
+          doc.rect(x, 34, w, h);
+        });
+
+        // The parts list, portrait, over as many pages as it needs.
+        doc.addPage("letter", "portrait");
+        const page_width = doc.internal.pageSize.getWidth();
+        const page_height = doc.internal.pageSize.getHeight();
+        const total = parts.reduce((n, part) => n + part.count, 0);
+        Header("Parts list", page_width);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(...grey);
+        doc.text(total + (total === 1 ? " part" : " parts"), page_width - 14, 29, { align: "right" });
+
+        const thumb = 16;
+        let y = 36;
+        for (const part of parts) {
+          const options = doc.splitTextToSize(part.options.join(", "), page_width - 28 - thumb - 30);
+          const row_h = Math.max(thumb, 6 + options.length * 4.2) + 4;
+          if (y + row_h > page_height - 14) {
+            doc.addPage("letter", "portrait");
+            Header("Parts list (continued)", page_width);
+            y = 36;
+          }
+          try {
+            if (quality.thumb_width) {
+              const image = await Load_image(part.thumbnail);
+              doc.addImage(Jpeg(image, quality.thumb_width, quality.thumb_quality), "JPEG", 14, y, thumb, thumb);
+            } else {
+              doc.addImage(part.thumbnail, "PNG", 14, y, thumb, thumb);
+            }
+          } catch (error) {
+            console.warn("Could not add a part's picture to the PDF:", error);
+          }
+          const text_x = 14 + thumb + 5;
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(11);
+          doc.setTextColor(...dark);
+          doc.text(part.name, text_x, y + 5);
+          doc.text("Qty " + part.count, page_width - 14, y + 5, { align: "right" });
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9);
+          doc.setTextColor(...grey);
+          doc.text(options, text_x, y + 10);
+          y += row_h;
+          doc.setDrawColor(235, 235, 235);
+          doc.line(14, y - 2, page_width - 14, y - 2);
+        }
+
+        // Page numbers.
+        const pages = doc.getNumberOfPages();
+        for (let i = 1; i <= pages; i++) {
+          doc.setPage(i);
+          const w = doc.internal.pageSize.getWidth();
+          const h = doc.internal.pageSize.getHeight();
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9);
+          doc.setTextColor(...grey);
+          doc.text("Page " + i + " of " + pages, w / 2, h - 8, { align: "center" });
+        }
+        return doc;
+      };
+
+      /** Save → PDF: the views and the parts list, at print quality. */
+      const Save_pdf = async () => {
+        if (!picked_meshes.length) {
+          alert("Add some parts to the yard first.");
+          return;
+        }
+        throbber.style.display = "block";
+        // A frame for the throbber to show before the renders hold the page.
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        try {
+          const doc = await Build_design_pdf({
+            views: Render_side_views(),
+            parts: Grouped_part_list(),
+            quality: Pdf_quality.download,
+          });
+          doc.save("playmor-design.pdf");
+        } catch (error) {
+          console.error("Could not make the PDF:", error);
+          alert("Sorry, the PDF could not be made. Details: " + error.message);
+        } finally {
+          throbber.style.display = "none";
+        }
+      };
+
       /** Kept for the few callers that still ask by the old name. */
       const Set_up_email = () => Open_panel("quote");
       const Toggle_measurements = (args) => {
@@ -9785,7 +10004,15 @@
       $("#pill_undo").on("click", () => blueprint.undo());
       $("#pill_reset").on("click", () => Refresh());
       $("#pill_open").on("click", () => Open());
-      $("#pill_save").on("click", () => Save());
+      $("#pill_save").on("click", () => Toggle_menu(pill_save, save_menu));
+      $("#menu_save_design").on("click", () => {
+        Close_menus();
+        Save();
+      });
+      $("#menu_save_pdf").on("click", () => {
+        Close_menus();
+        Save_pdf();
+      });
       $("#pill_catalog").on("click", () => showCatalogModal());
       $("#pill_parts").on("click", () =>
         panel_mode === "parts" ? Close_panel() : Open_panel("parts")
@@ -9824,7 +10051,7 @@
       );
       // Rows are divs so a switch can sit inside them; Enter and Space still
       // press them.
-      $("#view_menu .menu-row, #mulch_auto_row, #mulch_show_row").on("keydown", (event) => {
+      $("#view_menu .menu-row, #save_menu .menu-row, #mulch_auto_row, #mulch_show_row").on("keydown", (event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
           event.currentTarget.click();

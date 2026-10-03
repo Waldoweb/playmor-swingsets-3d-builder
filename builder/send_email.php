@@ -42,6 +42,24 @@ if (empty($input['part_list']) || !is_array($input['part_list'])) {
     $input['part_list'] = [];
 }
 
+// The four side views, shown in the email body. JPEG data URLs only, and no
+// more than four: each becomes an inline image referenced by its cid.
+$designImages = [];
+if (!empty($input['design_images']) && is_array($input['design_images'])) {
+    foreach (array_slice($input['design_images'], 0, 4) as $i => $view) {
+        $data = is_array($view) ? ($view['image'] ?? '') : '';
+        $prefix = 'data:image/jpeg;base64,';
+        if (!is_string($data) || strpos($data, $prefix) !== 0) continue;
+        $base64 = substr($data, strlen($prefix));
+        if (base64_decode($base64, true) === false) continue;
+        $designImages[] = [
+            'label' => is_string($view['label'] ?? null) ? $view['label'] : 'View ' . ($i + 1),
+            'content' => $base64,
+            'cid' => 'design-view-' . $i,
+        ];
+    }
+}
+
 // Load secure configuration
 $config = null;
 if (file_exists(__DIR__ . '/config.php')) {
@@ -142,10 +160,7 @@ if (!empty($input['notes'])) {
 $htmlContent .= "
   </div>
   
-  <div style=\"margin: 20px 0;\">
-    <h3>Design Preview</h3>
-    <img src=\"cid:design-preview\" style=\"max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px;\" alt=\"Playground Design\" />
-  </div>
+  " . generateDesignViewsHTML($designImages) . "
   
   <div style=\"background: #f0f8f0; padding: 20px; border-radius: 8px;\">
     <h3>Parts List</h3>
@@ -171,7 +186,7 @@ if (!empty($input['notes'])) {
 
 $textContent .= "Parts List:\n";
 foreach ($input['part_list'] as $part) {
-    $textContent .= "• " . $part['name'] . "\n";
+    $textContent .= "• " . $part['name'] . partCountSuffix($part) . "\n";
     if (!empty($part['options'])) {
         foreach ($part['options'] as $option) {
             $textContent .= "  - " . $option . "\n";
@@ -206,27 +221,16 @@ $emailPayload = [
     'textbody' => $textContent
 ];
 
-// Add design preview image as inline attachment for CID reference
-if (!empty($input['design_image'])) {
-    // Extract base64 data from data URL
-    $imageData = $input['design_image'];
-    if (strpos($imageData, 'data:image/png;base64,') === 0) {
-        $base64Data = substr($imageData, strlen('data:image/png;base64,'));
-        $emailPayload['inline_images'] = [[
-            'content' => $base64Data,
-            'mime_type' => 'image/png',
-            'name' => 'design-preview.png',
-            'cid' => 'design-preview'
-        ]];
-    } elseif (strpos($imageData, 'data:image/jpeg;base64,') === 0) {
-        $base64Data = substr($imageData, strlen('data:image/jpeg;base64,'));
-        $emailPayload['inline_images'] = [[
-            'content' => $base64Data,
+// The side views as inline images for the cid references in the body
+if (!empty($designImages)) {
+    $emailPayload['inline_images'] = array_map(function ($view) {
+        return [
+            'content' => $view['content'],
             'mime_type' => 'image/jpeg',
-            'name' => 'design-preview.jpg',
-            'cid' => 'design-preview'
-        ]];
-    }
+            'name' => $view['cid'] . '.jpg',
+            'cid' => $view['cid']
+        ];
+    }, $designImages);
 }
 
 // Add PDF attachment if provided
@@ -343,7 +347,7 @@ function recordSendAgainstDailyCap($file, $cap) {
 function generatePartsListHTML($partList) {
     $html = '<ul style="margin: 10px 0; padding-left: 20px;">';
     foreach ($partList as $part) {
-        $html .= '<li style="margin: 8px 0; font-weight: bold;">' . htmlspecialchars($part['name']);
+        $html .= '<li style="margin: 8px 0; font-weight: bold;">' . htmlspecialchars($part['name'] . partCountSuffix($part));
         if (!empty($part['options'])) {
             $html .= '<ul style="margin: 5px 0; padding-left: 20px; font-weight: normal;">';
             foreach ($part['options'] as $option) {
@@ -355,6 +359,35 @@ function generatePartsListHTML($partList) {
     }
     $html .= '</ul>';
     return $html;
+}
+
+/** " (Qty 2)" for a part listed more than once; nothing for one. */
+function partCountSuffix($part) {
+    $count = isset($part['count']) && is_numeric($part['count']) ? (int) $part['count'] : 1;
+    return $count > 1 ? ' (Qty ' . $count . ')' : '';
+}
+
+/**
+ * The side views, two to a row. A table, as email clients lay out tables
+ * and little else reliably.
+ */
+function generateDesignViewsHTML($views) {
+    if (empty($views)) return '';
+    $html = '<div style="margin: 20px 0;"><h3>Design Views</h3>'
+        . '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">';
+    foreach (array_chunk($views, 2) as $row) {
+        $html .= '<tr>';
+        foreach ($row as $view) {
+            $html .= '<td style="padding: 0 10px 14px 0; vertical-align: top;">'
+                . '<img src="cid:' . htmlspecialchars($view['cid']) . '" width="280" '
+                . 'style="display: block; width: 280px; max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 6px;" '
+                . 'alt="' . htmlspecialchars($view['label']) . '" />'
+                . '<div style="font-size: 12px; color: #666; margin-top: 4px;">' . htmlspecialchars($view['label']) . '</div>'
+                . '</td>';
+        }
+        $html .= '</tr>';
+    }
+    return $html . '</table></div>';
 }
 
 function parseEmailList($emails) {
