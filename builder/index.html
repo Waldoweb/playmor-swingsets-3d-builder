@@ -1511,7 +1511,7 @@
          down while the bed sizes itself. */
       .mulch-auto { display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; user-select: none; }
       .mulch-dim .slider { width: 160px; margin: 0; }
-      .mulch-dim-value { width: 32px; font-size: 12px; text-align: right; opacity: 0.8; }
+      .mulch-dim-value { width: 62px; font-size: 12px; text-align: right; opacity: 0.8; white-space: nowrap; }
       #mulch-size-section.auto .mulch-dim { opacity: 0.45; }
       #mulch-size-section .custom-controls-row { margin-top: 6px; }
 
@@ -1869,11 +1869,11 @@
             </div>
             <div class="custom-controls-row mulch-dim">
               <div class="custom-controls-text">Length</div>
-              <input type="range" min="3" max="50" value="10" class="slider" id="mulch_length_slider" aria-label="Mulch bed length" /><span class="mulch-dim-value" id="mulch_length_value">33'</span>
+              <input type="range" min="3" max="50" value="10" class="slider" id="mulch_length_slider" aria-label="Mulch bed length" /><span class="mulch-dim-value" id="mulch_length_value">32ft 10in</span>
             </div>
             <div class="custom-controls-row mulch-dim">
               <div class="custom-controls-text">Width</div>
-              <input type="range" min="3" max="50" value="10" class="slider" id="mulch_width_slider" aria-label="Mulch bed width" /><span class="mulch-dim-value" id="mulch_width_value">33'</span>
+              <input type="range" min="3" max="50" value="10" class="slider" id="mulch_width_slider" aria-label="Mulch bed width" /><span class="mulch-dim-value" id="mulch_width_value">32ft 10in</span>
             </div>
           </div>
         </div>
@@ -1968,6 +1968,11 @@
 
       const Deg2Rad = Math.PI / 180;
       const Meters2Feet = 3.28084;
+      /** A length in metres as feet and whole inches, e.g. "10ft 2in". */
+      const Feet_and_inches = (metres) => {
+        const inches = Math.round(metres * Meters2Feet * 12);
+        return Math.floor(inches / 12) + "ft " + (inches % 12) + "in";
+      };
 
       // Two modes: nothing in hand, or a part being carried to an opening.
       // There was a third, `placing`, for dropping a part anywhere on the
@@ -2459,7 +2464,7 @@
       // New object ID-based variables to replace category_index and item_index
       let selected_object_id = null;
       let show_mesurements = false;
-      let measurements = "0.00' x 0.00' x 0.00'";
+      let measurements = "0ft 0in x 0ft 0in x 0ft 0in";
       let measurements_font_height = 32;
 
       let part_list;
@@ -7192,12 +7197,7 @@
         let size = new THREE.Vector3();
         box.getSize(size);
         measurements =
-          (size.x * Meters2Feet).toFixed(2) +
-          "' x " +
-          (size.y * Meters2Feet).toFixed(2) +
-          "' x " +
-          (size.z * Meters2Feet).toFixed(2) +
-          "'";
+          Feet_and_inches(size.x) + " x " + Feet_and_inches(size.y) + " x " + Feet_and_inches(size.z);
 
         // The set has changed shape, so the bed under it follows.
         if (mulch) mulch.fit();
@@ -7942,7 +7942,7 @@
         stroke(draw, 4, "rgba(0, 0, 0, 0.8)");
         stroke(draw, 1.5, label === "Mulch" ? "#fac606" : "#ffffff");
 
-        const feet = (a.distanceTo(b) * Meters2Feet).toFixed(1) + "'";
+        const feet = Feet_and_inches(a.distanceTo(b));
         const at = new THREE.Vector2().lerpVectors(A, B, label_at);
         // Past the end of the line when the label sits at an end.
         const along = label_at >= 1 ? 14 : label_at <= 0 ? -14 : 0;
@@ -10120,7 +10120,6 @@
       });
 
       /** The mulch switch and the bed's toolbar show what the bed is doing. */
-      const Feet = (metres) => Math.round(metres * Meters2Feet) + "'";
       const Sync_mulch_panel = () => {
         switch_mulch.classList.toggle("on", !!mulch_enabled);
         const auto = !!(mulch && mulch.auto);
@@ -10129,8 +10128,8 @@
         if (!mulch) return;
         mulch_length_slider.value = Math.round(mulch.depth);
         mulch_width_slider.value = Math.round(mulch.width);
-        mulch_length_value.textContent = Feet(mulch.depth);
-        mulch_width_value.textContent = Feet(mulch.width);
+        mulch_length_value.textContent = Feet_and_inches(mulch.depth);
+        mulch_width_value.textContent = Feet_and_inches(mulch.width);
       };
       /** Hand the bed's size to the app, or take it back. */
       const Set_mulch_auto = (auto) => {
