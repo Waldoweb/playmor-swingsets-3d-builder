@@ -268,6 +268,51 @@
         transition: bottom 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
+      /* The set's footprint, bottom left above the parts bar; a click shows
+         or hides the dimension lines, and it turns red while they show. */
+      #size_chip {
+        position: fixed;
+        left: 16px;
+        bottom: calc(var(--bottom-bar-offset) + var(--bottom-bar-gap));
+        z-index: 990;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        height: 40px;
+        padding: 0 14px 0 12px;
+        border-radius: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+        color: #fff;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: bottom 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.15s ease, border-color 0.15s ease;
+      }
+      #size_chip[hidden] { display: none; }
+      #size_chip.covered { visibility: hidden; }
+      #size_chip:hover { background: rgba(30, 30, 30, 0.85); }
+      #size_chip:focus-visible { outline: 2px solid rgba(206, 3, 12, 0.8); outline-offset: 2px; }
+      #size_chip svg {
+        width: 18px;
+        height: 18px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        flex: 0 0 auto;
+      }
+      #size_chip.on {
+        background: linear-gradient(135deg, rgba(206, 3, 12, 0.85), rgba(165, 2, 9, 0.85));
+        border-color: rgba(206, 3, 12, 1);
+        box-shadow: 0 2px 10px rgba(206, 3, 12, 0.4);
+      }
+
       .bottom-bar {
         position: fixed;
         left: 0;
@@ -1757,17 +1802,20 @@
         <button class="pill" id="pill_parts" type="button" title="Every part in this design"><svg class="" viewBox="0 0 24 24" aria-hidden="true" ><path d="M8 6h13M8 12h13M8 18h13"></path><path d="M3 6h.01M3 12h.01M3 18h.01"></path></svg><span class="pill-label">Parts</span><span class="pill-count" id="parts_count">0</span></button>
         <div class="pill-sep"></div>
         <div class="pill-menu">
-          <button class="pill" id="pill_view" type="button" title="Background, dimensions and camera" aria-haspopup="true" aria-expanded="false"><svg class="" viewBox="0 0 24 24" aria-hidden="true" ><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2"></path></svg><span class="pill-label">View</span><svg class="pill-chevron" viewBox="0 0 24 24" aria-hidden="true" ><path d="m6 9 6 6 6-6"></path></svg></button>
+          <button class="pill" id="pill_view" type="button" title="Look at the set from the front, a side or the back" aria-haspopup="true" aria-expanded="false"><svg class="" viewBox="0 0 24 24" aria-hidden="true" ><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2"></path></svg><span class="pill-label">View</span><svg class="pill-chevron" viewBox="0 0 24 24" aria-hidden="true" ><path d="m6 9 6 6 6-6"></path></svg></button>
           <div class="menu" id="view_menu" role="menu" hidden>
-            <div class="menu-row" id="menu_background" role="menuitemcheckbox" tabindex="0"><span class="grow">Background scene</span><span class="switch" id="switch_background"><span class="knob"></span></span></div>
-            <div class="menu-row" id="menu_dimensions" role="menuitemcheckbox" tabindex="0"><span class="grow">Dimensions</span><span class="switch" id="switch_dimensions"><span class="knob"></span></span></div>
-            <div class="menu-rule"></div>
-            <div class="menu-row" id="menu_fit" role="menuitem" tabindex="0"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true" ><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"></path></svg><span class="grow">Fit whole set in view</span></div>
+            <div class="menu-row" data-side="front" role="menuitem" tabindex="0"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true" ><rect x="8" y="8" width="8" height="8" rx="1"></rect><path d="M12 22v-4.5M9.5 20l2.5-2.5 2.5 2.5"></path></svg><span class="grow">Front View</span></div>
+            <div class="menu-row" data-side="left" role="menuitem" tabindex="0"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true" ><rect x="8" y="8" width="8" height="8" rx="1"></rect><path d="M2 12h4.5M4 9.5l2.5 2.5L4 14.5"></path></svg><span class="grow">Left Side View</span></div>
+            <div class="menu-row" data-side="right" role="menuitem" tabindex="0"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true" ><rect x="8" y="8" width="8" height="8" rx="1"></rect><path d="M22 12h-4.5M20 9.5l-2.5 2.5 2.5 2.5"></path></svg><span class="grow">Right Side View</span></div>
+            <div class="menu-row" data-side="back" role="menuitem" tabindex="0"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true" ><rect x="8" y="8" width="8" height="8" rx="1"></rect><path d="M12 2v4.5M9.5 4l2.5 2.5L14.5 4"></path></svg><span class="grow">Back View</span></div>
+            <div class="menu-row" data-side="top" role="menuitem" tabindex="0"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true" ><path d="M3 20l5-5h13l-5 5z"></path><path d="M12 2v9M9 8.5l3 3 3-3"></path></svg><span class="grow">Top View</span></div>
           </div>
         </div>
         <div class="pill-sep"></div>
         <button class="pill" id="pill_help" type="button" title="How to use the builder"><svg class="" viewBox="0 0 24 24" aria-hidden="true" ><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.7"></path><path d="M12 17h.01"></path></svg><span class="pill-label">Help</span></button>
       </div>
+
+      <button id="size_chip" type="button" title="Show or hide the dimensions" aria-pressed="false" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17 17 3l4 4L7 21z"></path><path d="M7 13l2 2M10 10l2 2M13 7l2 2"></path></svg><span id="size_chip_text"></span></button>
 
       <div id="top_actions">
         <button class="cta" id="cta_quote" type="button" title="Send your design to PlayMor for a quote"><svg class="" viewBox="0 0 24 24" aria-hidden="true" ><path d="M4 6h16v12H4z"></path><path d="m4 7 8 6 8-6"></path></svg><span>Get a Quote</span></button>
@@ -1940,7 +1988,7 @@
           <h3>Looking around</h3>
           <ul>
             <li>Drag to orbit, drag with the right button to pan, and scroll or pinch to zoom.</li>
-            <li><b>View</b> &rsaquo; <b>Fit whole set in view</b> brings everything back into frame.</li>
+            <li>Any view in the <b>View</b> menu brings the whole set back into frame.</li>
             <li>While carrying a part, click where it snaps to place it. Click anywhere else, click its tile again, or press <b>Esc</b> to put it down.</li>
             <li><b>Space</b> changes which of a carried part's joints attaches.</li>
           </ul>
@@ -1948,7 +1996,7 @@
           <ul>
             <li><b>Undo</b> steps back one change. <b>Reset</b> clears the yard.</li>
             <li><b>Open</b> and <b>Save</b> keep a design as a file on your computer; <b>Save</b> can also make a PDF with a picture of each side and the parts list. <b>Catalog</b> starts from one of our sets.</li>
-            <li><b>Parts</b> lists everything in the design. <b>View</b> holds the scene settings. Click the mulch or its border to change its style, size, or hide it; click the ground under the set to bring it back.</li>
+            <li><b>Parts</b> lists everything in the design. <b>View</b> turns the camera to the front, either side or the back of the set, or looks down on it from the top. The size at the bottom left shows or hides the dimensions. Click the mulch or its border to change its style, size, or hide it; click the ground under the set to bring it back.</li>
           </ul>
           <p>When you are happy with it, press <b>Get a Quote</b> and we will take it from there.</p>
         </div>
@@ -2891,7 +2939,9 @@
           });
           Sync_mulch_panel();
 
-          skybox.visible = state.skybox.visible;
+          // The background can no longer be hidden; an older save that hid
+          // it comes back with it showing.
+          skybox.visible = true;
 
           // Phase 1: Create all models first without positioning
           let created_models = [];
@@ -3449,10 +3499,6 @@
           texture.wrapS = THREE.RepeatWrapping;
           texture.needsUpdate = true;
           return texture;
-        }
-        toggle(args) {
-          this.visible = !this.visible;
-          this.mesh.visible = this.visible;
         }
       }
       class Mulch {
@@ -7206,8 +7252,10 @@
         measurements =
           Feet_and_inches(size.x) + " x " + Feet_and_inches(size.y) + " x " + Feet_and_inches(size.z);
 
-        // The set has changed shape, so the bed under it follows.
+        // The set has changed shape, so the bed under it follows, and the
+        // size chip says its new size.
         if (mulch) mulch.fit();
+        Sync_size_chip();
 
         // ...and so does the point the camera looks at and zooms toward:
         // half the set's height, but never above a little under the 5 ft
@@ -7278,16 +7326,17 @@
        * circle it. The target moves instead, to the middle of the set's
        * footprint, keeping the direction the person was already looking from.
        */
-      const View_all = (args) => {
+      const View_all = (args = {}) => {
         const box = new THREE.Box3();
         for (const mesh of picked_meshes) box.expandByObject(mesh);
 
         const target = box.isEmpty()
           ? new THREE.Vector3()
           : box.getCenter(new THREE.Vector3()).setY(target_height);
-        const direction = new THREE.Vector3()
-          .subVectors(camera.position, orbitControls.target)
-          .normalize();
+        // From where the camera already is, unless a view is asked for.
+        const direction = args.direction
+          ? args.direction.clone().normalize()
+          : new THREE.Vector3().subVectors(camera.position, orbitControls.target).normalize();
         if (direction.lengthSq() === 0) direction.set(0, 0.5, 1).normalize();
 
         // How far back the camera must sit, along the direction it already
@@ -7334,10 +7383,55 @@
         if (!(d > 0)) d = Math.sqrt(200);
         d = THREE.MathUtils.clamp(d, orbitControls.minDistance, orbitControls.maxDistance);
 
+        const position = target.clone().addScaledVector(direction, d);
+        if (args.animate) {
+          Swing_camera(position, target);
+          return;
+        }
+        camera_swing = null;
         orbitControls.target.copy(target);
-        camera.position.copy(target).addScaledVector(direction, d);
+        camera.position.copy(position);
         orbitControls.update();
         if (window.syncWorldRotationWithCamera) syncWorldRotationWithCamera();
+      };
+      /**
+       * Carry the camera to a new view over a moment, round the set rather
+       * than through it: the target slides across, and the camera's angle
+       * round it, its height and its distance ease from old to new. Going
+       * from the front to the back swings round the side. A press or a
+       * wheel on the scene stops it where it is.
+       */
+      let camera_swing = null;
+      const CAMERA_SWING_MS = 650;
+      const Swing_camera = (position, target) => {
+        const from_target = orbitControls.target.clone();
+        const from = new THREE.Spherical().setFromVector3(
+          camera.position.clone().sub(from_target)
+        );
+        const to = new THREE.Spherical().setFromVector3(position.clone().sub(target));
+        // The short way round.
+        let turn = to.theta - from.theta;
+        turn = Math.atan2(Math.sin(turn), Math.cos(turn));
+
+        const swing = { start: performance.now() };
+        camera_swing = swing;
+        const step = () => {
+          if (camera_swing !== swing) return;
+          const t = Math.min(1, (performance.now() - swing.start) / CAMERA_SWING_MS);
+          const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+          const now = new THREE.Spherical(
+            from.radius + (to.radius - from.radius) * ease,
+            from.phi + (to.phi - from.phi) * ease,
+            from.theta + turn * ease
+          );
+          orbitControls.target.lerpVectors(from_target, target, ease);
+          camera.position.setFromSpherical(now).add(orbitControls.target);
+          orbitControls.update();
+          if (window.syncWorldRotationWithCamera) syncWorldRotationWithCamera();
+          if (t < 1) requestAnimationFrame(step);
+          else camera_swing = null;
+        };
+        step();
       };
       const Enable_disable_send_email_button = (args) => {
         const isValidEmail = (email) => {
@@ -8972,11 +9066,28 @@
        * view on screen is not touched.
        */
       const Side_views = [
-        { name: "Front", turn: 0 },
-        { name: "Right side", turn: 90 },
-        { name: "Back", turn: 180 },
-        { name: "Left side", turn: 270 },
+        { key: "front", name: "Front", turn: 0 },
+        { key: "right", name: "Right side", turn: 90 },
+        { key: "back", name: "Back", turn: 180 },
+        { key: "left", name: "Left side", turn: 270 },
       ];
+      /** How high the View menu's cameras look from, as the opening view does. */
+      const Camera_view_elevation = 20; // degrees above level
+      /**
+       * The way from the set out to a camera looking at one side: the side
+       * the builder opens on, turned `turn` degrees round, raised by
+       * `elevation` degrees.
+       */
+      const Side_direction = (turn, elevation) => {
+        const up = new THREE.Vector3(0, 1, 0);
+        const lift = THREE.MathUtils.degToRad(elevation);
+        return home_facing
+          .clone()
+          .applyAxisAngle(up, THREE.MathUtils.degToRad(turn))
+          .multiplyScalar(Math.cos(lift))
+          .setY(Math.sin(lift))
+          .normalize();
+      };
       const Side_view_size = { width: 1600, height: 1000 };
       const Side_view_elevation = 12; // degrees above level
       const Side_view_fov = 30;
@@ -9022,18 +9133,11 @@
         const tan_v = Math.tan(THREE.MathUtils.degToRad(Side_view_fov / 2));
         const tan_h = tan_v * view_camera.aspect;
         const margin = 1.08;
-        const elevation = THREE.MathUtils.degToRad(Side_view_elevation);
         const up = new THREE.Vector3(0, 1, 0);
 
         const images = [];
         for (const side of Side_views) {
-          const facing = home_facing
-            .clone()
-            .applyAxisAngle(up, THREE.MathUtils.degToRad(side.turn));
-          const direction = facing
-            .multiplyScalar(Math.cos(elevation))
-            .setY(Math.sin(elevation))
-            .normalize();
+          const direction = Side_direction(side.turn, Side_view_elevation);
           const forward = direction.clone().negate();
           const right = new THREE.Vector3().crossVectors(forward, up).normalize();
           const cam_up = new THREE.Vector3().crossVectors(right, forward);
@@ -9291,6 +9395,24 @@
       const Set_up_email = () => Open_panel("quote");
       const Toggle_measurements = (args) => {
         show_mesurements = !show_mesurements;
+        Sync_size_chip();
+      };
+      /**
+       * The size chip: the set's length and width, and whether the
+       * dimension lines show. Hidden while the yard is empty.
+       */
+      const Sync_size_chip = () => {
+        const chip = document.getElementById("size_chip");
+        if (!chip) return;
+        const empty = !set_box || set_box.isEmpty();
+        chip.hidden = empty;
+        if (!empty) {
+          const size = new THREE.Vector3();
+          set_box.getSize(size);
+          size_chip_text.textContent = Feet_and_inches(size.x) + " \u00d7 " + Feet_and_inches(size.z);
+        }
+        chip.classList.toggle("on", !!show_mesurements);
+        chip.setAttribute("aria-pressed", String(!!show_mesurements));
       };
       const Main = (args) => {
         // Email system ready (using Zeptomail API)
@@ -10087,7 +10209,6 @@
         const opening = menu.hidden;
         Close_menus();
         if (!opening) return;
-        Sync_view_menu();
         Sync_mulch_panel();
         menu.hidden = false;
         pill.setAttribute("aria-expanded", "true");
@@ -10111,23 +10232,51 @@
         }
       });
 
-      /** The View menu's switches show what the scene is doing. */
-      const Sync_view_menu = () => {
-        switch_background.classList.toggle("on", !!(skybox && skybox.visible));
-        switch_dimensions.classList.toggle("on", !!show_mesurements);
-      };
-      $("#menu_background").on("click", () => {
-        skybox.toggle();
-        Sync_view_menu();
-      });
-      $("#menu_dimensions").on("click", () => {
-        Toggle_measurements();
-        Sync_view_menu();
-      });
-      $("#menu_fit").on("click", () => {
-        View_all();
+      $("#size_chip").on("click", () => Toggle_measurements());
+      // The four side views, and the PDF's pictures, share Side_views. The
+      // top view looks straight down with the front at the bottom of the
+      // screen: a hair off vertical, so the camera knows which way is up.
+      $("#view_menu .menu-row[data-side]").on("click", (event) => {
+        const key = event.currentTarget.dataset.side;
+        const side = Side_views.find((view) => view.key === key);
+        if (side) View_all({ direction: Side_direction(side.turn, Camera_view_elevation), animate: true });
+        else if (key === "top") View_all({ direction: Side_direction(0, 89.5), animate: true });
         Close_menus();
       });
+      // A selected part's settings panel sits bottom centre. On a phone it
+      // reaches the chip's corner and the chip would sit over its colours,
+      // so the chip steps out of sight while the two overlap.
+      const Size_chip_clear = () => {
+        const panel = document.querySelector(".custom-controls-unified");
+        let covered = false;
+        if (panel && getComputedStyle(panel).display !== "none") {
+          const a = size_chip.getBoundingClientRect();
+          const b = panel.getBoundingClientRect();
+          covered = a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+        }
+        size_chip.classList.toggle("covered", covered);
+      };
+      (() => {
+        const panel = document.querySelector(".custom-controls-unified");
+        if (!panel) return;
+        new MutationObserver(Size_chip_clear).observe(panel, {
+          attributes: true,
+          attributeFilter: ["style", "class"],
+          childList: true,
+          subtree: true,
+        });
+        panel.addEventListener("transitionend", Size_chip_clear);
+        window.addEventListener("resize", Size_chip_clear);
+      })();
+      // Taking hold of the scene stops a camera swing where it is.
+      for (const type of ["pointerdown", "wheel"])
+        document.addEventListener(
+          type,
+          (event) => {
+            if (event.target === canvas || event.target === renderer?.domElement) camera_swing = null;
+          },
+          { capture: true, passive: true }
+        );
 
       /** The mulch switch and the bed's toolbar show what the bed is doing. */
       const Sync_mulch_panel = () => {
@@ -10820,7 +10969,6 @@
       Show_items();
 
       Main();
-      Sync_view_menu();
       Sync_mulch_panel();
     </script>
   </body>
