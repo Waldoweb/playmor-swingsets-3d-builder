@@ -9600,6 +9600,30 @@
           Pointers.down_position.copy(Pointers.position);
           Pointers.pressed = true;
 
+          // A second finger down makes the gesture a pinch or a two-finger
+          // pan, never a click.
+          scene_pointers.add(event.pointerId);
+          if (scene_pointers.size > 1 && pending_click) pending_click.multi = true;
+
+          // Empty-handed, a press is only a click if it lets go where it
+          // went down: it may be the start of an orbit, and turning the
+          // camera should not select the part under the pointer, pick a
+          // ring or drop the selection. The click is decided on release.
+          // A part in hand still goes down on the press (see below).
+          if (Mode.normal == Mode.mode) {
+            pending_click = {
+              id: event.pointerId,
+              button: event.button,
+              x: Pointers.position.x,
+              y: Pointers.position.y,
+              multi: scene_pointers.size > 1,
+            };
+            return;
+          }
+          Pointer_down();
+        });
+        /** An empty-handed click on the scene: a ring, a part, the bed or nothing. */
+        const Click_scene = () => {
           // Clicking a ring while empty-handed picks the opening to fill, and
           // the catalog narrows to what fits it. Clicking away clears it.
           if (Mode.normal == Mode.mode && !plug_model && browse_sockets.length) {
@@ -9639,6 +9663,22 @@
           }
 
           Pointer_down();
+        };
+        const Forget_scene_pointer = (event) => {
+          scene_pointers.delete(event.pointerId);
+          if (pending_click && pending_click.id === event.pointerId && event.type === "pointercancel")
+            pending_click = null;
+        };
+        document.addEventListener("pointerup", Forget_scene_pointer);
+        document.addEventListener("pointercancel", Forget_scene_pointer);
+        canvas.addEventListener("pointerup", (event) => {
+          const click = pending_click;
+          if (!click || click.id !== event.pointerId) return;
+          pending_click = null;
+          if (click.multi || click.button !== 0 || Mode.normal != Mode.mode) return;
+          if (Math.hypot(event.x - click.x, event.y - click.y) > CLICK_SLOP) return;
+          Pointers.position.set(event.x, event.y);
+          Click_scene();
         });
         // A click on the canvas with a part in hand that is not sitting on a
         // target puts the part down. Decided on the release, not the press,
@@ -9729,6 +9769,10 @@
       // How far a press may travel and still count as a click rather than
       // the start of an orbit. Pixels.
       const CLICK_SLOP = 6;
+      // The empty-handed press waiting to see whether it is a click, and the
+      // pointers down on the scene, to tell a pinch from a tap.
+      let pending_click = null;
+      const scene_pointers = new Set();
       const Keys = {
         code: 0,
         backspace: 8,
