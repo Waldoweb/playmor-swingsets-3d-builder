@@ -6788,12 +6788,42 @@
       const Product_for = (model, plug_joint, host_joint) => {
         const own = [plug_joint, ...model.joints.filter((joint) => joint !== plug_joint)];
         if (own.some((joint) => Joints_connect(joint, host_joint))) return model.object_id;
-        for (const id of Height_siblings(model.object_id)) {
+        for (const id of Height_candidates(model)) {
           const template = Template_for(id);
           if (template && template.template_joints().some((joint) => Joints_connect(joint, host_joint)))
             return id;
         }
         return null;
+      };
+
+      /**
+       * What a part may become at another height, in order of preference:
+       * what it was before an earlier swap changed it, then its own other
+       * heights, then the stand-ins object-mapping.json lists for a part sold
+       * at one height only -- the Wave Slide is 5 ft only, and a 7 ft deck
+       * takes the DX Wave Slide 7ft in its place (Weldon, 2026-10-05). The
+       * first keeps a round trip honest: 5 ft to 7 ft and back gives the
+       * Wave Slide again, not the DX Wave Slide 5ft.
+       */
+      const Height_candidates = (model) => {
+        const out = [];
+        const add = (id) => {
+          if (id && id !== model.object_id && !out.includes(id)) out.push(id);
+        };
+        const origin = model.came_from;
+        if (origin) {
+          add(origin);
+          Height_siblings(origin).forEach(add);
+        }
+        Height_siblings(model.object_id).forEach(add);
+        for (const source of [model.object_id, origin]) {
+          const info = source && objectMapping && objectMapping.objects[source];
+          for (const id of (info && info.height_stand_ins) || []) {
+            add(id);
+            Height_siblings(id).forEach(add);
+          }
+        }
+        return out;
       };
 
       /** Which way a joint faces across the yard, as a unit vector. */
@@ -6937,7 +6967,7 @@
         }
         if (!template.mesh) return false;
         const variants = new Set();
-        for (const h of hung) for (const id of Height_siblings(h.model.object_id)) variants.add(id);
+        for (const h of hung) for (const id of Height_candidates(h.model)) variants.add(id);
         await Promise.allSettled(
           [...variants].map((id) => (Template_for(id) ? Template_for(id).ensure_loaded() : null))
         );
@@ -7105,6 +7135,8 @@
         // on the old one across to the matching places on the new.
         const Replace_onto = (h, id, host) => {
           const fresh = Template_for(id).clone();
+          // Remembered for the way back (Height_candidates).
+          fresh.came_from = h.model.came_from || h.model.object_id;
           fresh.toy_color = h.model.toy_color;
           fresh.trim_color = h.model.trim_color;
           scene.add(fresh.mesh);

@@ -256,7 +256,8 @@
     "WS-10": {
       "name": "Wave Slide - 5ft",
       "category": "slides",
-      "index": 0
+      "index": 0,
+      "height_stand_ins": ["SWS-14"]
     },
     "SWS-10": {
       "name": "DX Wave Slide - 5ft",

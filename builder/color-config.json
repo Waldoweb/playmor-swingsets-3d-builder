@@ -43,7 +43,7 @@
       "green": {
         "color": "@roof_green",
         "hex": "0x01664b",
-        "render": "#014231"
+        "render": "#003822"
       },
       "blue": {
         "color": "@roof_blue",

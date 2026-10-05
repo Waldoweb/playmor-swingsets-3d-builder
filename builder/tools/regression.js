@@ -1004,16 +1004,21 @@
     const sky_steps = await place(socketFor(lone, "6"), "P-STEP-5");
     await place(socketFor(sky_steps, "handle"), "HR");
     await place(socketFor(lone, "6"), "WS-10");
+    await place(
+      lone.sockets().find((s) => Socket_is_open(s) && template("P-CN-5").capable({ socket: s })),
+      "P-CN-5"
+    );
     Offer_replacements(lone);
     selected_object_id = "P-WT-7";
     await Item_clicked();
     normal();
+    // The Wave Slide is 5 ft only; a 7 ft deck takes the DX Wave Slide 7ft.
     check(
       "swapping to 7 ft carries each part at the new height",
       built(),
-      ["HR", "HR", "P-AB-3-10", "P-STEP-7", "P-WT-7", "SS"]
+      ["HR", "HR", "P-AB-3-10", "P-STEP-7", "P-WT-7", "SS", "SWS-14"]
     );
-    check("a part with no 7 ft version is named", document.getElementById("notice").textContent.includes("Wave Slide - 5ft"), true);
+    check("a part with no 7 ft version is named", document.getElementById("notice").textContent.includes("Cargo Net - 5ft"), true);
     const sky7 = models_with_available_joints.find((m) => m.object_id === "P-WT-7");
     check(
       "the swing hangs from the new beam",
@@ -1022,8 +1027,23 @@
     );
     check("the new tower is left selected", !!replacing && replacing.model === sky7, true);
     check("nothing is left behind", strayMeshes(), 0);
+    // And back down: the stand-in turns into the part it stood in for.
+    Offer_replacements(sky7);
+    selected_object_id = "P-WT";
+    await Item_clicked();
+    normal();
+    check(
+      "back to 5 ft gives the Wave Slide again",
+      built(),
+      ["HR", "HR", "P-AB-3-8", "P-STEP-5", "P-WT", "SS", "WS-10"]
+    );
     blueprint.undo();
-    check("one undo brings the old tower back", built(), ["HR", "HR", "P-AB-3-8", "P-STEP-5", "P-WT", "SS", "WS-10"]);
+    blueprint.undo();
+    check(
+      "undo brings the first tower back",
+      built(),
+      ["HR", "HR", "P-AB-3-8", "P-CN-5", "P-STEP-5", "P-WT", "SS", "WS-10"]
+    );
 
     // Two towers over a bridge, both taken to 7 ft in turn: the bridge comes
     // up with the second and meets both decks again.
