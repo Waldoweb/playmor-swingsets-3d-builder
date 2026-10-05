@@ -635,32 +635,42 @@
         box-sizing: border-box;
       }
 
+      /* The deck height choice, laid over the tower's own tile (Weldon,
+         2026-10-05): it used to float above the strip, where the colours'
+         tab now sits, and got lost in it. */
       .height-picker {
-        position: fixed;
-        z-index: 1001;
+        position: absolute;
+        inset: 0;
+        z-index: 3;
         font-family: "Segoe UI", Arial, sans-serif;
         display: flex;
-        align-items: center;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: center;
         gap: 6px;
-        padding: 6px;
-        border-radius: 14px;
-        background: rgba(0, 0, 0, 0.88);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.22);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        padding: 8px 10px;
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.82);
+        backdrop-filter: blur(4px);
         color: #fff;
+        cursor: default;
+        animation: picker-in 0.15s ease-out;
+      }
+      @keyframes picker-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
       }
       .height-picker-title {
         font-size: 12px;
         font-weight: 600;
-        opacity: 0.75;
-        padding: 0 6px 0 8px;
+        opacity: 0.8;
+        text-align: center;
         white-space: nowrap;
       }
       .height-picker button {
-        height: 34px;
-        padding: 0 14px;
-        border-radius: 17px;
+        height: 32px;
+        padding: 0 10px;
+        border-radius: 16px;
         border: 1px solid rgba(255, 255, 255, 0.28);
         background: rgba(255, 255, 255, 0.08);
         color: #fff;
@@ -11249,23 +11259,21 @@
               );
             })
             .join("");
-        document.body.appendChild(picker);
+        // Over the tile itself, so it moves with the strip and nothing can
+        // sit on top of it.
+        tile.appendChild(picker);
         picker.tile = tile;
         height_picker = picker;
 
-        // Above the tile, centred on it, kept on screen.
-        const rect = tile.getBoundingClientRect();
-        const width = picker.offsetWidth;
-        const left = Math.min(
-          Math.max(8, rect.left + rect.width / 2 - width / 2),
-          window.innerWidth - width - 8
-        );
-        picker.style.left = left + "px";
-        picker.style.top = rect.top - picker.offsetHeight - 8 + "px";
-
+        // A press here is a choice of height, not the start of dragging the
+        // tower out of the strip.
+        picker.addEventListener("pointerdown", (event) => event.stopPropagation());
         picker.addEventListener("click", (event) => {
           const button = event.target.closest("button[data-object-id]");
+          // A click on the dark around the buttons falls through to the
+          // tile, which closes the choice again.
           if (!button) return;
+          event.stopPropagation();
           const id = button.getAttribute("data-object-id");
           Close_height_picker();
           const template = Model.instances.find((m) => m.object_id === id);
@@ -11279,9 +11287,6 @@
         });
         const first = picker.querySelector("button");
         if (first) first.focus({ preventScroll: true });
-        // It is placed against the tile, so it goes if the strip moves.
-        const strip = document.getElementById("part_strip");
-        if (strip) strip.addEventListener("scroll", Close_height_picker, { once: true });
       };
       document.addEventListener(
         "pointerdown",
