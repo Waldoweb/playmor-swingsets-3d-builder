@@ -974,7 +974,12 @@
       (() => { const v = new THREE.Vector3(); mate.getWorldPosition(v); return v; })(),
       (() => { const v = new THREE.Vector3(); mate.connected.getWorldPosition(v); return v; })()
     ).length().toFixed(4) : null, 0);
-    check("and the selection is cleared", replacing, null);
+    // The new part stays selected, its tile lit (Weldon, 2026-10-05).
+    check("and the new part stays selected", !!replacing && replacing.model === swapped, true);
+    check("with its tile lit in the strip",
+      [...document.querySelectorAll("#part_strip .part-tile.selected")].map((t) => t.getAttribute("data-object-id")),
+      ["SWS-10"]);
+    replacing = null;
 
     // Anything resting on the old part goes with it.
     await reset();

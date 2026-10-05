@@ -252,28 +252,36 @@
          --------------------------------------------------------------- */
 
       :root {
-        --bottom-bar-h: 196px;
+        --bottom-bar-h: 152px;
         --bottom-bar-gap: 16px;
         /* How much of the screen the bar actually takes: its height, or
            nothing once it is tucked away. The controls that sit above the
            bar anchor to this, so they follow it down when it hides. */
-        --bottom-bar-offset: var(--bottom-bar-h);
+        --bottom-bar-offset: calc(var(--bottom-bar-h) + var(--dock-h, 0px));
+      }
+
+      :root {
+        /* Where the size chip stands: on the strip, or above the pill and
+           the strip's last 10px once the bar is tucked away. */
+        --chip-base: var(--bottom-bar-h);
       }
 
       body.bar-collapsed {
         --bottom-bar-offset: 0px;
+        --chip-base: 24px;
       }
 
-      .custom-controls-unified {
-        transition: bottom 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
-      }
 
-      /* The set's footprint, bottom left above the parts bar; a click shows
-         or hides the dimension lines, and it turns red while they show. */
+      /* The set's footprint, above the parts bar; a click shows or hides
+         the dimension lines, and it turns red while they show. */
+      /* Bottom right, just above the strip (Weldon, 2026-10-05), clear of
+         the tabs that rise from its left end and of the show/hide pill on
+         its edge. Lifted over the tabs if they ever reach under it
+         (Size_chip_clear). */
       #size_chip {
         position: fixed;
-        left: 16px;
-        bottom: calc(var(--bottom-bar-offset) + var(--bottom-bar-gap));
+        right: calc(16px + var(--panel-offset, 0px));
+        bottom: calc(var(--chip-base) + var(--bottom-bar-gap));
         z-index: 990;
         display: flex;
         align-items: center;
@@ -318,7 +326,7 @@
       }
       #notice[hidden] { display: none; }
       #size_chip[hidden] { display: none; }
-      #size_chip.covered { visibility: hidden; }
+      #size_chip.lifted { bottom: calc(var(--bottom-bar-offset) + var(--bottom-bar-gap)); }
       #size_chip:hover { background: rgba(30, 30, 30, 0.85); }
       #size_chip:focus-visible { outline: 2px solid rgba(206, 3, 12, 0.8); outline-offset: 2px; }
       #size_chip svg {
@@ -367,11 +375,12 @@
 
       /* A small pill straddling the bar's top edge, with a chevron that
          turns to say which way the bar will go. */
+      /* At the right end of the edge: the tabs above the strip start at the
+         left, and the pill must never sit on them. */
       .bar-toggle {
         position: absolute;
         top: -14px;
-        left: 50%;
-        transform: translateX(-50%);
+        right: 16px;
         width: 46px;
         height: 24px;
         padding: 0;
@@ -410,23 +419,59 @@
         transform: rotate(180deg);
       }
 
-      /* Context row: category chips on the left, the "fits this spot"
-         notice on the right. */
+      /* The tabs on the strip's top edge: the category chips, and above them
+         the selection bar. Each is only as wide as what it holds, slides up
+         when it has something to show and is gone when it has not, so the
+         yard keeps the rest of the screen (Weldon, 2026-10-05). They stack
+         at the left; the bar's show/hide pill is at the right. Their height
+         is --dock-h (Sync_dock), which --bottom-bar-offset adds, so what
+         sits above the bar sits above them. */
+      .bar-tabs {
+        position: absolute;
+        left: 16px;
+        bottom: 100%;
+        margin-bottom: 2px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        max-width: calc(100% - 96px);
+        transition: opacity 0.25s ease;
+      }
+      .bottom-bar.collapsed .bar-tabs { opacity: 0; pointer-events: none; }
+      .bar-tab {
+        max-width: 100%;
+        box-sizing: border-box;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-bottom: 0;
+        border-radius: 14px 14px 0 0;
+        animation: tab-up 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+      /* Sitting on the chips, wider than them, the colours' tab keeps its
+         lower right corner round. */
+      .bar-tabs:not(.no-filter) .custom-controls-unified { border-radius: 14px 14px 14px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+      @keyframes tab-up {
+        from { transform: translateY(12px); opacity: 0; }
+        to { transform: none; opacity: 1; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .bar-tab { animation: none; }
+      }
       .bar-context {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 10px 16px 0 16px;
-        min-height: 34px;
-        box-sizing: border-box;
+        padding: 6px 8px;
       }
+      .bar-context.off { display: none; }
 
       #part_filter_row {
         display: flex;
         gap: 8px;
         overflow-x: auto;
         overflow-y: hidden;
-        flex: 1 1 auto;
+        flex: 0 1 auto;
+        min-width: 0;
         scrollbar-width: none;
       }
 
@@ -725,7 +770,7 @@
 
       @media (max-width: 768px) {
         :root {
-          --bottom-bar-h: 172px;
+          --bottom-bar-h: 128px;
         }
 
         .part-tile {
@@ -733,60 +778,55 @@
         }
       }
 
-      /* ---- the selection toolbar */
+      /* ---- the selection bar
+         A tab on the parts strip's top edge (see .bar-tabs), over the
+         category chips, so the colours sit just above the selected part's
+         lit tile and go down with the bar (Weldon, 2026-10-05).
+         Desktop: one row -- name, every colour group, then Add flags,
+         Delete and close. Phones: the name goes (the lit tile below says
+         which part it is), the groups become tabs beside Delete and close,
+         and one group's swatches show underneath. */
       .custom-controls-unified {
         display: none;
-        position: fixed;
-        bottom: calc(var(--bottom-bar-offset) + var(--bottom-bar-gap));
-        left: calc((100% - var(--panel-offset)) / 2);
-        transform: translateX(-50%);
-        z-index: 985;
+        position: relative;
         align-items: center;
-        gap: 14px;
-        padding: 8px 40px 8px 16px;
-        border-radius: 22px;
-        background: rgba(0, 0, 0, 0.8);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+        gap: 18px;
+        padding: 8px 14px;
+        min-height: 52px;
         color: #fff;
-        max-width: calc(100% - var(--panel-offset) - 24px);
-        box-sizing: border-box;
-        transition: bottom 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
       }
-      .sel-head { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 8px; padding-right: 14px; border-right: 1px solid rgba(255, 255, 255, 0.2); align-self: stretch; }
-      .sel-name { font-size: 13px; font-weight: 700; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+      .sel-name { flex: 0 0 auto; font-size: 13px; font-weight: 700; white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+      .sel-tabs { display: none; }
+      .sel-rows { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 22px; flex: 0 1 auto; min-width: 0; }
+      .sel-rows[hidden] { display: none; }
+      /* Beside the colours on a wide screen (Weldon, 2026-10-05), not out at
+         the far end of the bar; on a phone the tabs push them to the right. */
+      .sel-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; padding-left: 18px; border-left: 1px solid rgba(255, 255, 255, 0.2); }
       .sel-close {
-        position: absolute;
-        top: 6px;
-        right: 6px;
-        width: 26px;
-        height: 26px;
-        border-radius: 13px;
-        border: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
         background: transparent;
-        color: rgba(255, 255, 255, 0.6);
+        color: rgba(255, 255, 255, 0.8);
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         padding: 0;
+        flex: 0 0 auto;
       }
-      .sel-close:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+      .sel-close:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
       .sel-close svg, .sel-delete svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-      .sel-rows { display: flex; flex-direction: column; gap: 6px; }
-      .sel-rows[hidden] { display: none; }
-      .custom-controls-row { display: flex; align-items: center; gap: 12px; min-height: 36px; }
+      .custom-controls-row { display: flex; align-items: center; gap: 8px; min-height: 36px; }
       .custom-controls-text {
-        /* Wide enough for "Frame (all)" on one line; the other captions are
-           shorter and share the column so the swatches stay aligned. */
-        width: 84px;
         font-size: 11px;
         font-weight: 700;
         letter-spacing: 0.08em;
         text-transform: uppercase;
         color: rgba(255, 255, 255, 0.6);
         flex: 0 0 auto;
+        white-space: nowrap;
       }
       .custom-controls-color-canopy,
       .custom-controls-color-poly,
@@ -797,13 +837,14 @@
       .custom-controls-color-mulch .custom-controls-color { background-size: cover; background-position: center; }
       .custom-controls-color.selected { border-color: #fff; box-shadow: 0 0 0 2px rgba(206, 3, 12, 0.8); }
       .custom-controls-color {
-        width: 34px;
-        height: 34px;
-        border-radius: 17px;
+        width: 32px;
+        height: 32px;
+        border-radius: 16px;
         border: 2px solid rgba(255, 255, 255, 0.35);
         cursor: pointer;
         overflow: hidden;
         box-sizing: border-box;
+        flex: 0 0 auto;
         transition: transform 0.15s ease, border-color 0.15s ease;
       }
       .custom-controls-color:hover { transform: scale(1.08); border-color: #fff; }
@@ -814,9 +855,11 @@
       .roof-type-group { display: flex; align-items: center; gap: 8px; }
       .roof-type-group + .roof-type-group { padding-left: 12px; border-left: 1px solid rgba(255, 255, 255, 0.2); }
       .roof-type-label { font-size: 11px; font-weight: 600; color: rgba(255, 255, 255, 0.75); }
+      #mulch-size-section { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 22px; }
       .sel-delete {
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 7px;
         height: 36px;
         padding: 0 14px;
@@ -828,14 +871,44 @@
         font-size: 13px;
         font-weight: 600;
         cursor: pointer;
+        white-space: nowrap;
         transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
       }
       .sel-delete:hover { background: rgba(206, 3, 12, 0.85); border-color: #ce030c; color: #fff; }
       .sel-delete[hidden] { display: none; }
       .sel-restore:hover { background: rgba(255, 255, 255, 0.18); border-color: rgba(255, 255, 255, 0.5); }
-      @media (max-width: 900px) {
-        .custom-controls-unified { flex-wrap: wrap; justify-content: center; gap: 10px; padding: 10px 36px 10px 12px; }
-        .sel-head { border: 0; padding: 0; flex-direction: row; align-items: center; gap: 10px; }
+      .sel-tab {
+        height: 30px;
+        padding: 0 12px;
+        border-radius: 15px;
+        border: 0;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.7);
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .sel-tab.on { background: rgba(255, 255, 255, 0.16); color: #fff; }
+      @media (max-width: 640px) {
+        .bar-tabs { left: 8px; max-width: calc(100% - 78px); }
+        .custom-controls-unified { flex-wrap: wrap; gap: 6px 8px; padding: 6px 10px 8px; }
+        .sel-name { display: none; }
+        .sel-tabs { display: flex; order: 1; flex: 1 1 auto; gap: 2px; min-width: 0; overflow-x: auto; }
+        .sel-actions { order: 2; padding-left: 0; border-left: 0; }
+        .sel-rows { order: 3; flex: 1 0 100%; }
+        .sel-rows > .tab-off { display: none !important; }
+        .sel-rows .custom-controls-text { display: none; }
+        /* The tab names the group; the bed's own rows still need theirs. */
+        #mulch-size-section .custom-controls-text { display: block; width: 52px; }
+        #mulch-size-section { flex-direction: column; align-items: flex-start; }
+        .sel-rows > .custom-controls-row { overflow-x: auto; }
+        .custom-controls-color { width: 34px; height: 34px; border-radius: 17px; }
+        .sel-delete { padding: 0; width: 36px; }
+        .sel-delete span { display: none; }
+        .sel-delete.sel-restore { width: auto; padding: 0 12px; }
+        .sel-delete.sel-restore span { display: inline; }
       }
 
       .cedar-tan-split {
@@ -1181,48 +1254,6 @@
         -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
         text-overflow: ellipsis;
-      }
-
-      .catalog-modal-footer {
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 15px 40px;
-        text-align: center;
-      }
-
-      .catalog-back-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: white;
-        padding: 12px 30px;
-        height: fit-content;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: all 0.3s ease;
-      }
-
-      .catalog-back-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.5);
-      }
-
-      .catalog-new-project-btn {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: white;
-        padding: 12px 30px;
-        height: fit-content;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 16px;
-        margin-right: 15px;
-        transition: all 0.3s ease;
-        display: none;
-      }
-
-      .catalog-new-project-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.5);
       }
 
       /* .custom-controls-color-canopy {
@@ -1629,7 +1660,6 @@
       .mulch-dim .slider { width: 160px; margin: 0; }
       .mulch-dim-value { width: 62px; font-size: 12px; text-align: right; opacity: 0.8; white-space: nowrap; }
       #mulch-size-section.auto .mulch-dim { opacity: 0.45; }
-      #mulch-size-section .custom-controls-row { margin-top: 6px; }
 
       #top_actions {
         position: fixed;
@@ -1931,8 +1961,72 @@
             <polyline points="6 9 12 15 18 9" />
           </svg>
         </button>
-        <div class="bar-context">
+        <!-- Tabs on the strip's top edge: the selection bar (the clicked
+             part's name, colours and Delete) over the category chips. Each
+             shows only when it has something to show. On a phone the colour
+             groups become tabs of their own (Sync_dock). -->
+        <div class="bar-tabs no-filter" id="bar_tabs">
+        <div class="custom-controls-unified bar-tab" id="selection_bar" style="display: none" role="toolbar" aria-label="Selected part">
+          <div class="sel-name" id="selection_name">Part</div>
+          <div class="sel-tabs" id="selection_tabs" role="tablist" aria-label="Colour groups"></div>
+          <div id="custom-controls-padding" class="sel-rows">
+            <div class="custom-controls-row" id="frame-section" data-tab="Frame" style="display: none;">
+              <div class="custom-controls-text" title="The frame colour for every part of the set">Frame (all)</div>
+              <div class="custom-controls-color-frame"></div>
+            </div>
+            <div class="custom-controls-row" id="trim-section" data-tab="Trim" style="display: none;">
+              <div class="custom-controls-text">Trim</div>
+              <div class="custom-controls-color-trim"></div>
+            </div>
+            <div class="custom-controls-row" id="toy-section" data-tab="Color" style="display: none;">
+              <div class="custom-controls-text">Color</div>
+              <div class="custom-controls-color-toy"></div>
+            </div>
+            <div class="custom-controls-row" id="roof-section" data-tab="Roof" style="display: none;">
+              <div class="custom-controls-text">Roof</div>
+              <div class="roof-type-group">
+                <span class="roof-type-label">Canvas</span>
+                <div class="custom-controls-color-canopy"></div>
+              </div>
+              <div class="roof-type-group" id="poly-group">
+                <span class="roof-type-label">Poly</span>
+                <div class="custom-controls-color-poly"></div>
+              </div>
+            </div>
+            <!-- The mulch or the border round it, when one of those is clicked. -->
+            <div class="custom-controls-row" id="mulch-section" data-tab="Style" style="display: none;">
+              <div class="custom-controls-text">Style</div>
+              <div class="custom-controls-color-mulch"></div>
+            </div>
+            <!-- Showing and sizing the bed: only on the mulch itself, not its border. -->
+            <div id="mulch-size-section" data-tab="Size" style="display: none;">
+              <div class="custom-controls-row">
+                <div class="custom-controls-text">Bed</div>
+                <div class="mulch-auto" id="mulch_show_row" role="switch" tabindex="0" title="Show or hide the mulch bed. Click the ground under the set to bring this back."><span class="switch" id="switch_mulch"><span class="knob"></span></span><span>Show mulch bed</span></div>
+              </div>
+              <div class="custom-controls-row">
+                <div class="custom-controls-text">Size</div>
+                <div class="mulch-auto" id="mulch_auto_row" role="switch" tabindex="0" title="Size the bed to the set and keep the set centred in it"><span class="switch" id="switch_auto"><span class="knob"></span></span><span>Fit to the set</span></div>
+              </div>
+              <div class="custom-controls-row mulch-dim">
+                <div class="custom-controls-text">Length</div>
+                <input type="range" min="3" max="50" value="10" class="slider" id="mulch_length_slider" aria-label="Mulch bed length" /><span class="mulch-dim-value" id="mulch_length_value">32ft 10in</span>
+              </div>
+              <div class="custom-controls-row mulch-dim">
+                <div class="custom-controls-text">Width</div>
+                <input type="range" min="3" max="50" value="10" class="slider" id="mulch_width_slider" aria-label="Mulch bed width" /><span class="mulch-dim-value" id="mulch_width_value">32ft 10in</span>
+              </div>
+            </div>
+          </div>
+          <div class="sel-actions">
+            <button id="custom-controls-flags" class="sel-delete sel-restore" type="button" title="Put back the flags taken off this tower" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4"></path><path d="M6 4h11l-2.5 4L17 12H6"></path></svg><span>Add flags</span></button>
+            <button id="custom-controls-delete" class="sel-delete" type="button" title="Remove this part from the design" aria-label="Delete"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M10 11v6M14 11v6"></path><path d="M6 7l1 13h10l1-13"></path><path d="M9 7V4h6v3"></path></svg><span>Delete</span></button>
+            <button class="sel-close" id="selection_close" type="button" title="Close" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6 6 18"></path></svg></button>
+          </div>
+        </div>
+        <div class="bar-context bar-tab off">
           <div id="part_filter_row"></div>
+        </div>
         </div>
         <div class="strip-wrap">
           <button id="strip_prev" class="strip-arrow strip-arrow-left off" type="button" title="Earlier parts" aria-label="Scroll the parts list left"><span><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 6 9 12 15 18" /></svg></span></button>
@@ -1940,67 +2034,6 @@
           <button id="strip_next" class="strip-arrow strip-arrow-right off" type="button" title="More parts" aria-label="Scroll the parts list right"><span><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18" /></svg></span></button>
         </div>
       </div>
-      <!-- The selection toolbar: what the clicked part is with Delete beneath it,
-           the colours it offers, and a close X in the corner. Sits above the
-           parts bar, centred over the yard. -->
-      <div class="custom-controls-unified" id="selection_bar" style="display: none" role="toolbar" aria-label="Selected part">
-        <button class="sel-close" id="selection_close" type="button" title="Close" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12"></path><path d="M18 6 6 18"></path></svg></button>
-        <div class="sel-head">
-          <div class="sel-name" id="selection_name">Part</div>
-          <button id="custom-controls-delete" class="sel-delete" type="button" title="Remove this part from the design"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M10 11v6M14 11v6"></path><path d="M6 7l1 13h10l1-13"></path><path d="M9 7V4h6v3"></path></svg><span>Delete</span></button>
-          <button id="custom-controls-flags" class="sel-delete sel-restore" type="button" title="Put back the flags taken off this tower" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4"></path><path d="M6 4h11l-2.5 4L17 12H6"></path></svg><span>Add flags</span></button>
-        </div>
-        <div id="custom-controls-padding" class="sel-rows">
-          <div class="custom-controls-row" id="frame-section" style="display: none;">
-            <div class="custom-controls-text" title="The frame colour for every part of the set">Frame (all)</div>
-            <div class="custom-controls-color-frame"></div>
-          </div>
-          <div class="custom-controls-row" id="trim-section" style="display: none;">
-            <div class="custom-controls-text">Trim</div>
-            <div class="custom-controls-color-trim"></div>
-          </div>
-          <div class="custom-controls-row" id="toy-section" style="display: none;">
-            <div class="custom-controls-text">Color</div>
-            <div class="custom-controls-color-toy"></div>
-          </div>
-          <div class="custom-controls-row" id="roof-section" style="display: none;">
-            <div class="custom-controls-text">Roof</div>
-            <div class="roof-type-group">
-              <span class="roof-type-label">Canvas</span>
-              <div class="custom-controls-color-canopy"></div>
-            </div>
-            <div class="roof-type-group" id="poly-group">
-              <span class="roof-type-label">Poly</span>
-              <div class="custom-controls-color-poly"></div>
-            </div>
-          </div>
-          <!-- The mulch or the border round it, when one of those is clicked. -->
-          <div class="custom-controls-row" id="mulch-section" style="display: none;">
-            <div class="custom-controls-text">Style</div>
-            <div class="custom-controls-color-mulch"></div>
-          </div>
-          <!-- Showing and sizing the bed: only on the mulch itself, not its border. -->
-          <div id="mulch-size-section" style="display: none;">
-            <div class="custom-controls-row">
-              <div class="custom-controls-text">Bed</div>
-              <div class="mulch-auto" id="mulch_show_row" role="switch" tabindex="0" title="Show or hide the mulch bed. Click the ground under the set to bring this back."><span class="switch" id="switch_mulch"><span class="knob"></span></span><span>Show mulch bed</span></div>
-            </div>
-            <div class="custom-controls-row">
-              <div class="custom-controls-text">Size</div>
-              <div class="mulch-auto" id="mulch_auto_row" role="switch" tabindex="0" title="Size the bed to the set and keep the set centred in it"><span class="switch" id="switch_auto"><span class="knob"></span></span><span>Fit to the set</span></div>
-            </div>
-            <div class="custom-controls-row mulch-dim">
-              <div class="custom-controls-text">Length</div>
-              <input type="range" min="3" max="50" value="10" class="slider" id="mulch_length_slider" aria-label="Mulch bed length" /><span class="mulch-dim-value" id="mulch_length_value">32ft 10in</span>
-            </div>
-            <div class="custom-controls-row mulch-dim">
-              <div class="custom-controls-text">Width</div>
-              <input type="range" min="3" max="50" value="10" class="slider" id="mulch_width_slider" aria-label="Mulch bed width" /><span class="mulch-dim-value" id="mulch_width_value">32ft 10in</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div id="info-modal-container">
         <div id="info-modal">
           <div id="info-modal-close"></div>
@@ -2034,10 +2067,6 @@
           <p class="catalog-modal-subtitle">Select a pre-designed playground to start with</p>
           <div id="catalog-projects-container">
             <!-- Catalog cards will be populated here -->
-          </div>
-          <div class="catalog-modal-footer">
-            <button onclick="startNewProjectFromCatalog()" class="catalog-new-project-btn">New Project</button>
-            <button onclick="hideCatalogModal()" class="catalog-back-btn">Back to Options</button>
           </div>
         </div>
       </div>
@@ -2699,28 +2728,16 @@
         localStorage.setItem('yard-builder-visited', 'true');
       }
 
-      function startNewProjectFromCatalog() {
-        hideCatalogModal();
-        localStorage.setItem('yard-builder-visited', 'true');
-        window.location.href = '/';
-      }
-
       async function browseCatalog() {
         hideWelcomeModal();
-        await showCatalogModal(false);
+        await showCatalogModal();
         localStorage.setItem('yard-builder-visited', 'true');
       }
 
-      async function showCatalogModal(showNewProjectButton = true) {
+      async function showCatalogModal() {
         const catalogModal = document.getElementById('catalog-modal-container');
         if (catalogModal) {
           catalogModal.style.display = 'flex';
-
-          // Show/hide the New Project button based on parameter
-          const newProjectBtn = document.querySelector('.catalog-new-project-btn');
-          if (newProjectBtn) {
-            newProjectBtn.style.display = showNewProjectButton ? 'inline-block' : 'none';
-          }
 
           // Show loading indicator while fetching catalog data
           const container = document.getElementById('catalog-projects-container');
@@ -6737,6 +6754,12 @@
           }
           return Swap_tower(target.model, objectId);
         }
+        // Its own tile: it is already there.
+        if (target.model.object_id === objectId) {
+          replacing = target;
+          Highlight_item();
+          return false;
+        }
 
         const template = Model.instances.find((m) => m.object_id === objectId);
         if (!template) return false;
@@ -6787,9 +6810,14 @@
         plug_joint = null;
         plug_joint_index = -1;
         Mode.mode = Mode.normal;
-        picked_mesh = null;
-        Hide_options();
-        Show_items();
+
+        // The new part stays selected, its tile lit and its colours showing,
+        // as a swapped tower does: the next choice is often another swap.
+        Deselect_all();
+        fresh.selected = true;
+        picked_mesh = fresh.mesh;
+        Offer_replacements(fresh);
+        Show_unified_popup();
         Update_measurements();
         return true;
       };
@@ -10555,9 +10583,17 @@
               }
             }
             if (hit) {
-              if (hit !== selected_socket) {
-                selected_socket = hit;
+              // Choosing a spot to add to is a new choice: a part selected
+              // before it lets go -- its outline, its colour tab and its lit
+              // tile -- rather than staying selected beside the ring.
+              const had_selection = !!(picked_mesh || replacing);
+              if (had_selection) {
+                picked_mesh = null;
+                Hide_options();
                 replacing = null;
+              }
+              if (hit !== selected_socket || had_selection) {
+                selected_socket = hit;
                 Show_items();
               }
               // Asking what fits here is a reason to see the answer.
@@ -10818,11 +10854,25 @@
        * where only one is left the row stands down -- a filter offering a
        * single choice is just something else to read.
        */
-      const Show_filters = function (groups) {
+      /** Whether the strip was last drawn with the colours' tab up. */
+      let strip_drawn_with_colours = false;
+      /** Is the selection bar -- the colours' tab -- up? */
+      const Selection_showing = () => {
+        const bar = document.getElementById("selection_bar");
+        return !!bar && bar.style.display !== "none" && bar.style.display !== "";
+      };
+
+      const Show_filters = function (groups, stand_down) {
         const row = document.getElementById("part_filter_row");
         if (!row) return;
+        // The chips' tab is gone when there is no choice to make, and the
+        // colours' tab then sits on the strip itself.
+        const single = groups.length < 2 || !!stand_down;
+        if (row.parentElement) row.parentElement.classList.toggle("off", single);
+        const tabs = document.getElementById("bar_tabs");
+        if (tabs) tabs.classList.toggle("no-filter", single);
 
-        if (groups.length < 2) {
+        if (single) {
           row.innerHTML = "";
           row.classList.add("single");
           return;
@@ -10930,7 +10980,15 @@
         // Attach_plug_to renders once mid-placement with nothing placeable at
         // all. Lapsing on that threw away the user's choice on every part
         // they placed.
+        //
+        // One tab at a time (Weldon, 2026-10-05): while the colours' tab is
+        // up, the chips stand down, and so does the filter they set -- a
+        // strip filtered by chips no one can see would be a puzzle. The
+        // choice is kept, not lapsed, and is back when the colours go.
+        const choosing_colours = Selection_showing();
+        strip_drawn_with_colours = choosing_colours;
         if (
+          !choosing_colours &&
           parts.length &&
           active_category_filter &&
           !by_key.has(active_category_filter)
@@ -10938,11 +10996,10 @@
           active_category_filter = null;
         }
 
-        Show_filters(groups);
+        Show_filters(groups, choosing_colours);
 
-        const shown = active_category_filter
-          ? parts.filter((part) => part.key === active_category_filter)
-          : parts;
+        const filter = choosing_colours ? null : active_category_filter;
+        const shown = filter ? parts.filter((part) => part.key === filter) : parts;
 
         if (!shown.length) {
           strip.innerHTML =
@@ -11035,6 +11092,7 @@
         Prefetch_parts(shown.map((part) => part.child.model));
         Refresh_panel();
         Update_strip_arrows();
+        if (replacing) Scroll_to_selected_tile();
       };
 
       // ---------------------------------------- dragging a part out of the strip
@@ -11100,14 +11158,26 @@
 
       const Highlight_item = function () {
         $(".part-tile").removeClass("selected");
-        // With a tower selected, the strip is the towers it could become,
-        // and its own tile is the one lit.
-        const id =
-          selected_object_id || (replacing && replacing.tower ? replacing.model.object_id : null);
+        // With a part selected, the strip is what could go where it is --
+        // the towers a tower could become, the slides for a slide's opening
+        // -- and its own tile is the one lit, so the colour options above
+        // the strip read as belonging to it (Weldon, 2026-10-05).
+        const id = selected_object_id || (replacing ? replacing.model.object_id : null);
         if (id) {
           $('.part-tile[data-object-id="' + id + '"]').addClass("selected");
           $('.part-tile[data-members~="' + id + '"]').addClass("selected");
         }
+      };
+
+      /** Bring the selected part's tile into view in the strip, if it is off the end. */
+      const Scroll_to_selected_tile = () => {
+        const strip = document.getElementById("part_strip");
+        const tile = strip && strip.querySelector(".part-tile.selected");
+        if (!tile) return;
+        const left = tile.offsetLeft - strip.offsetLeft;
+        if (left < strip.scrollLeft || left + tile.offsetWidth > strip.scrollLeft + strip.clientWidth)
+          strip.scrollLeft = Math.max(0, left - (strip.clientWidth - tile.offsetWidth) / 2);
+        if (typeof Update_strip_arrows === "function") Update_strip_arrows();
       };
 
       // ------------------------------------------- towers sold at two heights
@@ -11341,15 +11411,20 @@
       // A selected part's settings panel sits bottom centre. On a phone it
       // reaches the chip's corner and the chip would sit over its colours,
       // so the chip steps out of sight while the two overlap.
+      /**
+       * Keep the size chip clear of the tabs on the strip's edge. It stands
+       * at the right and they rise from the left, so they only meet on a
+       * narrow screen with a wide tab up; then it stands above them.
+       */
       const Size_chip_clear = () => {
-        const panel = document.querySelector(".custom-controls-unified");
-        let covered = false;
-        if (panel && getComputedStyle(panel).display !== "none") {
+        const tabs = document.getElementById("bar_tabs");
+        let lifted = false;
+        if (tabs && tabs.offsetHeight > 0 && !document.body.classList.contains("bar-collapsed")) {
           const a = size_chip.getBoundingClientRect();
-          const b = panel.getBoundingClientRect();
-          covered = a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+          const b = tabs.getBoundingClientRect();
+          lifted = a.left < b.right && b.left < a.right;
         }
-        size_chip.classList.toggle("covered", covered);
+        size_chip.classList.toggle("lifted", lifted);
       };
       (() => {
         const panel = document.querySelector(".custom-controls-unified");
@@ -11363,6 +11438,87 @@
         panel.addEventListener("transitionend", Size_chip_clear);
         window.addEventListener("resize", Size_chip_clear);
       })();
+      // ------------------------------------------------- the selection bar
+      /**
+       * Keep the docked selection bar in step with what it is showing.
+       *
+       * The tabs a phone shows are the colour groups now visible -- Frame,
+       * Trim and Roof for a tower, Color for a slide, Style and Size for the
+       * mulch bed -- and only the chosen group's swatches show beneath them
+       * (CSS hides the rest below 640px; a wider screen shows them all and
+       * never sees the tabs). The group chosen is remembered, so going from
+       * one tower to another stays on Roof.
+       *
+       * Whoever shows or hides a group sets its inline display, so this
+       * watches for that rather than being called from every place that
+       * fills the bar.
+       */
+      let dock_tab = null;
+      const Sync_dock = () => {
+        const rows = document.getElementById("custom-controls-padding");
+        const tabs = document.getElementById("selection_tabs");
+        if (!rows || !tabs) return;
+        const names = [...rows.children]
+          .filter((el) => el.dataset.tab && el.style.display !== "none")
+          .map((el) => el.dataset.tab);
+        const active = names.includes(dock_tab) ? dock_tab : names[0] || null;
+        const html = names
+          .map(
+            (name) =>
+              '<button type="button" role="tab" class="sel-tab' +
+              (name === active ? " on" : "") +
+              '" aria-selected="' +
+              (name === active) +
+              '" data-tab="' +
+              name +
+              '">' +
+              name +
+              "</button>"
+          )
+          .join("");
+        if (tabs.innerHTML !== html) tabs.innerHTML = html;
+        for (const el of rows.children)
+          el.classList.toggle("tab-off", !!el.dataset.tab && el.dataset.tab !== active);
+      };
+      (() => {
+        const bar = document.getElementById("selection_bar");
+        const rows = document.getElementById("custom-controls-padding");
+        const tabs = document.getElementById("selection_tabs");
+        if (!bar || !rows || !tabs) return;
+        new MutationObserver(Sync_dock).observe(rows, {
+          attributes: true,
+          attributeFilter: ["style"],
+          subtree: true,
+        });
+        // The chips and the colours take turns: when the colours' tab comes
+        // or goes, the strip is drawn again with the chips (and their
+        // filter) out or back. Measured against how the strip was last
+        // drawn, not the tab's last state: a swap closes the tab, draws the
+        // strip, and opens the tab again within one task, so the tab looks
+        // unchanged while the strip was drawn with the chips back.
+        new MutationObserver(() => {
+          if (Selection_showing() !== strip_drawn_with_colours) Show_items();
+        }).observe(bar, { attributes: true, attributeFilter: ["style"] });
+        tabs.addEventListener("click", (event) => {
+          const tab = event.target.closest(".sel-tab");
+          if (!tab) return;
+          dock_tab = tab.dataset.tab;
+          Sync_dock();
+        });
+        // What sits above the parts bar -- the size chip -- sits above the
+        // tabs on its edge too, by however tall they stand.
+        const stack = document.getElementById("bar_tabs") || bar;
+        const measure = () => {
+          document.documentElement.style.setProperty("--dock-h", stack.offsetHeight + "px");
+          Size_chip_clear();
+        };
+        // The chip glides to its new place; ask again once it is there.
+        size_chip.addEventListener("transitionend", Size_chip_clear);
+        if (typeof ResizeObserver === "function") new ResizeObserver(measure).observe(stack);
+        new MutationObserver(measure).observe(stack, { attributes: true, attributeFilter: ["style", "class"], subtree: true });
+        Sync_dock();
+      })();
+
       // Taking hold of the scene stops a camera swing where it is.
       for (const type of ["pointerdown", "wheel"])
         document.addEventListener(
