@@ -811,7 +811,7 @@
     check("deleting the tower takes the rest", placed(), []);
 
     // A saved design says what it contains; nothing is added on top.
-    const state = await (await fetch("assets/catalog/_175 Jolly Retreat.json")).text();
+    const state = await (await fetch("assets/catalog/_175 Jolly Retreat.json", { cache: "no-cache" })).text();
     await Ensure_models_for_state(state);
     blueprint.restore({ state });
     await idle(600);
@@ -1116,7 +1116,7 @@
     let worstSet = "";
     const missing = [];
     for (const file of catalogue) {
-      const state = await (await fetch("assets/catalog/" + encodeURIComponent(file))).text();
+      const state = await (await fetch("assets/catalog/" + encodeURIComponent(file), { cache: "no-cache" })).text();
       await Ensure_models_for_state(state);
       blueprint.restore({ state });
       await idle(500);
@@ -1157,6 +1157,24 @@
             dangling.push(`${m.object_id}.${j.name}`);
       check(`${file.slice(0, 22)} leaves no joint closed for no reason`, dangling, []);
       check(`${file.slice(0, 22)} links all point both ways`, brokenLinks(), []);
+
+      // Rebuilt 2026-10-05 from the current rules: every connection a set
+      // makes is one placing it by hand would make.
+      const refused = [];
+      for (const m of models_with_available_joints)
+        for (const j of m.joints)
+          if (j.connected && !Joints_connect(j, j.connected) && !Joints_connect(j.connected, j))
+            refused.push(`${m.object_id}.${j.name} -> ${j.connected.model.object_id}.${j.connected.name}`);
+      check(`${file.slice(0, 22)} makes no connection the rules refuse`, refused, []);
+
+      // A swing comes back in its beam's length, though the beam is listed
+      // first and its record is the one that makes the connection.
+      const wrong_length = [];
+      for (const m of models_with_available_joints)
+        for (const j of m.joints)
+          if (j.connected && Morph_target_for(j.connected) && m.layers.length && m.layer !== Morph_target_for(j.connected))
+            wrong_length.push(`${m.object_id} is ${m.layer} on ${Morph_target_for(j.connected)}`);
+      check(`${file.slice(0, 22)} hangs every swing in its beam's length`, wrong_length, []);
 
       // Where every part ended up, against where the file says it was. Pair
       // each saved model with its NEAREST live twin of the same product, never

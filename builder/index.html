@@ -3320,11 +3320,24 @@
                     // length before it is hung. By name afterwards: morph
                     // rebuilds the joint list, and names are unique within a
                     // layer where indices are not.
+                    //
+                    // Whichever end this record is written from. Each
+                    // connection is made once, from the first of its two
+                    // records, and a beam is listed before its swings -- so
+                    // the beam's record made it, only the beam was asked to
+                    // morph, and every swing on an 8 ft beam came back with
+                    // its 10 ft chains, reaching up past the beam.
                     const joint_name = joint.name;
                     const joint_index = joint.index;
                     if (Morph_to_fit(model, joint2)) {
                       joint =
                         Find_saved_joint(model, joint_name, joint_index) || model.joints[0];
+                    }
+                    const joint2_name = joint2.name;
+                    const joint2_index = joint2.index;
+                    if (Morph_to_fit(model2, joint)) {
+                      joint2 =
+                        Find_saved_joint(model2, joint2_name, joint2_index) || model2.joints[0];
                     }
 
                     Connect_joints({ joint_1: joint, joint_2: joint2 });
@@ -4828,9 +4841,71 @@
           // A toy is all toy joints; a tower merely offers toy mounts.
           const on_a_post =
             model.joints.length > 0 && model.joints.every((joint) => joint.layer === "toy");
+          if (Category_of(model) === "swing_beams") {
+            for (const slice of Slice_boxes(model.mesh, box, BEAM_SLICES))
+              placed_boxes.push({ model, box: slice, anchors, on_a_post, slice: true });
+            continue;
+          }
           placed_boxes.push({ model, box, anchors, on_a_post });
         }
         return placed_boxes;
+      };
+
+      /**
+       * A swing beam's room, a length of it at a time.
+       *
+       * The beam and its A-frame are one mesh, so its box is as wide as the
+       * A-frame's feet -- 2.4 m -- all the way along, where the beam itself is
+       * 10 cm wide and three metres up. That box took the side of the tower
+       * the beam is fixed to: a Turbo Twister off the DX Sky Tower's upper
+       * deck, as PlayMor sell it in the Dizzy Delight, ran into a beam it is
+       * nowhere near. Cut into lengths, each measured from the triangles
+       * that cross it, the beam is thin by the tower and wide only at the
+       * A-frame end.
+       */
+      const BEAM_SLICES = 8;
+      const Slice_boxes = (root, whole, count) => {
+        const size = whole.getSize(new THREE.Vector3());
+        const axis = size.x > size.z ? "x" : "z";
+        const start = whole.min[axis];
+        const step = (whole.max[axis] - start) / count;
+        const boxes = Array.from({ length: count }, () => new THREE.Box3());
+        const corners = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
+        const point = new THREE.Vector3();
+        root.updateMatrixWorld(true);
+        root.traverse((mesh) => {
+          if (!mesh.isMesh || !mesh.geometry || mesh.name === HIT_BOX_NAME) return;
+          const position = mesh.geometry.attributes.position;
+          const index = mesh.geometry.index;
+          const triangles = (index ? index.count : position.count) / 3;
+          for (let t = 0; t < triangles; t++) {
+            for (let k = 0; k < 3; k++) {
+              const i = index ? index.getX(t * 3 + k) : t * 3 + k;
+              corners[k].fromBufferAttribute(position, i).applyMatrix4(mesh.matrixWorld);
+            }
+            const values = corners.map((corner) => corner[axis]);
+            const first = Math.max(0, Math.floor((Math.min(...values) - start) / step));
+            const last = Math.min(count - 1, Math.floor((Math.max(...values) - start) / step));
+            for (let s = first; s <= last; s++) {
+              // The part of the triangle inside this length: its corners
+              // that are, and where its edges cross the two cut planes.
+              const low = start + s * step;
+              const high = low + step;
+              for (let k = 0; k < 3; k++) {
+                const a = corners[k];
+                const b = corners[(k + 1) % 3];
+                if (a[axis] >= low - 1e-6 && a[axis] <= high + 1e-6) boxes[s].expandByPoint(a);
+                for (const cut of [low, high]) {
+                  if ((a[axis] - cut) * (b[axis] - cut) < 0) {
+                    point.copy(a).lerp(b, (cut - a[axis]) / (b[axis] - a[axis]));
+                    boxes[s].expandByPoint(point);
+                  }
+                }
+              }
+            }
+          }
+        });
+        return boxes.filter((box) => !box.isEmpty());
       };
 
       /**
@@ -4879,10 +4954,22 @@
         // filed under toys but goes where a slide goes, and takes that room.
         if (plug_joint.layer === "toy") return true;
 
+        // A swing hangs where the beam's maker spaced the hangers, clear of
+        // the tower the beam is fixed to -- but that tower's box reaches out
+        // to its roof's overhang, high above the hanger, and caught a trapeze
+        // or glider on the hanger beside it, which is where PlayMor's own
+        // sets hang the trapeze. So a swing is not measured against what
+        // holds its beam up; anything else in its way still counts.
+        const holders = new Set();
+        if (["s", "sh", "swivel"].includes(host_joint.layer) && host_joint.model)
+          for (const joint of host_joint.model.joints)
+            if (joint.connected && Is_free_standing(joint.connected.model))
+              holders.add(joint.connected.model);
         const placed = Placed_boxes().filter(
           (p) =>
             p.model !== host_joint.model &&
             p.model !== args.exclude_preview &&
+            !holders.has(p.model) &&
             !p.on_a_post
         );
         const hjp = new THREE.Vector3();
@@ -4911,7 +4998,10 @@
           let nearest = p.anchors[0];
           for (const candidate of p.anchors)
             if (candidate.distanceToSquared(hjp) < nearest.distanceToSquared(hjp)) nearest = candidate;
-          if (plug_box.intersectsBox(Shrunk_about(p.box, nearest))) return false;
+          // A length of beam is drawn in about its own nearest point, so the
+          // far lengths keep their place rather than sliding to the tower.
+          const pivot = p.slice ? p.box.clampPoint(nearest, new THREE.Vector3()) : nearest;
+          if (plug_box.intersectsBox(Shrunk_about(p.box, pivot))) return false;
         }
         return true;
       };
