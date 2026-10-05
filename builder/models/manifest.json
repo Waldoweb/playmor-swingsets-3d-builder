@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-10-03T14:12:41.098Z",
+  "generated_at": "2026-10-05T02:29:23.068Z",
   "product_count": 64,
   "default_fittings": [
     {
@@ -10493,8 +10493,8 @@
       "files": [
         {
           "layer": null,
-          "file": "MAIL.47e58b23.glb",
-          "bytes": 31684,
+          "file": "MAIL.882e7ccf.glb",
+          "bytes": 31716,
           "joints": [
             "joint_mailbox_or_phone,0,toy"
           ],
@@ -10520,12 +10520,12 @@
             [
               -0.128,
               -0.121,
-              -0.006
+              -0.149
             ],
             [
               0.128,
               0.119,
-              0.149
+              0.006
             ]
           ],
           "joint_positions": {
@@ -10555,8 +10555,8 @@
       "files": [
         {
           "layer": null,
-          "file": "TEL.1845eb6f.glb",
-          "bytes": 44744,
+          "file": "TEL.9728432e.glb",
+          "bytes": 44776,
           "joints": [
             "joint_mailbox_or_phone,0,toy"
           ],
@@ -10582,12 +10582,12 @@
             [
               -0.032,
               -0.102,
-              0
+              -0.092
             ],
             [
               0.032,
               0.102,
-              0.092
+              0
             ]
           ],
           "joint_positions": {
