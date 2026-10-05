@@ -222,6 +222,37 @@
         ]
       }
     },
+    "P-WT-7": {
+      "sections": [
+        "roof",
+        "frame",
+        "trim"
+      ],
+      "colors": {
+        "frame": "@frame_colors",
+        "roof": {
+          "canopy": "@roof_canopy_colors",
+          "poly": "@roof_poly"
+        },
+        "trim": "@trim_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": [
+          "Watch_tower_base_middle002",
+          "Cube833_1001"
+        ],
+        "tan_meshes": [
+          "Watch_tower_base_bottom002",
+          "Cube833"
+        ],
+        "all_meshes": [
+          "Watch_tower_base_bottom002",
+          "Cube833",
+          "Watch_tower_base_middle002",
+          "Cube833_1001"
+        ]
+      }
+    },
     "P-ST": {
       "sections": [
         "roof",

@@ -1,7 +1,7 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-10-05T02:29:23.068Z",
-  "product_count": 64,
+  "generated_at": "2026-10-05T02:50:23.122Z",
+  "product_count": 65,
   "default_fittings": [
     {
       "part": "SSC",
@@ -1304,7 +1304,7 @@
       ]
     },
     "P-WT": {
-      "name": "Sky Tower",
+      "name": "Sky Tower - 5ft",
       "category": "towers",
       "category_index": 0,
       "children_index": 2,
@@ -2136,11 +2136,834 @@
         }
       ]
     },
+    "P-WT-7": {
+      "name": "Sky Tower - 7ft",
+      "category": "towers",
+      "category_index": 0,
+      "children_index": 3,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-WT-7.9dd055aa.glb",
+          "bytes": 416464,
+          "joints": [
+            "joint,0,floor_center_watch",
+            "joint,1,8,4,5",
+            "joint,3,8,9,10",
+            "joint_back,2,end_rail",
+            "joint_back_l_wheel,0,toy",
+            "joint_back_l,2,8,7,6",
+            "joint_back_l_scope,2,toy",
+            "joint_back_r_wheel,0,toy",
+            "joint_back_r,2,8,7,6",
+            "joint_back_r_scope,2,toy",
+            "joint_beam_back,2,b10,8,6",
+            "joint_beam_front,0,b10,3,1",
+            "joint_floor_center,0,picnic",
+            "joint_front,0,end_rail",
+            "joint_front_l,0,8,2,1",
+            "joint_front_l_scope,0,toy",
+            "joint_front_l_wheel,2,toy",
+            "joint_front_r,0,8,2,1",
+            "joint_front_r_scope,0,toy",
+            "joint_front_r_wheel,2,toy",
+            "joint_left,3,end_rail",
+            "joint_left_l,3,8,10,9",
+            "joint_left_r,3,8,10,9",
+            "joint_pole_female,0,8,1,2",
+            "joint_pole_female,2,8,67",
+            "joint_right,1,end_rail",
+            "joint_right_l,1,8,5,4",
+            "joint_right_r,1,8,5,4"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                0.153,
+                0
+              ],
+              "accepts": [
+                "floor_center_watch"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,floor_center_watch"
+              ]
+            },
+            {
+              "marker": [
+                0.762,
+                2.425,
+                0
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,8,4,5"
+              ]
+            },
+            {
+              "marker": [
+                -0.762,
+                2.425,
+                0
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint,3,8,9,10"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0,
+                -0.777
+              ],
+              "accepts": [
+                "end_rail"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back,2,end_rail"
+              ]
+            },
+            {
+              "marker": [
+                0.312,
+                2.845,
+                -0.711
+              ],
+              "accepts": [
+                "toy"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_back_l_wheel,0,toy"
+              ]
+            },
+            {
+              "marker": [
+                0.339,
+                2.425,
+                -0.765
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back_l,2,8,7,6"
+              ]
+            },
+            {
+              "marker": [
+                0.312,
+                3.325,
+                -0.735
+              ],
+              "accepts": [
+                "toy"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back_l_scope,2,toy"
+              ]
+            },
+            {
+              "marker": [
+                -0.312,
+                2.845,
+                -0.711
+              ],
+              "accepts": [
+                "toy"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_back_r_wheel,0,toy"
+              ]
+            },
+            {
+              "marker": [
+                -0.329,
+                2.425,
+                -0.765
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back_r,2,8,7,6"
+              ]
+            },
+            {
+              "marker": [
+                -0.312,
+                3.325,
+                -0.735
+              ],
+              "accepts": [
+                "toy"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back_r_scope,2,toy"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.2,
+                -0.661
+              ],
+              "accepts": [
+                "b10"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_beam_back,2,b10,8,6"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.2,
+                0.661
+              ],
+              "accepts": [
+                "b10"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_beam_front,0,b10,3,1"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0.393,
+                0
+              ],
+              "accepts": [
+                "picnic"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_floor_center,0,picnic"
+              ],
+              "marker_offset": [
+                0,
+                0.393,
+                0
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0,
+                0.777
+              ],
+              "accepts": [
+                "end_rail"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front,0,end_rail"
+              ]
+            },
+            {
+              "marker": [
+                -0.339,
+                2.425,
+                0.765
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front_l,0,8,2,1"
+              ]
+            },
+            {
+              "marker": [
+                -0.312,
+                3.325,
+                0.738
+              ],
+              "accepts": [
+                "toy"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front_l_scope,0,toy"
+              ]
+            },
+            {
+              "marker": [
+                -0.312,
+                2.845,
+                0.706
+              ],
+              "accepts": [
+                "toy"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_front_l_wheel,2,toy"
+              ]
+            },
+            {
+              "marker": [
+                0.329,
+                2.425,
+                0.765
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front_r,0,8,2,1"
+              ]
+            },
+            {
+              "marker": [
+                0.312,
+                3.325,
+                0.738
+              ],
+              "accepts": [
+                "toy"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front_r_scope,0,toy"
+              ]
+            },
+            {
+              "marker": [
+                0.312,
+                2.845,
+                0.706
+              ],
+              "accepts": [
+                "toy"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_front_r_wheel,2,toy"
+              ]
+            },
+            {
+              "marker": [
+                -0.78,
+                0,
+                0
+              ],
+              "accepts": [
+                "end_rail"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left,3,end_rail"
+              ]
+            },
+            {
+              "marker": [
+                -0.762,
+                2.425,
+                -0.336
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left_l,3,8,10,9"
+              ]
+            },
+            {
+              "marker": [
+                -0.762,
+                2.425,
+                0.333
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left_r,3,8,10,9"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.425,
+                0.764
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_pole_female,0,8,1,2"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.425,
+                -0.764
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_pole_female,2,8,67"
+              ]
+            },
+            {
+              "marker": [
+                0.783,
+                0,
+                0
+              ],
+              "accepts": [
+                "end_rail"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_right,1,end_rail"
+              ]
+            },
+            {
+              "marker": [
+                0.762,
+                2.425,
+                0.341
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_right_l,1,8,5,4"
+              ]
+            },
+            {
+              "marker": [
+                0.762,
+                2.425,
+                -0.339
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_right_r,1,8,5,4"
+              ]
+            }
+          ],
+          "bounds": [
+            [
+              -1.262,
+              0,
+              -1.1
+            ],
+            [
+              1.262,
+              5.269,
+              1.093
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,floor_center_watch": [
+              0,
+              0.153,
+              0
+            ],
+            "joint,1,8,4,5": [
+              0.762,
+              2.425,
+              0
+            ],
+            "joint,3,8,9,10": [
+              -0.762,
+              2.425,
+              0
+            ],
+            "joint_back,2,end_rail": [
+              0,
+              0,
+              -0.777
+            ],
+            "joint_back_l_wheel,0,toy": [
+              0.312,
+              2.845,
+              -0.711
+            ],
+            "joint_back_l,2,8,7,6": [
+              0.339,
+              2.425,
+              -0.765
+            ],
+            "joint_back_l_scope,2,toy": [
+              0.312,
+              3.325,
+              -0.735
+            ],
+            "joint_back_r_wheel,0,toy": [
+              -0.312,
+              2.845,
+              -0.711
+            ],
+            "joint_back_r,2,8,7,6": [
+              -0.329,
+              2.425,
+              -0.765
+            ],
+            "joint_back_r_scope,2,toy": [
+              -0.312,
+              3.325,
+              -0.735
+            ],
+            "joint_beam_back,2,b10,8,6": [
+              0,
+              3.2,
+              -0.661
+            ],
+            "joint_beam_front,0,b10,3,1": [
+              0,
+              3.2,
+              0.661
+            ],
+            "joint_floor_center,0,picnic": [
+              0,
+              0,
+              0
+            ],
+            "joint_front,0,end_rail": [
+              0,
+              0,
+              0.777
+            ],
+            "joint_front_l,0,8,2,1": [
+              -0.339,
+              2.425,
+              0.765
+            ],
+            "joint_front_l_scope,0,toy": [
+              -0.312,
+              3.325,
+              0.738
+            ],
+            "joint_front_l_wheel,2,toy": [
+              -0.312,
+              2.845,
+              0.706
+            ],
+            "joint_front_r,0,8,2,1": [
+              0.329,
+              2.425,
+              0.765
+            ],
+            "joint_front_r_scope,0,toy": [
+              0.312,
+              3.325,
+              0.738
+            ],
+            "joint_front_r_wheel,2,toy": [
+              0.312,
+              2.845,
+              0.706
+            ],
+            "joint_left,3,end_rail": [
+              -0.78,
+              0,
+              0
+            ],
+            "joint_left_l,3,8,10,9": [
+              -0.762,
+              2.425,
+              -0.336
+            ],
+            "joint_left_r,3,8,10,9": [
+              -0.762,
+              2.425,
+              0.333
+            ],
+            "joint_pole_female,0,8,1,2": [
+              0,
+              2.425,
+              0.764
+            ],
+            "joint_pole_female,2,8,67": [
+              0,
+              2.425,
+              -0.764
+            ],
+            "joint_right,1,end_rail": [
+              0.783,
+              0,
+              0
+            ],
+            "joint_right_l,1,8,5,4": [
+              0.762,
+              2.425,
+              0.341
+            ],
+            "joint_right_r,1,8,5,4": [
+              0.762,
+              2.425,
+              -0.339
+            ]
+          }
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,floor_center_watch",
+          "direction": 0,
+          "layer": "floor_center_watch",
+          "tire_only": false
+        },
+        {
+          "name": "joint,1,8,4,5",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint,3,8,9,10",
+          "direction": 3,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_back,2,end_rail",
+          "direction": 2,
+          "layer": "end_rail",
+          "tire_only": false
+        },
+        {
+          "name": "joint_back_l_wheel,0,toy",
+          "direction": 0,
+          "layer": "toy",
+          "tire_only": false
+        },
+        {
+          "name": "joint_back_l,2,8,7,6",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_back_l_scope,2,toy",
+          "direction": 2,
+          "layer": "toy",
+          "tire_only": false
+        },
+        {
+          "name": "joint_back_r_wheel,0,toy",
+          "direction": 0,
+          "layer": "toy",
+          "tire_only": false
+        },
+        {
+          "name": "joint_back_r,2,8,7,6",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_back_r_scope,2,toy",
+          "direction": 2,
+          "layer": "toy",
+          "tire_only": false
+        },
+        {
+          "name": "joint_beam_back,2,b10,8,6",
+          "direction": 2,
+          "layer": "b10",
+          "tire_only": false
+        },
+        {
+          "name": "joint_beam_front,0,b10,3,1",
+          "direction": 0,
+          "layer": "b10",
+          "tire_only": false
+        },
+        {
+          "name": "joint_floor_center,0,picnic",
+          "direction": 0,
+          "layer": "picnic",
+          "tire_only": false
+        },
+        {
+          "name": "joint_front,0,end_rail",
+          "direction": 0,
+          "layer": "end_rail",
+          "tire_only": false
+        },
+        {
+          "name": "joint_front_l,0,8,2,1",
+          "direction": 0,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_front_l_scope,0,toy",
+          "direction": 0,
+          "layer": "toy",
+          "tire_only": false
+        },
+        {
+          "name": "joint_front_l_wheel,2,toy",
+          "direction": 2,
+          "layer": "toy",
+          "tire_only": false
+        },
+        {
+          "name": "joint_front_r,0,8,2,1",
+          "direction": 0,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_front_r_scope,0,toy",
+          "direction": 0,
+          "layer": "toy",
+          "tire_only": false
+        },
+        {
+          "name": "joint_front_r_wheel,2,toy",
+          "direction": 2,
+          "layer": "toy",
+          "tire_only": false
+        },
+        {
+          "name": "joint_left,3,end_rail",
+          "direction": 3,
+          "layer": "end_rail",
+          "tire_only": false
+        },
+        {
+          "name": "joint_left_l,3,8,10,9",
+          "direction": 3,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_left_r,3,8,10,9",
+          "direction": 3,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_pole_female,0,8,1,2",
+          "direction": 0,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_pole_female,2,8,67",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_right,1,end_rail",
+          "direction": 1,
+          "layer": "end_rail",
+          "tire_only": false
+        },
+        {
+          "name": "joint_right_l,1,8,5,4",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_right_r,1,8,5,4",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false
+        }
+      ]
+    },
     "P-ST": {
       "name": "Summit Tower",
       "category": "towers",
       "category_index": 0,
-      "children_index": 3,
+      "children_index": 4,
       "multi_layer": false,
       "files": [
         {
@@ -2834,7 +3657,7 @@
       "name": "DX Sky Tower",
       "category": "towers",
       "category_index": 0,
-      "children_index": 4,
+      "children_index": 5,
       "multi_layer": false,
       "files": [
         {
@@ -3733,7 +4556,7 @@
       "name": "DX Summit Tower",
       "category": "towers",
       "category_index": 0,
-      "children_index": 5,
+      "children_index": 6,
       "multi_layer": false,
       "files": [
         {
@@ -4842,7 +5665,7 @@
       "name": "King’s Tower",
       "category": "towers",
       "category_index": 0,
-      "children_index": 6,
+      "children_index": 7,
       "multi_layer": false,
       "files": [
         {
@@ -5634,7 +6457,7 @@
       "name": "Bridge",
       "category": "towers",
       "category_index": 0,
-      "children_index": 7,
+      "children_index": 8,
       "multi_layer": false,
       "files": [
         {
@@ -5724,7 +6547,7 @@
       "name": "Tunnel",
       "category": "towers",
       "category_index": 0,
-      "children_index": 8,
+      "children_index": 9,
       "multi_layer": false,
       "files": [
         {

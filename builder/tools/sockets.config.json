@@ -84,6 +84,10 @@
     "P-WT": [
       "joint_back_l_mailbox_or_phone,2,toy",
       "joint_front_l_mailbox_or_phone,0,toy"
+    ],
+    "P-WT-7": [
+      "joint_back_l_mailbox_or_phone,2,toy",
+      "joint_front_l_mailbox_or_phone,0,toy"
     ]
   },
   "_remove_joints_note": [
@@ -103,6 +107,9 @@
     "is the top-corner toy point, the same one taken off the King's Tower, so",
     "both go. The tower keeps its three scope mounts and three wheel mounts,",
     "which still take any of the five toys.",
+    "",
+    "P-WT-7: the 7 ft Sky Tower, built from the 5 ft one by tools/raise_tower.py,",
+    "so it carries the same two mounts, already taken out.",
     "",
     "P-KT: the King's Tower mailbox mounts, the pair up at the top corners.",
     "Weldon asked for that point to go and it is the highest toy point on the",
