@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 """
-Build the 5 ft and 7 ft Turbo Twister tubes from PlayMor's reference photos.
-
-The 5 ft slide (TurboTubeSlide5.jpg) has an S bend, not the 7 ft slide's
-full loop: facing the panel from outside, it sweeps left and then eases
-back to an outward-facing chute. The entrance is on the right of the
-exit. The lower elbow comes back toward the right before opening into
-the chute, as in the photo. Both versions retain their attachment nodes.
+Build the Turbo Twister tubes, 7 ft and 5 ft, to PlayMor's shapes.
 
 Weldon (2026-10-05, with photos): the old model was the wrong shape and its
 exit came out in the wrong place. The real slide leaves the deck through a
@@ -19,8 +13,14 @@ the face).
 
 So the centreline here is, seen from above, an arc to the right starting at
 the panel, an arc to the left that carries on round a full turn more -- its near side clear of the tower face -- and a straight chute out.
-Its height falls on a smooth slope: nearly level at the deck, steepest round
-the turn, easing off into the chute. Swept along it:
+The 5 ft one (Weldon, 2026-10-05, with PlayMor's photo) twists the same
+way -- right off the panel, then round to the left -- but stops a quarter
+turn sooner: it comes back under its top lengths and out to the right as
+you face the slide. Seven bolted lengths: the entrance, five round the
+twist, and the exit.
+
+The height falls on a smooth slope: nearly level at the deck, steepest
+round the turn, easing off into the chute. Swept along it:
 
   - the tube, 0.66 m across with a 15 mm wall, belled out at the panel (the
     hood the photos show) with its floor kept level with the deck;
@@ -40,12 +40,11 @@ Only the meshes change. The joint node -- its name, mesh, place -- and the
 root node are kept as they are, so saved designs keep their connection, and
 the builder still mirrors it by the `mirrorx` in the root's name.
 
-Usage:  python3 tools/turbo_twister.py [--height 5|7] [--dry-run]
+Usage:  python3 tools/turbo_twister.py [--dry-run] [TTWS-7] [TTWS-5]
 Then:   node tools/build_models.js
 """
 
 import glob
-import argparse
 import hashlib
 import json
 import math
@@ -94,22 +93,50 @@ SIDES = 32  # round the tube
 STEP = 0.05  # along it
 
 
-def path(deck, height=7):
-    """Centreline stations (u out from the panel, w to the left, y up, None, p
-    along), the length, and where each length of tube ends (p)."""
-    # (length, curvature): + turns left, toward +w.
+# The 5 ft, seen from above: the 7 ft's swing right and loop left, the loop
+# ending a quarter turn sooner so the chute faces right, under the top.
+SWING_5_R = 0.70
+SWING_5 = math.radians(60)
+TURN_5_R = 0.42
+CHUTE_5 = 0.50
+ENTRANCE_5 = 0.45  # the first length, the bell's
+EXIT_SECTION_5 = 0.75  # the last: the chute and the loop's end
+
+
+def shape(stem):
+    """The path seen from above as (length, curvature) pieces -- + turns
+    left, toward +w -- and where each length of tube ends, from the total."""
+    if stem == "TTWS-5":
+        segments = [
+            (SWING_5_R * SWING_5, -1 / SWING_5_R),
+            (TURN_5_R * (SWING_5 + 1.5 * math.pi), 1 / TURN_5_R),
+            (CHUTE_5, 0.0),
+        ]
+
+        def joins(total):
+            # Seven lengths: the entrance, five the same round the twist,
+            # and the exit.
+            last = total - EXIT_SECTION_5
+            return [ENTRANCE_5 + (last - ENTRANCE_5) * k / 5 for k in range(6)]
+
+        return segments, joins, None
+    # Four lengths of tube, as PlayMor's has (Weldon, 2026-10-05): a long
+    # first one that leaves the panel already curving right (the bell is
+    # its mouth) and runs on into the loop, two more down the loop, and the
+    # exit -- the end of the loop and the open chute. The first three are
+    # the same length.
     segments = [
         (SWING_R * SWING, -1 / SWING_R),
         (TURN_R * (SWING + 2 * math.pi), 1 / TURN_R),
         (CHUTE, 0.0),
     ]
-    if height == 5:
-        # The upper elbow sweeps left; the longer lower elbow returns right.
-        # Equal opposing angles make a diagonal dogleg with no return bend.
-        # The chute still projects out from the tower, angled back toward
-        # the entrance side, and its centre remains left of the entrance.
-        segments = [(0.70 * math.radians(80), 1 / 0.70),
-                    (0.55 * math.radians(135), -1 / 0.55), (CHUTE, 0.0)]
+    return segments, lambda total: [(total - EXIT_SECTION) * q for q in (1 / 3, 2 / 3, 1.0)], None
+
+
+def path(deck, stem="TTWS-7"):
+    """Centreline stations (u out from the panel, w to the left, y up, None, p
+    along), the length, and where each length of tube ends (p)."""
+    segments, joins_of, slope_of = shape(stem)
     total = sum(length for length, _ in segments)
     n = int(math.ceil(total / STEP))
     # Finer over the chute's opening, so the arch of its edge is drawn round:
@@ -136,17 +163,7 @@ def path(deck, height=7):
     us = np.interp(ps, walked[:, 0], walked[:, 1])
     ws = np.interp(ps, walked[:, 0], walked[:, 2])
 
-    # Four lengths of tube, as PlayMor's has (Weldon, 2026-10-05): a long
-    # first one that leaves the panel already curving right (the bell is
-    # its mouth) and runs on into the loop, two more down the loop, and the
-    # exit -- the end of the loop and the open chute. The first three are
-    # the same length.
-    body = total - EXIT_SECTION
-    joins = [body * q for q in (1 / 3, 2 / 3, 1.0)]
-    if height == 5:
-        swing_end, loop = segments[0][0], segments[1][0]
-        joins = [swing_end / 2, swing_end,
-                 swing_end + loop / 2, swing_end + loop]
+    joins = joins_of(total)
 
     # Height: the slope eased in from level at the deck and out into the
     # chute, scaled so the floor starts at the deck and the bed ends at BED.
@@ -156,6 +173,8 @@ def path(deck, height=7):
     ease_in, ease_out = 0.7, 0.9
 
     def slope(p):
+        if slope_of:
+            return slope_of(p, total)
         a = min(1.0, p / ease_in)
         b = min(1.0, (total - p) / ease_out)
         return (0.5 - 0.5 * math.cos(math.pi * a)) * (0.12 + 0.88 * (0.5 - 0.5 * math.cos(math.pi * b)))
@@ -246,12 +265,9 @@ def frames(stations):
     return pts, t, n, b
 
 
-def build(deck, height=7):
-    stations, total, joins = path(deck, height)
+def build(deck, stem="TTWS-7"):
+    stations, total, joins = path(deck, stem)
     pts, T, N, B = frames(stations)
-    if height == 5:
-        # Exact entry frame keeps the belled mouth flush with the panel.
-        T[0], N[0], B[0] = (1, 0, 0), (0, 0, 1), (0, -1, 0)
     # Work in (u, w, y); positions on the ring at angle a from the top.
     def ring(j, r, a0, a1, k, lift=0.0):
         p = stations[j][4]
@@ -465,7 +481,7 @@ def world_matrices(gltf):
     return out
 
 
-def rebuild(stem, dry_run, height=7):
+def rebuild(stem, dry_run):
     path_in = glob.glob(os.path.join(MODELS, stem + ".*.glb"))
     assert len(path_in) == 1, path_in
     gltf, binary = read_glb(path_in[0])
@@ -486,7 +502,7 @@ def rebuild(stem, dry_run, height=7):
     face_z = jw[:, 2].mean()
     print("%s: face x %.3f, deck %.3f" % (stem, face_x, deck))
 
-    tube_mesh, metal_mesh = build(deck, height)
+    tube_mesh, metal_mesh = build(deck, stem)
 
     def to_model(v):
         # (u out, w left facing the panel, y up) -> model space: out is -x,
@@ -601,8 +617,6 @@ def rebuild(stem, dry_run, height=7):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--height", type=int, choices=(5, 7), default=7)
-    parser.add_argument("--dry-run", action="store_true")
-    args = parser.parse_args()
-    rebuild("TTWS-%d" % args.height, args.dry_run, args.height)
+    dry = "--dry-run" in sys.argv
+    for stem in [a for a in sys.argv[1:] if not a.startswith("--")] or ["TTWS-7", "TTWS-5"]:
+        rebuild(stem, dry)
