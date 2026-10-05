@@ -832,6 +832,7 @@
       }
       .sel-delete:hover { background: rgba(206, 3, 12, 0.85); border-color: #ce030c; color: #fff; }
       .sel-delete[hidden] { display: none; }
+      .sel-restore:hover { background: rgba(255, 255, 255, 0.18); border-color: rgba(255, 255, 255, 0.5); }
       @media (max-width: 900px) {
         .custom-controls-unified { flex-wrap: wrap; justify-content: center; gap: 10px; padding: 10px 36px 10px 12px; }
         .sel-head { border: 0; padding: 0; flex-direction: row; align-items: center; gap: 10px; }
@@ -1947,6 +1948,7 @@
         <div class="sel-head">
           <div class="sel-name" id="selection_name">Part</div>
           <button id="custom-controls-delete" class="sel-delete" type="button" title="Remove this part from the design"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M10 11v6M14 11v6"></path><path d="M6 7l1 13h10l1-13"></path><path d="M9 7V4h6v3"></path></svg><span>Delete</span></button>
+          <button id="custom-controls-flags" class="sel-delete sel-restore" type="button" title="Put back the flags taken off this tower" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4"></path><path d="M6 4h11l-2.5 4L17 12H6"></path></svg><span>Add flags</span></button>
         </div>
         <div id="custom-controls-padding" class="sel-rows">
           <div class="custom-controls-row" id="frame-section" style="display: none;">
@@ -2950,6 +2952,8 @@
                 ruf: model.ruf,
                 ruf_color: model.ruf_color,
                 flags: model.get_flag_color_list(),
+                // Flags taken off, by name ("flag1"); absent in older saves.
+                removed_flags: model.removed_flags || [],
                 // Store the current GLB URL/path for model change detection
                 glb_path: model.glb_path || null,
                 // Enhanced connection data for relationship-based reconstruction
@@ -3135,6 +3139,8 @@
 
             // Apply visual properties
             this.applyVisualProperties(model, model_data);
+            if (Array.isArray(model_data.removed_flags) && model_data.removed_flags.length)
+              Set_removed_flags(model, model_data.removed_flags);
         }
 
         // Helper function to apply visual properties (colors, flags, etc.)
@@ -6272,6 +6278,9 @@
                 true
               );
               raycaster.layers.disable(HIT_BOX_LAYER);
+              // A flag that has been taken off is hidden, not gone, and the
+              // ray does not ask what can be seen.
+              intersection_objects = intersection_objects.filter((hit) => !Is_removed(hit.object));
               if (intersection_objects.length > 0) {
                 // A hit box stands in for its swing: the part's nearest real
                 // mesh under the pointer if there is one, else its first, so
@@ -6313,22 +6322,27 @@
                 intersection_mesh = intersection_object.object;
 
                 picked_mesh = intersection_objects[0].object;
+                // A pole is chosen as the flag it holds up.
+                if (Is_flag(picked_mesh)) picked_mesh = Flag_node(picked_mesh);
                 if ("model" in picked_mesh) {
                   Deselect_all();
 
                   picked_mesh.model.selected = true;
-                  // Fill the catalogue with what else fits where this sits.
-                  Offer_replacements(picked_mesh.model);
+                  // Fill the catalogue with what else fits where this sits --
+                  // or, for a tower, the towers it could become. Not for a
+                  // flag, which is chosen apart from its tower.
+                  Offer_replacements(Is_flag(picked_mesh) ? null : picked_mesh.model);
                 }
 
 
                 let splits = picked_mesh.name.toLowerCase().split(",");
 
                 if (splits[0].toLowerCase().startsWith("flag")) {
-                  // A flag is a piece of its tower: it takes a colour, but
-                  // Delete would remove the whole tower, so it is not offered.
+                  // A flag takes a colour, and Delete takes it off, pole and
+                  // all (Remove_picked_flag) -- not the tower it flies from.
                   selection_name.textContent = "Flag";
-                  $("#custom-controls-delete").hide();
+                  $("#custom-controls-delete").show();
+                  $("#custom-controls-flags").prop("hidden", true);
                   $("#frame-section").hide();
                   $("#roof-section").hide();
                   $("#toy-section").hide();
@@ -7029,6 +7043,8 @@
           trim_color: old_tower.trim_color,
         });
         tower.mesh.position.copy(old_tower.mesh.position);
+        // Flags taken off the old tower stay off the new one, by name.
+        if ((old_tower.removed_flags || []).length) Set_removed_flags(tower, old_tower.removed_flags);
         const Turn = (yaw) => {
           tower.yaw = yaw;
           tower.mesh.rotation.y = yaw * Deg2Rad;
@@ -7634,10 +7650,15 @@
           if (model.roof_poly_mesh && model.roof_poly_mesh.visible)
             options.push("Roof: " + Roof_colour_name(model.roof_poly_mesh) + " Poly");
 
+          // Numbered as on the tower, so Flag 2 stays Flag 2 when Flag 1 is
+          // taken off; a removed one says so.
           let flag = 0;
           model.mesh.traverse((node) => {
-            if (node.name && node.name.toLowerCase().split(",")[0].startsWith("flag"))
-              options.push("Flag " + ++flag + ": " + Color2Name(node.material.color));
+            if (!Is_flag_name(node) || Flag_node(node) !== node) return;
+            flag++;
+            options.push(
+              "Flag " + flag + ": " + (Is_removed(node) ? "Removed" : Color2Name(node.material.color))
+            );
           });
 
           list.push({
@@ -7914,11 +7935,75 @@
       // been brought in, so nothing can be constructed here.
       let set_box = null;
       /** A flag's pole or cloth: named flag..., or under a node that is. */
-      const Is_flag = (node) => {
-        for (let n = node; n; n = n.parent)
-          if (n.name && n.name.toLowerCase().split(",")[0].startsWith("flag")) return true;
+      // ------------------------------------------------------------- flags
+      // A tower's flags are chosen, coloured and removed on their own, each
+      // with its pole. The poles were part of the tower's trim mesh until
+      // tools/split_flag_poles.py gave each one a node of its own, marked
+      // with the flag it holds up (userData.flag_pole) and the trim it was
+      // cut from (userData.frame_as, for frame colours).
+      const Is_flag = (node) => !!Flag_node(node);
+      /** "flag1" from "flag1,#004983,...": what a pole names its flag by. */
+      const Flag_key = (node) => node.name.toLowerCase().split(",")[0];
+      const Is_flag_name = (node) => !!node.name && Flag_key(node).startsWith("flag");
+      const Model_root = (node) => (node.model && node.model.mesh) || node;
+      /** The flag a node belongs to -- the flag itself, or the one its pole holds up -- or null. */
+      const Flag_node = (node) => {
+        let flag = null;
+        for (let n = node; n; n = n.parent) {
+          if (n.userData && n.userData.flag_pole) {
+            let found = null;
+            Model_root(n).traverse((m) => {
+              if (!found && Is_flag_name(m) && Flag_key(m) === n.userData.flag_pole) found = m;
+            });
+            return found;
+          }
+          if (Is_flag_name(n)) flag = n;
+        }
+        return flag;
+      };
+      /** A flag and its pole: what is outlined, and removed, together. */
+      const Flag_pieces = (flag) => {
+        const pieces = [flag];
+        Model_root(flag).traverse((n) => {
+          if (n.userData && n.userData.flag_pole === Flag_key(flag)) pieces.push(n);
+        });
+        return pieces;
+      };
+      /** Is this part of a flag or pole that has been taken off? */
+      const Is_removed = (node) => {
+        for (let n = node; n; n = n.parent) if (n.userData && n.userData.removed) return true;
         return false;
       };
+      /** Take these flags (by key) off a model, or put them all back with []. */
+      const Set_removed_flags = (model, keys) => {
+        const off_keys = [];
+        model.mesh.traverse((n) => {
+          if (!Is_flag_name(n) || Flag_node(n) !== n) return;
+          const off = keys.includes(Flag_key(n));
+          if (off) off_keys.push(Flag_key(n));
+          for (const piece of Flag_pieces(n)) {
+            piece.visible = !off;
+            piece.userData.removed = off;
+          }
+        });
+        // Only flags this tower has: a swap from a tower with a third flag
+        // must not leave this one remembering a flag it never had.
+        model.removed_flags = off_keys;
+      };
+      /** The selected flag comes off, pole and all. One undo step. */
+      const Remove_picked_flag = () => {
+        const flag = picked_mesh && Flag_node(picked_mesh);
+        if (!flag || !flag.model) return;
+        blueprint.add_snapshot();
+        Set_removed_flags(flag.model, [...(flag.model.removed_flags || []), Flag_key(flag)]);
+        Deselect_all();
+        picked_mesh = null;
+        Hide_options();
+        Offer_replacements(null);
+        Update_measurements();
+      };
+      /** A frame mesh's name for the colour config: a split-off pole goes by its trim's. */
+      const Frame_name = (mesh) => (mesh.userData && mesh.userData.frame_as) || mesh.name;
       const Measure_set = () => {
         const whole = new THREE.Box3();
         for (const mesh of picked_meshes) whole.expandByObject(mesh);
@@ -8633,7 +8718,9 @@
           "|" + fit_version;
         for (const model of models_with_available_joints)
           if (model.selected) key += "|s" + Model_outline_signature(model);
-        if (picked_mesh && picked_mesh.model) key += "|p" + Model_outline_signature(picked_mesh.model);
+        // Which piece too: a flag is outlined alone, its tower without it.
+        if (picked_mesh && picked_mesh.model)
+          key += "|p" + Model_outline_signature(picked_mesh.model) + ":" + (Flag_node(picked_mesh) || {}).uuid;
         if (plug_model) key += "|c" + Model_outline_signature(plug_model);
         return key;
       };
@@ -8661,6 +8748,27 @@
               mesh.ov = mesh.visible;
             });
             picked_mesh.model.mesh.visible = true;
+
+            // A flag is chosen on its own -- its colour is the one thing the
+            // options then change -- so it alone is outlined. The tower, chosen
+            // as a whole, is outlined without its flags, which it does not
+            // colour (Weldon, 2026-10-05).
+            const root = picked_mesh.model.mesh;
+            const flag = Flag_node(picked_mesh);
+            if (flag) {
+              root.traverse((node) => {
+                if (node !== root) node.visible = false;
+              });
+              for (const piece of Flag_pieces(flag)) {
+                for (let node = piece; node && node !== root; node = node.parent) node.visible = true;
+                piece.traverse((node) => (node.visible = node.ov));
+              }
+            } else {
+              root.traverse((node) => {
+                if (node !== root && (Flag_node(node) === node || (node.userData && node.userData.flag_pole)))
+                  node.visible = false;
+              });
+            }
           } else {
             // The outline pass: only the selected part is drawn. Over the
             // placed models, not Model.instances — that list is the templates
@@ -8983,7 +9091,7 @@
           const cedar_meshes = getObjectInfoById(candidate.object_id).objectConfig?.frame_meshes?.cedar_meshes || [];
           let map = null;
           candidate.mesh.traverse((mesh) => {
-            if (!map && mesh.material && cedar_meshes.includes(mesh.name)) map = Original_map(mesh.material);
+            if (!map && mesh.material && cedar_meshes.includes(Frame_name(mesh))) map = Original_map(mesh.material);
           });
           if (map) return map;
         }
@@ -9026,12 +9134,12 @@
 
               // Check if mesh matches cedar mesh patterns
               let isCedarMesh = cedarMeshes.some(pattern => 
-                mesh.name === pattern
+                Frame_name(mesh) === pattern
               );
               
               // Check if mesh matches tan mesh patterns  
               let isTanMesh = tanMeshes.some(pattern => 
-                mesh.name === pattern
+                Frame_name(mesh) === pattern
               );
               
               if (isCedarMesh) {
@@ -9072,9 +9180,9 @@
           const cedarMap = Cedar_map(model);
 
           model.mesh.traverse((mesh) => {
-            if (!mesh.material || !mesh.material.color || !objectFrameMeshes.all_meshes.includes(mesh.name)) return;
+            if (!mesh.material || !mesh.material.color || !objectFrameMeshes.all_meshes.includes(Frame_name(mesh))) return;
             const ownMap = Original_map(mesh.material);
-            const map = cedarMeshes.includes(mesh.name) && ownMap ? ownMap : cedarMap;
+            const map = cedarMeshes.includes(Frame_name(mesh)) && ownMap ? ownMap : cedarMap;
             mesh.material.map = map;
             mesh.material.color = new THREE.Color(map ? 0xffffff : colorConfig.constants.colors.cedar);
             mesh.material.emissive = new THREE.Color(0x000000);
@@ -9102,7 +9210,7 @@
 
               // Check if mesh matches any of the frame mesh patterns
               let isFrameMesh = meshNames.some(pattern => 
-                mesh.name ===pattern
+                Frame_name(mesh) === pattern
               );
               
               if (isFrameMesh) {
@@ -9247,8 +9355,13 @@
                 picked_mesh.model &&
                 picked_meshes.includes(picked_mesh.model.mesh)
               ) {
-                Hide_options();
-                Trash_picked_mesh();
+                // A flag comes off alone, not the tower it flies from.
+                if (Is_flag(picked_mesh)) {
+                  Remove_picked_flag();
+                } else {
+                  Hide_options();
+                  Trash_picked_mesh();
+                }
               }
             }
             break;
@@ -11356,9 +11469,24 @@
         Show_mulch_options(kind);
       };
       $("#custom-controls-delete").on("click", (event) => {
+        // A flag comes off alone; anything else takes its part.
+        if (picked_mesh && Is_flag(picked_mesh)) {
+          Remove_picked_flag();
+          return;
+        }
         // Hide color options popup immediately when delete is pressed
         Hide_options();
         Trash_picked_mesh();
+      });
+      // Flags taken off a tower go back on together.
+      $("#custom-controls-flags").on("click", () => {
+        const model = picked_mesh && picked_mesh.model;
+        if (!model || !(model.removed_flags || []).length) return;
+        blueprint.add_snapshot();
+        Set_removed_flags(model, []);
+        Show_unified_popup();
+        Update_measurements();
+        if (typeof Refresh_panel === "function") Refresh_panel();
       });
       $("#selection_close").on("click", () => {
         Deselect_all();
@@ -11700,6 +11828,8 @@
 
         // Show delete button
         $("#custom-controls-delete").show();
+        // And a way back for flags taken off this tower.
+        $("#custom-controls-flags").prop("hidden", !(model.removed_flags || []).length);
         const { objectName: selected_name } = getObjectInfoById(model.object_id);
         selection_name.textContent = selected_name || "Selected part";
         $("#trim-section .custom-controls-text").text("Trim");
