@@ -1,7 +1,7 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-10-05T18:47:14.904Z",
-  "product_count": 68,
+  "generated_at": "2026-10-05T20:04:20.421Z",
+  "product_count": 67,
   "default_fittings": [
     {
       "part": "SSC",
@@ -14592,8 +14592,8 @@
       "files": [
         {
           "layer": null,
-          "file": "TTWS-7.addb0e76.glb",
-          "bytes": 365996,
+          "file": "TTWS-7.41c904ba.glb",
+          "bytes": 509144,
           "joints": [
             "joint_c,1,8"
           ],
@@ -14617,14 +14617,14 @@
           ],
           "bounds": [
             [
-              -1.184,
-              0.021,
-              -1.359
+              -1.109,
+              0,
+              -0.818
             ],
             [
               0.601,
               2.938,
-              1.148
+              0.771
             ]
           ],
           "joint_positions": {
@@ -14638,9 +14638,9 @@
             "joint_c,1,8": [
               [
                 [
-                  -0.905,
-                  0.021,
-                  -1.359
+                  -1.109,
+                  0.503,
+                  -0.818
                 ],
                 [
                   0.551,
@@ -14651,7 +14651,7 @@
               [
                 [
                   0.551,
-                  1.938,
+                  1.923,
                   -0.5
                 ],
                 [
@@ -14662,139 +14662,24 @@
               ],
               [
                 [
-                  -1.184,
-                  0.068,
+                  -1.109,
+                  0,
                   0
                 ],
                 [
                   0.551,
                   2.938,
-                  1.148
+                  0.771
                 ]
               ],
               [
                 [
                   0.551,
-                  1.938,
+                  1.923,
                   0
                 ],
                 [
                   0.601,
-                  2.938,
-                  0.5
-                ]
-              ]
-            ]
-          }
-        }
-      ],
-      "joints": [
-        {
-          "name": "joint_c,1,8",
-          "direction": 1,
-          "layer": "8",
-          "tire_only": false
-        }
-      ],
-      "tubular": true
-    },
-    "TTWSC-7": {
-      "name": "Turbo Twister (Clear) - 7ft",
-      "category": "slides",
-      "category_index": 5,
-      "children_index": 6,
-      "multi_layer": false,
-      "files": [
-        {
-          "layer": null,
-          "file": "TTWSC-7.72bbb6a5.glb",
-          "bytes": 417912,
-          "joints": [
-            "joint_c,1,8"
-          ],
-          "sockets": [
-            {
-              "marker": [
-                0.631,
-                2.438,
-                0
-              ],
-              "accepts": [
-                "8"
-              ],
-              "facings": [
-                1
-              ],
-              "joints": [
-                "joint_c,1,8"
-              ]
-            }
-          ],
-          "bounds": [
-            [
-              -1.184,
-              0.021,
-              -1.148
-            ],
-            [
-              0.681,
-              2.938,
-              1.359
-            ]
-          ],
-          "joint_positions": {
-            "joint_c,1,8": [
-              0.631,
-              2.438,
-              0
-            ]
-          },
-          "quarter_bounds": {
-            "joint_c,1,8": [
-              [
-                [
-                  -1.184,
-                  0.068,
-                  -1.148
-                ],
-                [
-                  0.631,
-                  2.938,
-                  0
-                ]
-              ],
-              [
-                [
-                  0.631,
-                  1.938,
-                  -0.5
-                ],
-                [
-                  0.681,
-                  2.938,
-                  0
-                ]
-              ],
-              [
-                [
-                  -0.905,
-                  0.021,
-                  0
-                ],
-                [
-                  0.631,
-                  2.938,
-                  1.359
-                ]
-              ],
-              [
-                [
-                  0.631,
-                  1.938,
-                  0
-                ],
-                [
-                  0.681,
                   2.938,
                   0.5
                 ]
@@ -14817,7 +14702,7 @@
       "name": "Side Winder Slide - 5ft",
       "category": "slides",
       "category_index": 5,
-      "children_index": 7,
+      "children_index": 6,
       "multi_layer": false,
       "files": [
         {
@@ -14932,7 +14817,7 @@
       "name": "Side Winder Slide - 7ft",
       "category": "slides",
       "category_index": 5,
-      "children_index": 8,
+      "children_index": 7,
       "multi_layer": false,
       "files": [
         {
@@ -15047,7 +14932,7 @@
       "name": "Super Spiral Slide - 5ft",
       "category": "slides",
       "category_index": 5,
-      "children_index": 9,
+      "children_index": 8,
       "multi_layer": false,
       "files": [
         {
@@ -15161,7 +15046,7 @@
       "name": "Super Spiral Slide - 7ft",
       "category": "slides",
       "category_index": 5,
-      "children_index": 10,
+      "children_index": 9,
       "multi_layer": false,
       "files": [
         {

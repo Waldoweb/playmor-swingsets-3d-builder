@@ -318,30 +318,25 @@
       "category": "slides",
       "index": 5
     },
-    "TTWSC-7": {
-      "name": "Turbo Twister (Clear) - 7ft",
-      "category": "slides",
-      "index": 6
-    },
     "SWIS-5": {
       "name": "Side Winder Slide - 5ft",
       "category": "slides",
-      "index": 7
+      "index": 6
     },
     "SWIS-7": {
       "name": "Side Winder Slide - 7ft",
       "category": "slides",
-      "index": 8
+      "index": 7
     },
     "SUPS-5": {
       "name": "Super Spiral Slide - 5ft",
       "category": "slides",
-      "index": 9
+      "index": 8
     },
     "SUPS-7": {
       "name": "Super Spiral Slide - 7ft",
       "category": "slides",
-      "index": 10
+      "index": 9
     },
     "SW": {
       "name": "Steering Wheel",
