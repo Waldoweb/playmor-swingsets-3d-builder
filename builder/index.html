@@ -4862,12 +4862,7 @@
         const geometry = Plug_geometry(plug_joint, host_joint);
         if (!geometry) return true;
 
-        const yaw =
-          Lookup_yaw({
-            host_model_yaw: host_joint.model.yaw,
-            host_joint_direction: host_joint.direction,
-            plug_joint_direction: plug_joint.direction,
-          }) * Deg2Rad;
+        const yaw = Joint_yaw(plug_joint, host_joint) * Deg2Rad;
         const rotation = new THREE.Quaternion().setFromAxisAngle(Y_AXIS, yaw);
         const turned_joint = geometry.position.clone().applyQuaternion(rotation);
         const origin = hjp.clone().sub(turned_joint);
@@ -5905,12 +5900,7 @@
           }
         }
 
-        plug_model.mesh.rotation.y =
-          Lookup_yaw({
-            host_model_yaw: host.model.yaw,
-            host_joint_direction: host.direction,
-            plug_joint_direction: plug_joint.direction,
-          }) * Deg2Rad;
+        plug_model.mesh.rotation.y = Joint_yaw(plug_joint, host) * Deg2Rad;
 
         // A handle accessory follows its host step's slope.
         if (host.layer == "handle") {
@@ -6063,8 +6053,11 @@
               qualifies = !!rect && Rect_distance(rect, cx, cy) <= margin;
             }
           }
-          if (qualifies && to_pointer < best_distance) {
-            best_distance = to_pointer;
+          // Twin toy mounts share a spot on screen; the one drawn for the toy
+          // wins the tie.
+          const score = to_pointer + (Toy_turned(plug_joint, joint) ? 0.5 : 0);
+          if (qualifies && score < best_distance) {
+            best_distance = score;
             best = joint;
           }
         }
@@ -6109,6 +6102,8 @@
             const pp = new THREE.Vector3();
             snap.getWorldPosition(pp);
             p.add(pp);
+            const shift = Toy_mount_shift(plug_joint, snap);
+            if (shift) p.add(shift);
             if (p.y < 0) p.y = 0;
           }
           plug_model.mesh.position.copy(p);
@@ -6486,6 +6481,8 @@
         const position = new THREE.Vector3()
           .subVectors(model_world, joint_world)
           .add(host_world);
+        const shift = Toy_mount_shift(plug_joint, host_joint);
+        if (shift) position.add(shift);
         if (position.y < 0) position.y = 0;
         model.mesh.position.copy(position);
       };
@@ -6783,12 +6780,18 @@
        * actually fits.
        */
       const Find_mate_in_socket = (model, socket) => {
+        // A toy post's two mounts are one opening; the one drawn for the toy
+        // in hand comes first, and its twin -- turned and moved to suit, see
+        // Toy_turned -- only if that one will not do.
+        let fallback = null;
         for (const host_joint of socket.joints) {
           if (!host_joint.available) continue;
           const plug_joint = Find_plug_joint_for(model, host_joint);
-          if (plug_joint) return { plug_joint, host_joint };
+          if (!plug_joint) continue;
+          if (!Toy_turned(plug_joint, host_joint)) return { plug_joint, host_joint };
+          if (!fallback) fallback = { plug_joint, host_joint };
         }
-        return null;
+        return fallback;
       };
 
       /**
@@ -6827,11 +6830,7 @@
         blueprint.add_snapshot();
 
         // orient the model & mesh
-        plug_model.yaw = Lookup_yaw({
-        host_model_yaw: host_joint.model.yaw,
-        host_joint_direction: host_joint.direction,
-        plug_joint_direction: plug_joint.direction,
-        });
+        plug_model.yaw = Joint_yaw(plug_joint, host_joint);
         plug_model.mesh.rotation.y = plug_model.yaw * Deg2Rad;
 
         let pjp = new THREE.Vector3();
@@ -7575,6 +7574,71 @@
         link.download = args.filename || "data.json";
         link.dispatchEvent(new MouseEvent("click"));
       };
+      /**
+       * Does a toy face the other way round on this mount?
+       *
+       * The toy mounts were drawn for one toy each, and a tower's scope mounts
+       * face the opposite way from its wheel mounts: the scope's lens sits at
+       * the rail with its eyepiece inside, a wheel hangs inside. The mailbox
+       * and telephone are drawn like the wheels (tools/turn_mount_toys.py).
+       * Since any of the five goes on any mount, a toy on a mount drawn for the
+       * other kind came out backwards -- a mailbox outside facing the yard on
+       * every Summit Tower post and on some of the others'. So such a toy is
+       * turned half round about the mount: a wheel, mailbox or phone always
+       * hangs inside, and the scope always looks out.
+       */
+      const Toy_mount_kind = (name) =>
+        /scope/i.test(name) ? "scope" : /wheel|mailbox_or_phone/i.test(name) ? "wheel" : null;
+      const Toy_turned = (plug_joint, host_joint) => {
+        if (!plug_joint || !host_joint) return false;
+        if (plug_joint.layer !== "toy" || host_joint.layer !== "toy") return false;
+        const toy = Toy_mount_kind(plug_joint.name);
+        const mount = Toy_mount_kind(host_joint.name);
+        return !!(toy && mount && toy !== mount);
+      };
+
+      /** The yaw a part takes on a host joint, toys turned to their mount. */
+      const Joint_yaw = (plug_joint, host_joint) => {
+        const yaw = Lookup_yaw({
+          host_model_yaw: host_joint.model.yaw,
+          host_joint_direction: host_joint.direction,
+          plug_joint_direction: plug_joint.direction,
+        });
+        return Toy_turned(plug_joint, host_joint) ? (yaw + 180) % 360 : yaw;
+      };
+
+      /**
+       * How far a turned toy moves across the rail.
+       *
+       * A tower's scope mount sits 1.6-4.2 cm further out than the wheel mount
+       * on the same post, so a wheel or mailbox turned round on it hung from
+       * that much nearer the rail and ran into it. It goes where a toy on the
+       * post's own wheel mount would be instead -- the nearest mount of its
+       * kind on the host, measured across the floor only, so a high mount
+       * keeps its height. The other way round for a scope on a wheel mount.
+       * Null when the toy is not turned or the post has no such mount.
+       */
+      const Toy_mount_shift = (plug_joint, host_joint) => {
+        if (!Toy_turned(plug_joint, host_joint)) return null;
+        const kind = Toy_mount_kind(plug_joint.name);
+        const at = new THREE.Vector3();
+        host_joint.getWorldPosition(at);
+        let best = null;
+        let best_distance = 0.12; // same post, not the next one along
+        const there = new THREE.Vector3();
+        for (const joint of host_joint.model.joints) {
+          if (joint === host_joint || joint.layer !== "toy") continue;
+          if (Toy_mount_kind(joint.name) !== kind) continue;
+          joint.getWorldPosition(there);
+          const across = Math.hypot(there.x - at.x, there.z - at.z);
+          if (across < best_distance) {
+            best_distance = across;
+            best = new THREE.Vector3(there.x - at.x, 0, there.z - at.z);
+          }
+        }
+        return best;
+      };
+
       const Lookup_yaw = (args) => {
         // Brought into 0..270 first: the table has one row per quarter turn,
         // and a yaw of 360 or -90 would otherwise read past its end and come
@@ -7614,7 +7678,8 @@
 
             if (available && layerMatch) {
               let position = Ddd2dd({ object3D: joint });
-              let distance_squared = args.position.distanceToSquared(position);
+              let distance_squared =
+                args.position.distanceToSquared(position) + (Toy_turned(plug_joint, joint) ? 1 : 0);
               if (distance_squared < min_joint_distance_squared) {
                 min_joint_distance_squared = distance_squared;
                 result = joint;
