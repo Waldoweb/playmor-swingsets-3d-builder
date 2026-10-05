@@ -5651,6 +5651,10 @@
         return (nx * tx + nz * tz) / (length * to_camera) < FACING_HIDE_BELOW;
       };
 
+      /** Is this placed mesh's model hung by a joint of that layer? */
+      const Hangs_by = (mesh, layer) =>
+        !!(mesh.model && mesh.model.joints && mesh.model.joints.some((j) => j.connected && j.layer === layer));
+
       /** Is the dot behind something, testing it as a disc? */
       const Marker_is_hidden = (joint, world, ignore_mesh) => {
         const dir = new THREE.Vector3().subVectors(world, camera.position).normalize();
@@ -5671,8 +5675,15 @@
         // tower, wrong for a swing beam, whose hangers run along its length,
         // so half of them were culled while plainly visible.
         const self_occludes = joint.model.mesh && !Model_is_elongated(joint.model);
+        // A floor kit goes under a picnic table, whose top sits right over
+        // the floor's dot in the middle of the bay: the table does not hide
+        // it, or a tower with a table could never be given a floor.
+        const under_table = /^floor/.test(joint.layer);
         const candidates = occluder_boxes.filter(
-          (o) => o.mesh !== ignore_mesh && (self_occludes || o.mesh !== joint.model.mesh)
+          (o) =>
+            o.mesh !== ignore_mesh &&
+            (self_occludes || o.mesh !== joint.model.mesh) &&
+            !(under_table && Hangs_by(o.mesh, "picnic"))
         );
         if (!candidates.length) return false;
 
