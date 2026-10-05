@@ -35,20 +35,25 @@
       "category": "towers",
       "index": 6
     },
-    "P-KT": {
-      "name": "King's Tower",
+    "P-KT-5": {
+      "name": "King's Tower - 5ft",
       "category": "towers",
       "index": 7
+    },
+    "P-KT": {
+      "name": "King's Tower - 7ft",
+      "category": "towers",
+      "index": 8
     },
     "Bridge": {
       "name": "Bridge",
       "category": "towers",
-      "index": 8
+      "index": 9
     },
     "Tunnel": {
       "name": "Tunnel",
       "category": "towers",
-      "index": 9
+      "index": 10
     },
     "P-AB-3-8": {
       "name": "3 Swing Beam - 8 ft",

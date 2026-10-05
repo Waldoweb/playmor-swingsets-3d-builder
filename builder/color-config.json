@@ -344,6 +344,40 @@
         ]
       }
     },
+    "P-KT-5": {
+      "sections": [
+        "roof",
+        "frame",
+        "trim"
+      ],
+      "colors": {
+        "frame": "@frame_colors",
+        "roof": {
+          "canopy": "@roof_canopy_colors"
+        },
+        "trim": "@trim_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": [
+          "King_base_middle",
+          "Cube201_1"
+        ],
+        "tan_meshes": [
+          "King_base_bottom",
+          "Cube201",
+          "King_base_top",
+          "Box"
+        ],
+        "all_meshes": [
+          "King_base_bottom",
+          "Cube201_1",
+          "Cube201",
+          "King_base_top",
+          "Box",
+          "King_base_middle"
+        ]
+      }
+    },
     "P-KT": {
       "sections": [
         "roof",

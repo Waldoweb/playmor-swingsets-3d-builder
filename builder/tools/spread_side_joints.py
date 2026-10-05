@@ -39,7 +39,7 @@ MODELS = os.path.join(HERE, "..", "models")
 CUT = {"5": 0.285, "6": 0.30, "8": 0.285}
 MARGIN = 0.005
 DECK_LAYERS = set(CUT)
-TOWERS = ["P-PT", "P-DPT", "P-WT", "P-WT-7", "P-ST", "P-DST", "P-DSMT", "P-KT"]
+TOWERS = ["P-PT", "P-DPT", "P-WT", "P-WT-7", "P-ST", "P-DST", "P-DSMT", "P-KT-5", "P-KT"]
 # The DX Play Tower's sides along z are 4 ft, with six slats and no centre
 # one to keep.
 SKIP = {("P-DPT", "z")}

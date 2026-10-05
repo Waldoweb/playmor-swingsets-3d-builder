@@ -80,6 +80,15 @@
       "joint_left,1,kitchen",
       "joint,1,0"
     ],
+    "P-KT-5": [
+      "joint_mailbox_or_phone,1,toy",
+      "joint_mailbox_or_phone,3,toy",
+      "joint,2,end_rail",
+      "joint_left,1,end_rail",
+      "joint_left,1,kitchen",
+      "joint,1,0",
+      "joint_left,3,kitchen"
+    ],
     "SR-KT": ["joint,0,0"],
     "P-WT": [
       "joint_back_l_mailbox_or_phone,2,toy",
@@ -109,7 +118,11 @@
     "which still take any of the five toys.",
     "",
     "P-WT-7: the 7 ft Sky Tower, built from the 5 ft one by tools/raise_tower.py,",
-    "so it carries the same two mounts, already taken out.",
+    "so it carries the same two mounts, already taken out. P-KT-5, the 5 ft",
+    "King's Tower, is built from P-KT the same way and carries its list, plus",
+    "its kitchen mount: the Kitchen Kit stands 1.96 m inside the end bay, which",
+    "fits under the 7 ft deck (underside 1.95) but would come up through the",
+    "5 ft one (1.31).",
     "",
     "P-KT: the King's Tower mailbox mounts, the pair up at the top corners.",
     "Weldon asked for that point to go and it is the highest toy point on the",
@@ -195,6 +208,7 @@
   "default_yaw": {
     "P-ST": 90,
     "P-KT": 90,
+    "P-KT-5": 90,
     "P-DSMT": 270
   },
   "_default_yaw_note": [

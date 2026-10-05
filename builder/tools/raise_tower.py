@@ -1,32 +1,45 @@
 #!/usr/bin/env python3
 """
-Build a taller tower from a shorter one: the same tower on longer legs.
+Build a tower at its other deck height: the same tower on longer or shorter
+legs.
 
 PlayMor sells some towers at two deck heights -- 5 ft and 7 ft -- and the
-only difference is the legs under the floor. So the 7 ft model is made from
-the 5 ft one rather than drawn again: everything above a cut between the
-ground frame and the floor (floor, rails, slats, upper posts, roof, flags,
-and every joint up there) is raised, and the legs, the one thing crossing the
-cut, stretch to meet it. Ground-level parts -- base frame, bottom brackets,
-the floor-kit, picnic and end-rail mounts -- stay where they are.
+only difference is the legs under the floor. So the second model is made from
+the first rather than drawn again: everything above a cut between the ground
+level parts and the floor (floor, rails, slats, upper posts, roof, flags, and
+every joint up there) moves up or down, and the legs, the one thing crossing
+the cut, stretch or shrink to meet it. Ground-level parts -- base frame,
+bottom brackets, a lower side panel, the floor-kit, picnic, kitchen and
+end-rail mounts -- stay where they are.
 
-The raised joints change layer with the deck: a slide or ladder for a 5 ft
+The moved joints change layer with the deck: a slide or ladder for a 5 ft
 deck is layer 6 and one for 7 ft is layer 8, and the swing-beam mount goes
-from an 8 ft beam (b8) to a 10 ft one (b10). The rest of each joint's name is
-kept, so its direction and the toy mounts read as before.
+between an 8 ft beam (b8) and a 10 ft one (b10). The rest of each joint's
+name is kept, so its direction and the toy mounts read as before.
 
-How far: 0.640 m, a little over 2 ft (0.610), so the beam mount lands at
-3.200 like every other 10 ft-beam tower's and a 10 ft beam's feet meet the
-ground; the deck joints land at 2.425, inside the 2.42-2.49 the 7 ft slides
-and ladders ask for (the DX Sky Tower's 7 ft deck is 2.452).
+How far: 0.640 m, a little over 2 ft (0.610), because the beam mounts of the
+towers drawn at each height sit 0.640 apart: 2.560 for an 8 ft beam, 3.200
+for a 10 ft one. So a beam's feet meet the ground on the new tower as on
+those, and the deck joints land among the heights the slides and ladders
+for that deck ask for.
+
+  Sky Tower 5 ft -> 7 ft: up, deck joints 1.785 -> 2.425
+  King's Tower 7 ft -> 5 ft: down, deck joints 2.445/2.485 -> 1.805/1.845;
+    the cut is above its lower side panel (to 0.94), which stays.
 
 The source file is only read. The output is written as
 models/<target>.<hash>.glb, replacing an earlier build of the same target.
 
-Usage:  python3 tools/raise_tower.py [--dry-run]
-Then:   python3 tools/spread_side_joints.py   (sets the taller deck's joints
+Usage:  python3 tools/raise_tower.py [--dry-run] [TARGET ...]
+        (TARGET is e.g. P-KT-5; with none, every tower in TOWERS is built --
+        which undoes the joint spacing below on the ones already built)
+Then:   python3 tools/spread_side_joints.py   (sets the new deck's joints
                                              clear of the centre slat for
                                              its layer's cut-out)
+        node tools/set_joint_layers.js       (takes out the mounts listed in
+                                             sockets.config remove_joints --
+                                             P-KT-5's kitchen, which would
+                                             not fit under a 5 ft deck)
         node tools/build_models.js
 """
 
@@ -42,9 +55,11 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 MODELS = os.path.join(HERE, "..", "models")
 
-# source stem, target stem, cut height, how far up, joint layer renames.
+# source stem, target stem, cut height, how far up (down if negative),
+# joint layer renames.
 TOWERS = [
     ("P-WT", "P-WT-7", 0.7, 0.640, {"6": "8", "b8": "b10"}),
+    ("P-KT", "P-KT-5", 1.4, -0.640, {"8": "6", "b10": "b8"}),
 ]
 
 
@@ -93,7 +108,8 @@ def local_matrix(node):
 def rename_layer(name, renames):
     """joint,<direction>,<layer>,... with the layer swapped, if it is one to swap."""
     fields = name.split(",")
-    if fields[0].startswith("joint") and len(fields) > 2 and fields[2] in renames:
+    # "Joint_..." counts too: the app reads joint names without regard to case.
+    if fields[0].lower().startswith("joint") and len(fields) > 2 and fields[2] in renames:
         fields[2] = renames[fields[2]]
     return ",".join(fields)
 
@@ -141,7 +157,7 @@ def raise_tower(source, target, cut, rise, renames, dry_run):
             target_world = old[i].copy()
             if old[i][1, 3] > cut:
                 target_world[1, 3] += rise
-                moved_joints += node.get("name", "").startswith("joint")
+                moved_joints += node.get("name", "").lower().startswith("joint")
             local = np.linalg.inv(above) @ target_world
             if not np.allclose(local, local_matrix(node), atol=1e-9):
                 assert "matrix" not in node, node.get("name")
@@ -186,8 +202,8 @@ def raise_tower(source, target, cut, rise, renames, dry_run):
             accessor["min"] = [float(v) for v in packed.min(axis=0)]
             accessor["max"] = [float(v) for v in packed.max(axis=0)]
 
-    print("%s -> %s: up %.3f above %.2f" % (source, target, rise, cut))
-    print("  joints raised: %d, joints relayered: %d" % (moved_joints, renamed))
+    print("%s -> %s: %+.3f above %.2f" % (source, target, rise, cut))
+    print("  joints moved: %d, joints relayered: %d" % (moved_joints, renamed))
     print("  stretched across the cut: %s" % ", ".join(stretched))
     if dry_run:
         return
@@ -204,5 +220,7 @@ def raise_tower(source, target, cut, rise, renames, dry_run):
 
 if __name__ == "__main__":
     dry = "--dry-run" in sys.argv
+    wanted = [arg for arg in sys.argv[1:] if not arg.startswith("--")]
     for args in TOWERS:
-        raise_tower(*args, dry)
+        if not wanted or args[1] in wanted:
+            raise_tower(*args, dry)

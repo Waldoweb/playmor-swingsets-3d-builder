@@ -25,7 +25,7 @@ The **3D Swing Set Builder** is an interactive web-based application that allows
 - **Interactive 3D Canvas** - Drag, drop, and position playground components in real-time
 - **Visual Product Catalog** - Browse hundreds of playground components including:
   - Swing beams (3, 4, and disc swing configurations)
-  - Towers (Play Tower, DX Play Tower, Sky Tower - 5ft and 7ft, Summit Tower, DX Sky Tower, DX Summit Tower, King's Tower)
+  - Towers (Play Tower, DX Play Tower, Sky Tower - 5ft and 7ft, Summit Tower, DX Sky Tower, DX Summit Tower, King's Tower - 5ft and 7ft)
   - Slides (Wave Slide, Side Winder, Super Spiral, Turbo Twister)
   - Swings (Baby Swing, Ball Swing, Bird's Nest, Disc Swing, Tire Swing, Horse Glider, Trapeze)
   - Climbing features (Rock Climb, Cargo Net, Monkey Bars, Climbing Pole)
