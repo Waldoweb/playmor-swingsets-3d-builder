@@ -566,6 +566,48 @@
         box-sizing: border-box;
       }
 
+      .height-picker {
+        position: fixed;
+        z-index: 1001;
+        font-family: "Segoe UI", Arial, sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px;
+        border-radius: 14px;
+        background: rgba(0, 0, 0, 0.88);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        color: #fff;
+      }
+      .height-picker-title {
+        font-size: 12px;
+        font-weight: 600;
+        opacity: 0.75;
+        padding: 0 6px 0 8px;
+        white-space: nowrap;
+      }
+      .height-picker button {
+        height: 34px;
+        padding: 0 14px;
+        border-radius: 17px;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .height-picker button:hover,
+      .height-picker button:focus-visible {
+        background: linear-gradient(135deg, rgba(206, 3, 12, 0.85), rgba(165, 2, 9, 0.85));
+        border-color: rgba(206, 3, 12, 1);
+        outline: none;
+      }
+
       .part-tile:hover {
         background: rgba(255, 255, 255, 0.26);
         border-color: rgba(255, 255, 255, 0.45);
@@ -9990,8 +10032,9 @@
       const Show_items = function () {
         const strip = document.getElementById("part_strip");
         if (!strip) return;
+        Close_height_picker();
 
-        const parts = Placeable_parts();
+        const parts = Family_tiles(Placeable_parts());
 
         // Group for the chips, preserving catalogue order.
         const groups = [];
@@ -10044,11 +10087,18 @@
           const object_id = (part.child.model && part.child.model.object_id) || "";
           // object-mapping.json is fetched fresh; categories.js is a script
           // a browser may hold on to, so a renamed part kept its old name on
-          // the tile for returning visitors.
-          const name = (object_id && getObjectInfoById(object_id).objectName) || part.child.name;
+          // the tile for returning visitors. A family tile goes by the
+          // family's name and carries every height that fits here.
+          const family = part.members && part.members.length > 1;
+          const name = family
+            ? part.family
+            : (object_id && getObjectInfoById(object_id).objectName) || part.child.name;
           html +=
-            '<div class="part-tile" data-object-id="' +
+            '<div class="part-tile' +
+            (family ? " family" : "") +
+            '" data-object-id="' +
             Escape_html(object_id) +
+            (family ? '" data-members="' + Escape_html(part.members.join(" ")) : "") +
             '" data-category-index="' +
             part.category_index +
             '" data-item-index="' +
@@ -10077,14 +10127,20 @@
           category_index = parseInt(tile.getAttribute("data-category-index"), 10);
           item_index = parseInt(tile.getAttribute("data-item-index"), 10);
           const object_id = tile.getAttribute("data-object-id");
+          const members = (tile.getAttribute("data-members") || "").split(" ").filter(Boolean);
           // The lit tile is the part in hand; clicking it again puts it down.
           if (
             Mode.plugging == Mode.mode &&
             plug_model &&
             object_id &&
-            plug_model.object_id === object_id
+            (plug_model.object_id === object_id || members.includes(plug_model.object_id))
           ) {
             Put_down_carried();
+            return;
+          }
+          // A family tile asks which height first.
+          if (members.length > 1) {
+            Show_height_picker(tile, members);
             return;
           }
           selected_object_id = object_id || null;
@@ -10174,8 +10230,124 @@
         $(".part-tile").removeClass("selected");
         if (selected_object_id) {
           $('.part-tile[data-object-id="' + selected_object_id + '"]').addClass("selected");
+          $('.part-tile[data-members~="' + selected_object_id + '"]').addClass("selected");
         }
       };
+
+      // ------------------------------------------- towers sold at two heights
+      // object-mapping.json gives such a product a `family` (the tower's name)
+      // and an `option` (its deck height). The strip shows the family once,
+      // and the tile asks for the height when clicked. Each height stays its
+      // own product, so the parts list, the PDF and the quote say which.
+      const Family_of = (object_id) => {
+        const info = objectMapping && objectMapping.objects[object_id];
+        return (info && info.family) || null;
+      };
+
+      /**
+       * The strip's parts with each family folded into its first member, which
+       * lists every member that fits here. A family with one member left --
+       * only the 7 ft takes a 10 ft beam's end, say -- is shown as that one.
+       */
+      const Family_tiles = (parts) => {
+        const out = [];
+        const tiles = new Map();
+        for (const part of parts) {
+          const id = part.child.model && part.child.model.object_id;
+          const family = id && Family_of(id);
+          if (!family) {
+            out.push(part);
+            continue;
+          }
+          const tile = tiles.get(family);
+          if (tile) {
+            tile.members.push(id);
+            continue;
+          }
+          const entry = Object.assign({}, part, { family, members: [id] });
+          tiles.set(family, entry);
+          out.push(entry);
+        }
+        return out;
+      };
+
+      /** The height choice, over the family's tile. */
+      let height_picker = null;
+      const Close_height_picker = () => {
+        if (!height_picker) return;
+        height_picker.remove();
+        height_picker = null;
+      };
+      const Show_height_picker = (tile, members) => {
+        const reopen = height_picker && height_picker.tile === tile;
+        Close_height_picker();
+        if (reopen) return;
+
+        const picker = document.createElement("div");
+        picker.className = "height-picker";
+        picker.setAttribute("role", "menu");
+        picker.innerHTML =
+          '<div class="height-picker-title">Deck height</div>' +
+          members
+            .map((id) => {
+              const info = objectMapping.objects[id] || {};
+              return (
+                '<button type="button" role="menuitem" data-object-id="' +
+                Escape_html(id) +
+                '">' +
+                Escape_html(info.option || info.name || id) +
+                "</button>"
+              );
+            })
+            .join("");
+        document.body.appendChild(picker);
+        picker.tile = tile;
+        height_picker = picker;
+
+        // Above the tile, centred on it, kept on screen.
+        const rect = tile.getBoundingClientRect();
+        const width = picker.offsetWidth;
+        const left = Math.min(
+          Math.max(8, rect.left + rect.width / 2 - width / 2),
+          window.innerWidth - width - 8
+        );
+        picker.style.left = left + "px";
+        picker.style.top = rect.top - picker.offsetHeight - 8 + "px";
+
+        picker.addEventListener("click", (event) => {
+          const button = event.target.closest("button[data-object-id]");
+          if (!button) return;
+          const id = button.getAttribute("data-object-id");
+          Close_height_picker();
+          const template = Model.instances.find((m) => m.object_id === id);
+          if (template) {
+            category_index = template.category;
+            item_index = template.children_index;
+          }
+          selected_object_id = id;
+          Highlight_item();
+          Run_item_click(tile, id);
+        });
+        const first = picker.querySelector("button");
+        if (first) first.focus({ preventScroll: true });
+        // It is placed against the tile, so it goes if the strip moves.
+        const strip = document.getElementById("part_strip");
+        if (strip) strip.addEventListener("scroll", Close_height_picker, { once: true });
+      };
+      document.addEventListener(
+        "pointerdown",
+        (event) => {
+          if (!height_picker) return;
+          if (event.target.closest(".height-picker")) return;
+          if (event.target.closest(".part-tile") === height_picker.tile) return;
+          Close_height_picker();
+        },
+        true
+      );
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") Close_height_picker();
+      });
+      window.addEventListener("resize", Close_height_picker);
 
 
       // ------------------------------------------------ paging the parts strip

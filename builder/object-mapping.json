@@ -13,12 +13,16 @@
     "P-WT": {
       "name": "Sky Tower - 5ft",
       "category": "towers",
-      "index": 2
+      "index": 2,
+      "family": "Sky Tower",
+      "option": "5 ft"
     },
     "P-WT-7": {
       "name": "Sky Tower - 7ft",
       "category": "towers",
-      "index": 3
+      "index": 3,
+      "family": "Sky Tower",
+      "option": "7 ft"
     },
     "P-ST": {
       "name": "Summit Tower",
@@ -38,12 +42,16 @@
     "P-KT-5": {
       "name": "King's Tower - 5ft",
       "category": "towers",
-      "index": 7
+      "index": 7,
+      "family": "King's Tower",
+      "option": "5 ft"
     },
     "P-KT": {
       "name": "King's Tower - 7ft",
       "category": "towers",
-      "index": 8
+      "index": 8,
+      "family": "King's Tower",
+      "option": "7 ft"
     },
     "Bridge": {
       "name": "Bridge",
