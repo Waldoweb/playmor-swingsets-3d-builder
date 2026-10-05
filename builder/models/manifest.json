@@ -1,7 +1,7 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-10-05T09:55:34.732Z",
-  "product_count": 66,
+  "generated_at": "2026-10-05T15:19:40.706Z",
+  "product_count": 68,
   "default_fittings": [
     {
       "part": "SSC",
@@ -7402,7 +7402,7 @@
       ]
     },
     "P-AB-3-8": {
-      "name": "3 Swing Beam - 8 ft",
+      "name": "3 Eco Beam - 8 ft",
       "category": "swing_beams",
       "category_index": 1,
       "children_index": 0,
@@ -7561,171 +7561,11 @@
         }
       ]
     },
-    "P-AB-3-10": {
-      "name": "3 Swing Beam - 10 ft",
+    "P-AB-4-8": {
+      "name": "4 Eco Beam - 8 ft",
       "category": "swing_beams",
       "category_index": 1,
       "children_index": 1,
-      "multi_layer": false,
-      "files": [
-        {
-          "layer": null,
-          "file": "P-AB-3-10.4b98adf0.glb",
-          "bytes": 54276,
-          "joints": [
-            "joint,0,b10",
-            "joint,0,sh,_x_0",
-            "joint_swing_1_female,0,s",
-            "joint_swing_2_female,0,s",
-            "joint_swing_3_female,0,s,_x_0"
-          ],
-          "sockets": [
-            {
-              "marker": [
-                0,
-                3.161,
-                4.215
-              ],
-              "accepts": [
-                "b10"
-              ],
-              "facings": [
-                0
-              ],
-              "joints": [
-                "joint,0,b10"
-              ]
-            },
-            {
-              "marker": [
-                0,
-                3.071,
-                0.958
-              ],
-              "accepts": [
-                "s",
-                "sh"
-              ],
-              "facings": [
-                0
-              ],
-              "joints": [
-                "joint,0,sh,_x_0",
-                "joint_swing_3_female,0,s,_x_0"
-              ]
-            },
-            {
-              "marker": [
-                0,
-                3.071,
-                3.463
-              ],
-              "accepts": [
-                "s"
-              ],
-              "facings": [
-                0
-              ],
-              "joints": [
-                "joint_swing_1_female,0,s"
-              ]
-            },
-            {
-              "marker": [
-                0,
-                3.071,
-                2.21
-              ],
-              "accepts": [
-                "s"
-              ],
-              "facings": [
-                0
-              ],
-              "joints": [
-                "joint_swing_2_female,0,s"
-              ]
-            }
-          ],
-          "bounds": [
-            [
-              -1.18,
-              -0.019,
-              -0.102
-            ],
-            [
-              1.18,
-              3.307,
-              4.215
-            ]
-          ],
-          "joint_positions": {
-            "joint,0,b10": [
-              0,
-              3.161,
-              4.215
-            ],
-            "joint,0,sh,_x_0": [
-              0,
-              3.071,
-              0.958
-            ],
-            "joint_swing_1_female,0,s": [
-              0,
-              3.071,
-              3.463
-            ],
-            "joint_swing_2_female,0,s": [
-              0,
-              3.071,
-              2.21
-            ],
-            "joint_swing_3_female,0,s,_x_0": [
-              0,
-              3.071,
-              0.958
-            ]
-          }
-        }
-      ],
-      "joints": [
-        {
-          "name": "joint,0,b10",
-          "direction": 0,
-          "layer": "b10",
-          "tire_only": false
-        },
-        {
-          "name": "joint,0,sh,_x_0",
-          "direction": 0,
-          "layer": "sh",
-          "tire_only": false
-        },
-        {
-          "name": "joint_swing_1_female,0,s",
-          "direction": 0,
-          "layer": "s",
-          "tire_only": false
-        },
-        {
-          "name": "joint_swing_2_female,0,s",
-          "direction": 0,
-          "layer": "s",
-          "tire_only": false
-        },
-        {
-          "name": "joint_swing_3_female,0,s,_x_0",
-          "direction": 0,
-          "layer": "s",
-          "tire_only": false
-        }
-      ]
-    },
-    "P-AB-4-8": {
-      "name": "4 Swing Beam - 8 ft",
-      "category": "swing_beams",
-      "category_index": 1,
-      "children_index": 2,
       "multi_layer": false,
       "files": [
         {
@@ -7909,8 +7749,168 @@
         }
       ]
     },
-    "P-AB-4-10": {
-      "name": "4 Swing Beam - 10 ft",
+    "P-SB-3-8": {
+      "name": "3 Swing Beam - 8 ft",
+      "category": "swing_beams",
+      "category_index": 1,
+      "children_index": 2,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-SB-3-8.d82e0d7c.glb",
+          "bytes": 55276,
+          "joints": [
+            "joint,0,b8",
+            "joint_female_1,0,s",
+            "joint_female_2,0,s",
+            "joint_female_3,0,s,_x_0",
+            "joint_female_3,0,sh,_x_0"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.64,
+                4.25
+              ],
+              "accepts": [
+                "b8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,b8"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                3.463
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_female_1,0,s"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                2.21
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_female_2,0,s"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                0.958
+              ],
+              "accepts": [
+                "s",
+                "sh"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_female_3,0,s,_x_0",
+                "joint_female_3,0,sh,_x_0"
+              ]
+            }
+          ],
+          "bounds": [
+            [
+              -0.991,
+              -0.015,
+              -0.083
+            ],
+            [
+              0.991,
+              2.75,
+              4.25
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,b8": [
+              0,
+              2.64,
+              4.25
+            ],
+            "joint_female_1,0,s": [
+              0,
+              2.514,
+              3.463
+            ],
+            "joint_female_2,0,s": [
+              0,
+              2.514,
+              2.21
+            ],
+            "joint_female_3,0,s,_x_0": [
+              0,
+              2.514,
+              0.958
+            ],
+            "joint_female_3,0,sh,_x_0": [
+              0,
+              2.514,
+              0.958
+            ]
+          }
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,b8",
+          "direction": 0,
+          "layer": "b8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_female_1,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false
+        },
+        {
+          "name": "joint_female_2,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false
+        },
+        {
+          "name": "joint_female_3,0,s,_x_0",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false
+        },
+        {
+          "name": "joint_female_3,0,sh,_x_0",
+          "direction": 0,
+          "layer": "sh",
+          "tire_only": false
+        }
+      ]
+    },
+    "P-AB-3-10": {
+      "name": "3 Swing Beam - 10 ft",
       "category": "swing_beams",
       "category_index": 1,
       "children_index": 3,
@@ -7918,8 +7918,356 @@
       "files": [
         {
           "layer": null,
-          "file": "P-AB-4-10.7a552f4a.glb",
-          "bytes": 54380,
+          "file": "P-AB-3-10.9339ce2b.glb",
+          "bytes": 55152,
+          "joints": [
+            "joint,0,b10",
+            "joint,0,sh,_x_0",
+            "joint_swing_1_female,0,s",
+            "joint_swing_2_female,0,s",
+            "joint_swing_3_female,0,s,_x_0"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                3.161,
+                4.215
+              ],
+              "accepts": [
+                "b10"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,b10"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.071,
+                0.958
+              ],
+              "accepts": [
+                "s",
+                "sh"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,sh,_x_0",
+                "joint_swing_3_female,0,s,_x_0"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.071,
+                3.463
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_swing_1_female,0,s"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.071,
+                2.21
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_swing_2_female,0,s"
+              ]
+            }
+          ],
+          "bounds": [
+            [
+              -1.205,
+              -0.019,
+              -0.102
+            ],
+            [
+              1.205,
+              3.307,
+              4.215
+            ]
+          ],
+          "joint_positions": {
+            "joint,0,b10": [
+              0,
+              3.161,
+              4.215
+            ],
+            "joint,0,sh,_x_0": [
+              0,
+              3.071,
+              0.958
+            ],
+            "joint_swing_1_female,0,s": [
+              0,
+              3.071,
+              3.463
+            ],
+            "joint_swing_2_female,0,s": [
+              0,
+              3.071,
+              2.21
+            ],
+            "joint_swing_3_female,0,s,_x_0": [
+              0,
+              3.071,
+              0.958
+            ]
+          }
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,0,b10",
+          "direction": 0,
+          "layer": "b10",
+          "tire_only": false
+        },
+        {
+          "name": "joint,0,sh,_x_0",
+          "direction": 0,
+          "layer": "sh",
+          "tire_only": false
+        },
+        {
+          "name": "joint_swing_1_female,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false
+        },
+        {
+          "name": "joint_swing_2_female,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false
+        },
+        {
+          "name": "joint_swing_3_female,0,s,_x_0",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false
+        }
+      ]
+    },
+    "P-SB-4-8": {
+      "name": "4 Swing Beam - 8 ft",
+      "category": "swing_beams",
+      "category_index": 1,
+      "children_index": 4,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-SB-4-8.9d2ba7f7.glb",
+          "bytes": 55352,
+          "joints": [
+            "Joint,0,b8",
+            "joint,0,sh,_x_0",
+            "joint_female_1,0,s",
+            "joint_female_2,0,s",
+            "joint_female_3,0,s",
+            "joint_female_4,0,s,_x_0"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                2.654,
+                5.345
+              ],
+              "accepts": [
+                "b8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "Joint,0,b8"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                0.958
+              ],
+              "accepts": [
+                "s",
+                "sh"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint,0,sh,_x_0",
+                "joint_female_4,0,s,_x_0"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                4.685
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_female_1,0,s"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                3.463
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_female_2,0,s"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.514,
+                2.25
+              ],
+              "accepts": [
+                "s"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_female_3,0,s"
+              ]
+            }
+          ],
+          "bounds": [
+            [
+              -0.991,
+              -0.015,
+              -0.083
+            ],
+            [
+              0.991,
+              2.75,
+              5.345
+            ]
+          ],
+          "joint_positions": {
+            "Joint,0,b8": [
+              0,
+              2.654,
+              5.345
+            ],
+            "joint,0,sh,_x_0": [
+              0,
+              2.514,
+              0.958
+            ],
+            "joint_female_1,0,s": [
+              0,
+              2.514,
+              4.685
+            ],
+            "joint_female_2,0,s": [
+              0,
+              2.514,
+              3.463
+            ],
+            "joint_female_3,0,s": [
+              0,
+              2.514,
+              2.25
+            ],
+            "joint_female_4,0,s,_x_0": [
+              0,
+              2.514,
+              0.958
+            ]
+          }
+        }
+      ],
+      "joints": [
+        {
+          "name": "Joint,0,b8",
+          "direction": 0,
+          "layer": "b8",
+          "tire_only": false
+        },
+        {
+          "name": "joint,0,sh,_x_0",
+          "direction": 0,
+          "layer": "sh",
+          "tire_only": false
+        },
+        {
+          "name": "joint_female_1,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false
+        },
+        {
+          "name": "joint_female_2,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false
+        },
+        {
+          "name": "joint_female_3,0,s",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false
+        },
+        {
+          "name": "joint_female_4,0,s,_x_0",
+          "direction": 0,
+          "layer": "s",
+          "tire_only": false
+        }
+      ]
+    },
+    "P-AB-4-10": {
+      "name": "4 Swing Beam - 10 ft",
+      "category": "swing_beams",
+      "category_index": 1,
+      "children_index": 5,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-AB-4-10.396a9d8d.glb",
+          "bytes": 55252,
           "joints": [
             "joint,0,b10",
             "joint,0,sh,_x_0",
@@ -8014,12 +8362,12 @@
           ],
           "bounds": [
             [
-              -1.18,
+              -1.205,
               -0.019,
               -0.102
             ],
             [
-              1.18,
+              1.205,
               3.307,
               5.345
             ]
@@ -8101,13 +8449,13 @@
       "name": "Extended Beam - 8 ft",
       "category": "swing_beams",
       "category_index": 1,
-      "children_index": 4,
+      "children_index": 6,
       "multi_layer": false,
       "files": [
         {
           "layer": null,
-          "file": "P-AB-DS-8.7999ebe0.glb",
-          "bytes": 55180,
+          "file": "P-AB-DS-8.d44b4684.glb",
+          "bytes": 56024,
           "joints": [
             "joint,0,b8",
             "joint,0,sh,_x_0",
@@ -8202,12 +8550,12 @@
           ],
           "bounds": [
             [
-              -0.966,
+              -0.991,
               -0.015,
               -1.501
             ],
             [
-              0.966,
+              0.991,
               2.75,
               4.25
             ]
@@ -8289,13 +8637,13 @@
       "name": "Extended Beam - 10 ft",
       "category": "swing_beams",
       "category_index": 1,
-      "children_index": 5,
+      "children_index": 7,
       "multi_layer": false,
       "files": [
         {
           "layer": null,
-          "file": "P-AB-DS-10.00871808.glb",
-          "bytes": 55100,
+          "file": "P-AB-DS-10.24130cc8.glb",
+          "bytes": 55908,
           "joints": [
             "joint,0,b10",
             "joint_1,0,s",
@@ -8390,12 +8738,12 @@
           ],
           "bounds": [
             [
-              -1.18,
+              -1.205,
               -0.019,
               -1.501
             ],
             [
-              1.18,
+              1.205,
               3.307,
               4.215
             ]

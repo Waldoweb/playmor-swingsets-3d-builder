@@ -404,7 +404,7 @@
       templates().find((m) => m.object_id === "MTS").capable(), true);
 
     await reset();
-    const rig = await beamRig("P-WT", "P-AB-4-8");
+    const rig = await beamRig("P-WT", "P-SB-4-8");
     const swings = ["SS", "TZR", "BS", "VTS", "BB"];
     const hangers = rig.beam.sockets().filter((socket) =>
       socket.joints.some((j) => j.available && ["s", "sh"].includes(j.layer))
@@ -796,10 +796,10 @@
 
     // Nor does a plain swing beam.
     await reset();
-    await beamRig("P-WT", "P-AB-3-8");
+    await beamRig("P-WT", "P-SB-3-8");
     await settle();
     check("a plain swing beam brings nothing of its own",
-      placed().sort(), ["P-AB-3-8", "P-WT", "SSC", "SW"]);
+      placed().sort(), ["P-SB-3-8", "P-WT", "SSC", "SW"]);
 
     // Removable one at a time, and they go with their tower.
     await reset();
@@ -999,7 +999,7 @@
     );
     // A part chosen for an opening while the tower is selected is placed,
     // not swapped in for the tower.
-    const sky_beam = await place(socketFor(lone, "b8"), "P-AB-3-8");
+    const sky_beam = await place(socketFor(lone, "b8"), "P-SB-3-8");
     await place(socketFor(sky_beam, "s"), "SS");
     const sky_steps = await place(socketFor(lone, "6"), "P-STEP-5");
     await place(socketFor(sky_steps, "handle"), "HR");
@@ -1035,15 +1035,43 @@
     check(
       "back to 5 ft gives the Wave Slide again",
       built(),
-      ["HR", "HR", "P-AB-3-8", "P-STEP-5", "P-WT", "SS", "WS-10"]
+      ["HR", "HR", "P-SB-3-8", "P-STEP-5", "P-WT", "SS", "WS-10"]
     );
     blueprint.undo();
     blueprint.undo();
     check(
       "undo brings the first tower back",
       built(),
-      ["HR", "HR", "P-AB-3-8", "P-CN-5", "P-STEP-5", "P-WT", "SS", "WS-10"]
+      ["HR", "HR", "P-CN-5", "P-SB-3-8", "P-STEP-5", "P-WT", "SS", "WS-10"]
     );
+
+    // Eco Beams go on the two Play Towers only, and only Swing Beams go on
+    // the rest (Weldon, 2026-10-05). A swap changes one for the other.
+    const beamsOffered = (tower) =>
+      templates()
+        .filter((m) => m.category === 1 && tower.sockets().some((s) => Socket_is_open(s) && m.capable({ socket: s })))
+        .map((m) => m.object_id)
+        .sort();
+    await reset();
+    const play = await placeFirst("P-PT");
+    check("the Play Tower is offered the Eco Beams", beamsOffered(play), ["P-AB-3-8", "P-AB-4-8"]);
+    await reset();
+    const sky = await placeFirst("P-WT");
+    check("the Sky Tower is offered the 8 ft Swing Beams", beamsOffered(sky), ["P-AB-DS-8", "P-SB-3-8", "P-SB-4-8"]);
+    await reset();
+    const play2 = await placeFirst("P-PT");
+    const eco = await place(socketFor(play2, "b8"), "P-AB-4-8");
+    await place(socketFor(eco, "s"), "SS");
+    Offer_replacements(play2);
+    selected_object_id = "P-ST";
+    await Item_clicked();
+    normal();
+    check("a swap off a Play Tower makes its Eco Beam a Swing Beam", built(), ["P-SB-4-8", "P-ST", "SS"]);
+    Offer_replacements(models_with_available_joints.find((m) => m.object_id === "P-ST"));
+    selected_object_id = "P-PT";
+    await Item_clicked();
+    normal();
+    check("and back onto a Play Tower makes it an Eco Beam again", built(), ["P-AB-4-8", "P-PT", "SS"]);
 
     // Two towers over a bridge, both taken to 7 ft in turn: the bridge comes
     // up with the second and meets both decks again.
@@ -1357,7 +1385,7 @@
     const seat = host.sockets().find((socket) =>
       socket.joints.some((j) => j.available && (j.layer === "b8" || j.layer === "b10"))
     );
-    const beam = await place(seat, "P-AB-3-8");
+    const beam = await place(seat, "P-SB-3-8");
     check("the beam went on", !!beam, true);
     // Stand off the beam's flank, where its hangers are plainly in view.
     camera.position.set(7, 3.4, -2.8);
@@ -1575,7 +1603,7 @@
 
     // Swapping a swing at the end hanger offers what hangs from the other
     // joint of that opening too.
-    const rig = await beamRig("P-WT", "P-AB-3-8");
+    const rig = await beamRig("P-WT", "P-SB-3-8");
     const endHanger = rig.beam.sockets().find((s) => s.joints.some((j) => j.layer === "sh"));
     const sling = await place(endHanger, "SS");
     Offer_replacements(sling);

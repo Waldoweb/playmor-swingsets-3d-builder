@@ -903,6 +903,50 @@
       "colors": {
         "toy": "@toy_colors"
       }
+    },
+    "P-SB-3-8": {
+      "sections": [
+        "frame"
+      ],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": [
+          "Plane001"
+        ],
+        "tan_meshes": [
+          "Plane001_1,_colorize_",
+          "Plane001_2"
+        ],
+        "all_meshes": [
+          "Plane001_1,_colorize_",
+          "Plane001",
+          "Plane001_2"
+        ]
+      }
+    },
+    "P-SB-4-8": {
+      "sections": [
+        "frame"
+      ],
+      "colors": {
+        "frame": "@frame_colors"
+      },
+      "frame_meshes": {
+        "cedar_meshes": [
+          "Plane003"
+        ],
+        "tan_meshes": [
+          "Plane003_1,_colorize_",
+          "Plane003_2"
+        ],
+        "all_meshes": [
+          "Plane003_1,_colorize_",
+          "Plane003",
+          "Plane003_2"
+        ]
+      }
     }
   },
   "default_sections": {

@@ -2479,8 +2479,31 @@
        * itself to another tower's deck. Every joint knows its model, so the
        * rule belongs here with the rest.
        */
+      /**
+       * Which beam a tower takes. PlayMor sell two: the Eco Beam, two boards
+       * under the cap, goes on the Play Tower and DX Play Tower and nowhere
+       * else; the Swing Beam, three boards wide, goes on every other tower
+       * (Weldon, 2026-10-05). object-mapping.json marks the Eco Beams
+       * `beam: "eco"` and those two towers `beams: "eco"`; anything unmarked
+       * is a Swing Beam, or takes one.
+       */
+      const Beam_kind = (model, field) => {
+        const info = objectMapping && model && model.object_id && objectMapping.objects[model.object_id];
+        return (info && info[field]) || "swing";
+      };
+      const Beam_fits_tower = (plug_joint, host_joint) => {
+        const plug = plug_joint.model;
+        const host = host_joint.model;
+        const beam =
+          Category_of(plug) === "swing_beams" ? plug : Category_of(host) === "swing_beams" ? host : null;
+        const tower = beam === plug ? host : plug;
+        if (!beam || !tower || !Is_free_standing(tower)) return true;
+        return Beam_kind(beam, "beam") === Beam_kind(tower, "beams");
+      };
+
       const Joints_connect = (plug_joint, host_joint) =>
         Layers_connect(plug_joint.layer, host_joint.layer) &&
+        Beam_fits_tower(plug_joint, host_joint) &&
         Tire_rule_holds(plug_joint, host_joint) &&
         Swivel_allows(plug_joint, host_joint) &&
         Deck_heights_agree(plug_joint, host_joint) &&
@@ -6799,11 +6822,13 @@
       /**
        * What a part may become at another height, in order of preference:
        * what it was before an earlier swap changed it, then its own other
-       * heights, then the stand-ins object-mapping.json lists for a part sold
-       * at one height only -- the Wave Slide is 5 ft only, and a 7 ft deck
-       * takes the DX Wave Slide 7ft in its place (Weldon, 2026-10-05). The
-       * first keeps a round trip honest: 5 ft to 7 ft and back gives the
-       * Wave Slide again, not the DX Wave Slide 5ft.
+       * heights, then the stand-ins object-mapping.json lists
+       * (`swap_stand_ins`) for a part the new tower cannot take in any height
+       * of its own -- the Wave Slide is 5 ft only, and a 7 ft deck takes the
+       * DX Wave Slide 7ft in its place; an Eco Beam goes only on the Play
+       * Towers, and any other tower takes the Swing Beam in its place
+       * (Weldon, 2026-10-05). The first keeps a round trip honest: 5 ft to
+       * 7 ft and back gives the Wave Slide again, not the DX Wave Slide 5ft.
        */
       const Height_candidates = (model) => {
         const out = [];
@@ -6818,7 +6843,7 @@
         Height_siblings(model.object_id).forEach(add);
         for (const source of [model.object_id, origin]) {
           const info = source && objectMapping && objectMapping.objects[source];
-          for (const id of (info && info.height_stand_ins) || []) {
+          for (const id of (info && info.swap_stand_ins) || []) {
             add(id);
             Height_siblings(id).forEach(add);
           }

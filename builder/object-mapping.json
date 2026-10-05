@@ -3,12 +3,14 @@
     "P-PT": {
       "name": "Play Tower",
       "category": "towers",
-      "index": 0
+      "index": 0,
+      "beams": "eco"
     },
     "P-DPT": {
       "name": "DX Play Tower",
       "category": "towers",
-      "index": 1
+      "index": 1,
+      "beams": "eco"
     },
     "P-WT": {
       "name": "Sky Tower - 5ft",
@@ -64,34 +66,64 @@
       "index": 10
     },
     "P-AB-3-8": {
+      "name": "3 Eco Beam - 8 ft",
+      "category": "swing_beams",
+      "index": 0,
+      "beam": "eco",
+      "swap_stand_ins": [
+        "P-SB-3-8"
+      ]
+    },
+    "P-AB-4-8": {
+      "name": "4 Eco Beam - 8 ft",
+      "category": "swing_beams",
+      "index": 1,
+      "beam": "eco",
+      "swap_stand_ins": [
+        "P-SB-4-8"
+      ]
+    },
+    "P-SB-3-8": {
       "name": "3 Swing Beam - 8 ft",
       "category": "swing_beams",
-      "index": 0
+      "index": 2,
+      "swap_stand_ins": [
+        "P-AB-3-8"
+      ]
     },
     "P-AB-3-10": {
       "name": "3 Swing Beam - 10 ft",
       "category": "swing_beams",
-      "index": 1
+      "index": 3,
+      "swap_stand_ins": [
+        "P-AB-3-8"
+      ]
     },
-    "P-AB-4-8": {
+    "P-SB-4-8": {
       "name": "4 Swing Beam - 8 ft",
       "category": "swing_beams",
-      "index": 2
+      "index": 4,
+      "swap_stand_ins": [
+        "P-AB-4-8"
+      ]
     },
     "P-AB-4-10": {
       "name": "4 Swing Beam - 10 ft",
       "category": "swing_beams",
-      "index": 3
+      "index": 5,
+      "swap_stand_ins": [
+        "P-AB-4-8"
+      ]
     },
     "P-AB-DS-8": {
       "name": "Extended Beam - 8 ft",
       "category": "swing_beams",
-      "index": 4
+      "index": 6
     },
     "P-AB-DS-10": {
       "name": "Extended Beam - 10 ft",
       "category": "swing_beams",
-      "index": 5
+      "index": 7
     },
     "SS": {
       "name": "Sling Swing",
@@ -257,7 +289,9 @@
       "name": "Wave Slide - 5ft",
       "category": "slides",
       "index": 0,
-      "height_stand_ins": ["SWS-14"]
+      "swap_stand_ins": [
+        "SWS-14"
+      ]
     },
     "SWS-10": {
       "name": "DX Wave Slide - 5ft",
