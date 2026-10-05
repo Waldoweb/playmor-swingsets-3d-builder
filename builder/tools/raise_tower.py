@@ -60,6 +60,11 @@ MODELS = os.path.join(HERE, "..", "models")
 TOWERS = [
     ("P-WT", "P-WT-7", 0.7, 0.640, {"6": "8", "b8": "b10"}),
     ("P-KT", "P-KT-5", 1.4, -0.640, {"8": "6", "b10": "b8"}),
+    # Not a tower: the Kitchen Kit's version for a 5 ft deck (2026-10-05).
+    # Its awning drops the same 0.640 a 5 ft deck sits below a 7 ft one;
+    # the counter, under the 1.1 cut, stays put. The app hangs it on mounts
+    # named `...,kitchen,short` (tools/add_kitchen_mounts.py).
+    ("KK__tall", "KK__short", 1.1, -0.640, {}),
 ]
 
 

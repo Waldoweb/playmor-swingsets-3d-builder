@@ -24,7 +24,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
-const { readJointPositions, readBounds, deriveSockets } = require("./sockets");
+const { readJointPositions, readBounds, readQuarterBounds, deriveSockets } = require("./sockets");
 
 const CATEGORIES_JS = "js/categories.js";
 const OBJECT_MAPPING = "object-mapping.json";
@@ -255,6 +255,12 @@ function main() {
           sockets,
           bounds: readBounds(buffer),
           joint_positions,
+          // The same box in quarters about each joint, for the parts that hang
+          // on something (readQuarterBounds). Not the towers: they stand on the
+          // ground and are never fitted to an opening.
+          ...(objectMapping.objects[objectId].category === "towers"
+            ? {}
+            : { quarter_bounds: readQuarterBounds(buffer, positions, readBounds(buffer)) }),
         });
         joints.push(...names);
       }
@@ -322,12 +328,33 @@ function main() {
   console.log(`joints   : ${jointTotal}`);
   console.log(`sockets  : ${socketTotal}  (${mergedTotal} joints merged into a shared opening)`);
   console.log(`manifest : ${OUT_DIR}/manifest.json`);
+  stampCatalogueVersion();
 
   if (problems.length) {
     console.error(`\n${problems.length} problem(s):`);
     for (const problem of problems) console.error(`  ${problem}`);
     process.exit(1);
   }
+}
+
+/**
+ * Tag index.html's <script src="./js/categories.js"> with the file's content
+ * hash, so a browser holding an older copy fetches the new one.
+ *
+ * object-mapping.json is fetched fresh on every load and categories.js is a
+ * script the browser may keep; the two are joined by position in each
+ * category, so an old categories.js against a new mapping put the DX Sky
+ * Tower's picture on the Summit Tower's tile (and would have mislabelled the
+ * beams after the Eco/Swing Beam change) for anyone who had visited before.
+ * Done here because this script runs after every change to the catalogue.
+ */
+function stampCatalogueVersion() {
+  const indexPath = "index.html";
+  const hash = crypto.createHash("sha256").update(fs.readFileSync(CATEGORIES_JS)).digest("hex").slice(0, 8);
+  const html = fs.readFileSync(indexPath, "utf8");
+  const stamped = html.replace(/(src="\.\/js\/categories\.js)(\?v=[0-9a-f]+)?"/, `$1?v=${hash}"`);
+  if (stamped !== html) fs.writeFileSync(indexPath, stamped);
+  console.log(`catalogue: js/categories.js?v=${hash}`);
 }
 
 main();

@@ -26,13 +26,13 @@
       "family": "Sky Tower",
       "option": "7 ft"
     },
-    "P-ST": {
-      "name": "Summit Tower",
+    "P-DST": {
+      "name": "DX Sky Tower",
       "category": "towers",
       "index": 4
     },
-    "P-DST": {
-      "name": "DX Sky Tower",
+    "P-ST": {
+      "name": "Summit Tower",
       "category": "towers",
       "index": 5
     },

@@ -199,8 +199,21 @@
     suite("sockets");
     const tower = await placeFirst("P-PT");
 
-    check("Play Tower joints", tower.joints.length, 20);
-    check("Play Tower sockets", tower.sockets().length, 16);
+    // 20, plus a kitchen mount beside each end rail since 2026-10-05 -- the
+    // two share their end rail's opening, so that adds no socket -- and a
+    // picnic table mount under the deck, which does.
+    check("Play Tower joints", tower.joints.length, 23);
+    check("Play Tower sockets", tower.sockets().length, 17);
+
+    // The Kitchen Kit goes on 5 ft and 7 ft towers, short under a 5 ft deck.
+    {
+      const kitchenSocket = tower.sockets().find((s) => s.joints.some((j) => j.layer === "kitchen"));
+      const kitchen = await place(kitchenSocket, "KK");
+      check("a Kitchen Kit goes on the Play Tower", !!kitchen, true);
+      check("in its short version, under the 5 ft deck", kitchen && kitchen.layer, "short");
+      if (kitchen) remove(kitchen);
+    }
+
 
     // A Play Tower's post carries its two toy mounts close enough together to
     // be one opening. Both are layer `toy` now — scope, wheel and mailbox were
@@ -286,6 +299,58 @@
       otherSwing ? (otherSwing.joints.find((j) => j.connected) || {}).direction
         : "no swing",
       (v) => v !== (placedSwing.joints.find((j) => j.connected) || {}).direction);
+
+    // A kitchen and a picnic table never share a bay: not at all on a
+    // single tower, not on the same side of a double one.
+    {
+      const offered = (t, id, layer) =>
+        t.sockets().filter((s) => Socket_is_open(s) && s.joints.some((j) => j.layer === layer) && template(id).capable({ socket: s })).length;
+      await reset();
+      const sky = await placeFirst("P-WT");
+      await place(sky.sockets().find((s) => s.joints.some((j) => j.layer === "kitchen")), "KK");
+      check("a Sky Tower with a kitchen is offered no picnic table", offered(sky, "PT-K", "picnic"), 0);
+      await reset();
+      const dx = await placeFirst("P-DST");
+      await place(dx.sockets().find((s) => s.joints.some((j) => j.layer === "kitchen")), "KK");
+      check("a DX Sky Tower with a kitchen still takes a table in its other bay", offered(dx, "PT-K", "picnic"), 1);
+      // The table goes under 5 ft decks too, but not where the Summit's
+      // tire swing hangs.
+      await reset();
+      const summit = await placeFirst("P-ST");
+      check("a Summit Tower takes a picnic table", offered(summit, "PT-K", "picnic"), 1);
+      await place(summit.sockets().find((s) => s.joints.some((j) => j.tire_only)), "MTS");
+      check("but not with the tire swing in its place", offered(summit, "PT-K", "picnic"), 0);
+      await reset();
+
+      // Weldon: the top of the seat is 16" from the ground, on every tower.
+      // The seat boards top out 0.262 up in the table's own space.
+      const seats = {};
+      for (const id of ["P-PT", "P-DPT", "P-WT", "P-WT-7", "P-DST", "P-ST", "P-DSMT", "P-KT", "P-KT-5"]) {
+        const t = await placeFirst(id);
+        const table = t && (await place(socketFor(t, "picnic"), "PT-K"));
+        seats[id] = table ? Math.round((table.mesh.position.y + 0.262) / 0.0254 * 10) / 10 : "no table";
+        await reset();
+      }
+      check("the picnic table's seat is 16 in up on every tower",
+        Object.entries(seats).filter(([, inches]) => inches !== 16), []);
+
+      // Weldon: the wave slides and the table do not meet. The slide's hood
+      // reaches back over the deck, and as one box that reach ran down to
+      // the ground under the deck and into the table; the fit test measures
+      // a part in quarters about its joint now.
+      for (const id of ["WS-10", "SWS-10"]) {
+        const sky = await placeFirst("P-WT");
+        const before = offered(sky, id, "6");
+        await place(socketFor(sky, "picnic"), "PT-K");
+        check(`a ${id} still goes on every side of a Sky Tower with a picnic table`,
+          [offered(sky, id, "6"), before > 0], [before, true]);
+        await reset();
+        const again = await placeFirst("P-WT");
+        await place(socketFor(again, "6"), id);
+        check(`...and a picnic table still goes under a Sky Tower with a ${id}`, offered(again, "PT-K", "picnic"), 1);
+        await reset();
+      }
+    }
   } catch (e) { fail("sockets suite", e); }
 
   // ————————————————————————————————————————————————— swing fit

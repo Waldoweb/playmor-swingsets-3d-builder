@@ -1,6 +1,6 @@
 {
   "generated_by": "tools/build_models.js",
-  "generated_at": "2026-10-05T15:34:08.004Z",
+  "generated_at": "2026-10-05T18:47:14.904Z",
   "product_count": 68,
   "default_fittings": [
     {
@@ -26,8 +26,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-PT.ce3f5b4f.glb",
-          "bytes": 316128,
+          "file": "P-PT.1e3618e4.glb",
+          "bytes": 316416,
           "joints": [
             "joint,1,6",
             "joint,3,6",
@@ -48,7 +48,10 @@
             "joint_r_wheel,0,toy",
             "joint_r,2,6,3,4",
             "joint_r_scope,2,toy",
-            "joint_r_wheel,2,toy"
+            "joint_r_wheel,2,toy",
+            "joint_back,2,kitchen,short",
+            "joint_front,0,kitchen,short",
+            "joint_floor_center,0,picnic"
           ],
           "sockets": [
             {
@@ -90,13 +93,15 @@
                 -0.615
               ],
               "accepts": [
-                "end_rail"
+                "end_rail",
+                "kitchen"
               ],
               "facings": [
                 2
               ],
               "joints": [
-                "joint_back,2,end_rail"
+                "joint_back,2,end_rail",
+                "joint_back,2,kitchen,short"
               ]
             },
             {
@@ -138,13 +143,15 @@
                 0.62
               ],
               "accepts": [
-                "end_rail"
+                "end_rail",
+                "kitchen"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint_front,0,end_rail"
+                "joint_front,0,end_rail",
+                "joint_front,0,kitchen,short"
               ]
             },
             {
@@ -314,6 +321,27 @@
               "joints": [
                 "joint_r,2,6,3,4"
               ]
+            },
+            {
+              "marker": [
+                0,
+                0.587,
+                0
+              ],
+              "accepts": [
+                "picnic"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_floor_center,0,picnic"
+              ],
+              "marker_offset": [
+                0,
+                0.393,
+                0
+              ]
             }
           ],
           "bounds": [
@@ -428,6 +456,21 @@
               0.355,
               2.299,
               0.558
+            ],
+            "joint_back,2,kitchen,short": [
+              0,
+              0,
+              -0.615
+            ],
+            "joint_front,0,kitchen,short": [
+              0,
+              0,
+              0.62
+            ],
+            "joint_floor_center,0,picnic": [
+              0,
+              0.194,
+              0
             ]
           }
         }
@@ -552,6 +595,24 @@
           "direction": 2,
           "layer": "toy",
           "tire_only": false
+        },
+        {
+          "name": "joint_back,2,kitchen,short",
+          "direction": 2,
+          "layer": "kitchen",
+          "tire_only": false
+        },
+        {
+          "name": "joint_front,0,kitchen,short",
+          "direction": 0,
+          "layer": "kitchen",
+          "tire_only": false
+        },
+        {
+          "name": "joint_floor_center,0,picnic",
+          "direction": 0,
+          "layer": "picnic",
+          "tire_only": false
         }
       ]
     },
@@ -564,8 +625,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-DPT.70021de9.glb",
-          "bytes": 681160,
+          "file": "P-DPT.f4d49506.glb",
+          "bytes": 681332,
           "joints": [
             "joint,0,5",
             "joint_scope,0,toy",
@@ -593,7 +654,9 @@
             "joint_r,1,6",
             "joint_r,2,6,1,2",
             "joint_r,3,5",
-            "joint_r,3,6"
+            "joint_r,3,6",
+            "joint_back,2,kitchen,short",
+            "joint_floor_center,0,picnic"
           ],
           "sockets": [
             {
@@ -737,13 +800,15 @@
                 -1.227
               ],
               "accepts": [
-                "end_rail"
+                "end_rail",
+                "kitchen"
               ],
               "facings": [
                 2
               ],
               "joints": [
-                "joint_back,2,end_rail"
+                "joint_back,2,end_rail",
+                "joint_back,2,kitchen,short"
               ]
             },
             {
@@ -985,6 +1050,27 @@
               "joints": [
                 "joint_r,3,6"
               ]
+            },
+            {
+              "marker": [
+                0,
+                0.587,
+                -0.615
+              ],
+              "accepts": [
+                "picnic"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_floor_center,0,picnic"
+              ],
+              "marker_offset": [
+                0,
+                0.393,
+                0
+              ]
             }
           ],
           "bounds": [
@@ -1134,6 +1220,16 @@
               -0.761,
               1.846,
               -0.318
+            ],
+            "joint_back,2,kitchen,short": [
+              0,
+              0,
+              -1.227
+            ],
+            "joint_floor_center,0,picnic": [
+              0,
+              0.194,
+              -0.615
             ]
           }
         }
@@ -1300,6 +1396,18 @@
           "direction": 3,
           "layer": "6",
           "tire_only": false
+        },
+        {
+          "name": "joint_back,2,kitchen,short",
+          "direction": 2,
+          "layer": "kitchen",
+          "tire_only": false
+        },
+        {
+          "name": "joint_floor_center,0,picnic",
+          "direction": 0,
+          "layer": "picnic",
+          "tire_only": false
         }
       ]
     },
@@ -1312,8 +1420,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-WT.0ac7fb23.glb",
-          "bytes": 422800,
+          "file": "P-WT.e3fc8941.glb",
+          "bytes": 423156,
           "joints": [
             "joint,0,floor_center_watch",
             "joint,1,6,4,5",
@@ -1342,7 +1450,11 @@
             "joint_pole_female,2,6,67",
             "joint_right,1,end_rail",
             "joint_right_l,1,6,5,4",
-            "joint_right_r,1,6,5,4"
+            "joint_right_r,1,6,5,4",
+            "joint_back,2,kitchen,short",
+            "joint_front,0,kitchen,short",
+            "joint_left,3,kitchen,short",
+            "joint_right,1,kitchen,short"
           ],
           "sockets": [
             {
@@ -1400,13 +1512,15 @@
                 -0.777
               ],
               "accepts": [
-                "end_rail"
+                "end_rail",
+                "kitchen"
               ],
               "facings": [
                 2
               ],
               "joints": [
-                "joint_back,2,end_rail"
+                "joint_back,2,end_rail",
+                "joint_back,2,kitchen,short"
               ]
             },
             {
@@ -1550,7 +1664,7 @@
             {
               "marker": [
                 0,
-                0.393,
+                0.587,
                 0
               ],
               "accepts": [
@@ -1575,13 +1689,15 @@
                 0.777
               ],
               "accepts": [
-                "end_rail"
+                "end_rail",
+                "kitchen"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint_front,0,end_rail"
+                "joint_front,0,end_rail",
+                "joint_front,0,kitchen,short"
               ]
             },
             {
@@ -1687,13 +1803,15 @@
                 0
               ],
               "accepts": [
-                "end_rail"
+                "end_rail",
+                "kitchen"
               ],
               "facings": [
                 3
               ],
               "joints": [
-                "joint_left,3,end_rail"
+                "joint_left,3,end_rail",
+                "joint_left,3,kitchen,short"
               ]
             },
             {
@@ -1767,13 +1885,15 @@
                 0
               ],
               "accepts": [
-                "end_rail"
+                "end_rail",
+                "kitchen"
               ],
               "facings": [
                 1
               ],
               "joints": [
-                "joint_right,1,end_rail"
+                "joint_right,1,end_rail",
+                "joint_right,1,kitchen,short"
               ]
             },
             {
@@ -1884,7 +2004,7 @@
             ],
             "joint_floor_center,0,picnic": [
               0,
-              0,
+              0.194,
               0
             ],
             "joint_front,0,end_rail": [
@@ -1961,6 +2081,26 @@
               0.762,
               1.785,
               -0.354
+            ],
+            "joint_back,2,kitchen,short": [
+              0,
+              0,
+              -0.777
+            ],
+            "joint_front,0,kitchen,short": [
+              0,
+              0,
+              0.777
+            ],
+            "joint_left,3,kitchen,short": [
+              -0.78,
+              0,
+              0
+            ],
+            "joint_right,1,kitchen,short": [
+              0.783,
+              0,
+              0
             ]
           }
         }
@@ -2133,6 +2273,30 @@
           "direction": 1,
           "layer": "6",
           "tire_only": false
+        },
+        {
+          "name": "joint_back,2,kitchen,short",
+          "direction": 2,
+          "layer": "kitchen",
+          "tire_only": false
+        },
+        {
+          "name": "joint_front,0,kitchen,short",
+          "direction": 0,
+          "layer": "kitchen",
+          "tire_only": false
+        },
+        {
+          "name": "joint_left,3,kitchen,short",
+          "direction": 3,
+          "layer": "kitchen",
+          "tire_only": false
+        },
+        {
+          "name": "joint_right,1,kitchen,short",
+          "direction": 1,
+          "layer": "kitchen",
+          "tire_only": false
         }
       ]
     },
@@ -2145,8 +2309,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-WT-7.06b60615.glb",
-          "bytes": 422816,
+          "file": "P-WT-7.fb3f346e.glb",
+          "bytes": 423148,
           "joints": [
             "joint,0,floor_center_watch",
             "joint,1,8,4,5",
@@ -2175,7 +2339,11 @@
             "joint_pole_female,2,8,67",
             "joint_right,1,end_rail",
             "joint_right_l,1,8,5,4",
-            "joint_right_r,1,8,5,4"
+            "joint_right_r,1,8,5,4",
+            "joint_back,2,kitchen",
+            "joint_front,0,kitchen",
+            "joint_left,3,kitchen",
+            "joint_right,1,kitchen"
           ],
           "sockets": [
             {
@@ -2233,13 +2401,15 @@
                 -0.777
               ],
               "accepts": [
-                "end_rail"
+                "end_rail",
+                "kitchen"
               ],
               "facings": [
                 2
               ],
               "joints": [
-                "joint_back,2,end_rail"
+                "joint_back,2,end_rail",
+                "joint_back,2,kitchen"
               ]
             },
             {
@@ -2373,7 +2543,7 @@
             {
               "marker": [
                 0,
-                0.393,
+                0.587,
                 0
               ],
               "accepts": [
@@ -2398,13 +2568,15 @@
                 0.777
               ],
               "accepts": [
-                "end_rail"
+                "end_rail",
+                "kitchen"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint_front,0,end_rail"
+                "joint_front,0,end_rail",
+                "joint_front,0,kitchen"
               ]
             },
             {
@@ -2510,13 +2682,15 @@
                 0
               ],
               "accepts": [
-                "end_rail"
+                "end_rail",
+                "kitchen"
               ],
               "facings": [
                 3
               ],
               "joints": [
-                "joint_left,3,end_rail"
+                "joint_left,3,end_rail",
+                "joint_left,3,kitchen"
               ]
             },
             {
@@ -2590,13 +2764,15 @@
                 0
               ],
               "accepts": [
-                "end_rail"
+                "end_rail",
+                "kitchen"
               ],
               "facings": [
                 1
               ],
               "joints": [
-                "joint_right,1,end_rail"
+                "joint_right,1,end_rail",
+                "joint_right,1,kitchen"
               ]
             },
             {
@@ -2707,7 +2883,7 @@
             ],
             "joint_floor_center,0,picnic": [
               0,
-              0,
+              0.194,
               0
             ],
             "joint_front,0,end_rail": [
@@ -2784,6 +2960,26 @@
               0.762,
               2.425,
               -0.339
+            ],
+            "joint_back,2,kitchen": [
+              0,
+              0,
+              -0.777
+            ],
+            "joint_front,0,kitchen": [
+              0,
+              0,
+              0.777
+            ],
+            "joint_left,3,kitchen": [
+              -0.78,
+              0,
+              0
+            ],
+            "joint_right,1,kitchen": [
+              0.783,
+              0,
+              0
             ]
           }
         }
@@ -2956,11 +3152,35 @@
           "direction": 1,
           "layer": "8",
           "tire_only": false
+        },
+        {
+          "name": "joint_back,2,kitchen",
+          "direction": 2,
+          "layer": "kitchen",
+          "tire_only": false
+        },
+        {
+          "name": "joint_front,0,kitchen",
+          "direction": 0,
+          "layer": "kitchen",
+          "tire_only": false
+        },
+        {
+          "name": "joint_left,3,kitchen",
+          "direction": 3,
+          "layer": "kitchen",
+          "tire_only": false
+        },
+        {
+          "name": "joint_right,1,kitchen",
+          "direction": 1,
+          "layer": "kitchen",
+          "tire_only": false
         }
       ]
     },
-    "P-ST": {
-      "name": "Summit Tower",
+    "P-DST": {
+      "name": "DX Sky Tower",
       "category": "towers",
       "category_index": 0,
       "children_index": 4,
@@ -2968,8 +3188,907 @@
       "files": [
         {
           "layer": null,
-          "file": "P-ST.bed2df0d.glb",
-          "bytes": 353044,
+          "file": "P-DST.40df204b.glb",
+          "bytes": 542772,
+          "joints": [
+            "joint,1,6,4,5",
+            "joint,1,8,6,7",
+            "joint,2,8,8,9",
+            "joint,3,6,13,14",
+            "joint,3,8,11,12",
+            "joint_back,2,end_rail",
+            "joint_back,2,kitchen,7,6",
+            "joint_back_l,2,8,9,8",
+            "joint_back_r,2,8,9,8",
+            "joint_beam_back,2,b10,10,8",
+            "joint_beam_front,0,b8,3,1",
+            "joint_floor_back,0,picnic",
+            "joint_floor_front,0,picnic,6,7",
+            "joint_front,0,end_rail",
+            "joint_front_l,0,6,2,1",
+            "joint_front_r,0,6,2,1",
+            "joint_l,0,6,1,2",
+            "joint_l_wheel,0,toy",
+            "joint_l,2,8,8,9",
+            "joint_l_scope,2,toy",
+            "joint_left_l,3,6,14,13",
+            "joint_left_l,3,8,12,11",
+            "joint_left_r,3,6,14,13",
+            "joint_left_r,3,8,12,11",
+            "joint_pole_female_f,0,6,1,2",
+            "joint_r,0,6,1,2",
+            "joint_r_wheel,0,toy",
+            "joint_r,2,8,8,9",
+            "joint_r_scope,2,toy",
+            "joint_right_l,1,6,5,4",
+            "joint_right_l,1,8,7,6",
+            "joint_right_r,1,6,5,4",
+            "joint_right_r,1,8,7,6",
+            "jointj,0,floor_deluxe"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0.764,
+                1.833,
+                0.719
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,6,4,5"
+              ]
+            },
+            {
+              "marker": [
+                0.764,
+                2.452,
+                -0.737
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint,1,8,6,7"
+              ]
+            },
+            {
+              "marker": [
+                -0.003,
+                2.452,
+                -1.523
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint,2,8,8,9"
+              ]
+            },
+            {
+              "marker": [
+                -0.764,
+                1.833,
+                0.719
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint,3,6,13,14"
+              ]
+            },
+            {
+              "marker": [
+                -0.764,
+                2.452,
+                -0.737
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint,3,8,11,12"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0,
+                -1.565
+              ],
+              "accepts": [
+                "end_rail",
+                "kitchen"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back,2,end_rail",
+                "joint_back,2,kitchen,7,6"
+              ]
+            },
+            {
+              "marker": [
+                0.337,
+                2.452,
+                -1.524
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back_l,2,8,9,8",
+                "joint_l,2,8,8,9"
+              ]
+            },
+            {
+              "marker": [
+                -0.332,
+                2.452,
+                -1.524
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_back_r,2,8,9,8",
+                "joint_r,2,8,8,9"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                3.2,
+                -1.413
+              ],
+              "accepts": [
+                "b10"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "joint_beam_back,2,b10,10,8"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                2.93,
+                1.427
+              ],
+              "accepts": [
+                "b8"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_beam_front,0,b8,3,1"
+              ],
+              "marker_offset": [
+                0,
+                0.37,
+                0
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0.587,
+                0.684
+              ],
+              "accepts": [
+                "picnic"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_floor_back,0,picnic"
+              ],
+              "marker_offset": [
+                0,
+                0.393,
+                0
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0.587,
+                -0.684
+              ],
+              "accepts": [
+                "picnic"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_floor_front,0,picnic,6,7"
+              ],
+              "marker_offset": [
+                0,
+                0.393,
+                0
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0,
+                1.565
+              ],
+              "accepts": [
+                "end_rail"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front,0,end_rail"
+              ]
+            },
+            {
+              "marker": [
+                -0.352,
+                1.833,
+                1.515
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front_l,0,6,2,1",
+                "joint_l,0,6,1,2"
+              ]
+            },
+            {
+              "marker": [
+                0.347,
+                1.833,
+                1.524
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_front_r,0,6,2,1",
+                "joint_r,0,6,1,2"
+              ]
+            },
+            {
+              "marker": [
+                -0.295,
+                2.868,
+                -1.471
+              ],
+              "accepts": [
+                "toy"
+              ],
+              "facings": [
+                0,
+                2
+              ],
+              "joints": [
+                "joint_l_wheel,0,toy",
+                "joint_l_scope,2,toy"
+              ]
+            },
+            {
+              "marker": [
+                -0.764,
+                1.833,
+                1.067
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left_l,3,6,14,13"
+              ]
+            },
+            {
+              "marker": [
+                -0.764,
+                2.452,
+                -0.406
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left_l,3,8,12,11"
+              ]
+            },
+            {
+              "marker": [
+                -0.764,
+                1.833,
+                0.368
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left_r,3,6,14,13"
+              ]
+            },
+            {
+              "marker": [
+                -0.764,
+                2.452,
+                -1.074
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                3
+              ],
+              "joints": [
+                "joint_left_r,3,8,12,11"
+              ]
+            },
+            {
+              "marker": [
+                0.003,
+                1.833,
+                1.524
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "joint_pole_female_f,0,6,1,2"
+              ]
+            },
+            {
+              "marker": [
+                0.272,
+                2.877,
+                -1.471
+              ],
+              "accepts": [
+                "toy"
+              ],
+              "facings": [
+                0,
+                2
+              ],
+              "joints": [
+                "joint_r_wheel,0,toy",
+                "joint_r_scope,2,toy"
+              ]
+            },
+            {
+              "marker": [
+                0.764,
+                1.833,
+                1.073
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_right_l,1,6,5,4"
+              ]
+            },
+            {
+              "marker": [
+                0.764,
+                2.452,
+                -0.403
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_right_l,1,8,7,6"
+              ]
+            },
+            {
+              "marker": [
+                0.764,
+                1.833,
+                0.374
+              ],
+              "accepts": [
+                "6"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_right_r,1,6,5,4"
+              ]
+            },
+            {
+              "marker": [
+                0.764,
+                2.452,
+                -1.071
+              ],
+              "accepts": [
+                "8"
+              ],
+              "facings": [
+                1
+              ],
+              "joints": [
+                "joint_right_r,1,8,7,6"
+              ]
+            },
+            {
+              "marker": [
+                0,
+                0.153,
+                0
+              ],
+              "accepts": [
+                "floor_deluxe"
+              ],
+              "facings": [
+                0
+              ],
+              "joints": [
+                "jointj,0,floor_deluxe"
+              ]
+            }
+          ],
+          "bounds": [
+            [
+              -1.309,
+              0,
+              -1.869
+            ],
+            [
+              1.309,
+              4.461,
+              1.801
+            ]
+          ],
+          "joint_positions": {
+            "joint,1,6,4,5": [
+              0.764,
+              1.833,
+              0.719
+            ],
+            "joint,1,8,6,7": [
+              0.764,
+              2.452,
+              -0.737
+            ],
+            "joint,2,8,8,9": [
+              -0.003,
+              2.452,
+              -1.523
+            ],
+            "joint,3,6,13,14": [
+              -0.764,
+              1.833,
+              0.719
+            ],
+            "joint,3,8,11,12": [
+              -0.764,
+              2.452,
+              -0.737
+            ],
+            "joint_back,2,end_rail": [
+              0,
+              0,
+              -1.565
+            ],
+            "joint_back,2,kitchen,7,6": [
+              0,
+              0,
+              -1.565
+            ],
+            "joint_back_l,2,8,9,8": [
+              0.337,
+              2.452,
+              -1.524
+            ],
+            "joint_back_r,2,8,9,8": [
+              -0.332,
+              2.452,
+              -1.524
+            ],
+            "joint_beam_back,2,b10,10,8": [
+              0,
+              3.2,
+              -1.413
+            ],
+            "joint_beam_front,0,b8,3,1": [
+              0,
+              2.56,
+              1.427
+            ],
+            "joint_floor_back,0,picnic": [
+              0,
+              0.194,
+              0.684
+            ],
+            "joint_floor_front,0,picnic,6,7": [
+              0,
+              0.194,
+              -0.684
+            ],
+            "joint_front,0,end_rail": [
+              0,
+              0,
+              1.565
+            ],
+            "joint_front_l,0,6,2,1": [
+              -0.352,
+              1.833,
+              1.515
+            ],
+            "joint_front_r,0,6,2,1": [
+              0.347,
+              1.833,
+              1.524
+            ],
+            "joint_l,0,6,1,2": [
+              -0.352,
+              1.833,
+              1.524
+            ],
+            "joint_l_wheel,0,toy": [
+              -0.295,
+              2.868,
+              -1.471
+            ],
+            "joint_l,2,8,8,9": [
+              0.337,
+              2.452,
+              -1.523
+            ],
+            "joint_l_scope,2,toy": [
+              -0.276,
+              2.938,
+              -1.513
+            ],
+            "joint_left_l,3,6,14,13": [
+              -0.764,
+              1.833,
+              1.067
+            ],
+            "joint_left_l,3,8,12,11": [
+              -0.764,
+              2.452,
+              -0.406
+            ],
+            "joint_left_r,3,6,14,13": [
+              -0.764,
+              1.833,
+              0.368
+            ],
+            "joint_left_r,3,8,12,11": [
+              -0.764,
+              2.452,
+              -1.074
+            ],
+            "joint_pole_female_f,0,6,1,2": [
+              0.003,
+              1.833,
+              1.524
+            ],
+            "joint_r,0,6,1,2": [
+              0.347,
+              1.833,
+              1.524
+            ],
+            "joint_r_wheel,0,toy": [
+              0.272,
+              2.877,
+              -1.471
+            ],
+            "joint_r,2,8,8,9": [
+              -0.332,
+              2.452,
+              -1.523
+            ],
+            "joint_r_scope,2,toy": [
+              0.291,
+              2.938,
+              -1.501
+            ],
+            "joint_right_l,1,6,5,4": [
+              0.764,
+              1.833,
+              1.073
+            ],
+            "joint_right_l,1,8,7,6": [
+              0.764,
+              2.452,
+              -0.403
+            ],
+            "joint_right_r,1,6,5,4": [
+              0.764,
+              1.833,
+              0.374
+            ],
+            "joint_right_r,1,8,7,6": [
+              0.764,
+              2.452,
+              -1.071
+            ],
+            "jointj,0,floor_deluxe": [
+              0,
+              0.153,
+              0
+            ]
+          }
+        }
+      ],
+      "joints": [
+        {
+          "name": "joint,1,6,4,5",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false
+        },
+        {
+          "name": "joint,1,8,6,7",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint,2,8,8,9",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint,3,6,13,14",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false
+        },
+        {
+          "name": "joint,3,8,11,12",
+          "direction": 3,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_back,2,end_rail",
+          "direction": 2,
+          "layer": "end_rail",
+          "tire_only": false
+        },
+        {
+          "name": "joint_back,2,kitchen,7,6",
+          "direction": 2,
+          "layer": "kitchen",
+          "tire_only": false
+        },
+        {
+          "name": "joint_back_l,2,8,9,8",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_back_r,2,8,9,8",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_beam_back,2,b10,10,8",
+          "direction": 2,
+          "layer": "b10",
+          "tire_only": false
+        },
+        {
+          "name": "joint_beam_front,0,b8,3,1",
+          "direction": 0,
+          "layer": "b8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_floor_back,0,picnic",
+          "direction": 0,
+          "layer": "picnic",
+          "tire_only": false
+        },
+        {
+          "name": "joint_floor_front,0,picnic,6,7",
+          "direction": 0,
+          "layer": "picnic",
+          "tire_only": false
+        },
+        {
+          "name": "joint_front,0,end_rail",
+          "direction": 0,
+          "layer": "end_rail",
+          "tire_only": false
+        },
+        {
+          "name": "joint_front_l,0,6,2,1",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false
+        },
+        {
+          "name": "joint_front_r,0,6,2,1",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false
+        },
+        {
+          "name": "joint_l,0,6,1,2",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false
+        },
+        {
+          "name": "joint_l_wheel,0,toy",
+          "direction": 0,
+          "layer": "toy",
+          "tire_only": false
+        },
+        {
+          "name": "joint_l,2,8,8,9",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_l_scope,2,toy",
+          "direction": 2,
+          "layer": "toy",
+          "tire_only": false
+        },
+        {
+          "name": "joint_left_l,3,6,14,13",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false
+        },
+        {
+          "name": "joint_left_l,3,8,12,11",
+          "direction": 3,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_left_r,3,6,14,13",
+          "direction": 3,
+          "layer": "6",
+          "tire_only": false
+        },
+        {
+          "name": "joint_left_r,3,8,12,11",
+          "direction": 3,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_pole_female_f,0,6,1,2",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false
+        },
+        {
+          "name": "joint_r,0,6,1,2",
+          "direction": 0,
+          "layer": "6",
+          "tire_only": false
+        },
+        {
+          "name": "joint_r_wheel,0,toy",
+          "direction": 0,
+          "layer": "toy",
+          "tire_only": false
+        },
+        {
+          "name": "joint_r,2,8,8,9",
+          "direction": 2,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_r_scope,2,toy",
+          "direction": 2,
+          "layer": "toy",
+          "tire_only": false
+        },
+        {
+          "name": "joint_right_l,1,6,5,4",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false
+        },
+        {
+          "name": "joint_right_l,1,8,7,6",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "joint_right_r,1,6,5,4",
+          "direction": 1,
+          "layer": "6",
+          "tire_only": false
+        },
+        {
+          "name": "joint_right_r,1,8,7,6",
+          "direction": 1,
+          "layer": "8",
+          "tire_only": false
+        },
+        {
+          "name": "jointj,0,floor_deluxe",
+          "direction": 0,
+          "layer": "floor_deluxe",
+          "tire_only": false
+        }
+      ]
+    },
+    "P-ST": {
+      "name": "Summit Tower",
+      "category": "towers",
+      "category_index": 0,
+      "children_index": 5,
+      "multi_layer": false,
+      "files": [
+        {
+          "layer": null,
+          "file": "P-ST.9fc67c4d.glb",
+          "bytes": 353116,
           "joints": [
             "joint,0,s,tire",
             "Joint_beam_left,3,b8,5,6",
@@ -2993,7 +4112,8 @@
             "joint_r_scope,3,toy",
             "joint_r_wheel,3,toy",
             "joint_right_l,1,6,2,1",
-            "joint_right_r,1,6,2,1"
+            "joint_right_r,1,6,2,1",
+            "joint_floor_center,0,picnic"
           ],
           "sockets": [
             {
@@ -3003,13 +4123,15 @@
                 0
               ],
               "accepts": [
+                "picnic",
                 "s"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint,0,s,tire"
+                "joint,0,s,tire",
+                "joint_floor_center,0,picnic"
               ],
               "marker_offset": [
                 0,
@@ -3507,6 +4629,11 @@
               0.763,
               1.792,
               -0.343
+            ],
+            "joint_floor_center,0,picnic": [
+              0,
+              0.194,
+              0
             ]
           }
         }
@@ -3649,908 +4776,15 @@
           "direction": 1,
           "layer": "6",
           "tire_only": false
+        },
+        {
+          "name": "joint_floor_center,0,picnic",
+          "direction": 0,
+          "layer": "picnic",
+          "tire_only": false
         }
       ],
       "default_yaw": 90
-    },
-    "P-DST": {
-      "name": "DX Sky Tower",
-      "category": "towers",
-      "category_index": 0,
-      "children_index": 5,
-      "multi_layer": false,
-      "files": [
-        {
-          "layer": null,
-          "file": "P-DST.9e0a092e.glb",
-          "bytes": 542796,
-          "joints": [
-            "joint,1,6,4,5",
-            "joint,1,8,6,7",
-            "joint,2,8,8,9",
-            "joint,3,6,13,14",
-            "joint,3,8,11,12",
-            "joint_back,2,end_rail",
-            "joint_back,2,kitchen,7,6",
-            "joint_back_l,2,8,9,8",
-            "joint_back_r,2,8,9,8",
-            "joint_beam_back,2,b10,10,8",
-            "joint_beam_front,0,b8,3,1",
-            "joint_floor_back,0,picnic",
-            "joint_floor_front,0,picnic,6,7",
-            "joint_front,0,end_rail",
-            "joint_front_l,0,6,2,1",
-            "joint_front_r,0,6,2,1",
-            "joint_l,0,6,1,2",
-            "joint_l_wheel,0,toy",
-            "joint_l,2,8,8,9",
-            "joint_l_scope,2,toy",
-            "joint_left_l,3,6,14,13",
-            "joint_left_l,3,8,12,11",
-            "joint_left_r,3,6,14,13",
-            "joint_left_r,3,8,12,11",
-            "joint_pole_female_f,0,6,1,2",
-            "joint_r,0,6,1,2",
-            "joint_r_wheel,0,toy",
-            "joint_r,2,8,8,9",
-            "joint_r_scope,2,toy",
-            "joint_right_l,1,6,5,4",
-            "joint_right_l,1,8,7,6",
-            "joint_right_r,1,6,5,4",
-            "joint_right_r,1,8,7,6",
-            "jointj,0,floor_deluxe"
-          ],
-          "sockets": [
-            {
-              "marker": [
-                0.764,
-                1.833,
-                0.719
-              ],
-              "accepts": [
-                "6"
-              ],
-              "facings": [
-                1
-              ],
-              "joints": [
-                "joint,1,6,4,5"
-              ]
-            },
-            {
-              "marker": [
-                0.764,
-                2.452,
-                -0.737
-              ],
-              "accepts": [
-                "8"
-              ],
-              "facings": [
-                1
-              ],
-              "joints": [
-                "joint,1,8,6,7"
-              ]
-            },
-            {
-              "marker": [
-                -0.003,
-                2.452,
-                -1.523
-              ],
-              "accepts": [
-                "8"
-              ],
-              "facings": [
-                2
-              ],
-              "joints": [
-                "joint,2,8,8,9"
-              ]
-            },
-            {
-              "marker": [
-                -0.764,
-                1.833,
-                0.719
-              ],
-              "accepts": [
-                "6"
-              ],
-              "facings": [
-                3
-              ],
-              "joints": [
-                "joint,3,6,13,14"
-              ]
-            },
-            {
-              "marker": [
-                -0.764,
-                2.452,
-                -0.737
-              ],
-              "accepts": [
-                "8"
-              ],
-              "facings": [
-                3
-              ],
-              "joints": [
-                "joint,3,8,11,12"
-              ]
-            },
-            {
-              "marker": [
-                0,
-                0,
-                -1.565
-              ],
-              "accepts": [
-                "end_rail",
-                "kitchen"
-              ],
-              "facings": [
-                2
-              ],
-              "joints": [
-                "joint_back,2,end_rail",
-                "joint_back,2,kitchen,7,6"
-              ]
-            },
-            {
-              "marker": [
-                0.337,
-                2.452,
-                -1.524
-              ],
-              "accepts": [
-                "8"
-              ],
-              "facings": [
-                2
-              ],
-              "joints": [
-                "joint_back_l,2,8,9,8",
-                "joint_l,2,8,8,9"
-              ]
-            },
-            {
-              "marker": [
-                -0.332,
-                2.452,
-                -1.524
-              ],
-              "accepts": [
-                "8"
-              ],
-              "facings": [
-                2
-              ],
-              "joints": [
-                "joint_back_r,2,8,9,8",
-                "joint_r,2,8,8,9"
-              ]
-            },
-            {
-              "marker": [
-                0,
-                3.2,
-                -1.413
-              ],
-              "accepts": [
-                "b10"
-              ],
-              "facings": [
-                2
-              ],
-              "joints": [
-                "joint_beam_back,2,b10,10,8"
-              ]
-            },
-            {
-              "marker": [
-                0,
-                2.93,
-                1.427
-              ],
-              "accepts": [
-                "b8"
-              ],
-              "facings": [
-                0
-              ],
-              "joints": [
-                "joint_beam_front,0,b8,3,1"
-              ],
-              "marker_offset": [
-                0,
-                0.37,
-                0
-              ]
-            },
-            {
-              "marker": [
-                0,
-                0.546,
-                0.684
-              ],
-              "accepts": [
-                "picnic"
-              ],
-              "facings": [
-                0
-              ],
-              "joints": [
-                "joint_floor_back,0,picnic"
-              ],
-              "marker_offset": [
-                0,
-                0.393,
-                0
-              ]
-            },
-            {
-              "marker": [
-                0,
-                0.546,
-                -0.684
-              ],
-              "accepts": [
-                "picnic"
-              ],
-              "facings": [
-                0
-              ],
-              "joints": [
-                "joint_floor_front,0,picnic,6,7"
-              ],
-              "marker_offset": [
-                0,
-                0.393,
-                0
-              ]
-            },
-            {
-              "marker": [
-                0,
-                0,
-                1.565
-              ],
-              "accepts": [
-                "end_rail"
-              ],
-              "facings": [
-                0
-              ],
-              "joints": [
-                "joint_front,0,end_rail"
-              ]
-            },
-            {
-              "marker": [
-                -0.352,
-                1.833,
-                1.515
-              ],
-              "accepts": [
-                "6"
-              ],
-              "facings": [
-                0
-              ],
-              "joints": [
-                "joint_front_l,0,6,2,1",
-                "joint_l,0,6,1,2"
-              ]
-            },
-            {
-              "marker": [
-                0.347,
-                1.833,
-                1.524
-              ],
-              "accepts": [
-                "6"
-              ],
-              "facings": [
-                0
-              ],
-              "joints": [
-                "joint_front_r,0,6,2,1",
-                "joint_r,0,6,1,2"
-              ]
-            },
-            {
-              "marker": [
-                -0.295,
-                2.868,
-                -1.471
-              ],
-              "accepts": [
-                "toy"
-              ],
-              "facings": [
-                0,
-                2
-              ],
-              "joints": [
-                "joint_l_wheel,0,toy",
-                "joint_l_scope,2,toy"
-              ]
-            },
-            {
-              "marker": [
-                -0.764,
-                1.833,
-                1.067
-              ],
-              "accepts": [
-                "6"
-              ],
-              "facings": [
-                3
-              ],
-              "joints": [
-                "joint_left_l,3,6,14,13"
-              ]
-            },
-            {
-              "marker": [
-                -0.764,
-                2.452,
-                -0.406
-              ],
-              "accepts": [
-                "8"
-              ],
-              "facings": [
-                3
-              ],
-              "joints": [
-                "joint_left_l,3,8,12,11"
-              ]
-            },
-            {
-              "marker": [
-                -0.764,
-                1.833,
-                0.368
-              ],
-              "accepts": [
-                "6"
-              ],
-              "facings": [
-                3
-              ],
-              "joints": [
-                "joint_left_r,3,6,14,13"
-              ]
-            },
-            {
-              "marker": [
-                -0.764,
-                2.452,
-                -1.074
-              ],
-              "accepts": [
-                "8"
-              ],
-              "facings": [
-                3
-              ],
-              "joints": [
-                "joint_left_r,3,8,12,11"
-              ]
-            },
-            {
-              "marker": [
-                0.003,
-                1.833,
-                1.524
-              ],
-              "accepts": [
-                "6"
-              ],
-              "facings": [
-                0
-              ],
-              "joints": [
-                "joint_pole_female_f,0,6,1,2"
-              ]
-            },
-            {
-              "marker": [
-                0.272,
-                2.877,
-                -1.471
-              ],
-              "accepts": [
-                "toy"
-              ],
-              "facings": [
-                0,
-                2
-              ],
-              "joints": [
-                "joint_r_wheel,0,toy",
-                "joint_r_scope,2,toy"
-              ]
-            },
-            {
-              "marker": [
-                0.764,
-                1.833,
-                1.073
-              ],
-              "accepts": [
-                "6"
-              ],
-              "facings": [
-                1
-              ],
-              "joints": [
-                "joint_right_l,1,6,5,4"
-              ]
-            },
-            {
-              "marker": [
-                0.764,
-                2.452,
-                -0.403
-              ],
-              "accepts": [
-                "8"
-              ],
-              "facings": [
-                1
-              ],
-              "joints": [
-                "joint_right_l,1,8,7,6"
-              ]
-            },
-            {
-              "marker": [
-                0.764,
-                1.833,
-                0.374
-              ],
-              "accepts": [
-                "6"
-              ],
-              "facings": [
-                1
-              ],
-              "joints": [
-                "joint_right_r,1,6,5,4"
-              ]
-            },
-            {
-              "marker": [
-                0.764,
-                2.452,
-                -1.071
-              ],
-              "accepts": [
-                "8"
-              ],
-              "facings": [
-                1
-              ],
-              "joints": [
-                "joint_right_r,1,8,7,6"
-              ]
-            },
-            {
-              "marker": [
-                0,
-                0.153,
-                0
-              ],
-              "accepts": [
-                "floor_deluxe"
-              ],
-              "facings": [
-                0
-              ],
-              "joints": [
-                "jointj,0,floor_deluxe"
-              ]
-            }
-          ],
-          "bounds": [
-            [
-              -1.309,
-              0,
-              -1.869
-            ],
-            [
-              1.309,
-              4.461,
-              1.801
-            ]
-          ],
-          "joint_positions": {
-            "joint,1,6,4,5": [
-              0.764,
-              1.833,
-              0.719
-            ],
-            "joint,1,8,6,7": [
-              0.764,
-              2.452,
-              -0.737
-            ],
-            "joint,2,8,8,9": [
-              -0.003,
-              2.452,
-              -1.523
-            ],
-            "joint,3,6,13,14": [
-              -0.764,
-              1.833,
-              0.719
-            ],
-            "joint,3,8,11,12": [
-              -0.764,
-              2.452,
-              -0.737
-            ],
-            "joint_back,2,end_rail": [
-              0,
-              0,
-              -1.565
-            ],
-            "joint_back,2,kitchen,7,6": [
-              0,
-              0,
-              -1.565
-            ],
-            "joint_back_l,2,8,9,8": [
-              0.337,
-              2.452,
-              -1.524
-            ],
-            "joint_back_r,2,8,9,8": [
-              -0.332,
-              2.452,
-              -1.524
-            ],
-            "joint_beam_back,2,b10,10,8": [
-              0,
-              3.2,
-              -1.413
-            ],
-            "joint_beam_front,0,b8,3,1": [
-              0,
-              2.56,
-              1.427
-            ],
-            "joint_floor_back,0,picnic": [
-              0,
-              0.153,
-              0.684
-            ],
-            "joint_floor_front,0,picnic,6,7": [
-              0,
-              0.153,
-              -0.684
-            ],
-            "joint_front,0,end_rail": [
-              0,
-              0,
-              1.565
-            ],
-            "joint_front_l,0,6,2,1": [
-              -0.352,
-              1.833,
-              1.515
-            ],
-            "joint_front_r,0,6,2,1": [
-              0.347,
-              1.833,
-              1.524
-            ],
-            "joint_l,0,6,1,2": [
-              -0.352,
-              1.833,
-              1.524
-            ],
-            "joint_l_wheel,0,toy": [
-              -0.295,
-              2.868,
-              -1.471
-            ],
-            "joint_l,2,8,8,9": [
-              0.337,
-              2.452,
-              -1.523
-            ],
-            "joint_l_scope,2,toy": [
-              -0.276,
-              2.938,
-              -1.513
-            ],
-            "joint_left_l,3,6,14,13": [
-              -0.764,
-              1.833,
-              1.067
-            ],
-            "joint_left_l,3,8,12,11": [
-              -0.764,
-              2.452,
-              -0.406
-            ],
-            "joint_left_r,3,6,14,13": [
-              -0.764,
-              1.833,
-              0.368
-            ],
-            "joint_left_r,3,8,12,11": [
-              -0.764,
-              2.452,
-              -1.074
-            ],
-            "joint_pole_female_f,0,6,1,2": [
-              0.003,
-              1.833,
-              1.524
-            ],
-            "joint_r,0,6,1,2": [
-              0.347,
-              1.833,
-              1.524
-            ],
-            "joint_r_wheel,0,toy": [
-              0.272,
-              2.877,
-              -1.471
-            ],
-            "joint_r,2,8,8,9": [
-              -0.332,
-              2.452,
-              -1.523
-            ],
-            "joint_r_scope,2,toy": [
-              0.291,
-              2.938,
-              -1.501
-            ],
-            "joint_right_l,1,6,5,4": [
-              0.764,
-              1.833,
-              1.073
-            ],
-            "joint_right_l,1,8,7,6": [
-              0.764,
-              2.452,
-              -0.403
-            ],
-            "joint_right_r,1,6,5,4": [
-              0.764,
-              1.833,
-              0.374
-            ],
-            "joint_right_r,1,8,7,6": [
-              0.764,
-              2.452,
-              -1.071
-            ],
-            "jointj,0,floor_deluxe": [
-              0,
-              0.153,
-              0
-            ]
-          }
-        }
-      ],
-      "joints": [
-        {
-          "name": "joint,1,6,4,5",
-          "direction": 1,
-          "layer": "6",
-          "tire_only": false
-        },
-        {
-          "name": "joint,1,8,6,7",
-          "direction": 1,
-          "layer": "8",
-          "tire_only": false
-        },
-        {
-          "name": "joint,2,8,8,9",
-          "direction": 2,
-          "layer": "8",
-          "tire_only": false
-        },
-        {
-          "name": "joint,3,6,13,14",
-          "direction": 3,
-          "layer": "6",
-          "tire_only": false
-        },
-        {
-          "name": "joint,3,8,11,12",
-          "direction": 3,
-          "layer": "8",
-          "tire_only": false
-        },
-        {
-          "name": "joint_back,2,end_rail",
-          "direction": 2,
-          "layer": "end_rail",
-          "tire_only": false
-        },
-        {
-          "name": "joint_back,2,kitchen,7,6",
-          "direction": 2,
-          "layer": "kitchen",
-          "tire_only": false
-        },
-        {
-          "name": "joint_back_l,2,8,9,8",
-          "direction": 2,
-          "layer": "8",
-          "tire_only": false
-        },
-        {
-          "name": "joint_back_r,2,8,9,8",
-          "direction": 2,
-          "layer": "8",
-          "tire_only": false
-        },
-        {
-          "name": "joint_beam_back,2,b10,10,8",
-          "direction": 2,
-          "layer": "b10",
-          "tire_only": false
-        },
-        {
-          "name": "joint_beam_front,0,b8,3,1",
-          "direction": 0,
-          "layer": "b8",
-          "tire_only": false
-        },
-        {
-          "name": "joint_floor_back,0,picnic",
-          "direction": 0,
-          "layer": "picnic",
-          "tire_only": false
-        },
-        {
-          "name": "joint_floor_front,0,picnic,6,7",
-          "direction": 0,
-          "layer": "picnic",
-          "tire_only": false
-        },
-        {
-          "name": "joint_front,0,end_rail",
-          "direction": 0,
-          "layer": "end_rail",
-          "tire_only": false
-        },
-        {
-          "name": "joint_front_l,0,6,2,1",
-          "direction": 0,
-          "layer": "6",
-          "tire_only": false
-        },
-        {
-          "name": "joint_front_r,0,6,2,1",
-          "direction": 0,
-          "layer": "6",
-          "tire_only": false
-        },
-        {
-          "name": "joint_l,0,6,1,2",
-          "direction": 0,
-          "layer": "6",
-          "tire_only": false
-        },
-        {
-          "name": "joint_l_wheel,0,toy",
-          "direction": 0,
-          "layer": "toy",
-          "tire_only": false
-        },
-        {
-          "name": "joint_l,2,8,8,9",
-          "direction": 2,
-          "layer": "8",
-          "tire_only": false
-        },
-        {
-          "name": "joint_l_scope,2,toy",
-          "direction": 2,
-          "layer": "toy",
-          "tire_only": false
-        },
-        {
-          "name": "joint_left_l,3,6,14,13",
-          "direction": 3,
-          "layer": "6",
-          "tire_only": false
-        },
-        {
-          "name": "joint_left_l,3,8,12,11",
-          "direction": 3,
-          "layer": "8",
-          "tire_only": false
-        },
-        {
-          "name": "joint_left_r,3,6,14,13",
-          "direction": 3,
-          "layer": "6",
-          "tire_only": false
-        },
-        {
-          "name": "joint_left_r,3,8,12,11",
-          "direction": 3,
-          "layer": "8",
-          "tire_only": false
-        },
-        {
-          "name": "joint_pole_female_f,0,6,1,2",
-          "direction": 0,
-          "layer": "6",
-          "tire_only": false
-        },
-        {
-          "name": "joint_r,0,6,1,2",
-          "direction": 0,
-          "layer": "6",
-          "tire_only": false
-        },
-        {
-          "name": "joint_r_wheel,0,toy",
-          "direction": 0,
-          "layer": "toy",
-          "tire_only": false
-        },
-        {
-          "name": "joint_r,2,8,8,9",
-          "direction": 2,
-          "layer": "8",
-          "tire_only": false
-        },
-        {
-          "name": "joint_r_scope,2,toy",
-          "direction": 2,
-          "layer": "toy",
-          "tire_only": false
-        },
-        {
-          "name": "joint_right_l,1,6,5,4",
-          "direction": 1,
-          "layer": "6",
-          "tire_only": false
-        },
-        {
-          "name": "joint_right_l,1,8,7,6",
-          "direction": 1,
-          "layer": "8",
-          "tire_only": false
-        },
-        {
-          "name": "joint_right_r,1,6,5,4",
-          "direction": 1,
-          "layer": "6",
-          "tire_only": false
-        },
-        {
-          "name": "joint_right_r,1,8,7,6",
-          "direction": 1,
-          "layer": "8",
-          "tire_only": false
-        },
-        {
-          "name": "jointj,0,floor_deluxe",
-          "direction": 0,
-          "layer": "floor_deluxe",
-          "tire_only": false
-        }
-      ]
     },
     "P-DSMT": {
       "name": "DX Summit Tower",
@@ -4561,8 +4795,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-DSMT.7da302b5.glb",
-          "bytes": 551532,
+          "file": "P-DSMT.088042a2.glb",
+          "bytes": 551628,
           "joints": [
             "joint,0,8,6,7",
             "joint,0,floor_center_watch",
@@ -4606,7 +4840,8 @@
             "joint_right_l,0,8,7,6",
             "joint_right_l,3,6,2,1",
             "joint_right_r,0,8,7,6",
-            "joint_right_r,3,6,2,1"
+            "joint_right_r,3,6,2,1",
+            "joint_floor_center,0,picnic"
           ],
           "sockets": [
             {
@@ -4648,13 +4883,15 @@
                 -0.421
               ],
               "accepts": [
+                "picnic",
                 "s"
               ],
               "facings": [
                 0
               ],
               "joints": [
-                "joint,0,s,tire"
+                "joint,0,s,tire",
+                "joint_floor_center,0,picnic"
               ],
               "marker_offset": [
                 0,
@@ -4827,7 +5064,7 @@
             {
               "marker": [
                 -0.02,
-                0.546,
+                0.587,
                 0.838
               ],
               "accepts": [
@@ -5253,7 +5490,7 @@
             ],
             "joint_floor_front,0,picnic,6,7": [
               -0.02,
-              0.153,
+              0.194,
               0.838
             ],
             "joint_front,3,end_rail": [
@@ -5395,6 +5632,11 @@
               -0.772,
               1.792,
               -0.08
+            ],
+            "joint_floor_center,0,picnic": [
+              0,
+              0.194,
+              -0.42
             ]
           }
         }
@@ -5657,6 +5899,12 @@
           "direction": 3,
           "layer": "6",
           "tire_only": false
+        },
+        {
+          "name": "joint_floor_center,0,picnic",
+          "direction": 0,
+          "layer": "picnic",
+          "tire_only": false
         }
       ],
       "default_yaw": 270
@@ -5670,8 +5918,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-KT-5.3c3ea5cc.glb",
-          "bytes": 390588,
+          "file": "P-KT-5.dff602f4.glb",
+          "bytes": 390576,
           "joints": [
             "joint,0,6,1,2001",
             "joint,0,6,1,2002",
@@ -5696,6 +5944,7 @@
             "joint_floor_center,0,floor_center_king",
             "joint_floor_center,0,picnic",
             "joint_left,3,end_rail",
+            "joint_left,3,kitchen,short",
             "Joint_left_l,3,6,9,8",
             "Joint_left_r,3,6,9,8",
             "Joint_right_l,1,6,4,3",
@@ -6013,7 +6262,7 @@
             {
               "marker": [
                 0,
-                0.546,
+                0.587,
                 0
               ],
               "accepts": [
@@ -6038,13 +6287,15 @@
                 0
               ],
               "accepts": [
-                "end_rail"
+                "end_rail",
+                "kitchen"
               ],
               "facings": [
                 3
               ],
               "joints": [
-                "joint_left,3,end_rail"
+                "joint_left,3,end_rail",
+                "joint_left,3,kitchen,short"
               ]
             },
             {
@@ -6232,10 +6483,15 @@
             ],
             "joint_floor_center,0,picnic": [
               0,
-              0.153,
+              0.194,
               0
             ],
             "joint_left,3,end_rail": [
+              -1.216,
+              0,
+              0
+            ],
+            "joint_left,3,kitchen,short": [
               -1.216,
               0,
               0
@@ -6403,6 +6659,12 @@
           "tire_only": false
         },
         {
+          "name": "joint_left,3,kitchen,short",
+          "direction": 3,
+          "layer": "kitchen",
+          "tire_only": false
+        },
+        {
           "name": "Joint_left_l,3,6,9,8",
           "direction": 3,
           "layer": "6",
@@ -6438,8 +6700,8 @@
       "files": [
         {
           "layer": null,
-          "file": "P-KT.98b576e8.glb",
-          "bytes": 390572,
+          "file": "P-KT.f9b758b0.glb",
+          "bytes": 390564,
           "joints": [
             "joint,0,8,1,2001",
             "joint,0,8,1,2002",
@@ -6792,7 +7054,7 @@
             {
               "marker": [
                 0,
-                0.546,
+                0.587,
                 0
               ],
               "accepts": [
@@ -7013,7 +7275,7 @@
             ],
             "joint_floor_center,0,picnic": [
               0,
-              0.153,
+              0.194,
               0
             ],
             "joint_left,3,end_rail": [
@@ -7525,6 +7787,208 @@
               2.514,
               0.958
             ]
+          },
+          "quarter_bounds": {
+            "joint_female_1,0,s": [
+              [
+                [
+                  -0.966,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  3.463
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.966,
+                  2.75,
+                  3.463
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  3.463
+                ],
+                [
+                  0,
+                  2.75,
+                  4.25
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  3.463
+                ],
+                [
+                  0.071,
+                  2.75,
+                  4.25
+                ]
+              ]
+            ],
+            "joint_female_2,0,s": [
+              [
+                [
+                  -0.966,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  2.21
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.966,
+                  2.75,
+                  2.21
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  2.21
+                ],
+                [
+                  0,
+                  2.75,
+                  4.25
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  2.21
+                ],
+                [
+                  0.071,
+                  2.75,
+                  4.25
+                ]
+              ]
+            ],
+            "joint_female_3,0,s,_x_0": [
+              [
+                [
+                  -0.966,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.966,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0,
+                  2.75,
+                  4.25
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0.071,
+                  2.75,
+                  4.25
+                ]
+              ]
+            ],
+            "joint_female_3,0,sh,_x_0": [
+              [
+                [
+                  -0.966,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.966,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0,
+                  2.75,
+                  4.25
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0.071,
+                  2.75,
+                  4.25
+                ]
+              ]
+            ]
           }
         }
       ],
@@ -7707,6 +8171,258 @@
               2.514,
               0.958
             ]
+          },
+          "quarter_bounds": {
+            "joint,0,sh,_x_0": [
+              [
+                [
+                  -0.966,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.966,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0,
+                  2.75,
+                  5.345
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0.071,
+                  2.75,
+                  5.345
+                ]
+              ]
+            ],
+            "joint_female_1,0,s": [
+              [
+                [
+                  -0.966,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  4.685
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.966,
+                  2.75,
+                  4.685
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  4.685
+                ],
+                [
+                  0,
+                  2.75,
+                  5.345
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  4.685
+                ],
+                [
+                  0.071,
+                  2.75,
+                  5.345
+                ]
+              ]
+            ],
+            "joint_female_2,0,s": [
+              [
+                [
+                  -0.966,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  3.463
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.966,
+                  2.75,
+                  3.463
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  3.463
+                ],
+                [
+                  0,
+                  2.75,
+                  5.345
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  3.463
+                ],
+                [
+                  0.071,
+                  2.75,
+                  5.345
+                ]
+              ]
+            ],
+            "joint_female_3,0,s": [
+              [
+                [
+                  -0.966,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  2.25
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.966,
+                  2.75,
+                  2.25
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  2.25
+                ],
+                [
+                  0,
+                  2.75,
+                  5.345
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  2.25
+                ],
+                [
+                  0.071,
+                  2.75,
+                  5.345
+                ]
+              ]
+            ],
+            "joint_female_4,0,s,_x_0": [
+              [
+                [
+                  -0.966,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.966,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0,
+                  2.75,
+                  5.345
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0.071,
+                  2.75,
+                  5.345
+                ]
+              ]
+            ]
           }
         }
       ],
@@ -7873,6 +8589,208 @@
               2.514,
               0.958
             ]
+          },
+          "quarter_bounds": {
+            "joint_female_1,0,s": [
+              [
+                [
+                  -0.991,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  3.463
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.991,
+                  2.75,
+                  3.463
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  3.463
+                ],
+                [
+                  0,
+                  2.75,
+                  4.25
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  3.463
+                ],
+                [
+                  0.071,
+                  2.75,
+                  4.25
+                ]
+              ]
+            ],
+            "joint_female_2,0,s": [
+              [
+                [
+                  -0.991,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  2.21
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.991,
+                  2.75,
+                  2.21
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  2.21
+                ],
+                [
+                  0,
+                  2.75,
+                  4.25
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  2.21
+                ],
+                [
+                  0.071,
+                  2.75,
+                  4.25
+                ]
+              ]
+            ],
+            "joint_female_3,0,s,_x_0": [
+              [
+                [
+                  -0.991,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.991,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0,
+                  2.75,
+                  4.25
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0.071,
+                  2.75,
+                  4.25
+                ]
+              ]
+            ],
+            "joint_female_3,0,sh,_x_0": [
+              [
+                [
+                  -0.991,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.991,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0,
+                  2.75,
+                  4.25
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0.071,
+                  2.75,
+                  4.25
+                ]
+              ]
+            ]
           }
         }
       ],
@@ -8032,6 +8950,208 @@
               0,
               3.071,
               0.958
+            ]
+          },
+          "quarter_bounds": {
+            "joint,0,sh,_x_0": [
+              [
+                [
+                  -1.205,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  0,
+                  3.307,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  1.205,
+                  3.307,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  -0.077,
+                  3.074,
+                  0.958
+                ],
+                [
+                  0,
+                  3.307,
+                  4.215
+                ]
+              ],
+              [
+                [
+                  0,
+                  3.074,
+                  0.958
+                ],
+                [
+                  0.077,
+                  3.307,
+                  4.215
+                ]
+              ]
+            ],
+            "joint_swing_1_female,0,s": [
+              [
+                [
+                  -1.205,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  0,
+                  3.307,
+                  3.463
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  1.205,
+                  3.307,
+                  3.463
+                ]
+              ],
+              [
+                [
+                  -0.077,
+                  3.074,
+                  3.463
+                ],
+                [
+                  0,
+                  3.307,
+                  4.215
+                ]
+              ],
+              [
+                [
+                  0,
+                  3.074,
+                  3.463
+                ],
+                [
+                  0.077,
+                  3.307,
+                  4.215
+                ]
+              ]
+            ],
+            "joint_swing_2_female,0,s": [
+              [
+                [
+                  -1.205,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  0,
+                  3.307,
+                  2.21
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  1.205,
+                  3.307,
+                  2.21
+                ]
+              ],
+              [
+                [
+                  -0.077,
+                  3.074,
+                  2.21
+                ],
+                [
+                  0,
+                  3.307,
+                  4.215
+                ]
+              ],
+              [
+                [
+                  0,
+                  3.074,
+                  2.21
+                ],
+                [
+                  0.077,
+                  3.307,
+                  4.215
+                ]
+              ]
+            ],
+            "joint_swing_3_female,0,s,_x_0": [
+              [
+                [
+                  -1.205,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  0,
+                  3.307,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  1.205,
+                  3.307,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  -0.077,
+                  3.074,
+                  0.958
+                ],
+                [
+                  0,
+                  3.307,
+                  4.215
+                ]
+              ],
+              [
+                [
+                  0,
+                  3.074,
+                  0.958
+                ],
+                [
+                  0.077,
+                  3.307,
+                  4.215
+                ]
+              ]
             ]
           }
         }
@@ -8214,6 +9334,258 @@
               0,
               2.514,
               0.958
+            ]
+          },
+          "quarter_bounds": {
+            "joint,0,sh,_x_0": [
+              [
+                [
+                  -0.991,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.991,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0,
+                  2.75,
+                  5.345
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0.071,
+                  2.75,
+                  5.345
+                ]
+              ]
+            ],
+            "joint_female_1,0,s": [
+              [
+                [
+                  -0.991,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  4.685
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.991,
+                  2.75,
+                  4.685
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  4.685
+                ],
+                [
+                  0,
+                  2.75,
+                  5.345
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  4.685
+                ],
+                [
+                  0.071,
+                  2.75,
+                  5.345
+                ]
+              ]
+            ],
+            "joint_female_2,0,s": [
+              [
+                [
+                  -0.991,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  3.463
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.991,
+                  2.75,
+                  3.463
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  3.463
+                ],
+                [
+                  0,
+                  2.75,
+                  5.345
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  3.463
+                ],
+                [
+                  0.071,
+                  2.75,
+                  5.345
+                ]
+              ]
+            ],
+            "joint_female_3,0,s": [
+              [
+                [
+                  -0.991,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  2.25
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.991,
+                  2.75,
+                  2.25
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  2.25
+                ],
+                [
+                  0,
+                  2.75,
+                  5.345
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  2.25
+                ],
+                [
+                  0.071,
+                  2.75,
+                  5.345
+                ]
+              ]
+            ],
+            "joint_female_4,0,s,_x_0": [
+              [
+                [
+                  -0.991,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -0.083
+                ],
+                [
+                  0.991,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0,
+                  2.75,
+                  5.345
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0.071,
+                  2.75,
+                  5.345
+                ]
+              ]
             ]
           }
         }
@@ -8403,6 +9775,258 @@
               3.071,
               0.958
             ]
+          },
+          "quarter_bounds": {
+            "joint,0,sh,_x_0": [
+              [
+                [
+                  -1.205,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  0,
+                  3.307,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  1.205,
+                  3.307,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  -0.077,
+                  3.074,
+                  0.958
+                ],
+                [
+                  0,
+                  3.307,
+                  5.345
+                ]
+              ],
+              [
+                [
+                  0,
+                  3.074,
+                  0.958
+                ],
+                [
+                  0.077,
+                  3.307,
+                  5.345
+                ]
+              ]
+            ],
+            "joint_swing_1_female,0,s": [
+              [
+                [
+                  -1.205,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  0,
+                  3.307,
+                  4.685
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  1.205,
+                  3.307,
+                  4.685
+                ]
+              ],
+              [
+                [
+                  -0.077,
+                  3.074,
+                  4.685
+                ],
+                [
+                  0,
+                  3.307,
+                  5.345
+                ]
+              ],
+              [
+                [
+                  0,
+                  3.074,
+                  4.685
+                ],
+                [
+                  0.077,
+                  3.307,
+                  5.345
+                ]
+              ]
+            ],
+            "joint_swing_2_female,0,s": [
+              [
+                [
+                  -1.205,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  0,
+                  3.307,
+                  3.463
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  1.205,
+                  3.307,
+                  3.463
+                ]
+              ],
+              [
+                [
+                  -0.077,
+                  3.074,
+                  3.463
+                ],
+                [
+                  0,
+                  3.307,
+                  5.345
+                ]
+              ],
+              [
+                [
+                  0,
+                  3.074,
+                  3.463
+                ],
+                [
+                  0.077,
+                  3.307,
+                  5.345
+                ]
+              ]
+            ],
+            "joint_swing_3_female,0,s": [
+              [
+                [
+                  -1.205,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  0,
+                  3.307,
+                  2.21
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  1.205,
+                  3.307,
+                  2.21
+                ]
+              ],
+              [
+                [
+                  -0.077,
+                  3.074,
+                  2.21
+                ],
+                [
+                  0,
+                  3.307,
+                  5.345
+                ]
+              ],
+              [
+                [
+                  0,
+                  3.074,
+                  2.21
+                ],
+                [
+                  0.077,
+                  3.307,
+                  5.345
+                ]
+              ]
+            ],
+            "joint_swing_4_female,0,s,_x_0": [
+              [
+                [
+                  -1.205,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  0,
+                  3.307,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.019,
+                  -0.102
+                ],
+                [
+                  1.205,
+                  3.307,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  -0.077,
+                  3.074,
+                  0.958
+                ],
+                [
+                  0,
+                  3.307,
+                  5.345
+                ]
+              ],
+              [
+                [
+                  0,
+                  3.074,
+                  0.958
+                ],
+                [
+                  0.077,
+                  3.307,
+                  5.345
+                ]
+              ]
+            ]
           }
         }
       ],
@@ -8590,6 +10214,208 @@
               0,
               2.514,
               0.958
+            ]
+          },
+          "quarter_bounds": {
+            "joint,0,sh,_x_0": [
+              [
+                [
+                  -0.991,
+                  -0.015,
+                  -1.501
+                ],
+                [
+                  0,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -1.501
+                ],
+                [
+                  0.991,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0,
+                  2.75,
+                  4.25
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0.071,
+                  2.75,
+                  4.25
+                ]
+              ]
+            ],
+            "joint_swing_female_1,0,s": [
+              [
+                [
+                  -0.991,
+                  -0.015,
+                  -1.501
+                ],
+                [
+                  0,
+                  2.75,
+                  3.463
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -1.501
+                ],
+                [
+                  0.991,
+                  2.75,
+                  3.463
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  3.463
+                ],
+                [
+                  0,
+                  2.75,
+                  4.25
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  3.463
+                ],
+                [
+                  0.071,
+                  2.75,
+                  4.25
+                ]
+              ]
+            ],
+            "joint_swing_female_2,0,s": [
+              [
+                [
+                  -0.991,
+                  -0.015,
+                  -1.501
+                ],
+                [
+                  0,
+                  2.75,
+                  2.21
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -1.501
+                ],
+                [
+                  0.991,
+                  2.75,
+                  2.21
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  2.21
+                ],
+                [
+                  0,
+                  2.75,
+                  4.25
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  2.21
+                ],
+                [
+                  0.071,
+                  2.75,
+                  4.25
+                ]
+              ]
+            ],
+            "joint_swing_female_3,0,s,_x_0": [
+              [
+                [
+                  -0.991,
+                  -0.015,
+                  -1.501
+                ],
+                [
+                  0,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.015,
+                  -1.501
+                ],
+                [
+                  0.991,
+                  2.75,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  -0.071,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0,
+                  2.75,
+                  4.25
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.517,
+                  0.958
+                ],
+                [
+                  0.071,
+                  2.75,
+                  4.25
+                ]
+              ]
             ]
           }
         }
@@ -8779,6 +10605,208 @@
               3.071,
               -1.061
             ]
+          },
+          "quarter_bounds": {
+            "joint_1,0,s": [
+              [
+                [
+                  -1.205,
+                  -0.019,
+                  -1.501
+                ],
+                [
+                  0,
+                  3.307,
+                  3.463
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.019,
+                  -1.501
+                ],
+                [
+                  1.205,
+                  3.307,
+                  3.463
+                ]
+              ],
+              [
+                [
+                  -0.077,
+                  3.074,
+                  3.463
+                ],
+                [
+                  0,
+                  3.307,
+                  4.215
+                ]
+              ],
+              [
+                [
+                  0,
+                  3.074,
+                  3.463
+                ],
+                [
+                  0.077,
+                  3.307,
+                  4.215
+                ]
+              ]
+            ],
+            "joint_2,0,s": [
+              [
+                [
+                  -1.205,
+                  -0.019,
+                  -1.501
+                ],
+                [
+                  0,
+                  3.307,
+                  2.21
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.019,
+                  -1.501
+                ],
+                [
+                  1.205,
+                  3.307,
+                  2.21
+                ]
+              ],
+              [
+                [
+                  -0.077,
+                  3.074,
+                  2.21
+                ],
+                [
+                  0,
+                  3.307,
+                  4.215
+                ]
+              ],
+              [
+                [
+                  0,
+                  3.074,
+                  2.21
+                ],
+                [
+                  0.077,
+                  3.307,
+                  4.215
+                ]
+              ]
+            ],
+            "joint_3,0,s,_x_0": [
+              [
+                [
+                  -1.205,
+                  -0.019,
+                  -1.501
+                ],
+                [
+                  0,
+                  3.307,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.019,
+                  -1.501
+                ],
+                [
+                  1.205,
+                  3.307,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  -0.077,
+                  3.074,
+                  0.958
+                ],
+                [
+                  0,
+                  3.307,
+                  4.215
+                ]
+              ],
+              [
+                [
+                  0,
+                  3.074,
+                  0.958
+                ],
+                [
+                  0.077,
+                  3.307,
+                  4.215
+                ]
+              ]
+            ],
+            "joint_4,0,sh,_x_0": [
+              [
+                [
+                  -1.205,
+                  -0.019,
+                  -1.501
+                ],
+                [
+                  0,
+                  3.307,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.019,
+                  -1.501
+                ],
+                [
+                  1.205,
+                  3.307,
+                  0.958
+                ]
+              ],
+              [
+                [
+                  -0.077,
+                  3.074,
+                  0.958
+                ],
+                [
+                  0,
+                  3.307,
+                  4.215
+                ]
+              ],
+              [
+                [
+                  0,
+                  3.074,
+                  0.958
+                ],
+                [
+                  0.077,
+                  3.307,
+                  4.215
+                ]
+              ]
+            ]
           }
         }
       ],
@@ -8871,7 +10899,8 @@
               2.42,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         },
         {
           "layer": "b10",
@@ -8916,7 +10945,8 @@
               3.03,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -8984,7 +11014,8 @@
               2.42,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         },
         {
           "layer": "b10",
@@ -9029,7 +11060,8 @@
               2.99,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -9105,7 +11137,8 @@
               2.465,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         },
         {
           "layer": "b10",
@@ -9158,7 +11191,8 @@
               3.075,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -9239,7 +11273,8 @@
               2.48,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         },
         {
           "layer": "b10",
@@ -9284,7 +11319,8 @@
               3.106,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -9353,7 +11389,8 @@
               2.4,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         },
         {
           "layer": "b10",
@@ -9398,7 +11435,8 @@
               3.01,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -9466,7 +11504,8 @@
               2.455,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         },
         {
           "layer": "b10",
@@ -9511,7 +11550,8 @@
               3.115,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -9579,7 +11619,8 @@
               2.443,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         },
         {
           "layer": "b10",
@@ -9624,7 +11665,8 @@
               3.084,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -9692,7 +11734,8 @@
               2.461,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         },
         {
           "layer": "b10",
@@ -9737,7 +11780,8 @@
               3.07,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -9805,7 +11849,8 @@
               2.411,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         },
         {
           "layer": "b10",
@@ -9850,7 +11895,8 @@
               3.075,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         },
         {
           "layer": "tire",
@@ -9895,7 +11941,8 @@
               1.445,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -9969,7 +12016,8 @@
               0.153,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -10039,7 +12087,8 @@
               0.153,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -10107,7 +12156,8 @@
               0.153,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -10169,7 +12219,8 @@
               0.153,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -10190,10 +12241,9 @@
       "files": [
         {
           "layer": null,
-          "file": "PT-K.32b2ac48.glb",
-          "bytes": 122352,
+          "file": "PT-K.3d269ea4.glb",
+          "bytes": 122360,
           "joints": [
-            "joint,0,picnic",
             "joint,1,picnic"
           ],
           "sockets": [
@@ -10207,11 +12257,9 @@
                 "picnic"
               ],
               "facings": [
-                0,
                 1
               ],
               "joints": [
-                "joint,0,picnic",
                 "joint,1,picnic"
               ],
               "marker_offset": [
@@ -10234,26 +12282,16 @@
             ]
           ],
           "joint_positions": {
-            "joint,0,picnic": [
-              0,
-              0.05,
-              0
-            ],
             "joint,1,picnic": [
               0,
               0.05,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
-        {
-          "name": "joint,0,picnic",
-          "direction": 0,
-          "layer": "picnic",
-          "tire_only": false
-        },
         {
           "name": "joint,1,picnic",
           "direction": 1,
@@ -10267,11 +12305,57 @@
       "category": "floors_kits",
       "category_index": 3,
       "children_index": 5,
-      "multi_layer": false,
+      "multi_layer": true,
       "files": [
         {
-          "layer": null,
-          "file": "KK.ea1e8904.glb",
+          "layer": "short",
+          "file": "KK__short.6f7ca84b.glb",
+          "bytes": 199408,
+          "joints": [
+            "Joint,2,kitchen"
+          ],
+          "sockets": [
+            {
+              "marker": [
+                0,
+                -0.051,
+                0.08
+              ],
+              "accepts": [
+                "kitchen"
+              ],
+              "facings": [
+                2
+              ],
+              "joints": [
+                "Joint,2,kitchen"
+              ]
+            }
+          ],
+          "bounds": [
+            [
+              -0.679,
+              0,
+              -0.31
+            ],
+            [
+              0.679,
+              1.27,
+              0.013
+            ]
+          ],
+          "joint_positions": {
+            "Joint,2,kitchen": [
+              0,
+              -0.051,
+              0.08
+            ]
+          },
+          "quarter_bounds": {}
+        },
+        {
+          "layer": "tall",
+          "file": "KK__tall.ea1e8904.glb",
           "bytes": 199404,
           "joints": [
             "Joint,2,kitchen"
@@ -10312,10 +12396,17 @@
               -0.051,
               0.08
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
+        {
+          "name": "Joint,2,kitchen",
+          "direction": 2,
+          "layer": "kitchen",
+          "tire_only": false
+        },
         {
           "name": "Joint,2,kitchen",
           "direction": 2,
@@ -10374,7 +12465,8 @@
               0,
               0.01
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -10435,6 +12527,58 @@
               0,
               0,
               0
+            ]
+          },
+          "quarter_bounds": {
+            "joint,2,end_rail": [
+              [
+                [
+                  -0.6,
+                  0.842,
+                  -0.047
+                ],
+                [
+                  0,
+                  0.942,
+                  0
+                ]
+              ],
+              [
+                [
+                  0,
+                  0.842,
+                  -0.047
+                ],
+                [
+                  0.6,
+                  0.942,
+                  0
+                ]
+              ],
+              [
+                [
+                  -0.6,
+                  0.039,
+                  0
+                ],
+                [
+                  0,
+                  0.942,
+                  0.027
+                ]
+              ],
+              [
+                [
+                  0,
+                  0.039,
+                  0
+                ],
+                [
+                  0.6,
+                  0.942,
+                  0.027
+                ]
+              ]
             ]
           }
         }
@@ -10541,6 +12685,108 @@
               0,
               1.566,
               0.637
+            ]
+          },
+          "quarter_bounds": {
+            "joint_right_handle,0,handle": [
+              [
+                [
+                  -0.254,
+                  0.001,
+                  -0.085
+                ],
+                [
+                  0.225,
+                  1.062,
+                  0.476
+                ]
+              ],
+              [
+                [
+                  0.225,
+                  0.001,
+                  -0.085
+                ],
+                [
+                  0.254,
+                  1.062,
+                  0.476
+                ]
+              ],
+              [
+                [
+                  -0.254,
+                  0.735,
+                  0.476
+                ],
+                [
+                  0.225,
+                  1.816,
+                  0.687
+                ]
+              ],
+              [
+                [
+                  0.225,
+                  0.735,
+                  0.476
+                ],
+                [
+                  0.254,
+                  1.816,
+                  0.687
+                ]
+              ]
+            ],
+            "joint_left_handle,0,handle": [
+              [
+                [
+                  -0.254,
+                  0.001,
+                  -0.085
+                ],
+                [
+                  -0.225,
+                  1.062,
+                  0.476
+                ]
+              ],
+              [
+                [
+                  -0.225,
+                  0.001,
+                  -0.085
+                ],
+                [
+                  0.254,
+                  1.062,
+                  0.476
+                ]
+              ],
+              [
+                [
+                  -0.254,
+                  0.736,
+                  0.476
+                ],
+                [
+                  -0.225,
+                  1.816,
+                  0.687
+                ]
+              ],
+              [
+                [
+                  -0.225,
+                  0.736,
+                  0.476
+                ],
+                [
+                  0.254,
+                  1.816,
+                  0.687
+                ]
+              ]
             ]
           }
         }
@@ -10661,6 +12907,108 @@
               1.81,
               -0.082
             ]
+          },
+          "quarter_bounds": {
+            "joint_right_handle,0,handle": [
+              [
+                [
+                  -0.272,
+                  -0.028,
+                  -0.851
+                ],
+                [
+                  -0.24,
+                  1.498,
+                  -0.259
+                ]
+              ],
+              [
+                [
+                  -0.24,
+                  -0.028,
+                  -0.851
+                ],
+                [
+                  0.272,
+                  1.498,
+                  -0.259
+                ]
+              ],
+              [
+                [
+                  -0.3,
+                  1.09,
+                  -0.259
+                ],
+                [
+                  -0.24,
+                  1.86,
+                  -0.057
+                ]
+              ],
+              [
+                [
+                  -0.24,
+                  1.09,
+                  -0.259
+                ],
+                [
+                  0.3,
+                  1.86,
+                  -0.057
+                ]
+              ]
+            ],
+            "joint_left_handle,0,handle": [
+              [
+                [
+                  -0.272,
+                  -0.028,
+                  -0.851
+                ],
+                [
+                  0.24,
+                  1.498,
+                  -0.259
+                ]
+              ],
+              [
+                [
+                  0.24,
+                  -0.028,
+                  -0.851
+                ],
+                [
+                  0.272,
+                  1.498,
+                  -0.259
+                ]
+              ],
+              [
+                [
+                  -0.3,
+                  1.09,
+                  -0.259
+                ],
+                [
+                  0.24,
+                  1.86,
+                  -0.057
+                ]
+              ],
+              [
+                [
+                  0.24,
+                  1.09,
+                  -0.259
+                ],
+                [
+                  0.3,
+                  1.86,
+                  -0.057
+                ]
+              ]
+            ]
           }
         }
       ],
@@ -10780,6 +13128,108 @@
               2.48,
               0.643
             ]
+          },
+          "quarter_bounds": {
+            "joint_right_handle,0,handle": [
+              [
+                [
+                  -0.254,
+                  0.001,
+                  -0.085
+                ],
+                [
+                  0.227,
+                  1.998,
+                  0.517
+                ]
+              ],
+              [
+                [
+                  0.227,
+                  0.001,
+                  -0.085
+                ],
+                [
+                  0.254,
+                  1.998,
+                  0.517
+                ]
+              ],
+              [
+                [
+                  -0.254,
+                  1.502,
+                  0.517
+                ],
+                [
+                  0.227,
+                  2.73,
+                  0.693
+                ]
+              ],
+              [
+                [
+                  0.227,
+                  1.502,
+                  0.517
+                ],
+                [
+                  0.254,
+                  2.73,
+                  0.693
+                ]
+              ]
+            ],
+            "joint_left_handle,0,handle": [
+              [
+                [
+                  -0.254,
+                  0.001,
+                  -0.085
+                ],
+                [
+                  -0.219,
+                  1.999,
+                  0.517
+                ]
+              ],
+              [
+                [
+                  -0.219,
+                  0.001,
+                  -0.085
+                ],
+                [
+                  0.254,
+                  1.999,
+                  0.517
+                ]
+              ],
+              [
+                [
+                  -0.254,
+                  1.504,
+                  0.517
+                ],
+                [
+                  -0.219,
+                  2.73,
+                  0.693
+                ]
+              ],
+              [
+                [
+                  -0.219,
+                  1.504,
+                  0.517
+                ],
+                [
+                  0.254,
+                  2.73,
+                  0.693
+                ]
+              ]
+            ]
           }
         }
       ],
@@ -10855,7 +13305,8 @@
               1.546,
               3.298
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -10917,7 +13368,8 @@
               1.89,
               3.318
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -10979,7 +13431,8 @@
               1.846,
               -0.815
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -11041,7 +13494,8 @@
               2.465,
               0.847
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -11102,6 +13556,58 @@
               0,
               1.83,
               0
+            ]
+          },
+          "quarter_bounds": {
+            "joint,0,6": [
+              [
+                [
+                  -0.465,
+                  0.011,
+                  -1.112
+                ],
+                [
+                  0,
+                  1.955,
+                  0
+                ]
+              ],
+              [
+                [
+                  0,
+                  0.011,
+                  -1.112
+                ],
+                [
+                  0.465,
+                  1.955,
+                  0
+                ]
+              ],
+              [
+                [
+                  -0.465,
+                  1.467,
+                  0
+                ],
+                [
+                  0,
+                  1.955,
+                  0.5
+                ]
+              ],
+              [
+                [
+                  0,
+                  1.467,
+                  0
+                ],
+                [
+                  0.465,
+                  1.955,
+                  0.5
+                ]
+              ]
             ]
           }
         }
@@ -11165,6 +13671,58 @@
               1.867,
               0.727
             ]
+          },
+          "quarter_bounds": {
+            "joint_c,0,6": [
+              [
+                [
+                  -0.629,
+                  -0.02,
+                  -0.047
+                ],
+                [
+                  0,
+                  2.117,
+                  0.727
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.02,
+                  -0.047
+                ],
+                [
+                  0.63,
+                  2.117,
+                  0.727
+                ]
+              ],
+              [
+                [
+                  -0.61,
+                  1.617,
+                  0.727
+                ],
+                [
+                  0,
+                  2.117,
+                  0.852
+                ]
+              ],
+              [
+                [
+                  0,
+                  1.617,
+                  0.727
+                ],
+                [
+                  0.61,
+                  2.117,
+                  0.852
+                ]
+              ]
+            ]
           }
         }
       ],
@@ -11227,7 +13785,8 @@
               1.85,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -11289,7 +13848,8 @@
               1.85,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -11351,7 +13911,8 @@
               1.83,
               -0.226
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -11413,7 +13974,8 @@
               2.345,
               2.99
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -11475,7 +14037,8 @@
               0,
               0.195
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -11537,7 +14100,8 @@
               -0.001,
               0.552
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -11598,6 +14162,58 @@
               0,
               1.89,
               2.728
+            ]
+          },
+          "quarter_bounds": {
+            "joint,0,6": [
+              [
+                [
+                  -0.285,
+                  -0.009,
+                  -0.101
+                ],
+                [
+                  0,
+                  2.015,
+                  2.728
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.009,
+                  -0.101
+                ],
+                [
+                  0.285,
+                  2.015,
+                  2.728
+                ]
+              ],
+              [
+                [
+                  -0.285,
+                  1.485,
+                  2.728
+                ],
+                [
+                  0,
+                  2.015,
+                  3.228
+                ]
+              ],
+              [
+                [
+                  0,
+                  1.484,
+                  2.728
+                ],
+                [
+                  0.285,
+                  2.015,
+                  3.228
+                ]
+              ]
             ]
           }
         }
@@ -11661,6 +14277,58 @@
               1.846,
               2.328
             ]
+          },
+          "quarter_bounds": {
+            "joint,0,6": [
+              [
+                [
+                  -0.326,
+                  -0.033,
+                  -0.148
+                ],
+                [
+                  0,
+                  1.971,
+                  2.328
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.033,
+                  -0.148
+                ],
+                [
+                  0.326,
+                  1.971,
+                  2.328
+                ]
+              ],
+              [
+                [
+                  -0.285,
+                  1.423,
+                  2.328
+                ],
+                [
+                  0,
+                  1.971,
+                  2.828
+                ]
+              ],
+              [
+                [
+                  0,
+                  1.423,
+                  2.328
+                ],
+                [
+                  0.285,
+                  1.971,
+                  2.828
+                ]
+              ]
+            ]
           }
         }
       ],
@@ -11722,6 +14390,58 @@
               0,
               2.445,
               -0.091
+            ]
+          },
+          "quarter_bounds": {
+            "joint,0,8": [
+              [
+                [
+                  -0.297,
+                  -0.02,
+                  -3.658
+                ],
+                [
+                  0,
+                  2.583,
+                  -0.091
+                ]
+              ],
+              [
+                [
+                  0,
+                  -0.02,
+                  -3.658
+                ],
+                [
+                  0.297,
+                  2.583,
+                  -0.091
+                ]
+              ],
+              [
+                [
+                  -0.285,
+                  2.016,
+                  -0.091
+                ],
+                [
+                  0,
+                  2.583,
+                  0.059
+                ]
+              ],
+              [
+                [
+                  0,
+                  2.016,
+                  -0.091
+                ],
+                [
+                  0.285,
+                  2.583,
+                  0.059
+                ]
+              ]
             ]
           }
         }
@@ -11785,7 +14505,8 @@
               1.829,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -11848,7 +14569,8 @@
               1.829,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -11910,6 +14632,58 @@
               0.551,
               2.438,
               0
+            ]
+          },
+          "quarter_bounds": {
+            "joint_c,1,8": [
+              [
+                [
+                  -0.905,
+                  0.021,
+                  -1.359
+                ],
+                [
+                  0.551,
+                  2.938,
+                  0
+                ]
+              ],
+              [
+                [
+                  0.551,
+                  1.938,
+                  -0.5
+                ],
+                [
+                  0.601,
+                  2.938,
+                  0
+                ]
+              ],
+              [
+                [
+                  -1.184,
+                  0.068,
+                  0
+                ],
+                [
+                  0.551,
+                  2.938,
+                  1.148
+                ]
+              ],
+              [
+                [
+                  0.551,
+                  1.938,
+                  0
+                ],
+                [
+                  0.601,
+                  2.938,
+                  0.5
+                ]
+              ]
             ]
           }
         }
@@ -11974,6 +14748,58 @@
               2.438,
               0
             ]
+          },
+          "quarter_bounds": {
+            "joint_c,1,8": [
+              [
+                [
+                  -1.184,
+                  0.068,
+                  -1.148
+                ],
+                [
+                  0.631,
+                  2.938,
+                  0
+                ]
+              ],
+              [
+                [
+                  0.631,
+                  1.938,
+                  -0.5
+                ],
+                [
+                  0.681,
+                  2.938,
+                  0
+                ]
+              ],
+              [
+                [
+                  -0.905,
+                  0.021,
+                  0
+                ],
+                [
+                  0.631,
+                  2.938,
+                  1.359
+                ]
+              ],
+              [
+                [
+                  0.631,
+                  1.938,
+                  0
+                ],
+                [
+                  0.681,
+                  2.938,
+                  0.5
+                ]
+              ]
+            ]
           }
         }
       ],
@@ -12036,6 +14862,58 @@
               0,
               1.855,
               0
+            ]
+          },
+          "quarter_bounds": {
+            "joint_c,1,6": [
+              [
+                [
+                  -0.833,
+                  0.008,
+                  -2.757
+                ],
+                [
+                  0,
+                  2.355,
+                  0
+                ]
+              ],
+              [
+                [
+                  0,
+                  1.355,
+                  -0.5
+                ],
+                [
+                  0.05,
+                  2.355,
+                  0
+                ]
+              ],
+              [
+                [
+                  -0.7,
+                  1.355,
+                  0
+                ],
+                [
+                  0,
+                  2.355,
+                  0.5
+                ]
+              ],
+              [
+                [
+                  0,
+                  1.355,
+                  0
+                ],
+                [
+                  0.05,
+                  2.355,
+                  0.5
+                ]
+              ]
             ]
           }
         }
@@ -12100,6 +14978,58 @@
               2.465,
               0
             ]
+          },
+          "quarter_bounds": {
+            "joint_c,1,8": [
+              [
+                [
+                  -0.705,
+                  1.968,
+                  -0.454
+                ],
+                [
+                  0.041,
+                  2.889,
+                  0
+                ]
+              ],
+              [
+                [
+                  0.041,
+                  2.365,
+                  -0.25
+                ],
+                [
+                  0.091,
+                  2.565,
+                  0
+                ]
+              ],
+              [
+                [
+                  -0.833,
+                  0.001,
+                  0
+                ],
+                [
+                  0.041,
+                  2.889,
+                  2.262
+                ]
+              ],
+              [
+                [
+                  0.041,
+                  2.365,
+                  0
+                ],
+                [
+                  0.091,
+                  2.565,
+                  0.25
+                ]
+              ]
+            ]
           }
         }
       ],
@@ -12163,6 +15093,58 @@
               1.829,
               -1.009
             ]
+          },
+          "quarter_bounds": {
+            "joint,2,6": [
+              [
+                [
+                  0.052,
+                  1.329,
+                  -1.059
+                ],
+                [
+                  0.367,
+                  2.329,
+                  -1.009
+                ]
+              ],
+              [
+                [
+                  0.367,
+                  1.329,
+                  -1.059
+                ],
+                [
+                  0.642,
+                  2.329,
+                  -1.009
+                ]
+              ],
+              [
+                [
+                  -0.645,
+                  -0.01,
+                  -1.009
+                ],
+                [
+                  0.367,
+                  2.364,
+                  0.645
+                ]
+              ],
+              [
+                [
+                  0.367,
+                  1.033,
+                  -1.009
+                ],
+                [
+                  0.664,
+                  2.364,
+                  0.489
+                ]
+              ]
+            ]
           }
         }
       ],
@@ -12225,7 +15207,8 @@
               2.438,
               -0.318
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -12287,7 +15270,8 @@
               0,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -12349,7 +15333,8 @@
               0,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -12411,7 +15396,8 @@
               0,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -12473,7 +15459,8 @@
               0,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -12535,7 +15522,8 @@
               0,
               0
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [
@@ -12597,7 +15585,8 @@
               0,
               0.08
             ]
-          }
+          },
+          "quarter_bounds": {}
         }
       ],
       "joints": [

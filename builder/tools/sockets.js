@@ -178,6 +178,132 @@ function readBounds(buffer) {
   return [min.map(round), max.map(round)];
 }
 
+/**
+ * A part's box in quarters about each joint: the plane through the joint
+ * square to x and the one square to z cut the part into four, and each
+ * quarter gets the box round its own share of the geometry.
+ *
+ * A part's one box runs the whole height of the part on every side of its
+ * joint. A wave slide's hood reaches 0.5 m back over the deck from where the
+ * slide hangs, 1.5 m up -- and as a box that reach went down to the ground,
+ * inside the tower, where it met the picnic table. In quarters, the slide is
+ * its own boxes out in the yard and two small ones for the hood, up on the
+ * deck.
+ *
+ * Triangles are clipped at the planes, not sorted by their corners, so a
+ * board crossing a plane is in both quarters up to the plane: the four boxes
+ * together hold all of the part, and the fit test can only lose room that
+ * was never there. Null for a joint where the quarters come to more than
+ * nine tenths of the whole box -- nothing worth the extra tests.
+ *
+ * Measured from the geometry, not the accessor extents readBounds uses:
+ * those are per mesh, and a slide whose bed and hood are one mesh would
+ * come back as the whole slide again.
+ */
+function readQuarterBounds(buffer, joints, bounds) {
+  const gltf = readGltfJson(buffer);
+  const bin = readBinChunk(buffer);
+  const nodes = gltf.nodes || [];
+  const roots = (gltf.scenes && gltf.scenes[gltf.scene || 0])
+    ? gltf.scenes[gltf.scene || 0].nodes || []
+    : nodes.map((_, index) => index);
+  if (!bin) return {};
+
+  // quarter q: bit 0 is the +x side, bit 1 the +z side.
+  const boxes = joints.map(() => [null, null, null, null]);
+  const grow = (j, q, p) => {
+    const box = boxes[j][q] || (boxes[j][q] = [[Infinity, Infinity, Infinity], [-Infinity, -Infinity, -Infinity]]);
+    for (let k = 0; k < 3; k++) {
+      if (p[k] < box[0][k]) box[0][k] = p[k];
+      if (p[k] > box[1][k]) box[1][k] = p[k];
+    }
+  };
+  // Sutherland-Hodgman against one half-space: axis value * sign >= cut * sign.
+  const clip = (polygon, axis, cut, sign) => {
+    const out = [];
+    for (let i = 0; i < polygon.length; i++) {
+      const a = polygon[i];
+      const b = polygon[(i + 1) % polygon.length];
+      const a_in = (a[axis] - cut) * sign >= 0;
+      const b_in = (b[axis] - cut) * sign >= 0;
+      if (a_in) out.push(a);
+      if (a_in !== b_in) {
+        const t = (cut - a[axis]) / (b[axis] - a[axis]);
+        out.push([0, 1, 2].map((k) => a[k] + (b[k] - a[k]) * t));
+      }
+    }
+    return out;
+  };
+
+  const walk = (index, parentMatrix) => {
+    const node = nodes[index];
+    if (!node) return;
+    const worldMatrix = multiply(parentMatrix, localMatrix(node));
+    if (node.mesh !== undefined && gltf.meshes && gltf.meshes[node.mesh]) {
+      for (const primitive of gltf.meshes[node.mesh].primitives || []) {
+        if (primitive.mode !== undefined && primitive.mode !== 4) continue;
+        const accessor = gltf.accessors[(primitive.attributes || {}).POSITION];
+        if (!accessor || accessor.componentType !== 5126 || accessor.bufferView === undefined) continue;
+        const view = gltf.bufferViews[accessor.bufferView];
+        const stride = view.byteStride || 12;
+        const start = (view.byteOffset || 0) + (accessor.byteOffset || 0);
+        const points = [];
+        for (let i = 0; i < accessor.count; i++) {
+          const at = start + i * stride;
+          points.push(transformPoint(worldMatrix, [bin.readFloatLE(at), bin.readFloatLE(at + 4), bin.readFloatLE(at + 8)]));
+        }
+        let indices = null;
+        if (primitive.indices !== undefined) {
+          const ia = gltf.accessors[primitive.indices];
+          const iv = gltf.bufferViews[ia.bufferView];
+          const size = { 5121: 1, 5123: 2, 5125: 4 }[ia.componentType];
+          const read = { 1: "readUInt8", 2: "readUInt16LE", 4: "readUInt32LE" }[size];
+          const base = (iv.byteOffset || 0) + (ia.byteOffset || 0);
+          indices = [];
+          for (let i = 0; i < ia.count; i++) indices.push(bin[read](base + i * (iv.byteStride || size)));
+        }
+        const count = indices ? indices.length : points.length;
+        for (let t = 0; t + 2 < count; t += 3) {
+          const triangle = [0, 1, 2].map((k) => points[indices ? indices[t + k] : t + k]);
+          joints.forEach((joint, j) => {
+            const [jx, , jz] = joint.position;
+            for (let q = 0; q < 4; q++) {
+              const piece = clip(clip(triangle, 0, jx, q & 1 ? 1 : -1), 2, jz, q & 2 ? 1 : -1);
+              for (const p of piece) grow(j, q, p);
+            }
+          });
+        }
+      }
+    }
+    for (const child of node.children || []) walk(child, worldMatrix);
+  };
+  for (const root of roots) walk(root, identity());
+
+  const volume = (box) =>
+    Math.max(0, box[1][0] - box[0][0]) * Math.max(0, box[1][1] - box[0][1]) * Math.max(0, box[1][2] - box[0][2]);
+  const out = {};
+  joints.forEach((joint, j) => {
+    const quarters = boxes[j].filter(Boolean);
+    const total = quarters.reduce((sum, box) => sum + volume(box), 0);
+    if (quarters.length && total < volume(bounds) * 0.9)
+      out[joint.name] = quarters.map((box) => [box[0].map(round), box[1].map(round)]);
+  });
+  return out;
+}
+
+/** A GLB's binary chunk, or null if it has none. */
+function readBinChunk(buffer) {
+  let offset = 12;
+  while (offset < buffer.length) {
+    const length = buffer.readUInt32LE(offset);
+    const type = buffer.readUInt32LE(offset + 4);
+    offset += 8;
+    if (type === 0x004e4942) return buffer.slice(offset, offset + length);
+    offset += length;
+  }
+  return null;
+}
+
 // -------------------------------------------------------------------- sockets
 
 function distance(a, b) {
@@ -246,4 +372,4 @@ function deriveSockets(joints, parseJoint, config) {
   });
 }
 
-module.exports = { readJointPositions, readBounds, deriveSockets };
+module.exports = { readJointPositions, readBounds, readQuarterBounds, deriveSockets };

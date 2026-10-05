@@ -2181,6 +2181,8 @@
       // catalogue with everything that would fit where it sits, and choosing
       // one swaps it. Null whenever nothing is selected.
       let replacing = null;
+      // "mulch" or "border" while the bed's options are up, for the outline.
+      let mulch_selected = null;
 
       // The target the carried part has locked onto, if any. Update_carried
       // sets it every frame while a part is in hand; Pointer_down attaches to
@@ -2566,6 +2568,11 @@
        */
       const Morph_target_for = (host_joint) => {
         if (host_joint.tire_only) return "tire";
+        // The Kitchen Kit stands under the deck: on a 5 ft tower its mount
+        // is named `...,kitchen,short` and takes the version whose awning
+        // is 0.64 m lower (tools/add_kitchen_mounts.py, raise_tower.py).
+        if (host_joint.layer === "kitchen")
+          return /,short(,|$)/i.test(host_joint.name || "") ? "short" : "tall";
         if (["s", "sh", "swivel"].includes(host_joint.layer)) {
           const first = host_joint.model && host_joint.model.joints[0];
           return first ? first.layer : null;
@@ -3397,6 +3404,19 @@
                     }
 
                     Connect_joints({ joint_1: joint, joint_2: joint2 });
+
+                    // A picnic table goes back onto its mount rather than
+                    // where it was saved: the mounts moved (2026-10-05, to a
+                    // 16" seat on every tower), and a table saved before
+                    // that would float or sink by the difference.
+                    if (joint.layer === "picnic") {
+                      const table_first = !Is_free_standing(model);
+                      const [table, plug, host] = table_first
+                        ? [model, joint, joint2]
+                        : [model2, joint2, joint];
+                      (table_first ? model2 : model).mesh.updateMatrixWorld(true);
+                      Settle_on_joint(table, plug, host);
+                    }
                   }
                 }
               } catch (error) {
@@ -4864,12 +4884,17 @@
         }
         const position = file.joint_positions && file.joint_positions[plug_joint.name];
         if (!position || !file.bounds) return null;
+        const box = (pair) =>
+          new THREE.Box3(new THREE.Vector3().fromArray(pair[0]), new THREE.Vector3().fromArray(pair[1]));
+        const quarters = file.quarter_bounds && file.quarter_bounds[plug_joint.name];
         return {
           position: new THREE.Vector3().fromArray(position),
-          bounds: new THREE.Box3(
-            new THREE.Vector3().fromArray(file.bounds[0]),
-            new THREE.Vector3().fromArray(file.bounds[1])
-          ),
+          bounds: box(file.bounds),
+          // The part's room: its box in quarters about this joint where the
+          // manifest has them (tools/sockets.js readQuarterBounds), so a
+          // slide's hood up on the deck is not a column down to the ground
+          // inside the tower. Otherwise the one box.
+          boxes: quarters ? quarters.map(box) : [box(file.bounds)],
         };
       };
 
@@ -4902,9 +4927,35 @@
               placed_boxes.push({ model, box: slice, anchors, on_a_post, slice: true });
             continue;
           }
+          // In quarters about the joint it hangs by, as Plug_geometry
+          // measures it before it is placed: the same part takes the same
+          // room either way round.
+          const quarters = Placed_quarters(model);
+          if (quarters) {
+            for (const quarter of quarters) placed_boxes.push({ model, box: quarter, anchors, on_a_post });
+            continue;
+          }
           placed_boxes.push({ model, box, anchors, on_a_post });
         }
         return placed_boxes;
+      };
+
+      /**
+       * A placed part's quarter boxes in the world, about the first of its
+       * joints that is connected, or null if the manifest has none for it.
+       */
+      const Placed_quarters = (model) => {
+        const entry = modelManifest && model.object_id ? modelManifest.products[model.object_id] : null;
+        if (!entry || !entry.files || !entry.files.length) return null;
+        const file = entry.files.find((f) => f.layer === model.layer) || entry.files[0];
+        const joint = model.joints.find((j) => j.connected);
+        const quarters = joint && file.quarter_bounds && file.quarter_bounds[joint.name];
+        if (!quarters) return null;
+        model.mesh.updateMatrixWorld(true);
+        return quarters.map((pair) =>
+          new THREE.Box3(new THREE.Vector3().fromArray(pair[0]), new THREE.Vector3().fromArray(pair[1]))
+            .applyMatrix4(model.mesh.matrixWorld)
+        );
       };
 
       /**
@@ -4995,9 +5046,50 @@
        * what lets the browse dots and the strip give the same answer as the
        * markers do once a part is picked up.
        */
+      /**
+       * A Kitchen Kit and a Picnic Table Kit never share a bay (Weldon,
+       * 2026-10-05): not at all on a single tower, and not on the same side
+       * of a double one. The kitchen stands at a bay's end and the table in
+       * its middle, 0.78 to 1.22 m apart on every tower; the DX Sky's other
+       * bay is 2.25 m off. So a mount of one within 1.5 m of the other's,
+       * taken, is closed to it. The part being swapped out does not count.
+       */
+      //
+      // Likewise a picnic table and the tire swing that hangs in the middle
+      // of the Summit towers' 5 ft bay take the same spot; that one is
+      // measured tight, so a tire swing there still leaves the DX Summit's
+      // other bay (1.26 m off) to a table.
+      //
+      // Asked of the host's mounts, which say what goes on them: the layer
+      // for the kits, the tire-only hanger for the tire swing.
+      const Mount_kind = (joint) =>
+        joint.layer === "kitchen" || joint.layer === "picnic" ? joint.layer : joint.tire_only ? "tire" : null;
+      const KIT_RIVALS = {
+        kitchen: [["picnic", 1.5]],
+        picnic: [["kitchen", 1.5], ["tire", 0.6]],
+        tire: [["picnic", 0.6]],
+      };
+      const Kits_apart = (plug_joint, host_joint, exclude) => {
+        const rivals = KIT_RIVALS[Mount_kind(host_joint)];
+        if (!rivals || !host_joint.model) return true;
+        const at = host_joint.getWorldPosition(new THREE.Vector3());
+        const there = new THREE.Vector3();
+        for (const joint of host_joint.model.joints) {
+          if (!joint.connected || joint === host_joint) continue;
+          if (exclude && joint.connected.model === exclude) continue;
+          const rival = rivals.find(([kind]) => kind === Mount_kind(joint));
+          if (!rival) continue;
+          joint.getWorldPosition(there);
+          if (Math.hypot(there.x - at.x, there.z - at.z) < rival[1]) return false;
+        }
+        return true;
+      };
+
       const Can_connect = (args) => {
         const plug_joint = args.plug_joint;
         const host_joint = args.host_joint;
+
+        if (!Kits_apart(plug_joint, host_joint, args.exclude_preview)) return false;
 
         // Handle accessories mount flush against their host, so the box test
         // would always report them as colliding with the thing they attach to.
@@ -5043,13 +5135,10 @@
         // Where the part's joint ends up: on the opening, unless the part had
         // to be lifted to keep its feet on the ground.
         const anchor = origin.clone().add(turned_joint);
-        const plug_box = geometry.bounds
-          .clone()
-          .applyMatrix4(
-            new THREE.Matrix4()
-              .compose(anchor, rotation, new THREE.Vector3(0.75, 0.75, 0.75))
-              .multiply(new THREE.Matrix4().makeTranslation(-geometry.position.x, -geometry.position.y, -geometry.position.z))
-          );
+        const placing = new THREE.Matrix4()
+          .compose(anchor, rotation, new THREE.Vector3(0.75, 0.75, 0.75))
+          .multiply(new THREE.Matrix4().makeTranslation(-geometry.position.x, -geometry.position.y, -geometry.position.z));
+        const plug_boxes = geometry.boxes.map((box) => box.clone().applyMatrix4(placing));
         for (const p of placed) {
           let nearest = p.anchors[0];
           for (const candidate of p.anchors)
@@ -5057,7 +5146,8 @@
           // A length of beam is drawn in about its own nearest point, so the
           // far lengths keep their place rather than sliding to the tower.
           const pivot = p.slice ? p.box.clampPoint(nearest, new THREE.Vector3()) : nearest;
-          if (plug_box.intersectsBox(Shrunk_about(p.box, pivot))) return false;
+          const room = Shrunk_about(p.box, pivot);
+          if (plug_boxes.some((box) => box.intersectsBox(room))) return false;
         }
         return true;
       };
@@ -6349,6 +6439,8 @@
                 intersection_mesh = intersection_object.object;
 
                 picked_mesh = intersection_objects[0].object;
+                // A part now, not the bed.
+                mulch_selected = null;
                 // A pole is chosen as the flag it holds up.
                 if (Is_flag(picked_mesh)) picked_mesh = Flag_node(picked_mesh);
                 if ("model" in picked_mesh) {
@@ -8760,15 +8852,28 @@
         if (picked_mesh && picked_mesh.model)
           key += "|p" + Model_outline_signature(picked_mesh.model) + ":" + (Flag_node(picked_mesh) || {}).uuid;
         if (plug_model) key += "|c" + Model_outline_signature(plug_model);
+        if (mulch_selected && mulch)
+          key += "|m" + mulch_selected + ":" + mulch_enabled + ":" + mulch.width + "x" + mulch.depth +
+            "@" + (mulch.origin ? mulch.origin.x + "," + mulch.origin.z : "");
         return key;
       };
       const Render = (args) => {
         // The outline pass costs a scene render, a readback from the GPU and a
         // trace over every pixel. With nothing selected and nothing carried it
         // was spent on an outline of nothing, every frame.
+        // The bed or its border, while its options are up: outlined like a
+        // part (Weldon, 2026-10-05). The bed alone is the mulch -- its edge
+        // runs along the border's inside -- and the four curbs the border.
+        const mulch_outline =
+          mulch_selected && mulch_enabled && mulch && mulch.meshes.length
+            ? mulch_selected === "mulch"
+              ? mulch.meshes.slice(-1)
+              : mulch.meshes.slice(0, -1)
+            : null;
         const outlining =
           !!picked_mesh ||
           !!plug_model ||
+          !!mulch_outline ||
           models_with_available_joints.some((model) => model.selected);
         if (outlining) {
           if (picked_mesh) {
@@ -8815,11 +8920,13 @@
               model.mesh.visible = model.selected;
           }
           if (plug_model) plug_model.mesh.visible = true;
+          if (mulch_outline) for (const mesh of mulch_outline) mesh.visible = true;
           scene.background = null;
           renderer.setRenderTarget(scene_render_target);
           renderer.clear();
           renderer.render(scene, camera);
           if (plug_model) plug_model.mesh.visible = false;
+          if (mulch_outline) for (const mesh of mulch_outline) mesh.visible = false;
           if (picked_mesh) {
             picked_mesh.model.mesh.traverse(function (mesh) {
               mesh.visible = mesh.ov;
@@ -10697,7 +10804,7 @@
       };
     </script>
 
-    <script src="./js/categories.js"></script>
+    <script src="./js/categories.js?v=1fe39890"></script>
     <script src="./js/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="./js/three.min.js"></script>
@@ -11603,6 +11710,8 @@
       };
 
       const Show_mulch_options = (kind) => {
+        // Outlined like a part while its options are up (Render).
+        mulch_selected = kind;
         const styles = Mulch_styles[kind];
         selection_name.textContent = styles.name;
         $("#custom-controls-delete").hide();
@@ -12215,6 +12324,7 @@
       };
       
       const Hide_options = (args) => {
+        mulch_selected = null;
         $(".custom-controls").css("display", "none");
         $(".custom-controls-roof").css("display", "none");
         $(".custom-controls-unified").css("display", "none");
