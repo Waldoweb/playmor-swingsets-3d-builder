@@ -600,13 +600,13 @@
     const offered7 = templates().filter((m) => m.capable({ socket: end7 })).map((m) => m.object_id);
     check("a 7 ft bridge offers only 7 ft towers",
       offered7.filter((id) => templates().find((m) => m.object_id === id).category === 0).sort(),
-      ["P-DSMT", "P-DST", "P-KT"]);
+      ["P-DSMT", "P-DST", "P-KT", "P-WT-7"]);
 
     // A bridge has no legs, so it cannot be the first thing in an empty yard.
     await reset();
     const offered = templates().filter((m) => m.capable()).map((m) => m.object_id);
     check("an empty yard offers only towers", offered.sort(), [
-      "P-DPT", "P-DSMT", "P-DST", "P-KT", "P-PT", "P-ST", "P-WT",
+      "P-DPT", "P-DSMT", "P-DST", "P-KT", "P-KT-5", "P-PT", "P-ST", "P-WT", "P-WT-7",
     ]);
   } catch (e) { fail("spanning suite", e); }
 
@@ -986,11 +986,64 @@
     await Item_clicked();
     check("swapping a beam takes its swings", built(), ["P-AB-4-8", "P-PT"]);
 
-    // A tower is the ground the design stands on, not a part in an opening.
+    // A tower is the ground the design stands on, not a part in an opening:
+    // it is offered the other towers, and swapped whole.
     await reset();
-    const lone = await placeFirst("P-PT");
+    const lone = await placeFirst("P-WT");
     Offer_replacements(lone);
-    check("a free-standing tower offers no replacement", replacing, null);
+    check("a free-standing tower is offered the towers", !!(replacing && replacing.tower), true);
+    check(
+      "and only towers",
+      Placeable_parts().map((p) => p.child.model.object_id).sort(),
+      ["P-DPT", "P-DSMT", "P-DST", "P-KT", "P-KT-5", "P-PT", "P-ST", "P-WT", "P-WT-7"]
+    );
+    // A part chosen for an opening while the tower is selected is placed,
+    // not swapped in for the tower.
+    const sky_beam = await place(socketFor(lone, "b8"), "P-AB-3-8");
+    await place(socketFor(sky_beam, "s"), "SS");
+    const sky_steps = await place(socketFor(lone, "6"), "P-STEP-5");
+    await place(socketFor(sky_steps, "handle"), "HR");
+    await place(socketFor(lone, "6"), "WS-10");
+    Offer_replacements(lone);
+    selected_object_id = "P-WT-7";
+    await Item_clicked();
+    normal();
+    check(
+      "swapping to 7 ft carries each part at the new height",
+      built(),
+      ["HR", "HR", "P-AB-3-10", "P-STEP-7", "P-WT-7", "SS"]
+    );
+    check("a part with no 7 ft version is named", document.getElementById("notice").textContent.includes("Wave Slide - 5ft"), true);
+    const sky7 = models_with_available_joints.find((m) => m.object_id === "P-WT-7");
+    check(
+      "the swing hangs from the new beam",
+      models_with_available_joints.find((m) => m.object_id === "SS").joints[0].connected.model.object_id,
+      "P-AB-3-10"
+    );
+    check("the new tower is left selected", !!replacing && replacing.model === sky7, true);
+    check("nothing is left behind", strayMeshes(), 0);
+    blueprint.undo();
+    check("one undo brings the old tower back", built(), ["HR", "HR", "P-AB-3-8", "P-STEP-5", "P-WT", "SS", "WS-10"]);
+
+    // Two towers over a bridge, both taken to 7 ft in turn: the bridge comes
+    // up with the second and meets both decks again.
+    await reset();
+    const left = await placeFirst("P-WT");
+    const bridge = await place(socketFor(left, "6"), "Bridge");
+    await place(socketFor(bridge, "deck"), "P-WT");
+    const right = models_with_available_joints.filter((m) => m.object_id === "P-WT").pop();
+    Offer_replacements(right);
+    selected_object_id = "P-WT-7";
+    await Item_clicked();
+    Offer_replacements(left);
+    selected_object_id = "P-WT-7";
+    await Item_clicked();
+    normal();
+    check(
+      "a bridge between two swapped towers meets both decks",
+      bridge.joints.map((j) => j.connected && j.connected.model.object_id).sort(),
+      ["P-WT-7", "P-WT-7"]
+    );
   } catch (e) { fail("replace suite", e); }
 
   // ————————————————————————————————————————————————— save and restore

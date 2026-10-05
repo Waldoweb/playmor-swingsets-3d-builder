@@ -293,6 +293,30 @@
         cursor: pointer;
         transition: bottom 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.15s ease, border-color 0.15s ease;
       }
+      /* What a tower swap had to leave off; goes by itself. */
+      #notice {
+        position: fixed;
+        top: 72px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1002;
+        max-width: min(560px, calc(100vw - 32px));
+        box-sizing: border-box;
+        padding: 10px 16px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+        color: #fff;
+        font-family: "Segoe UI", Arial, sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.4;
+        text-align: center;
+        pointer-events: none;
+      }
+      #notice[hidden] { display: none; }
       #size_chip[hidden] { display: none; }
       #size_chip.covered { visibility: hidden; }
       #size_chip:hover { background: rgba(30, 30, 30, 0.85); }
@@ -600,6 +624,10 @@
         font-weight: 600;
         cursor: pointer;
         white-space: nowrap;
+      }
+      .height-picker button.current {
+        border-color: rgba(206, 3, 12, 0.9);
+        background: rgba(206, 3, 12, 0.3);
       }
       .height-picker button:hover,
       .height-picker button:focus-visible {
@@ -1858,6 +1886,8 @@
       </div>
 
       <button id="size_chip" type="button" title="Show or hide the dimensions" aria-pressed="false" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17 17 3l4 4L7 21z"></path><path d="M7 13l2 2M10 10l2 2M13 7l2 2"></path></svg><span id="size_chip_text"></span></button>
+
+      <div id="notice" role="status" aria-live="polite" hidden></div>
 
       <div id="top_actions">
         <button class="cta" id="cta_quote" type="button" title="Send your design to PlayMor for a quote"><svg class="" viewBox="0 0 24 24" aria-hidden="true" ><path d="M4 6h16v12H4z"></path><path d="m4 7 8 6 8-6"></path></svg><span>Get a Quote</span></button>
@@ -6503,7 +6533,7 @@
        */
       const With_opening_free = (body) => {
         const freed = [];
-        if (replacing) {
+        if (replacing && replacing.socket) {
           // The whole opening, not just the joint the part hangs by. A socket
           // is one spot described by several joints, and filling one closes
           // the rest (Sync_sockets), so the twin has to be lent out too — or
@@ -6540,7 +6570,11 @@
       const Offer_replacements = (model) => {
         replacing = null;
 
-        if (model && !Is_free_standing(model)) {
+        // A tower is offered the other towers instead: choosing one swaps it
+        // in, with what hangs on it carried across (Swap_tower).
+        if (model && Is_free_standing(model)) {
+          replacing = { model, tower: true };
+        } else if (model) {
           const own = model.joints.find((joint) => joint.connected);
           if (own) {
             const host_joint = own.connected;
@@ -6566,6 +6600,16 @@
         const target = replacing;
         replacing = null;
         if (!target) return false;
+        if (target.tower) {
+          // The tower already standing there: nothing to do, and it stays
+          // selected.
+          if (target.model.object_id === objectId) {
+            replacing = target;
+            Highlight_item();
+            return false;
+          }
+          return Swap_tower(target.model, objectId);
+        }
 
         const template = Model.instances.find((m) => m.object_id === objectId);
         if (!template) return false;
@@ -6621,6 +6665,495 @@
         Show_items();
         Update_measurements();
         return true;
+      };
+
+      // ---------------------------------------------------- swapping a tower
+      /**
+       * The same part sold for another deck or beam height, told by name:
+       * "Steps - 4ft", "Steps - 5ft" and "Steps - 7ft" are one part at three
+       * heights, as are "3 Swing Beam - 8 ft" and "- 10 ft". Within a
+       * category, so nothing is mistaken for a part of another kind.
+       */
+      const Height_base = (object_id) => {
+        const info = objectMapping && objectMapping.objects[object_id];
+        if (!info || !info.name) return null;
+        const base = info.name.replace(/\s*-?\s*\d+\s*ft$/i, "");
+        return base === info.name ? null : info.category + "|" + base;
+      };
+      const Height_siblings = (object_id) => {
+        const base = Height_base(object_id);
+        if (!base) return [];
+        return Object.keys(objectMapping.objects).filter(
+          (id) => id !== object_id && Height_base(id) === base
+        );
+      };
+      const Template_for = (object_id) =>
+        Model.instances.find((model) => model.object_id === object_id) || null;
+
+      /**
+       * Which product goes on this opening in place of a part: the part
+       * itself if it fits, else the height of it that does -- a 5 ft slide
+       * on a 5 ft deck, its 7 ft self on a 7 ft one. Null if neither.
+       */
+      const Product_for = (model, plug_joint, host_joint) => {
+        const own = [plug_joint, ...model.joints.filter((joint) => joint !== plug_joint)];
+        if (own.some((joint) => Joints_connect(joint, host_joint))) return model.object_id;
+        for (const id of Height_siblings(model.object_id)) {
+          const template = Template_for(id);
+          if (template && template.template_joints().some((joint) => Joints_connect(joint, host_joint)))
+            return id;
+        }
+        return null;
+      };
+
+      /** Which way a joint faces across the yard, as a unit vector. */
+      const Joint_facing = (joint) => {
+        const angle = (joint.direction || 0) * 90 * Deg2Rad + joint.model.mesh.rotation.y;
+        return new THREE.Vector3(Math.sin(angle), 0, Math.cos(angle));
+      };
+
+      /**
+       * What hangs from a part, through it: everything reached by its
+       * connections without going back through `parent`. A route that
+       * reaches something standing on its own ground -- a bridge over to
+       * another tower -- makes the part a link rather than a rider.
+       */
+      const Riders = (model, parent) => {
+        const seen = new Set([model]);
+        const queue = [model];
+        let link = false;
+        while (queue.length) {
+          for (const joint of queue.shift().joints) {
+            const other = joint.connected && joint.connected.model;
+            if (!other || other === parent || seen.has(other)) continue;
+            if (Is_free_standing(other)) {
+              link = true;
+              continue;
+            }
+            seen.add(other);
+            queue.push(other);
+          }
+        }
+        seen.delete(model);
+        return { riders: [...seen], link };
+      };
+
+      const Unlist_model = (model) => {
+        let index = models_with_available_joints.indexOf(model);
+        if (index != -1) models_with_available_joints.splice(index, 1);
+        index = picked_meshes.indexOf(model.mesh);
+        if (index != -1) picked_meshes.splice(index, 1);
+      };
+      const List_model = (model) => {
+        if (!models_with_available_joints.includes(model)) models_with_available_joints.push(model);
+        if (!picked_meshes.includes(model.mesh)) picked_meshes.push(model.mesh);
+      };
+
+      /** Undo a connection from both ends. */
+      const Unhook = (joint) => {
+        const other = joint.connected;
+        joint.connected = null;
+        joint.available = true;
+        if (!other) return;
+        other.connected = null;
+        other.available = true;
+      };
+
+      /**
+       * Hang a part on an opening the way Attach_plug_to does -- the right
+       * swing length, turned to its host, joint on joint, connected -- but
+       * as one step of a larger change: no undo entry, no fittings.
+       */
+      const Hang_on = (model, plug, host) => {
+        const name = plug.name;
+        const index = plug.index;
+        if (Morph_to_fit(model, host)) plug = Find_saved_joint(model, name, index) || model.joints[0];
+        model.yaw = Joint_yaw(plug, host);
+        model.mesh.rotation.y = model.yaw * Deg2Rad;
+        Settle_on_joint(model, plug, host);
+        Connect_joints({ joint_1: host, joint_2: plug });
+        Settle_on_joint(model, plug, host);
+        List_model(model);
+        Sync_sockets();
+        return plug;
+      };
+
+      /**
+       * Take a part's riders along when it moves: each keeps where it was
+       * relative to the part, turned with it, still connected as it was.
+       */
+      const Carry_riders = (model, riders, from_position, from_turn) => {
+        const turn = model.mesh.rotation.y - from_turn;
+        for (const rider of riders) {
+          const offset = rider.mesh.position.clone().sub(from_position).applyAxisAngle(Y_AXIS, turn);
+          rider.mesh.position.copy(model.mesh.position).add(offset);
+          rider.mesh.rotation.y += turn;
+          rider.yaw = ((((rider.yaw || 0) + turn / Deg2Rad) % 360) + 360) % 360;
+          List_model(rider);
+        }
+      };
+
+      /**
+       * Put a different tower where the selected one stands, keeping what is
+       * on it.
+       *
+       * Each part goes to the new tower's opening that matches where it was:
+       * the same side, nearest along it -- a slide on the front stays on the
+       * front. A part made at another height becomes that height to suit the
+       * new deck: a 5 ft slide on a 7 ft tower is its 7 ft self, an 8 ft
+       * swing beam on a 10 ft mount the 10 ft beam, and what hangs on it
+       * moves over -- a step's handrails, a beam's swings. Toys go to the
+       * nearest toy mount. A part with nowhere to go, or no version at the
+       * new height, is left off, and the person is told which.
+       *
+       * A bridge or tunnel over to another tower holds the new tower to it,
+       * if the new tower's deck can meet it; otherwise it stays on the other
+       * tower. Without one the new tower stands where the old one did, turned
+       * whichever of the four ways keeps the most of what was on it, the way
+       * its own default faces first.
+       *
+       * One undo step.
+       */
+      const Swap_tower = async (old_tower, object_id) => {
+        const template = Template_for(object_id);
+        if (!old_tower || !template || old_tower.object_id === object_id) return false;
+        if (!Is_free_standing(template)) return false;
+
+        // What hangs straight off the tower, recorded before anything moves.
+        const hung = [];
+        for (const host of old_tower.joints) {
+          const plug = host.connected;
+          if (!plug || hung.some((h) => h.model === plug.model)) continue;
+          hung.push({
+            model: plug.model,
+            plug,
+            at: host.getWorldPosition(new THREE.Vector3()),
+            facing: Joint_facing(host),
+            toy: plug.layer === "toy",
+          });
+        }
+        for (const h of hung) Object.assign(h, Riders(h.model, old_tower));
+        // A part reached both ways moves with the first it is reached from.
+        const moving = new Set(hung.map((h) => h.model));
+        for (const h of hung) h.riders = h.riders.filter((rider) => !moving.has(rider));
+
+        // Geometry first, before anything is taken apart: the new tower and
+        // every other height of what hangs on the old one.
+        try {
+          await template.ensure_loaded();
+        } catch (error) {
+          console.warn(`Could not load ${object_id} to swap in`, error);
+          return false;
+        }
+        if (!template.mesh) return false;
+        const variants = new Set();
+        for (const h of hung) for (const id of Height_siblings(h.model.object_id)) variants.add(id);
+        await Promise.allSettled(
+          [...variants].map((id) => (Template_for(id) ? Template_for(id).ensure_loaded() : null))
+        );
+
+        blueprint.add_snapshot();
+
+        // Off the old tower.
+        for (const host of old_tower.joints) {
+          const plug = host.connected;
+          if (!plug) continue;
+          Unhook(host);
+          if (plug.model.mesh) Show_touched_fences({ joint: host, mesh: plug.model.mesh });
+        }
+        Remove_model(old_tower);
+        // Whatever moves is off the lists until it is hung again, so the fit
+        // test measures it where it lands, not where it was.
+        for (const h of hung) {
+          if (h.link) continue;
+          Unlist_model(h.model);
+          for (const rider of h.riders) Unlist_model(rider);
+        }
+
+        const tower = template.clone();
+        tower.ruf = old_tower.ruf;
+        tower.ruf_color = old_tower.ruf_color;
+        scene.add(tower.mesh);
+        applyDefaultColors(tower);
+        blueprint.applyVisualProperties(tower, {
+          flags: old_tower.get_flag_color_list(),
+          ruf: old_tower.ruf,
+          colorized: old_tower.colorized,
+          toy_color: old_tower.toy_color,
+          frame_color: old_tower.frame_color,
+          trim_color: old_tower.trim_color,
+        });
+        tower.mesh.position.copy(old_tower.mesh.position);
+        const Turn = (yaw) => {
+          tower.yaw = yaw;
+          tower.mesh.rotation.y = yaw * Deg2Rad;
+          tower.mesh.updateMatrixWorld(true);
+        };
+        Turn(old_tower.yaw || 0);
+
+        const left_off = [];
+        const name_of = (model) => getObjectInfoById(model.object_id).objectName || model.object_id;
+
+        // A span to another tower decides where this one stands.
+        let anchored = false;
+        for (const h of hung.filter((h) => h.link)) {
+          let plug = null;
+          if (!anchored) {
+            plug = Find_plug_joint_for(tower, h.plug);
+            if (plug) {
+              tower.yaw = Joint_yaw(plug, h.plug);
+              tower.mesh.rotation.y = tower.yaw * Deg2Rad;
+              Settle_on_joint(tower, plug, h.plug);
+              anchored = true;
+            }
+          } else {
+            // A second span: only if the deck happens to meet it.
+            const at = h.plug.getWorldPosition(new THREE.Vector3());
+            const there = new THREE.Vector3();
+            plug = tower.joints.find(
+              (joint) =>
+                joint.available &&
+                Joints_connect(joint, h.plug) &&
+                joint.getWorldPosition(there).distanceTo(at) < 0.05
+            );
+          }
+          if (plug) {
+            Connect_joints({ joint_1: h.plug, joint_2: plug });
+          } else {
+            left_off.push(name_of(h.model) + " (stays on the other tower)");
+          }
+        }
+        // Lifted to meet a span only while it meets one.
+        if (!anchored) tower.mesh.position.y = 0;
+        List_model(tower);
+        Sync_sockets();
+
+        const movers = hung.filter((h) => !h.link);
+        const Toy_sockets = () =>
+          tower.sockets().filter(
+            (socket) => Socket_is_open(socket) && socket.joints.some((joint) => joint.layer === "toy")
+          );
+        const Across = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
+        const there = new THREE.Vector3();
+
+        /** Every opening a part could take on the new tower, best first. */
+        const Choices = (h) => {
+          if (h.toy) {
+            // A mount of the toy's own kind, if there is one nearby: a scope
+            // to a scope mount, a wheel to a wheel's (see Toy_turned).
+            const kind = Toy_mount_kind(h.plug.name);
+            return Toy_sockets()
+              .map((socket) => ({
+                socket,
+                cost:
+                  Across(socket.joints[0].getWorldPosition(there), h.at) +
+                  (socket.joints.some((joint) => Toy_mount_kind(joint.name) === kind) ? 0 : 0.5),
+                same_side: true,
+              }))
+              .sort((a, b) => a.cost - b.cost);
+          }
+          const out = [];
+          for (const joint of tower.joints) {
+            if (!joint.available) continue;
+            const id = Product_for(h.model, h.plug, joint);
+            if (!id) continue;
+            joint.getWorldPosition(there);
+            const step = new THREE.Vector3(there.x - h.at.x, 0, there.z - h.at.z);
+            const along = step.dot(h.facing);
+            const sideways = step.addScaledVector(h.facing, -along).length();
+            const same_side = Joint_facing(joint).dot(h.facing) > 0.7;
+            out.push({
+              joint,
+              id,
+              same_side,
+              cost:
+                (same_side ? 0 : 5) +
+                sideways +
+                0.25 * Math.abs(along) +
+                (id === h.model.object_id ? 0 : 0.3),
+            });
+          }
+          return out.sort((a, b) => a.cost - b.cost);
+        };
+
+        // Which way round: the one that keeps the most on the side it was on.
+        if (!anchored && movers.length) {
+          const base =
+            ((((old_tower.yaw || 0) - Default_yaw(old_tower) + Default_yaw(tower)) % 360) + 360) % 360;
+          let best = null;
+          for (const quarter of [0, 180, 90, 270]) {
+            const yaw = (base + quarter) % 360;
+            Turn(yaw);
+            let score = 0;
+            for (const h of movers) {
+              const first = Choices(h)[0];
+              if (first) score += (h.toy ? 0.25 : 1) * (first.same_side ? 1 : 0.3);
+            }
+            if (!best || score > best.score + 1e-6) best = { yaw, score };
+          }
+          Turn(best.yaw);
+        } else if (!anchored) {
+          Turn(
+            ((((old_tower.yaw || 0) - Default_yaw(old_tower) + Default_yaw(tower)) % 360) + 360) % 360
+          );
+        }
+
+        // Moves a part, unchanged, onto an opening; its riders come along.
+        const Move_onto = (model, hint, host, riders) => {
+          const plug = [hint, ...model.joints].find(
+            (joint) => joint && Fits_at(joint, host, model)
+          );
+          if (!plug) return false;
+          const from_position = model.mesh.position.clone();
+          const from_turn = model.mesh.rotation.y;
+          Hang_on(model, plug, host);
+          Carry_riders(model, riders, from_position, from_turn);
+          return true;
+        };
+
+        // Puts the part's other height on an opening, and moves what hung
+        // on the old one across to the matching places on the new.
+        const Replace_onto = (h, id, host) => {
+          const fresh = Template_for(id).clone();
+          fresh.toy_color = h.model.toy_color;
+          fresh.trim_color = h.model.trim_color;
+          scene.add(fresh.mesh);
+          applyDefaultColors(fresh);
+          const plug = [fresh.joints.find((joint) => joint.name === h.plug.name), ...fresh.joints].find(
+            (joint) => joint && Fits_at(joint, host, fresh)
+          );
+          if (!plug) {
+            scene.remove(fresh.mesh);
+            return false;
+          }
+          Hang_on(fresh, plug, host);
+
+          const local = new THREE.Vector3();
+          for (const joint of h.model.joints) {
+            const child_plug = joint.connected;
+            if (!child_plug) continue;
+            const child = child_plug.model;
+            const where = h.model.mesh.worldToLocal(joint.getWorldPosition(new THREE.Vector3()));
+            const { riders } = Riders(child, h.model);
+            Unhook(joint);
+            // By name where the heights share one, else the opening of the
+            // right kind nearest the same spot on the part.
+            const options = fresh.joints
+              .filter(
+                (candidate) =>
+                  candidate.available &&
+                  Joints_connect(child_plug, candidate) &&
+                  Marker_rule(child_plug, candidate)
+              )
+              .map((candidate) => ({
+                candidate,
+                cost:
+                  (candidate.name === joint.name ? -1 : 0) +
+                  fresh.mesh.worldToLocal(candidate.getWorldPosition(local)).distanceTo(where),
+              }))
+              .sort((a, b) => a.cost - b.cost);
+            if (options.length) {
+              const from_position = child.mesh.position.clone();
+              const from_turn = child.mesh.rotation.y;
+              Hang_on(child, child_plug, options[0].candidate);
+              Carry_riders(child, riders, from_position, from_turn);
+            } else {
+              left_off.push(name_of(child));
+              for (const model of [child, ...riders]) scene.remove(model.mesh);
+            }
+          }
+          scene.remove(h.model.mesh);
+          return true;
+        };
+
+        // The big parts first, so a toy never takes the room a beam needs.
+        const ORDER = ["swing_beams", "towers", "floors_kits", "slides", "entries_climbers", "swings", "toys"];
+        const rank = (h) => {
+          const index = ORDER.indexOf(Category_of(h.model));
+          return index < 0 ? ORDER.length : index;
+        };
+        movers.sort((a, b) => rank(a) - rank(b));
+
+        for (const h of movers) {
+          let placed = false;
+          for (const choice of Choices(h)) {
+            if (h.toy) {
+              if (!Socket_is_open(choice.socket)) continue;
+              const mate = Find_mate_in_socket(h.model, choice.socket);
+              if (mate) placed = Move_onto(h.model, mate.plug_joint, mate.host_joint, h.riders);
+            } else {
+              if (!choice.joint.available) continue;
+              placed =
+                choice.id === h.model.object_id
+                  ? Move_onto(h.model, h.plug, choice.joint, h.riders)
+                  : Replace_onto(h, choice.id, choice.joint);
+            }
+            if (placed) break;
+          }
+          if (!placed) {
+            left_off.push(name_of(h.model));
+            for (const model of [h.model, ...h.riders]) scene.remove(model.mesh);
+          }
+        }
+
+        // A bridge or tunnel end left free joins a deck it now meets: swap
+        // both towers of a bridge to 7 ft in turn, and the second swap brings
+        // the bridge up to the first tower's new deck.
+        const end = new THREE.Vector3();
+        const near = new THREE.Vector3();
+        for (const span of models_with_available_joints) {
+          for (const free of span.joints) {
+            if (free.layer !== "deck" || free.connected) continue;
+            free.getWorldPosition(end);
+            let best = null;
+            let gap = 0.12;
+            for (const model of models_with_available_joints) {
+              if (model === span || !Is_free_standing(model)) continue;
+              for (const joint of model.joints) {
+                if (!joint.available || !Joints_connect(free, joint)) continue;
+                const distance = joint.getWorldPosition(near).distanceTo(end);
+                if (distance < gap) {
+                  gap = distance;
+                  best = joint;
+                }
+              }
+            }
+            if (best) Connect_joints({ joint_1: best, joint_2: free });
+          }
+        }
+
+        Sync_sockets();
+        plug_model = null;
+        plug_joint = null;
+        plug_joint_index = -1;
+        Mode.mode = Mode.normal;
+
+        // The new tower stays selected, so the next one can be tried straight
+        // away.
+        Deselect_all();
+        tower.selected = true;
+        picked_mesh = tower.mesh;
+        Offer_replacements(tower);
+        Show_unified_popup();
+        Update_measurements();
+
+        if (left_off.length) {
+          Show_notice(
+            "Not carried over to the " + name_of(tower) + ": " + left_off.join(", ") + "."
+          );
+        }
+        return true;
+      };
+
+      /** A line of news at the top of the screen that goes by itself. */
+      let notice_timer = null;
+      const Show_notice = (text) => {
+        const notice = document.getElementById("notice");
+        if (!notice) return;
+        notice.textContent = text;
+        notice.hidden = false;
+        clearTimeout(notice_timer);
+        notice_timer = setTimeout(() => (notice.hidden = true), 7000);
       };
 
       /**
@@ -8833,6 +9366,17 @@
       };
 
       const Place_clicked_item = async (args) => {
+        // A selected tower is only ever swapped for another tower; anything
+        // else is an ordinary placement, and the selection lapses.
+        if (
+          replacing &&
+          replacing.tower &&
+          selected_object_id &&
+          !Is_free_standing(Template_for(selected_object_id))
+        ) {
+          replacing = null;
+        }
+
         // A part is selected, so this click means "put that there instead".
         if (replacing) {
           const objectId =
@@ -9977,11 +10521,14 @@
         // filled, and asking what fits a full socket answers "nothing" --
         // which blanked the strip for a frame and, worse, looked exactly like
         // every category having emptied at once.
-        const constraint = replacing
+        const constraint = replacing && replacing.socket
           ? { socket: replacing.socket }
           : selected_socket && Socket_is_open(selected_socket)
           ? { socket: selected_socket }
           : undefined;
+        // A selected tower is offered the towers it could become.
+        const offers = (model) =>
+          replacing && replacing.tower ? Is_free_standing(model) : model.capable(constraint);
 
         With_opening_free(() => {
           let category_index_i = 0;
@@ -9990,7 +10537,7 @@
             let child_index = 0;
             for (const child of category.children) {
               child.index = child_index++;
-              if (child.model && child.model.capable(constraint)) {
+              if (child.model && offers(child.model)) {
                 parts.push({
                   child,
                   category_index: category_index_i,
@@ -10293,9 +10840,13 @@
 
       const Highlight_item = function () {
         $(".part-tile").removeClass("selected");
-        if (selected_object_id) {
-          $('.part-tile[data-object-id="' + selected_object_id + '"]').addClass("selected");
-          $('.part-tile[data-members~="' + selected_object_id + '"]').addClass("selected");
+        // With a tower selected, the strip is the towers it could become,
+        // and its own tile is the one lit.
+        const id =
+          selected_object_id || (replacing && replacing.tower ? replacing.model.object_id : null);
+        if (id) {
+          $('.part-tile[data-object-id="' + id + '"]').addClass("selected");
+          $('.part-tile[data-members~="' + id + '"]').addClass("selected");
         }
       };
 
@@ -10351,13 +10902,16 @@
         const picker = document.createElement("div");
         picker.className = "height-picker";
         picker.setAttribute("role", "menu");
+        const current = replacing && replacing.tower ? replacing.model.object_id : null;
         picker.innerHTML =
           '<div class="height-picker-title">Deck height</div>' +
           members
             .map((id) => {
               const info = objectMapping.objects[id] || {};
               return (
-                '<button type="button" role="menuitem" data-object-id="' +
+                '<button type="button" role="menuitem"' +
+                (id === current ? ' class="current" aria-current="true"' : "") +
+                ' data-object-id="' +
                 Escape_html(id) +
                 '">' +
                 Escape_html(info.option || info.name || id) +
