@@ -5708,7 +5708,82 @@
               }
             }
           }
+          Fit_top_posts(model);
         }
+      };
+      /**
+       * Stretch a gang plank's top posts up to the rail over its opening.
+       *
+       * The posts at the plank's top end stand against the tower's floor
+       * frame and run up to the top of the rail board over the opening
+       * (Weldon, 2026-10-06). That rail is at a different height on every
+       * tower -- its underside from 2.09 to 2.24 over a 5 ft deck -- so the
+       * model draws them only as tall as they always need to be, as a node of
+       * their own (`top_posts`, made by tools/gangplank.py, whose extras say
+       * where they stand), and this finds the rail and stretches the node.
+       *
+       * One ray straight down, just behind each post, from well above the
+       * rail: the first thing it meets on the tower is the rail's top. The
+       * fence boards in the opening are hidden by then and not counted. Worked
+       * out again only when the plank or its tower has moved or changed.
+       */
+      const Fit_top_posts = (model) => {
+        if (model.top_posts === undefined) {
+          model.top_posts = null;
+          model.mesh.traverse((node) => {
+            if (!model.top_posts && node.name === "top_posts" && node.isMesh) model.top_posts = node;
+          });
+        }
+        const posts = model.top_posts;
+        if (!posts) return;
+
+        const mine = model.joints.find((joint) => joint.connected);
+        const host = mine && mine.connected.model;
+        if (!host || !host.mesh) {
+          posts.scale.y = 1;
+          model.top_posts_key = null;
+          return;
+        }
+        model.mesh.updateMatrixWorld(true);
+        host.mesh.updateMatrixWorld(true);
+        const key = host.mesh.uuid + ":" + mine.connected.name + ":" +
+          model.mesh.matrixWorld.elements.concat(host.mesh.matrixWorld.elements)
+            .map((value) => value.toFixed(4)).join(",");
+        if (key === model.top_posts_key) return;
+        model.top_posts_key = key;
+
+        if (!posts.geometry.boundingBox) posts.geometry.computeBoundingBox();
+        const drawn = posts.geometry.boundingBox.max.y;
+        const { post_face, post_x, post_deck } = posts.userData;
+        const space = posts.parent;
+        // Hidden inside the tower, as the opening's fence boards are. The
+        // tower's own root is hidden between frames (Render shows it only to
+        // draw), so the search stops short of it.
+        const shown = (object) => {
+          for (let node = object; node && node !== host.mesh; node = node.parent)
+            if (node.visible === false) return false;
+          return true;
+        };
+        // Most towers' rail is flush with the floor frame the posts stand on;
+        // the King's Tower 5 ft's back is 3 cm deeper, so step back to it.
+        let top = null;
+        for (const side of [-1, 1]) {
+          for (const back of [0.012, 0.03, 0.05]) {
+            const at = (y) => space.localToWorld(new THREE.Vector3(side * post_x, y, post_face - back));
+            const from = at(post_deck + 0.95), to = at(post_deck + 0.35);
+            const ray = new THREE.Raycaster(from, to.clone().sub(from).normalize(), 0, from.distanceTo(to));
+            const hit = ray
+              .intersectObject(host.mesh, true)
+              .find((h) => shown(h.object) && !h.object.name.toLowerCase().startsWith("joint"));
+            if (!hit) continue;
+            const y = space.worldToLocal(hit.point.clone()).y;
+            top = top === null ? y : Math.max(top, y);
+            break;
+          }
+        }
+        // Nothing found, or something too low to be the rail: as drawn.
+        const foot = posts.position.y;
+        posts.scale.y = top !== null && top - foot > drawn ? (top - foot) / drawn : 1;
       };
       const Connect_joints = (args) => {
         let host_joint = args.joint_1;

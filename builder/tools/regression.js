@@ -1597,6 +1597,50 @@
     await reset();
   } catch (e) { fail("heights suite", e); }
 
+  // ————————————————————————————————————————————————— gang planks
+
+  try {
+    suite("gang planks");
+
+    // The top of the plank is level with the deck and its top posts stand
+    // against the floor frame up to the top of the rail over the opening
+    // (Weldon, 2026-10-06). The rail is at a different height on each tower,
+    // so Fit_top_posts stretches the posts to it once the plank is on.
+    const topOf = (plank) => {
+      const posts = plank.top_posts;
+      if (!posts.geometry.boundingBox) posts.geometry.computeBoundingBox();
+      return posts.position.y + posts.geometry.boundingBox.max.y * posts.scale.y;
+    };
+    for (const [towerId, plankId, jointName, railTop] of [
+      ["P-PT", "P-GP-12", "joint,1,6", 2.339],
+      ["P-WT", "P-GP-12", "joint,1,6,4,5", 2.253],
+      ["P-DPT", "P-GP-10", "joint,1,5", 2.020],
+    ]) {
+      await reset();
+      const tower = await placeFirst(towerId);
+      const socket = tower.sockets().find((s) => Socket_is_open(s) && s.joints.some((j) => j.name === jointName));
+      const plank = await place(socket, plankId);
+      check(`${plankId} goes on the ${towerId}`, !!plank, true);
+      if (!plank) continue;
+      check(`${plankId} has its top posts`, !!plank.top_posts, true);
+      check(`its top posts reach the ${towerId}'s rail`, +topOf(plank).toFixed(2), +railTop.toFixed(2));
+    }
+
+    // A saved design comes back with its posts fitted, and a tower swapped
+    // under the plank refits them to the new tower's rail.
+    await reset();
+    const tower = await placeFirst("P-PT");
+    await place(tower.sockets().find((s) => Socket_is_open(s) && s.joints.some((j) => j.name === "joint,1,6")), "P-GP-12");
+    const saved = blueprint.get_snapshot();
+    await blueprint.restore({ state: saved.state || saved });
+    let plank = models_with_available_joints.find((m) => m.object_id === "P-GP-12");
+    check("restored, the posts still reach the rail", plank && +topOf(plank).toFixed(2), 2.34);
+    await Swap_tower(models_with_available_joints.find((m) => m.object_id === "P-PT"), "P-WT");
+    plank = models_with_available_joints.find((m) => m.object_id === "P-GP-12");
+    check("on a swapped-in Sky Tower, they reach its rail", plank && +topOf(plank).toFixed(2), 2.25);
+    await reset();
+  } catch (e) { fail("gang planks suite", e); }
+
   // ————————————————————————————————————————————————— state hygiene
 
   try {
