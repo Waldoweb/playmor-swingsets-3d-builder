@@ -43,9 +43,9 @@ OUT_DIR = "textures"
 
 # asset index -> (name, target longest edge or None to keep, output format)
 PLAN = {
-    0: ("mulch_border_h", None, "webp"),
-    1: ("mulch_border_v", None, "webp"),
-    2: ("mulch_border_pink", 512, "webp"),   # was 1000x750, non-POT
+    # 0-2 were the mulch border's pictures (mulch_border_h, _v, _pink). Both
+    # borders have been drawn in code since 2026-10-06 (index.html,
+    # Stone_border and Rubber_border), so those files are gone.
     3: ("mulch_tar", None, "webp"),
     4: ("mulch_blue", None, "webp"),
     5: ("joint_ring", None, "keep"),         # sprite strip; do not touch
