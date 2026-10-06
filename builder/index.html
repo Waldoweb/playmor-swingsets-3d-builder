@@ -3930,59 +3930,20 @@
       /**
        * The Rubber Safety Border: 4" x 4" recycled-rubber curb, brown with
        * light flecks, its top edges rounded (Weldon, 2026-10-06, with
-       * PlayMor's photo). It comes in lengths whose ends are stepped -- the
-       * top half cut back, the bottom half run on as a tongue -- so laid end
-       * to end each joint laps the next and shows a Z-shaped seam.
-       *
-       * A run is those lengths end to end, each made of a top and a bottom
-       * half, the bottoms set along by the lap, everything cut off square at
-       * the run's two ends.
+       * PlayMor's photo). It comes in lapped lengths, but laid end to end
+       * they read as one curb, so each side is drawn as one solid bar with
+       * no seams (Weldon: no gaps between the sections), capped at the ends.
        */
       const Rubber_border = (() => {
         const SIZE = 0.1016; // 4" square
-        const LENGTH = 1.2192; // a 4 ft length
-        const LAP = 0.12; // how far the tongue runs past the top half
-        const SPLIT = SIZE / 2; // where the top half sits on the tongue
         const ROUND = 0.012;
-        const SEAM = 0.003;
-
-        /**
-         * A straight bar from x0 to x1 of the given cross-section, as
-         * outlined anticlockwise in (z, y) with a normal at each point; a
-         * point listed twice with two normals is a sharp edge. The ends are
-         * capped flat.
-         */
-        const bar = (out, x0, x1, outline) => {
-          const base = out.position.length / 3;
-          for (const x of [x0, x1])
-            for (const [z, y, nz, ny] of outline) {
-              out.position.push(x, y, z);
-              out.normal.push(0, ny, nz);
-              // Metres along, and up the sides or across the top.
-              out.uv.push(x, y + z * Math.abs(ny));
-            }
-          const n = outline.length;
-          for (let i = 0; i < n - 1; i++) {
-            const a = base + i, b = base + i + 1, c = base + n + i + 1, d = base + n + i;
-            // Facing out of the outline, which runs anticlockwise seen from +x.
-            out.index.push(a, d, c, a, c, b);
-          }
-          for (const [x, facing] of [[x0, -1], [x1, 1]]) {
-            const start = out.position.length / 3;
-            for (const [z, y] of outline) {
-              out.position.push(x, y, z);
-              out.normal.push(facing, 0, 0);
-              out.uv.push(z, y);
-            }
-            for (let i = 1; i < n - 1; i++)
-              out.index.push(...(facing > 0 ? [start, start + i, start + i + 1] : [start, start + i + 1, start + i]));
-          }
-        };
-
-        // The top half: square below, its two top edges rounded.
         const half = SIZE / 2;
-        const top_outline = (() => {
-          const pts = [[half, SPLIT, 1, 0]];
+
+        // The cross-section in (z, y), from the foot of one side, up and over
+        // the rounded top, down to the foot of the other, with a normal at
+        // each point; a point listed twice with two normals is a sharp edge.
+        const outline = (() => {
+          const pts = [[half, 0, 1, 0]];
           for (let i = 0; i <= 4; i++) {
             const a = (Math.PI / 2) * (i / 4);
             pts.push([half - ROUND + ROUND * Math.cos(a), SIZE - ROUND + ROUND * Math.sin(a), Math.cos(a), Math.sin(a)]);
@@ -3991,35 +3952,43 @@
             const a = Math.PI / 2 + (Math.PI / 2) * (i / 4);
             pts.push([-half + ROUND + ROUND * Math.cos(a), SIZE - ROUND + ROUND * Math.sin(a), Math.cos(a), Math.sin(a)]);
           }
-          pts.push([-half, SPLIT, -1, 0]);
+          pts.push([-half, 0, -1, 0]);
           return pts;
         })();
-        // The tongue: square, its top seen only in the seams.
-        const bottom_outline = [
-          [half, 0, 1, 0], [half, SPLIT, 1, 0],
-          [half, SPLIT, 0, 1], [-half, SPLIT, 0, 1],
-          [-half, SPLIT, -1, 0], [-half, 0, -1, 0],
-        ];
 
+        /** One straight run `length` long, along x, centred, on y = 0. */
         const run = (length) => {
-          const out = { position: [], normal: [], uv: [], index: [] };
-          const lo = -length / 2, hi = length / 2;
-          const piece = (a, b, outline) => {
-            a = Math.max(a, lo);
-            b = Math.min(b, hi);
-            if (b - a > 0.002) bar(out, a, b, outline);
-          };
-          const count = Math.ceil(length / LENGTH) + 1;
-          for (let k = -1; k < count; k++) {
-            const start = lo + k * LENGTH;
-            piece(start + (k ? SEAM / 2 : 0), start + LENGTH - SEAM / 2, top_outline);
-            piece(start + LAP + SEAM / 2, start + LENGTH + LAP - SEAM / 2, bottom_outline);
+          const position = [], normal = [], uv = [], index = [];
+          const x0 = -length / 2, x1 = length / 2;
+          const n = outline.length;
+          for (const x of [x0, x1])
+            for (const [z, y, nz, ny] of outline) {
+              position.push(x, y, z);
+              normal.push(0, ny, nz);
+              // Metres along, and up the sides or across the top.
+              uv.push(x, y + z * Math.abs(ny));
+            }
+          for (let i = 0; i < n - 1; i++) {
+            const a = i, b = i + 1, c = n + i + 1, d = n + i;
+            index.push(a, d, c, a, c, b);
+          }
+          // The ends: a fan over the section, each facing out along the run.
+          // Seen from +x the outline runs clockwise (+z is to the left).
+          for (const [x, facing] of [[x0, -1], [x1, 1]]) {
+            const start = position.length / 3;
+            for (const [z, y] of outline) {
+              position.push(x, y, z);
+              normal.push(facing, 0, 0);
+              uv.push(z, y);
+            }
+            for (let i = 1; i < n - 1; i++)
+              index.push(...(facing > 0 ? [start, start + i + 1, start + i] : [start, start + i, start + i + 1]));
           }
           const geometry = new THREE.BufferGeometry();
-          geometry.setAttribute("position", new THREE.Float32BufferAttribute(out.position, 3));
-          geometry.setAttribute("normal", new THREE.Float32BufferAttribute(out.normal, 3));
-          geometry.setAttribute("uv", new THREE.Float32BufferAttribute(out.uv, 2));
-          geometry.setIndex(out.index);
+          geometry.setAttribute("position", new THREE.Float32BufferAttribute(position, 3));
+          geometry.setAttribute("normal", new THREE.Float32BufferAttribute(normal, 3));
+          geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+          geometry.setIndex(index);
           return geometry;
         };
 
